@@ -37,7 +37,7 @@ public class MemberRepositoryTest {
         // given -> 데이터
         Optional<Members> member = membersRepository.findById(1L);
         // when -> 증명하고 싶은 메서드
-        // then -> 증명
+        // then -> 증명 과정
         Assertions.assertThat(1L).isEqualTo(member.get().getId());
     }
 }
