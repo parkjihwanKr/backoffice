@@ -23,7 +23,7 @@ public class MemberRepositoryTest {
     void setUp(){
         Members member = Members.builder()
                 .id(1L)
-                .username("notLoginMember")
+                .memberName("notLoginMember")
                 .password("12341234")
                 .email("test1@naver.com")
                 .build();
