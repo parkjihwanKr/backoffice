@@ -9,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Member;
-
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -54,5 +52,11 @@ public class MembersController {
         MembersResponseDto.UpdateMemberRoleResponseDto responseDto =
                 membersService.updateMemberRole(memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping("/members/{meberId}")
+    public void deleteMember(
+            @PathVariable long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        membersService.deleteMember(memberId, memberDetails.getMembers());
     }
 }

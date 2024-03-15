@@ -19,4 +19,6 @@ public interface MembersService {
 
     public MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
             Long memberId, Members member, MembersRequestDto.UpdateMemberRoleRequestDto requestDto);
+
+    public void deleteMember(Long memberId, Members member);
 }

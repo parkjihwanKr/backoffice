@@ -75,6 +75,16 @@ public class MembersServiceImpl implements MembersService{
         membersRepository.save(updateMember);
         return MembersResponseDto.UpdateMemberRoleResponseDto.of(member);
     }
+
+    @Override
+    @Transactional
+    public void deleteMember(Long memberId, Members loginMember){
+        if(memberId.equals(loginMember.getId())){
+            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER);
+        }
+        membersRepository.deleteById(memberId);
+    }
+
     // 해당 MemberId 찾기
     @Transactional(readOnly = true)
     public Members findById(Long memberId){
