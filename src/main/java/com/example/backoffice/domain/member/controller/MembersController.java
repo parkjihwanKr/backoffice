@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -54,6 +55,14 @@ public class MembersController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @PatchMapping("/members/{memberId}/profileImage")
+    public ResponseEntity<MembersResponseDto.UpdateMemberProfileImageUrlResponseDto> updateProfileUrl(
+            @PathVariable long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            MultipartFile image){
+        MembersResponseDto.UpdateMemberProfileImageUrlResponseDto responseDto =
+                membersService.updateMemberProfileImageUrl(memberId, memberDetails.getMembers(), image);
+        return ResponseEntity.ok(responseDto);
+    }
     @DeleteMapping("/members/{meberId}")
     public void deleteMember(
             @PathVariable long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){

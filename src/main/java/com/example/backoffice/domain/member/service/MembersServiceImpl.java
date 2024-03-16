@@ -10,6 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +30,6 @@ public class MembersServiceImpl implements MembersService{
         if(requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
-
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
         Members member = MembersRequestDto.CreateMembersRequestDto.from(requestDto, bCrytPassword);
         membersRepository.save(member);
@@ -74,6 +77,46 @@ public class MembersServiceImpl implements MembersService{
         updateMember.updateRole(requestDto.getRole());
         membersRepository.save(updateMember);
         return MembersResponseDto.UpdateMemberRoleResponseDto.of(member);
+    }
+
+    // 프로필 이미지 업로드
+    @Override
+    @Transactional
+    public MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateMemberProfileImageUrl(
+            Long memberId, Members member, MultipartFile image){
+        findMember(member, memberId);
+        if (Objects.requireNonNull(image.getOriginalFilename()).isBlank()) {
+            throw new MembersCustomException(MembersExceptionCode.NOT_BLANK_IMAGE_FILE);
+        }
+        List<String> extension = List.of("jpg","jpeg","png");
+
+        // 확장자 구분
+        String[] fileNameArray = image.getOriginalFilename().split(".");
+        for(int i = 0; i<extension.size(); i++){
+            if(fileNameArray[1].equals(extension.get(i))){
+                break;
+            }else if(!fileNameArray[1].equals(extension.get(i)) && i == extension.size()-1){
+                throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_IMAGE_FILE);
+            }
+        }
+
+        // fix #3 IOExcpetion에 대한 예외 처리 필요
+        UUID uuid = UUID.randomUUID();
+        String originalFilename = image.getOriginalFilename();
+        String uuidProfileImageUrl = uuid+"_"+originalFilename;
+        member.updateProfileImage(uuidProfileImageUrl);
+
+        membersRepository.save(member);
+        return MembersResponseDto.UpdateMemberProfileImageUrlResponseDto.of(member);
+    }
+
+    // 프로필 이미지 삭제
+    @Override
+    @Transactional
+    public void deleteMemberProfileImageUrl(
+            Long memberId, Members member){
+        findMember(member, memberId);
+        membersRepository.deleteProfileImageUrl(memberId);
     }
 
     @Override

@@ -67,4 +67,14 @@ public class MembersRequestDto {
         private String passwordConfirm;
         private MemberRole role;
     }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateMemberProfileImageUrlRequestDto {
+        private String password;
+        private String passwordConfirm;
+        private String profileImageUrl;
+    }
 }

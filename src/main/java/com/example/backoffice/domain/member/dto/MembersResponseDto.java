@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 public class MembersResponseDto {
 
     @Builder
@@ -76,6 +78,28 @@ public class MembersResponseDto {
         public static UpdateMemberRoleResponseDto of(Members member){
             return UpdateMemberRoleResponseDto.builder()
                     .role(member.getRole())
+                    .build();
+        }
+    }
+
+    @Builder
+    public static class UpdateMemberProfileImageUrlResponseDto{
+        private String profileImageUrl;
+
+        public static UpdateMemberProfileImageUrlResponseDto of(Members member){
+            return UpdateMemberProfileImageUrlResponseDto.builder()
+                    .profileImageUrl(member.getProfileImageUrl())
+                    .build();
+        }
+    }
+
+    @Builder
+    public static class DeleteMemberProfileImageUrlResponseDto{
+        private String profileImageUrl;
+
+        public static DeleteMemberProfileImageUrlResponseDto of(Members member){
+            return DeleteMemberProfileImageUrlResponseDto.builder()
+                    .profileImageUrl(member.getProfileImageUrl())
                     .build();
         }
     }

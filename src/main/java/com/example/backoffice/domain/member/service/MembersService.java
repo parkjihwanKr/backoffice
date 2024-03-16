@@ -3,22 +3,29 @@ package com.example.backoffice.domain.member.service;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface MembersService {
 
-    public MembersResponseDto.CreateMembersResponseDto signup(
+    MembersResponseDto.CreateMembersResponseDto signup(
             MembersRequestDto.CreateMembersRequestDto requestDto);
 
-    public void login(MembersRequestDto.LoginMemberRequestDto requestDto);
+    void login(MembersRequestDto.LoginMemberRequestDto requestDto);
 
-    public MembersResponseDto.ReadMemberResponseDto readMemberInfo(
+    MembersResponseDto.ReadMemberResponseDto readMemberInfo(
             Long memberId, Members member);
 
-    public MembersResponseDto.UpdateMemberResponseDto updateMember(
+    MembersResponseDto.UpdateMemberResponseDto updateMember(
             Long memberId,  Members Member, MembersRequestDto.UpdateMemberRequestDto requestDto);
 
-    public MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
+    MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
             Long memberId, Members member, MembersRequestDto.UpdateMemberRoleRequestDto requestDto);
 
-    public void deleteMember(Long memberId, Members member);
+    void deleteMember(Long memberId, Members member);
+
+    MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateMemberProfileImageUrl(
+            Long memberId, Members member, MultipartFile image);
+
+    void deleteMemberProfileImageUrl(
+            Long memberId, Members member);
 }
