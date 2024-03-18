@@ -1,4 +1,3 @@
-
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -21,8 +20,24 @@ spring:
       repositories:
         enabled: false
       host: ${REDIS_HOST}
-      port: ${REDIS_PORT} #6379
+      port: ${REDIS_PORT}
 
 # jwt token secret key
 jwt:
   secret: ${JWT_SECRET}
+
+logging:
+  level:
+    org.springframework.security: ERROR
+
+cloud:
+  aws:
+    s3:
+      bucket: ${YOUR_BUCKET_NAME}
+    stack:
+      auto: false
+    region:
+      static: ${YOUR_REGION}
+    credentials:
+      accessKey: ${YOUR_ACCESSKEY}
+      secretKey: ${YOUR_SECRETKEY}

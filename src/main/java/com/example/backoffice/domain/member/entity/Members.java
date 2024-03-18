@@ -1,14 +1,18 @@
 package com.example.backoffice.domain.member.entity;
 
+import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
+@Table(name = "members")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Members extends CommonEntity {
@@ -35,6 +39,8 @@ public class Members extends CommonEntity {
 
     private String contact;
 
+    private String profileImageUrl;
+
     public void updateMemberInfo(MembersRequestDto.UpdateMemberRequestDto requestDto, String bCrytPassword){
         this.memberName = requestDto.getMemberName();
         this.password = bCrytPassword;
@@ -45,5 +51,9 @@ public class Members extends CommonEntity {
 
     public void updateRole(MemberRole role){
         this.role = role;
+    }
+
+    public void updateProfileImage(String profileImageUrl){
+        this.profileImageUrl = profileImageUrl;
     }
 }
