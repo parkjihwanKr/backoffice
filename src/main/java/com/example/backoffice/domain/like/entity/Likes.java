@@ -1,10 +1,8 @@
 package com.example.backoffice.domain.like.entity;
 
+import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.global.common.CommonEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,4 +19,9 @@ public class Likes extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "board_id")
+    private Boards board;
+
+    private Long count;
 }
