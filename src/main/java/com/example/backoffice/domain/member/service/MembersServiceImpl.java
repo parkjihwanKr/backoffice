@@ -30,7 +30,7 @@ public class MembersServiceImpl implements MembersService{
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
-        Members member = MembersRequestDto.CreateMembersRequestDto.from(requestDto, bCrytPassword);
+        Members member = requestDto.toEntity(bCrytPassword);
         membersRepository.save(member);
         return MembersResponseDto.CreateMembersResponseDto.from(member);
     }

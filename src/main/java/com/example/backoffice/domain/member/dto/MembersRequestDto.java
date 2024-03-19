@@ -23,14 +23,15 @@ public class MembersRequestDto {
         private String passwordConfirm;
         private String contact;
 
-        public static Members from(CreateMembersRequestDto requestDto, String bCrytPassword){
+        public Members toEntity(String bcryptPassword) {
             return Members.builder()
-                    .memberName(requestDto.getMemberName())
-                    .role(MemberRole.USER)
-                    .email(requestDto.getEmail())
-                    .address(requestDto.getAddress())
-                    .password(bCrytPassword)
-                    .contact(requestDto.getContact())
+                    .memberName(this.memberName)
+                    .name(this.name) // 이름을 name으로 설정하는 것이 맞는지 확인
+                    .role(this.role) // 역할 설정, MemberRole.USER 또는 직접 설정
+                    .email(this.email)
+                    .address(this.address)
+                    .password(bcryptPassword) // 암호화된 비밀번호 사용
+                    .contact(this.contact)
                     .build();
         }
     }
