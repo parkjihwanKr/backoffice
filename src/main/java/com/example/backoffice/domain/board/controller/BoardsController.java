@@ -35,11 +35,12 @@ public class BoardsController {
 
     // 게시글 게시
     @PostMapping("/boards/{boardId}")
-    public ResponseEntity<BoardsResponseDto> createPost(
+    public ResponseEntity<BoardsResponseDto.CreateBoardResponseDto> createPost(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody BoardsRequestDto requestDto){
-
-        return null;
+            @RequestBody BoardsRequestDto.CreateBoardRequestDto requestDto){
+        BoardsResponseDto.CreateBoardResponseDto responseDto =
+                boardsService.createPost(boardId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     // 게시글 수정

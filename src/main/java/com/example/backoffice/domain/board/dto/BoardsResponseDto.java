@@ -3,6 +3,7 @@ package com.example.backoffice.domain.board.dto;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.image.entity.Images;
+import com.example.backoffice.domain.like.entity.Likes;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -58,6 +59,27 @@ public class BoardsResponseDto {
                     .content(board.getContent())
                     .commentList(board.getCommentList())
                     .imageList(board.getImageList())
+                    .build();
+        }
+    }
+    @Builder
+    public static class CreateBoardResponseDto {
+        private String writer;
+        private String title;
+        private String content;
+        private List<Images> imageList;
+        private List<Comments> commentList;
+        private Integer likeCount;
+        private LocalDateTime createdAt;
+        public static CreateBoardResponseDto from(Boards board){
+            return CreateBoardResponseDto.builder()
+                    .writer(board.getMember().getMemberName())
+                    .title(board.getTitle())
+                    .content(board.getContent())
+                    .imageList(board.getImageList())
+                    .commentList(board.getCommentList())
+                    .likeCount(board.getLikeList().size())
+                    .createdAt(board.getCreatedAt())
                     .build();
         }
     }
