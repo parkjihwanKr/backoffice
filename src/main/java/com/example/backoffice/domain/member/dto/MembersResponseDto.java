@@ -21,7 +21,7 @@ public class MembersResponseDto {
         private String contact;
         private String address;
 
-        public static CreateMembersResponseDto of(Members member){
+        public static CreateMembersResponseDto from(Members member){
             return CreateMembersResponseDto.builder()
                     .email(member.getEmail())
                     .memberName(member.getMemberName())
@@ -39,7 +39,7 @@ public class MembersResponseDto {
         private String email;
         private String address;
 
-        public static ReadMemberResponseDto of(Members member){
+        public static ReadMemberResponseDto from(Members member){
             return ReadMemberResponseDto.builder()
                     .email(member.getEmail())
                     .address(member.getAddress())
@@ -57,7 +57,7 @@ public class MembersResponseDto {
         private String contact;
         private String address;
 
-        public static UpdateMemberResponseDto of(Members member){
+        public static UpdateMemberResponseDto from(Members member){
             return UpdateMemberResponseDto.builder()
                     .memberName(member.getMemberName())
                     .username(member.getName())
@@ -75,7 +75,7 @@ public class MembersResponseDto {
     public static class UpdateMemberRoleResponseDto{
         private MemberRole role;
 
-        public static UpdateMemberRoleResponseDto of(Members member){
+        public static UpdateMemberRoleResponseDto from(Members member){
             return UpdateMemberRoleResponseDto.builder()
                     .role(member.getRole())
                     .build();
@@ -86,7 +86,7 @@ public class MembersResponseDto {
     public static class UpdateMemberProfileImageUrlResponseDto{
         private String profileImageUrl;
 
-        public static UpdateMemberProfileImageUrlResponseDto of(Members member){
+        public static UpdateMemberProfileImageUrlResponseDto from(Members member){
             return UpdateMemberProfileImageUrlResponseDto.builder()
                     .profileImageUrl(member.getProfileImageUrl())
                     .build();

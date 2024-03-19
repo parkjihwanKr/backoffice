@@ -32,7 +32,7 @@ public class MembersServiceImpl implements MembersService{
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
         Members member = MembersRequestDto.CreateMembersRequestDto.from(requestDto, bCrytPassword);
         membersRepository.save(member);
-        return MembersResponseDto.CreateMembersResponseDto.of(member);
+        return MembersResponseDto.CreateMembersResponseDto.from(member);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MembersServiceImpl implements MembersService{
     public MembersResponseDto.ReadMemberResponseDto readMemberInfo(
             Long memberId, Members member){
         Members matchedMember = findMember(member, memberId);
-        return MembersResponseDto.ReadMemberResponseDto.of(matchedMember);
+        return MembersResponseDto.ReadMemberResponseDto.from(matchedMember);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class MembersServiceImpl implements MembersService{
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
         member.updateMemberInfo(requestDto, bCrytPassword);
         Members updateMember = membersRepository.save(member);
-        return MembersResponseDto.UpdateMemberResponseDto.of(updateMember);
+        return MembersResponseDto.UpdateMemberResponseDto.from(updateMember);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class MembersServiceImpl implements MembersService{
         Members updateMember = findMember(member, memberId);
         updateMember.updateRole(requestDto.getRole());
         membersRepository.save(updateMember);
-        return MembersResponseDto.UpdateMemberRoleResponseDto.of(member);
+        return MembersResponseDto.UpdateMemberRoleResponseDto.from(member);
     }
 
     // 프로필 이미지 업로드
@@ -89,7 +89,7 @@ public class MembersServiceImpl implements MembersService{
 
         member.updateProfileImage(profileImageUrl);
         membersRepository.save(member);
-        return MembersResponseDto.UpdateMemberProfileImageUrlResponseDto.of(member);
+        return MembersResponseDto.UpdateMemberProfileImageUrlResponseDto.from(member);
     }
 
     // 프로필 이미지 삭제
