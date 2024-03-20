@@ -17,7 +17,12 @@ public class ImagesServiceImpl implements ImagesService {
     }
 
     @Override
-    public void removeFile(String profileImageUrl){
+    public void removeProfileImageUrl(String profileImageUrl){
+        s3Util.removeFile(profileImageUrl);
+    }
 
+    @Override
+    public void removeFile(String imageUrl){
+        s3Util.removeFile(imageUrl);
     }
 }

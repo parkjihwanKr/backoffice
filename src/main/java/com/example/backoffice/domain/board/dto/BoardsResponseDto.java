@@ -83,4 +83,25 @@ public class BoardsResponseDto {
                     .build();
         }
     }
+
+    @Builder
+    public static class UpdateBoardResponseDto {
+        private String title;
+        private String content;
+        private String writer;
+        private List<Comments> commentList;
+        private Integer likeCount;
+        private LocalDateTime createdAt;
+
+        public static UpdateBoardResponseDto from(Boards board){
+            return UpdateBoardResponseDto.builder()
+                    .title(board.getTitle())
+                    .content(board.getContent())
+                    .writer(board.getMember().getMemberName())
+                    .commentList(board.getCommentList())
+                    .likeCount(board.getLikeCount())
+                    .createdAt(board.getCreatedAt())
+                    .build();
+        }
+    }
 }

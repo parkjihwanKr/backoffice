@@ -31,4 +31,14 @@ public class BoardsRequestDto {
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateBoardRequestDto {
+        private String title;
+        private String content;
+        private MultipartFile file;
+    }
 }

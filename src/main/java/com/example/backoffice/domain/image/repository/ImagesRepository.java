@@ -1,4 +1,8 @@
 package com.example.backoffice.domain.image.repository;
 
-public interface ImagesRepository {
+import com.example.backoffice.domain.image.entity.Images;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ImagesRepository extends JpaRepository<Images, Long> {
+
 }

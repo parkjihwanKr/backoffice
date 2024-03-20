@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.board.entity;
 
+import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.image.entity.Images;
 import com.example.backoffice.domain.like.entity.Likes;
@@ -8,6 +9,7 @@ import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -45,6 +47,9 @@ public class Boards extends CommonEntity {
     private List<Images> imageList;
 
     // entity method
-
+    public void update(BoardsRequestDto.UpdateBoardRequestDto requestDto){
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+    }
     //
 }

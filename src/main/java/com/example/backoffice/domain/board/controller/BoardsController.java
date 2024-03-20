@@ -45,11 +45,12 @@ public class BoardsController {
 
     // 게시글 수정
     @PatchMapping("/boards/{boardId}")
-    public ResponseEntity<BoardsResponseDto> updatePost(
+    public ResponseEntity<BoardsResponseDto.UpdateBoardResponseDto> updatePost(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody BoardsRequestDto requestDto){
-
-        return null;
+            @RequestBody BoardsRequestDto.UpdateBoardRequestDto requestDto){
+        BoardsResponseDto.UpdateBoardResponseDto responseDto
+                = boardsService.updatePost(boardId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     // 게시글 이미지 수정

@@ -8,7 +8,6 @@ import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
 import com.example.backoffice.domain.image.service.ImagesService;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.member.service.MembersServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,12 +22,14 @@ public class BoardsServiceImpl implements BoardsService{
     private final BoardsRepository boardsRepository;
     private final ImagesService imagesService;
     private final MembersServiceImpl membersService;
+
     @Override
     @Transactional(readOnly = true)
     public List<BoardsResponseDto.ReadBoardListResponseDto> readBoard(){
         List<Boards> boardList = boardsRepository.findAll();
         return BoardsResponseDto.ReadBoardListResponseDto.of(boardList);
     }
+
     @Override
     @Transactional(readOnly = true)
     public BoardsResponseDto.ReadBoardResponseDto readPost(Long boardId){
@@ -39,13 +40,26 @@ public class BoardsServiceImpl implements BoardsService{
     @Override
     @Transactional
     public BoardsResponseDto.CreateBoardResponseDto createPost(
-            Long boardId, Members member, BoardsRequestDto.CreateBoardRequestDto requestDto){
+            Long boardId, Members member,
+            BoardsRequestDto.CreateBoardRequestDto requestDto){
         imagesService.uploadFile(requestDto.getFile());
         Boards board = requestDto.toEntity(member);
         boardsRepository.save(board);
         return BoardsResponseDto.CreateBoardResponseDto.from(board);
     }
 
+    @Override
+    @Transactional
+    public BoardsResponseDto.UpdateBoardResponseDto updatePost(
+            Long boardId, Members member,
+            BoardsRequestDto.UpdateBoardRequestDto requestDto){
+        Boards board = findById(boardId);
+        board.update(requestDto);
+        imagesService.uploadFile(requestDto.getFile());
+        boardsRepository.save(board);
+        return BoardsResponseDto.UpdateBoardResponseDto.from(board);
+    }
+    
     @Transactional(readOnly = true)
     public Boards findById(Long boardId){
         return boardsRepository.findById(boardId).orElseThrow(
