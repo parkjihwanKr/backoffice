@@ -60,11 +60,12 @@ public class BoardsController {
 
     // 게시글 이미지 수정
     @PatchMapping("/boards/{boardId}/boardImage")
-    public ResponseEntity<BoardsResponseDto> updatePostImage(
+    public ResponseEntity<BoardsResponseDto.UpdateImageBoardResponseDto> updatePostImage(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody BoardsRequestDto requestDto){
-
-        return null;
+            @RequestBody BoardsRequestDto.UpdateImageBoardRequestDto requestDto){
+        BoardsResponseDto.UpdateImageBoardResponseDto responseDto =
+                boardsService.updatePostImage(boardId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     // 게시글 삭제

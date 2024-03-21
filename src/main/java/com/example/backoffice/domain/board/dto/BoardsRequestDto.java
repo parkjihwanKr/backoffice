@@ -41,4 +41,12 @@ public class BoardsRequestDto {
         private String content;
         private MultipartFile file;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateImageBoardRequestDto{
+        private MultipartFile file;
+    }
 }

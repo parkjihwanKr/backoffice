@@ -16,4 +16,6 @@ public interface BoardsService {
             Long boardId, Members member, BoardsRequestDto.CreateBoardRequestDto requestDto);
     public BoardsResponseDto.UpdateBoardResponseDto updatePost(
             Long boardId, Members member, BoardsRequestDto.UpdateBoardRequestDto requestDto);
+    public BoardsResponseDto.UpdateImageBoardResponseDto updatePostImage(
+            Long boardId, Members member, BoardsRequestDto.UpdateImageBoardRequestDto requestDto);
 }

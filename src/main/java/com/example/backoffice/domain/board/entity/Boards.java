@@ -8,6 +8,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +52,8 @@ public class Boards extends CommonEntity {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
     }
-    //
+
+    public void updateImage(MultipartFile file){
+        imageList.add(Images.builder().url(file.getOriginalFilename()).build());
+    }
 }

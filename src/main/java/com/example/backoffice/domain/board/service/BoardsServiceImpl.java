@@ -63,6 +63,16 @@ public class BoardsServiceImpl implements BoardsService{
         return BoardsResponseDto.UpdateBoardResponseDto.from(board);
     }
 
+    @Override
+    public BoardsResponseDto.UpdateImageBoardResponseDto updatePostImage(
+            Long boardId, Members member, BoardsRequestDto.UpdateImageBoardRequestDto requestDto){
+        Boards board = findById(boardId);
+        board.updateImage(requestDto.getFile());
+        imagesService.uploadFile(requestDto.getFile());
+        boardsRepository.save(board);
+        return BoardsResponseDto.UpdateImageBoardResponseDto.from(board);
+    }
+
     @Transactional(readOnly = true)
     public Boards findById(Long boardId){
         return boardsRepository.findById(boardId).orElseThrow(
