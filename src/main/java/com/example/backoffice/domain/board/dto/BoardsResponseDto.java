@@ -5,6 +5,7 @@ import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.image.entity.Images;
 import com.example.backoffice.domain.like.entity.Likes;
 import lombok.Builder;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,22 +21,16 @@ public class BoardsResponseDto {
         private Integer commentCount;
         private LocalDateTime modifiedAt;
 
-        public static List<ReadBoardListResponseDto> of(List<Boards> boardList){
-            List<ReadBoardListResponseDto> responseDtoList= new ArrayList<>();
-
-            // fix #2
-            // 해당부분을 commentList.size()를 가지고 오는 것은 무거움
-            for(int i = 0; i<boardList.size(); i++){
-                ReadBoardListResponseDto responseDto = ReadBoardListResponseDto.builder()
-                        .title(boardList.get(i).getTitle())
-                        .writer(boardList.get(i).getMember().getMemberName())
-                        .likeCount(boardList.get(i).getLikeList().size())
-                        .commentCount(boardList.get(i).getCommentList().size())
-                        .modifiedAt(boardList.get(i).getModifiedAt())
+        public static Page<ReadBoardListResponseDto> of(Page<Boards> boardPage){
+            return boardPage.map(board -> {
+                return ReadBoardListResponseDto.builder()
+                        .title(board.getTitle())
+                        .writer(board.getMember().getMemberName())
+                        .likeCount(board.getLikeList().size())
+                        .commentCount(board.getCommentList().size())
+                        .modifiedAt(board.getModifiedAt())
                         .build();
-                responseDtoList.add(responseDto);
-            }
-            return responseDtoList;
+            });
         }
     }
 

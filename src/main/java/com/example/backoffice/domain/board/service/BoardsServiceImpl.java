@@ -10,6 +10,8 @@ import com.example.backoffice.domain.image.service.ImagesService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +25,11 @@ public class BoardsServiceImpl implements BoardsService{
     private final ImagesService imagesService;
     private final MembersServiceImpl membersService;
 
+    // Paging 처리
     @Override
     @Transactional(readOnly = true)
-    public List<BoardsResponseDto.ReadBoardListResponseDto> readBoard(){
-        List<Boards> boardList = boardsRepository.findAll();
+    public Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable){
+        Page<Boards> boardList = boardsRepository.findBoardsByCreatedAt(pageable);
         return BoardsResponseDto.ReadBoardListResponseDto.of(boardList);
     }
 
@@ -59,7 +62,7 @@ public class BoardsServiceImpl implements BoardsService{
         boardsRepository.save(board);
         return BoardsResponseDto.UpdateBoardResponseDto.from(board);
     }
-    
+
     @Transactional(readOnly = true)
     public Boards findById(Long boardId){
         return boardsRepository.findById(boardId).orElseThrow(
