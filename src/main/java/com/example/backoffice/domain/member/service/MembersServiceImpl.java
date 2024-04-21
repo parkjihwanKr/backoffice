@@ -26,7 +26,7 @@ public class MembersServiceImpl implements MembersService{
     public MembersResponseDto.CreateMembersResponseDto signup(
             MembersRequestDto.CreateMembersRequestDto requestDto){
 
-        if(requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
+        if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
@@ -37,9 +37,10 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public void login(MembersRequestDto.LoginMemberRequestDto requestDto){
+    public void login(MembersRequestDto.LoginMemberRequestDto requestDto,
+                      String memberName){
         Members loginMember = membersRepository.findByMemberName(requestDto.getMemberName());
-        if(loginMember == null){
+        if(loginMember.getMemberName().equals(memberName)){
             throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
         }
         if(loginMember.getPassword().equals(requestDto.getPassword())){
@@ -55,11 +56,12 @@ public class MembersServiceImpl implements MembersService{
         return MembersResponseDto.ReadMemberResponseDto.from(matchedMember);
     }
 
+
     @Override
     @Transactional
     public MembersResponseDto.UpdateMemberResponseDto updateMember(
             Long memberId, Members member, MembersRequestDto.UpdateMemberRequestDto requestDto){
-        if(requestDto.getPassword().equals(requestDto.getPasswordCofirm())){
+        if(requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());

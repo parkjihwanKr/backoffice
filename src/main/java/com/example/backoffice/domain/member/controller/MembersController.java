@@ -4,7 +4,9 @@ import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.global.security.MemberDetailsImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,14 +21,17 @@ public class MembersController {
 
     @PostMapping("/signup")
     public ResponseEntity<MembersResponseDto.CreateMembersResponseDto> signup(
-            @RequestBody MembersRequestDto.CreateMembersRequestDto requestDto){
-        MembersResponseDto.CreateMembersResponseDto responseDto = membersService.signup(requestDto);
-        return ResponseEntity.ok(responseDto);
+            @Valid @RequestBody MembersRequestDto.CreateMembersRequestDto requestDto){
+        MembersResponseDto.CreateMembersResponseDto responseDto
+                = membersService.signup(requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PostMapping("/login")
-    public void login(@RequestBody MembersRequestDto.LoginMemberRequestDto requestDto){
-        membersService.login(requestDto);
+    public ResponseEntity<Void> login(@RequestBody MembersRequestDto.LoginMemberRequestDto requestDto,
+                      @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        membersService.login(requestDto, memberDetails.getMembers().getMemberName());
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @GetMapping("/members/{memberId}/profile")
@@ -65,7 +70,8 @@ public class MembersController {
     }
     @DeleteMapping("/members/{meberId}")
     public void deleteMember(
-            @PathVariable long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @PathVariable long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         membersService.deleteMember(memberId, memberDetails.getMembers());
     }
 }

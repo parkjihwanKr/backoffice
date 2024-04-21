@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface BoardsService {
 
-    public Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable);
+    //public Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable);
     public BoardsResponseDto.ReadBoardResponseDto readPost(Long boardId);
     public BoardsResponseDto.CreateBoardResponseDto createPost(
             Long boardId, Members member, BoardsRequestDto.CreateBoardRequestDto requestDto);

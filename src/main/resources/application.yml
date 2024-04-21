@@ -14,7 +14,7 @@ spring:
         show_sql: 'true'
         default_batch_fetch_size: 20
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
   data:
     redis:
       repositories:
@@ -26,6 +26,7 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
 
+# logging level : security error
 logging:
   level:
     org.springframework.security: ERROR

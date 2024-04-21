@@ -11,7 +11,10 @@ import java.util.UUID;
 
 public class MembersResponseDto {
 
+    @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CreateMembersResponseDto{
         // 접속 아이디
         private String memberName;
@@ -20,6 +23,7 @@ public class MembersResponseDto {
         private String email;
         private String contact;
         private String address;
+        private MemberRole role;
 
         public static CreateMembersResponseDto from(Members member){
             return CreateMembersResponseDto.builder()
@@ -27,12 +31,16 @@ public class MembersResponseDto {
                     .memberName(member.getMemberName())
                     .name(member.getMemberName())
                     .contact(member.getContact())
+                    .role(member.getRole())
                     .address(member.getAddress())
                     .build();
         }
     }
 
+    @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReadMemberResponseDto {
 
         private String memberName;
@@ -48,7 +56,10 @@ public class MembersResponseDto {
         }
     }
 
+    @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UpdateMemberResponseDto{
 
         private String memberName;
@@ -82,7 +93,10 @@ public class MembersResponseDto {
         }
     }
 
+    @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UpdateMemberProfileImageUrlResponseDto{
         private String profileImageUrl;
 
@@ -93,7 +107,10 @@ public class MembersResponseDto {
         }
     }
 
+    @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DeleteMemberProfileImageUrlResponseDto{
         private String profileImageUrl;
 

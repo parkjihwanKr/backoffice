@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BoardsRepository extends JpaRepository<Boards, Long> {
-    Page<Boards> findBoardsByCreatedAt(Pageable pageable);
+    //Page<Boards> findBoardsByCreatedAt(Pageable pageable);
 }
