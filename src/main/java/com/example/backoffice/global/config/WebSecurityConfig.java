@@ -1,9 +1,15 @@
 package com.example.backoffice.global.config;
 
+import com.example.backoffice.global.jwt.JwtAuthenticationFilter;
 import com.example.backoffice.global.jwt.JwtAuthorizationFilter;
+import com.example.backoffice.global.jwt.JwtProvider;
+import com.example.backoffice.global.security.AuthenticationService;
+import com.example.backoffice.global.security.MemberDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,13 +22,34 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class WebConfigSecurity {
+public class WebSecurityConfig {
 
-    private final JwtAuthorizationFilter jwtAuthorizationFilter;
-
+    private final JwtProvider jwtProvider;
+    private final MemberDetailsServiceImpl memberDetailsService;
+    private final AuthenticationService authenticationService;
+    private final AuthenticationConfiguration authenticationConfiguration;
+    // private final CustomAuthenticationSuccessFilter successFilter;
+    // private final CustomAuthenticationFailureHandler failureHandler;
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider);
+        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+        return filter;
+    }
+
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
+        return new JwtAuthorizationFilter(jwtProvider, memberDetailsService, authenticationService);
     }
 
     @Bean
@@ -40,10 +67,12 @@ public class WebConfigSecurity {
                         .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-        // http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
-        // http.addFilterBefore(jwtCustomExceptionFilter, AuthorizationFilter.class);
+        ;
+        // 필터 관리
+        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

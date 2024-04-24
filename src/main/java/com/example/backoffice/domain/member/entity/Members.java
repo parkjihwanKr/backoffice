@@ -41,12 +41,15 @@ public class Members extends CommonEntity {
 
     private String profileImageUrl;
 
+    private String introduction;
+
     public void updateMemberInfo(MembersRequestDto.UpdateMemberRequestDto requestDto, String bCrytPassword){
         this.memberName = requestDto.getMemberName();
         this.password = bCrytPassword;
         this.email = requestDto.getEmail();
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
+        this.introduction = requestDto.getIntroduction();
     }
 
     public void updateRole(MemberRole role){

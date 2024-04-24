@@ -7,17 +7,22 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.repository.MembersRepository;
+import com.example.backoffice.global.jwt.dto.TokenDto;
+import com.example.backoffice.global.security.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MembersServiceImpl implements MembersService{
 
     private final ImagesService imagesService;
+    private final AuthenticationService authenticationService;
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -37,15 +42,18 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public void login(MembersRequestDto.LoginMemberRequestDto requestDto,
-                      String memberName){
-        Members loginMember = membersRepository.findByMemberName(requestDto.getMemberName());
-        if(loginMember.getMemberName().equals(memberName)){
-            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
-        }
-        if(loginMember.getPassword().equals(requestDto.getPassword())){
+    public void login(MembersRequestDto.LoginMemberRequestDto requestDto){
+        Members loginMember = membersRepository.findByMemberName(requestDto.getMemberName()).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+        );
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), loginMember.getPassword())) {
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
+
+        TokenDto token = authenticationService.generateAuthToken(requestDto.getMemberName());
+        log.info("Access token : "+token.getAccessToken());
+        log.info("Refresh token : "+token.getRefreshToken());
     }
 
     @Override
@@ -127,7 +135,7 @@ public class MembersServiceImpl implements MembersService{
     }
 
     private Members findMember(Members member, Long memberId){
-        if(member.getId().equals(memberId)){
+        if(!member.getId().equals(memberId)){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER);
         }
         return member;

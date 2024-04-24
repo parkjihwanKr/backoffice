@@ -69,6 +69,7 @@ public class MembersRequestDto {
         private String email;
         private String address;
         private String contact;
+        private String introduction;
     }
 
     @Builder

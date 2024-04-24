@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class MembersResponseDto {
@@ -46,12 +47,18 @@ public class MembersResponseDto {
         private String memberName;
         private String email;
         private String address;
+        private MemberRole role;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
 
         public static ReadMemberResponseDto from(Members member){
             return ReadMemberResponseDto.builder()
                     .email(member.getEmail())
                     .address(member.getAddress())
                     .memberName(member.getMemberName())
+                    .role(member.getRole())
+                    .createdAt(member.getCreatedAt())
+                    .modifiedAt(member.getModifiedAt())
                     .build();
         }
     }

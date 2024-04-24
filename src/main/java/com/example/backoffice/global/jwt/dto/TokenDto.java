@@ -12,13 +12,7 @@ public class TokenDto {
     private String accessToken;
     private String refreshToken;
 
-    // accessToken 만료 시
-    public TokenDto createAccessToken(String accessToken) {
-        return new TokenDto(accessToken, refreshToken);
-    }
-
-    // refreshToken 만료 시
-    public TokenDto createToken(String accessToken, String refreshToken){
-        return new TokenDto(accessToken, refreshToken);
+    public static TokenDto of(String accessToken, String refreshToken){
+        return new TokenDto(accessToken,refreshToken);
     }
 }

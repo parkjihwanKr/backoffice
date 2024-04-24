@@ -11,8 +11,7 @@ public interface MembersService {
     MembersResponseDto.CreateMembersResponseDto signup(
             MembersRequestDto.CreateMembersRequestDto requestDto);
 
-    void login(MembersRequestDto.LoginMemberRequestDto requestDto,
-               String memberName);
+    void login(MembersRequestDto.LoginMemberRequestDto requestDto);
 
     MembersResponseDto.ReadMemberResponseDto readMemberInfo(
             Long memberId, Members member);

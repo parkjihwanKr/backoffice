@@ -3,6 +3,7 @@ package com.example.backoffice.domain.member.controller;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +28,13 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    // 로그인 로직이 없네...? 그냥 filter에서 처리하는듯?
+    // MemberDetails에 대한 정보가 그래서 없나봄
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody MembersRequestDto.LoginMemberRequestDto requestDto,
-                      @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        membersService.login(requestDto, memberDetails.getMembers().getMemberName());
+    public ResponseEntity<Void> login(
+            @RequestBody MembersRequestDto.LoginMemberRequestDto requestDto
+            /*@AuthenticationPrincipal MemberDetailsImpl memberDetails*/){
+        membersService.login(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
