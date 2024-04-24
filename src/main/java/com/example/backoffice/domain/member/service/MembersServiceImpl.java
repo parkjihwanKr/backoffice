@@ -69,7 +69,10 @@ public class MembersServiceImpl implements MembersService{
     @Transactional
     public MembersResponseDto.UpdateMemberResponseDto updateMember(
             Long memberId, Members member, MembersRequestDto.UpdateMemberRequestDto requestDto){
-        if(requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
+        if(!requestDto.getMemberName().equals(member.getMemberName())){
+            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER_NAME);
+        }
+        if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
@@ -121,7 +124,7 @@ public class MembersServiceImpl implements MembersService{
     @Transactional
     public void deleteMember(Long memberId, Members loginMember){
         if(memberId.equals(loginMember.getId())){
-            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER);
+            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
         }
         membersRepository.deleteById(memberId);
     }
@@ -136,7 +139,7 @@ public class MembersServiceImpl implements MembersService{
 
     private Members findMember(Members member, Long memberId){
         if(!member.getId().equals(memberId)){
-            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER);
+            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
         }
         return member;
     }

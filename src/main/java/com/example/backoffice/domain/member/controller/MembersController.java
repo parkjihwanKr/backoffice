@@ -28,14 +28,13 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 로그인 로직이 없네...? 그냥 filter에서 처리하는듯?
-    // MemberDetails에 대한 정보가 그래서 없나봄
     @PostMapping("/login")
-    public ResponseEntity<Void> login(
-            @RequestBody MembersRequestDto.LoginMemberRequestDto requestDto
-            /*@AuthenticationPrincipal MemberDetailsImpl memberDetails*/){
+    public ResponseEntity<CommonResponse<Void>> login(
+            @RequestBody MembersRequestDto.LoginMemberRequestDto requestDto){
         membersService.login(requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(HttpStatus.OK, "로그인 성공!")
+        );
     }
 
     @GetMapping("/members/{memberId}/profile")
@@ -46,7 +45,7 @@ public class MembersController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/members/{memberId}")
+    @PatchMapping("/members/{memberId}/profile")
     public ResponseEntity<MembersResponseDto.UpdateMemberResponseDto> updateMember(
             @PathVariable long memberId, @RequestBody MembersRequestDto.UpdateMemberRequestDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){

@@ -31,7 +31,7 @@ public class AuthenticationService {
         jwtProvider.setTokenForCookie(tokenDto);
 
         // Redis에 Refresh Token 저장
-        String refreshTokenKey = "refreshToken:" + memberName;
+        String refreshTokenKey = "refreshToken : " + memberName;
         redisProvider.saveKey(
                 refreshTokenKey,
                 Math.toIntExact(

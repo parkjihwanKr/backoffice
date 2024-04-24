@@ -68,20 +68,25 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateMemberResponseDto{
-
+        private String name;
         private String memberName;
-        private String username;
         private String email;
         private String contact;
         private String address;
+        private String introduction;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
 
         public static UpdateMemberResponseDto from(Members member){
             return UpdateMemberResponseDto.builder()
                     .memberName(member.getMemberName())
-                    .username(member.getName())
+                    .name(member.getName())
                     .address(member.getAddress())
                     .contact(member.getContact())
                     .email(member.getEmail())
+                    .introduction(member.getIntroduction())
+                    .createdAt(member.getCreatedAt())
+                    .modifiedAt(member.getModifiedAt())
                     .build();
         }
     }
