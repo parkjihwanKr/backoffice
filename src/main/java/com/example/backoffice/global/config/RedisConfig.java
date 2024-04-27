@@ -1,4 +1,4 @@
-package com.example.backoffice.global.redis;
+package com.example.backoffice.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +22,6 @@ public class RedisConfig {
         return new LettuceConnectionFactory(host, port);
     }
 
-    // 임시로 닫아놓음
-    // error #1 : bean이 두 개 생성된다구 해서..
     /*@Bean
     public RedisTemplate<String, String> redisTemplate(){
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();

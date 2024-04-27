@@ -27,6 +27,4 @@ public class CommonResponse<T> {
         this(httpStatus.value(), message, null);
     }
 
-    public CommonResponse(T paymentKey) {
-    }
 }

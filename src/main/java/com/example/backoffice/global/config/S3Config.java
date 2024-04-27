@@ -1,4 +1,4 @@
-package com.example.backoffice.global.awss3;
+package com.example.backoffice.global.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class S3Config {
 
-    @Value("${YOUR_ACCESSKEY}")
+    @Value("${YOUR_ACCESS_KEY}")
     private String accessKey;
 
-    @Value("${YOUR_SECRETKEY}")
+    @Value("${YOUR_SECRET_KEY}")
     private String secretKey;
 
     @Value("${YOUR_BUCKET_NAME}")
