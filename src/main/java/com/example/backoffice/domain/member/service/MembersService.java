@@ -17,16 +17,19 @@ public interface MembersService {
             Long memberId, Members member);
 
     MembersResponseDto.UpdateMemberResponseDto updateMember(
-            Long memberId,  Members Member, MembersRequestDto.UpdateMemberRequestDto requestDto);
+            Long memberId,  Members Member,
+            MembersRequestDto.UpdateMemberRequestDto requestDto);
 
     MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
-            Long memberId, Members member, MembersRequestDto.UpdateMemberRoleRequestDto requestDto);
-
-    void deleteMember(Long memberId, Members member);
+            Long memberId, Members member,
+            MembersRequestDto.UpdateMemberRoleRequestDto requestDto,
+            MultipartFile file);
 
     MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateMemberProfileImageUrl(
             Long memberId, Members member, MultipartFile image);
 
-    void deleteMemberProfileImageUrl(
+    MembersResponseDto.DeleteMemberProfileImageResponseDto deleteMemberProfileImage(
             Long memberId, Members member);
+
+    void deleteMember(Long memberId, Members member);
 }

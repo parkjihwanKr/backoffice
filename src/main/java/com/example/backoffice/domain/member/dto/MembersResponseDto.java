@@ -96,11 +96,15 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateMemberRoleResponseDto{
+        private String fromMemberName;
         private MemberRole role;
+        private String fileName;
 
-        public static UpdateMemberRoleResponseDto from(Members member){
+        public static UpdateMemberRoleResponseDto from(Members member, String document){
             return UpdateMemberRoleResponseDto.builder()
+                    .fromMemberName(member.getMemberName())
                     .role(member.getRole())
+                    .fileName(document)
                     .build();
         }
     }
@@ -110,10 +114,12 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateMemberProfileImageUrlResponseDto{
+        private String fromMemberName;
         private String profileImageUrl;
 
         public static UpdateMemberProfileImageUrlResponseDto from(Members member){
             return UpdateMemberProfileImageUrlResponseDto.builder()
+                    .fromMemberName(member.getMemberName())
                     .profileImageUrl(member.getProfileImageUrl())
                     .build();
         }
@@ -123,12 +129,12 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeleteMemberProfileImageUrlResponseDto{
-        private String profileImageUrl;
+    public static class DeleteMemberProfileImageResponseDto{
+        private String fromMemberName;
 
-        public static DeleteMemberProfileImageUrlResponseDto of(Members member){
-            return DeleteMemberProfileImageUrlResponseDto.builder()
-                    .profileImageUrl(member.getProfileImageUrl())
+        public static DeleteMemberProfileImageResponseDto from(Members member){
+            return DeleteMemberProfileImageResponseDto.builder()
+                    .fromMemberName(member.getMemberName())
                     .build();
         }
     }

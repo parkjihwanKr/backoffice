@@ -81,16 +81,21 @@ public class MembersServiceImpl implements MembersService{
         return MembersResponseDto.UpdateMemberResponseDto.from(updateMember);
     }
 
+    // #1 요구 사항 : role을 바꾸기 위해서 일정 기간을 기다려야함.
+    // 어떠한 파일을 업로드 하고 그 파일이 적절성을 관리자가 판단하여 바꿀 수 있게 함
+    // 그러므로 UpdateMemberRoleRequestDto에는 s3에 파일을 업로드 할 수 있어야함
     @Override
     @Transactional
     public MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
-            Long memberId, Members member, MembersRequestDto.UpdateMemberRoleRequestDto requestDto){
+            Long memberId, Members member,
+            MembersRequestDto.UpdateMemberRoleRequestDto requestDto,
+            MultipartFile file){
         Members updateMember = findMember(member, memberId);
         updateMember.updateRole(requestDto.getRole());
+        String document = imagesService.uploadFile(file);
         membersRepository.save(updateMember);
-        return MembersResponseDto.UpdateMemberRoleResponseDto.from(member);
+        return MembersResponseDto.UpdateMemberRoleResponseDto.from(member, document);
     }
-
     // 프로필 이미지 업로드
     @Override
     @Transactional
@@ -108,33 +113,27 @@ public class MembersServiceImpl implements MembersService{
     // 프로필 이미지 삭제
     @Override
     @Transactional
-    public void deleteMemberProfileImageUrl(
+    public MembersResponseDto.DeleteMemberProfileImageResponseDto deleteMemberProfileImage(
             Long memberId, Members member){
         Members existMember = findMember(member, memberId);
         String existMemberProfileImageUrl = existMember.getProfileImageUrl();
         // 문자열이 비어 있거나, 빈 공백으로만 이루어져 있으면, true를 리턴
-        if(!existMemberProfileImageUrl.isBlank()){
+        if(existMemberProfileImageUrl.isBlank()){
             throw new MembersCustomException(MembersExceptionCode.NOT_BLANK_IMAGE_FILE);
         }
         imagesService.removeFile(existMember.getProfileImageUrl());
         existMember.updateProfileImage(null);
+
+        return MembersResponseDto.DeleteMemberProfileImageResponseDto.from(member);
     }
 
     @Override
     @Transactional
     public void deleteMember(Long memberId, Members loginMember){
-        if(memberId.equals(loginMember.getId())){
+        if(!memberId.equals(loginMember.getId())){
             throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
         }
         membersRepository.deleteById(memberId);
-    }
-
-    // 해당 MemberId 찾기
-    @Transactional(readOnly = true)
-    public Members findById(Long memberId){
-        return membersRepository.findById(memberId).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
-        );
     }
 
     private Members findMember(Members member, Long memberId){

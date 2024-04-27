@@ -56,25 +56,38 @@ public class MembersController {
 
     @PatchMapping("/members/{memberId}/role")
     public ResponseEntity<MembersResponseDto.UpdateMemberRoleResponseDto> updateRole(
-            @PathVariable long memberId, @RequestBody MembersRequestDto.UpdateMemberRoleRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @PathVariable long memberId, MembersRequestDto.UpdateMemberRoleRequestDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestParam("file")MultipartFile file){
         MembersResponseDto.UpdateMemberRoleResponseDto responseDto =
-                membersService.updateMemberRole(memberId, memberDetails.getMembers(), requestDto);
+                membersService.updateMemberRole(memberId, memberDetails.getMembers(), requestDto, file);
         return ResponseEntity.ok(responseDto);
     }
 
     @PatchMapping("/members/{memberId}/profileImage")
-    public ResponseEntity<MembersResponseDto.UpdateMemberProfileImageUrlResponseDto> updateProfileUrl(
+    public ResponseEntity<MembersResponseDto.UpdateMemberProfileImageUrlResponseDto> updateProfile(
             @PathVariable long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            MultipartFile image){
+            @RequestParam("file")MultipartFile image){
         MembersResponseDto.UpdateMemberProfileImageUrlResponseDto responseDto =
                 membersService.updateMemberProfileImageUrl(memberId, memberDetails.getMembers(), image);
         return ResponseEntity.ok(responseDto);
     }
-    @DeleteMapping("/members/{meberId}")
-    public void deleteMember(
+
+    @DeleteMapping("/members/{memberId}/profileImage")
+    public ResponseEntity<MembersResponseDto.DeleteMemberProfileImageResponseDto> deleteProfile(
+            @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        MembersResponseDto.DeleteMemberProfileImageResponseDto responseDto=
+                membersService.deleteMemberProfileImage(memberId, memberDetails.getMembers());
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping("/members/{memberId}")
+    public ResponseEntity<CommonResponse<Void>> deleteMember(
             @PathVariable long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         membersService.deleteMember(memberId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(HttpStatus.OK, "회원 삭제")
+        );
     }
 }
