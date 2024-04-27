@@ -56,11 +56,11 @@ public class MembersController {
 
     @PatchMapping("/members/{memberId}/role")
     public ResponseEntity<MembersResponseDto.UpdateMemberRoleResponseDto> updateRole(
-            @PathVariable long memberId, MembersRequestDto.UpdateMemberRoleRequestDto requestDto,
+            @PathVariable long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestParam("file")MultipartFile file){
         MembersResponseDto.UpdateMemberRoleResponseDto responseDto =
-                membersService.updateMemberRole(memberId, memberDetails.getMembers(), requestDto, file);
+                membersService.updateMemberRole(memberId, memberDetails.getMembers(), file);
         return ResponseEntity.ok(responseDto);
     }
 

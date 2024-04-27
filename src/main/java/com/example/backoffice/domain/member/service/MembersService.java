@@ -22,7 +22,6 @@ public interface MembersService {
 
     MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
             Long memberId, Members member,
-            MembersRequestDto.UpdateMemberRoleRequestDto requestDto,
             MultipartFile file);
 
     MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateMemberProfileImageUrl(

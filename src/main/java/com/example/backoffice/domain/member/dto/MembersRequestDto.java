@@ -76,16 +76,6 @@ public class MembersRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UpdateMemberRoleRequestDto {
-        private String password;
-        private String passwordConfirm;
-        private MemberRole role;
-    }
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class UpdateMemberProfileImageUrlRequestDto {
         private String password;
         private String passwordConfirm;

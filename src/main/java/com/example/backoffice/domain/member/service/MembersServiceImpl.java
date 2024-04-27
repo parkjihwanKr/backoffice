@@ -81,17 +81,12 @@ public class MembersServiceImpl implements MembersService{
         return MembersResponseDto.UpdateMemberResponseDto.from(updateMember);
     }
 
-    // #1 요구 사항 : role을 바꾸기 위해서 일정 기간을 기다려야함.
-    // 어떠한 파일을 업로드 하고 그 파일이 적절성을 관리자가 판단하여 바꿀 수 있게 함
-    // 그러므로 UpdateMemberRoleRequestDto에는 s3에 파일을 업로드 할 수 있어야함
     @Override
     @Transactional
     public MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
             Long memberId, Members member,
-            MembersRequestDto.UpdateMemberRoleRequestDto requestDto,
             MultipartFile file){
         Members updateMember = findMember(member, memberId);
-        updateMember.updateRole(requestDto.getRole());
         String document = imagesService.uploadFile(file);
         membersRepository.save(updateMember);
         return MembersResponseDto.UpdateMemberRoleResponseDto.from(member, document);
@@ -103,7 +98,7 @@ public class MembersServiceImpl implements MembersService{
             Long memberId, Members member, MultipartFile image){
         findMember(member, memberId);
 
-        String profileImageUrl = imagesService.uploadFile(image);
+        String profileImageUrl = imagesService.uploadImage(image);
 
         member.updateProfileImage(profileImageUrl);
         membersRepository.save(member);
@@ -121,7 +116,7 @@ public class MembersServiceImpl implements MembersService{
         if(existMemberProfileImageUrl.isBlank()){
             throw new MembersCustomException(MembersExceptionCode.NOT_BLANK_IMAGE_FILE);
         }
-        imagesService.removeFile(existMember.getProfileImageUrl());
+        imagesService.removeImage(existMember.getProfileImageUrl());
         existMember.updateProfileImage(null);
 
         return MembersResponseDto.DeleteMemberProfileImageResponseDto.from(member);

@@ -52,10 +52,6 @@ public class Members extends CommonEntity {
         this.introduction = requestDto.getIntroduction();
     }
 
-    public void updateRole(MemberRole role){
-        this.role = role;
-    }
-
     public void updateProfileImage(String profileImageUrl){
         this.profileImageUrl = profileImageUrl;
     }
