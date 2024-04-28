@@ -22,14 +22,14 @@ public class BoardsController {
 
     private final BoardsService boardsService;
 
-    // 게시글 한개 읽기
-    /*@GetMapping("/boards")
+    // 게시글 전체 읽기
+    @GetMapping("/boards")
     public ResponseEntity<Page<BoardsResponseDto.ReadBoardListResponseDto>> readBoard(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         Page<BoardsResponseDto.ReadBoardListResponseDto> responseDtoList =
                 boardsService.readBoard(pageable);
         return ResponseEntity.ok(responseDtoList);
-    }*/
+    }
 
     // 게시글 하나 읽기
     @GetMapping("/boards/{boardId}")

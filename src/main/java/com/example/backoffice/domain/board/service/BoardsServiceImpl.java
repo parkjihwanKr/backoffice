@@ -26,12 +26,12 @@ public class BoardsServiceImpl implements BoardsService{
     private final MembersServiceImpl membersService;
 
     // Paging 처리
-    /*@Override
+    @Override
     @Transactional(readOnly = true)
     public Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable){
-        Page<Boards> boardList = boardsRepository.findBoardsByCreatedAt(pageable);
+        Page<Boards> boardList = null;
         return BoardsResponseDto.ReadBoardListResponseDto.of(boardList);
-    }*/
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -45,7 +45,7 @@ public class BoardsServiceImpl implements BoardsService{
     public BoardsResponseDto.CreateBoardResponseDto createPost(
             Long boardId, Members member,
             BoardsRequestDto.CreateBoardRequestDto requestDto){
-        imagesService.uploadFile(requestDto.getFile());
+        // imagesService.uploadFile(requestDto.getFile());
         Boards board = requestDto.toEntity(member);
         boardsRepository.save(board);
         return BoardsResponseDto.CreateBoardResponseDto.from(board);
