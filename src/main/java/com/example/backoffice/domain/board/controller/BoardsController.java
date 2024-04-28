@@ -4,14 +4,17 @@ import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.board.service.BoardsService;
 import com.example.backoffice.global.security.MemberDetailsImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -39,12 +42,20 @@ public class BoardsController {
     }
 
     // 게시글 게시
-    @PostMapping("/boards/{boardId}")
+    @PostMapping(
+            value = "/boards/{boardId}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.MULTIPART_FORM_DATA_VALUE
+            })
     public ResponseEntity<BoardsResponseDto.CreateBoardResponseDto> createPost(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody BoardsRequestDto.CreateBoardRequestDto requestDto){
+            @RequestPart(value = "data") @Valid BoardsRequestDto.CreateBoardRequestDto requestDto,
+            @RequestPart(value = "file") MultipartFile file){
+        System.out.println("requestDto.getContent() : "+requestDto.getContent());
         BoardsResponseDto.CreateBoardResponseDto responseDto =
-                boardsService.createPost(boardId, memberDetails.getMembers(), requestDto);
+                boardsService.createPost(
+                        boardId, memberDetails.getMembers(),
+                        requestDto, file);
         return ResponseEntity.ok(responseDto);
     }
 
