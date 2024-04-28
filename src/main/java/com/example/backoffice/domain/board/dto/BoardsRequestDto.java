@@ -23,11 +23,12 @@ public class BoardsRequestDto {
         private String content;
 
         // 처음 생성되는 Entity의 likeCount = 0 고정
-        public Boards toEntity(Members member){
+        public Boards toEntity(
+                Members member, String title, String content){
             return Boards.builder()
                     .member(member)
-                    .title(this.getTitle())
-                    .content(this.getContent())
+                    .title(title)
+                    .content(content)
                     .likeCount(0)
                     .build();
         }

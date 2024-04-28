@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.board.service;
 
+import com.example.backoffice.domain.board.converter.BoardsConverter;
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.board.entity.Boards;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -44,9 +46,10 @@ public class BoardsServiceImpl implements BoardsService{
     @Transactional
     public BoardsResponseDto.CreateBoardResponseDto createPost(
             Long boardId, Members member,
-            BoardsRequestDto.CreateBoardRequestDto requestDto){
-        // imagesService.uploadFile(requestDto.getFile());
-        Boards board = requestDto.toEntity(member);
+            BoardsRequestDto.CreateBoardRequestDto requestDto,
+            MultipartFile file){
+        imagesService.uploadFile(file);
+        Boards board = BoardsConverter.toEntity(requestDto, file, member);
         boardsRepository.save(board);
         return BoardsResponseDto.CreateBoardResponseDto.from(board);
     }
