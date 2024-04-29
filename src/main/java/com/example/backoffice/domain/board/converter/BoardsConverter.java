@@ -5,15 +5,18 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public class BoardsConverter {
 
     public static Boards toEntity(
             BoardsRequestDto.CreateBoardRequestDto requestDto,
-            MultipartFile file, Members member){
+            List<MultipartFile> files, Members member){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
+                .likeCount(0)
                 .imageList(
                     null
                 ).build();

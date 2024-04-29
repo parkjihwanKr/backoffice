@@ -55,13 +55,17 @@ public class MembersController {
     }
 
     @PatchMapping("/members/{memberId}/role")
-    public ResponseEntity<MembersResponseDto.UpdateMemberRoleResponseDto> updateRole(
+    public ResponseEntity<CommonResponse<MembersResponseDto.UpdateMemberRoleResponseDto>> updateRole(
             @PathVariable long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestParam("file")MultipartFile file){
         MembersResponseDto.UpdateMemberRoleResponseDto responseDto =
                 membersService.updateMemberRole(memberId, memberDetails.getMembers(), file);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        HttpStatus.OK, "증빙 서류 검토 후, 권한이 변경됩니다.", responseDto
+                )
+        );
     }
 
     @PatchMapping("/members/{memberId}/profileImage")

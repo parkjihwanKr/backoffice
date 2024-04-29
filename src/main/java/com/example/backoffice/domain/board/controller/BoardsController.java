@@ -50,12 +50,11 @@ public class BoardsController {
     public ResponseEntity<BoardsResponseDto.CreateBoardResponseDto> createPost(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") @Valid BoardsRequestDto.CreateBoardRequestDto requestDto,
-            @RequestPart(value = "file") MultipartFile file){
-        System.out.println("requestDto.getContent() : "+requestDto.getContent());
+            @RequestPart(value = "files") List<MultipartFile> files){
         BoardsResponseDto.CreateBoardResponseDto responseDto =
                 boardsService.createPost(
                         boardId, memberDetails.getMembers(),
-                        requestDto, file);
+                        requestDto, files);
         return ResponseEntity.ok(responseDto);
     }
 

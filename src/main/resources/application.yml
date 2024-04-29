@@ -14,13 +14,18 @@ spring:
         show_sql: 'true'
         default_batch_fetch_size: 20
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   data:
     redis:
       repositories:
         enabled: false
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2MB
+      max-request-size: 2MB
 
 # jwt token secret key
 jwt:
@@ -40,5 +45,5 @@ cloud:
     region:
       static: ${YOUR_REGION}
     credentials:
-      accessKey: ${YOUR_ACCESSKEY}
-      secretKey: ${YOUR_SECRETKEY}
+      accessKey: ${YOUR_ACCESS_KEY}
+      secretKey: ${YOUR_SECRET_KEY}

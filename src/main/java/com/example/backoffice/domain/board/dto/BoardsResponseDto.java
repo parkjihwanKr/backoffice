@@ -2,8 +2,7 @@ package com.example.backoffice.domain.board.dto;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.entity.Comments;
-import com.example.backoffice.domain.image.entity.Images;
-import com.example.backoffice.domain.like.entity.Likes;
+import com.example.backoffice.domain.file.entity.Files;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +10,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BoardsResponseDto {
@@ -54,7 +52,7 @@ public class BoardsResponseDto {
         private Integer likeCount;
         // CommentList
         private List<Comments> commentList;
-        private List<Images> imageList;
+        private List<Files> imageList;
 
         public static ReadBoardResponseDto from(Boards board){
             return ReadBoardResponseDto.builder()

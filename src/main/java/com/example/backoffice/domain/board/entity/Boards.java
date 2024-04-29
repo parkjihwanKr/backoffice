@@ -2,15 +2,17 @@ package com.example.backoffice.domain.board.entity;
 
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.comment.entity.Comments;
-import com.example.backoffice.domain.image.entity.Images;
+import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.like.entity.Likes;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -45,7 +47,7 @@ public class Boards extends CommonEntity {
     private List<Likes> likeList;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Images> imageList;
+    private List<Files> imageList;
 
     // entity method
     public void update(BoardsRequestDto.UpdateBoardRequestDto requestDto){
@@ -54,6 +56,6 @@ public class Boards extends CommonEntity {
     }
 
     public void updateImage(MultipartFile file){
-        imageList.add(Images.builder().url(file.getOriginalFilename()).build());
+        imageList.add(Files.builder().url(file.getOriginalFilename()).build());
     }
 }

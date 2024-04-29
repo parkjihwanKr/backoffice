@@ -16,7 +16,7 @@ public interface BoardsService {
     public BoardsResponseDto.CreateBoardResponseDto createPost(
             Long boardId, Members member,
             BoardsRequestDto.CreateBoardRequestDto requestDto,
-            MultipartFile file);
+            List<MultipartFile> files);
     public BoardsResponseDto.UpdateBoardResponseDto updatePost(
             Long boardId, Members member, BoardsRequestDto.UpdateBoardRequestDto requestDto);
     public BoardsResponseDto.UpdateImageBoardResponseDto updatePostImage(
