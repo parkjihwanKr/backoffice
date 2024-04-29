@@ -7,7 +7,7 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
-import com.example.backoffice.domain.image.service.ImagesService;
+import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.List;
 public class BoardsServiceImpl implements BoardsService{
 
     private final BoardsRepository boardsRepository;
-    private final ImagesService imagesService;
+    private final FilesService filesService;
     private final MembersServiceImpl membersService;
 
     // Paging 처리
@@ -47,9 +47,11 @@ public class BoardsServiceImpl implements BoardsService{
     public BoardsResponseDto.CreateBoardResponseDto createPost(
             Long boardId, Members member,
             BoardsRequestDto.CreateBoardRequestDto requestDto,
-            MultipartFile file){
-        imagesService.uploadFile(file);
-        Boards board = BoardsConverter.toEntity(requestDto, file, member);
+            List<MultipartFile> files){
+        Boards board = BoardsConverter.toEntity(requestDto, files, member);
+        for(int i = 0; i<files.size(); i++) {
+            filesService.createFileForBoard(files.get(i), board);
+        }
         boardsRepository.save(board);
         return BoardsResponseDto.CreateBoardResponseDto.from(board);
     }
@@ -61,7 +63,7 @@ public class BoardsServiceImpl implements BoardsService{
             BoardsRequestDto.UpdateBoardRequestDto requestDto){
         Boards board = findById(boardId);
         board.update(requestDto);
-        imagesService.uploadFile(requestDto.getFile());
+        filesService.createFileForBoard(requestDto.getFile(), board);
         boardsRepository.save(board);
         return BoardsResponseDto.UpdateBoardResponseDto.from(board);
     }
@@ -71,7 +73,7 @@ public class BoardsServiceImpl implements BoardsService{
             Long boardId, Members member, BoardsRequestDto.UpdateImageBoardRequestDto requestDto){
         Boards board = findById(boardId);
         board.updateImage(requestDto.getFile());
-        imagesService.uploadFile(requestDto.getFile());
+        filesService.createFileForBoard(requestDto.getFile(), board);
         boardsRepository.save(board);
         return BoardsResponseDto.UpdateImageBoardResponseDto.from(board);
     }

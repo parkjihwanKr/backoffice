@@ -1,6 +1,6 @@
 package com.example.backoffice.domain.member.service;
 
-import com.example.backoffice.domain.image.service.ImagesService;
+import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class MembersServiceImpl implements MembersService{
 
-    private final ImagesService imagesService;
+    private final FilesService filesService;
     private final AuthenticationService authenticationService;
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
@@ -81,16 +81,18 @@ public class MembersServiceImpl implements MembersService{
         return MembersResponseDto.UpdateMemberResponseDto.from(updateMember);
     }
 
+    // 권한 변경
     @Override
     @Transactional
     public MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
             Long memberId, Members member,
             MultipartFile file){
-        Members updateMember = findMember(member, memberId);
-        String document = imagesService.uploadFile(file);
-        membersRepository.save(updateMember);
+        Members changeRoleMember = findMember(member, memberId);
+        String document = filesService.createFileForMemberRole(file, changeRoleMember);
+        membersRepository.save(changeRoleMember);
         return MembersResponseDto.UpdateMemberRoleResponseDto.from(member, document);
     }
+
     // 프로필 이미지 업로드
     @Override
     @Transactional
@@ -98,7 +100,7 @@ public class MembersServiceImpl implements MembersService{
             Long memberId, Members member, MultipartFile image){
         findMember(member, memberId);
 
-        String profileImageUrl = imagesService.uploadImage(image);
+        String profileImageUrl = filesService.createImage(image);
 
         member.updateProfileImage(profileImageUrl);
         membersRepository.save(member);
@@ -116,7 +118,7 @@ public class MembersServiceImpl implements MembersService{
         if(existMemberProfileImageUrl.isBlank()){
             throw new MembersCustomException(MembersExceptionCode.NOT_BLANK_IMAGE_FILE);
         }
-        imagesService.removeImage(existMember.getProfileImageUrl());
+        filesService.deleteImage(existMember.getProfileImageUrl());
         existMember.updateProfileImage(null);
 
         return MembersResponseDto.DeleteMemberProfileImageResponseDto.from(member);

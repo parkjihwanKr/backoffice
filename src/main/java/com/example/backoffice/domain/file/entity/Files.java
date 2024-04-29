@@ -1,4 +1,4 @@
-package com.example.backoffice.domain.image.entity;
+package com.example.backoffice.domain.file.entity;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.entity.Members;
@@ -9,12 +9,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "images")
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Images {
+public class Files {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +23,8 @@ public class Images {
     private String url;
 
     // profileImageUrl은 image : member = 1:1
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "members_id")
     private Members member;
 
     @ManyToOne(fetch = FetchType.LAZY)
