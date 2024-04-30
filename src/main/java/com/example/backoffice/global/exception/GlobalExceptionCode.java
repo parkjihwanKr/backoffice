@@ -20,6 +20,13 @@ public enum GlobalExceptionCode {
     INVALID_TOKEN_VALUE(HttpStatus.BAD_REQUEST, "JWT-001", "JWT 토큰 값이 유효하지 않습니다."),
     UNAUTHORIZED_REFRESH_TOKEN_VALUE(HttpStatus.UNAUTHORIZED, "JWT-002", "JWT Refresh 토큰값이 유효하지 않습니다."),
 
+    // Authentcation
+    NOT_MATCHED_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "AUTH-001", "해당 인증 정보가 일치하지 않습니다."),
+
+    // JSON
+    NOT_SERIALIZED_JSON(HttpStatus.BAD_REQUEST, "JSON-001", "직렬화가 되지 않습니다."),
+    NOT_DESERIALIZED_JSON(HttpStatus.BAD_REQUEST, "JSON-002", "역직렬화가 되지 않습니다."),
+
     ;
 
     private final HttpStatus httpStatus;

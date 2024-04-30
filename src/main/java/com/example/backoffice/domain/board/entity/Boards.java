@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -28,11 +29,17 @@ public class Boards extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private String title;
 
+    @Column
     private String content;
 
-    private Integer likeCount;
+    @Column
+    private Long viewCount;
+
+    @Column
+    private Long likeCount;
 
     // feat #1 조회수 ? 구현해보고 싶은데?
     // relations
@@ -40,22 +47,37 @@ public class Boards extends CommonEntity {
     @JoinColumn(name = "member_id")
     private Members member;
 
+    @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comments> commentList;
+    private List<Comments> commentList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Likes> likeList;
+    private List<Likes> likeList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Files> imageList;
+    private List<Files> fileList = new ArrayList<>();
 
     // entity method
+    public void incrementViewCount(){
+        this.viewCount++;
+    }
+
+    public void updateViewCount(Long redisViewCount){
+        this.viewCount = redisViewCount;
+    }
     public void update(BoardsRequestDto.UpdateBoardRequestDto requestDto){
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
     }
 
-    public void updateImage(MultipartFile file){
-        imageList.add(Files.builder().url(file.getOriginalFilename()).build());
+    public void updateFile(MultipartFile file){
+        fileList.add(Files.builder().url(file.getOriginalFilename()).build());
+    }
+
+    public void addLike(){
+        likeList.add(null);
+        this.likeCount++;
     }
 }

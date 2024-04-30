@@ -20,13 +20,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/boards")
 public class BoardsController {
 
     private final BoardsService boardsService;
 
     // 게시글 전체 읽기
-    @GetMapping("/boards")
+    @GetMapping
     public ResponseEntity<Page<BoardsResponseDto.ReadBoardListResponseDto>> readBoard(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         Page<BoardsResponseDto.ReadBoardListResponseDto> responseDtoList =
@@ -35,52 +35,51 @@ public class BoardsController {
     }
 
     // 게시글 하나 읽기
-    @GetMapping("/boards/{boardId}")
-    public ResponseEntity<BoardsResponseDto.ReadBoardResponseDto> readPost(@PathVariable long boardId){
-        BoardsResponseDto.ReadBoardResponseDto responseDto = boardsService.readPost(boardId);
+    @GetMapping("/{boardId}")
+    public ResponseEntity<BoardsResponseDto.ReadBoardResponseDto> readOne(@PathVariable long boardId){
+        BoardsResponseDto.ReadBoardResponseDto responseDto = boardsService.readOne(boardId);
         return ResponseEntity.ok(responseDto);
     }
 
     // 게시글 게시
     @PostMapping(
-            value = "/boards/{boardId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE,
                     MediaType.MULTIPART_FORM_DATA_VALUE
             })
-    public ResponseEntity<BoardsResponseDto.CreateBoardResponseDto> createPost(
-            @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+    public ResponseEntity<BoardsResponseDto.CreateBoardResponseDto> createBoard(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") @Valid BoardsRequestDto.CreateBoardRequestDto requestDto,
             @RequestPart(value = "files") List<MultipartFile> files){
         BoardsResponseDto.CreateBoardResponseDto responseDto =
-                boardsService.createPost(
-                        boardId, memberDetails.getMembers(),
+                boardsService.createBoard(
+                        memberDetails.getMembers(),
                         requestDto, files);
         return ResponseEntity.ok(responseDto);
     }
 
     // 게시글 수정
-    @PatchMapping("/boards/{boardId}")
-    public ResponseEntity<BoardsResponseDto.UpdateBoardResponseDto> updatePost(
+    @PatchMapping("/{boardId}")
+    public ResponseEntity<BoardsResponseDto.UpdateBoardResponseDto> updateBoard(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody BoardsRequestDto.UpdateBoardRequestDto requestDto){
         BoardsResponseDto.UpdateBoardResponseDto responseDto
-                = boardsService.updatePost(boardId, memberDetails.getMembers(), requestDto);
+                = boardsService.updateBoard(boardId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     // 게시글 이미지 수정
-    @PatchMapping("/boards/{boardId}/boardImage")
-    public ResponseEntity<BoardsResponseDto.UpdateImageBoardResponseDto> updatePostImage(
+    @PatchMapping("/{boardId}/boardImage")
+    public ResponseEntity<BoardsResponseDto.UpdateImageBoardResponseDto> updateBoardImage(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody BoardsRequestDto.UpdateImageBoardRequestDto requestDto){
         BoardsResponseDto.UpdateImageBoardResponseDto responseDto =
-                boardsService.updatePostImage(boardId, memberDetails.getMembers(), requestDto);
+                boardsService.updateBoardImage(boardId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     // 게시글 삭제
-    @DeleteMapping("/boards/{boardId}")
-    public ResponseEntity<BoardsResponseDto> deletePost(
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<BoardsResponseDto> deleteBoard(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody BoardsRequestDto requestDto){
 

@@ -10,15 +10,13 @@ import java.util.List;
 public class BoardsConverter {
 
     public static Boards toEntity(
-            BoardsRequestDto.CreateBoardRequestDto requestDto,
-            List<MultipartFile> files, Members member){
+            BoardsRequestDto.CreateBoardRequestDto requestDto, Members member){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
-                .likeCount(0)
-                .imageList(
-                    null
-                ).build();
+                .likeCount(0L)
+                .viewCount(0L)
+                .build();
     }
 }

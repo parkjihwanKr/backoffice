@@ -12,13 +12,12 @@ import java.util.List;
 public interface BoardsService {
 
     public Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable);
-    public BoardsResponseDto.ReadBoardResponseDto readPost(Long boardId);
-    public BoardsResponseDto.CreateBoardResponseDto createPost(
-            Long boardId, Members member,
-            BoardsRequestDto.CreateBoardRequestDto requestDto,
+    public BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId);
+    public BoardsResponseDto.CreateBoardResponseDto createBoard(
+            Members member, BoardsRequestDto.CreateBoardRequestDto requestDto,
             List<MultipartFile> files);
-    public BoardsResponseDto.UpdateBoardResponseDto updatePost(
+    public BoardsResponseDto.UpdateBoardResponseDto updateBoard(
             Long boardId, Members member, BoardsRequestDto.UpdateBoardRequestDto requestDto);
-    public BoardsResponseDto.UpdateImageBoardResponseDto updatePostImage(
+    public BoardsResponseDto.UpdateImageBoardResponseDto updateBoardImage(
             Long boardId, Members member, BoardsRequestDto.UpdateImageBoardRequestDto requestDto);
 }

@@ -29,7 +29,9 @@ dependencies {
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
 	// database : redis
+	// jedis add dependency
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'redis.clients:jedis'
 
 	// spring boot basic settings
 	implementation 'org.springframework.boot:spring-boot-starter-security'

@@ -1,7 +1,8 @@
 package com.example.backoffice.global.security;
 
 import com.example.backoffice.domain.member.entity.MemberRole;
-import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.global.exception.AuthenticationCustomException;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.jwt.JwtProvider;
 import com.example.backoffice.global.jwt.dto.TokenDto;
 import com.example.backoffice.global.redis.RedisProvider;
@@ -32,7 +33,7 @@ public class AuthenticationService {
 
         // Redis에 Refresh Token 저장
         String refreshTokenKey = "refreshToken : " + memberName;
-        redisProvider.saveKey(
+        redisProvider.saveToken(
                 refreshTokenKey,
                 Math.toIntExact(
                         jwtProvider.getRefreshTokenExpiration() / 1000),
@@ -47,6 +48,10 @@ public class AuthenticationService {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
+    }
+
+    public String getCurrentMemberName(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
     private Authentication createAuthentication(String username){

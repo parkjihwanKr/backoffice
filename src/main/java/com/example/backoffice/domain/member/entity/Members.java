@@ -22,13 +22,17 @@ public class Members extends CommonEntity {
     private Long id;
 
     // 실명
+    @Column
     private String name;
 
     // 게임 접속 아이디
+    @Column(unique = true)
     private String memberName;
 
+    @Column
     private String password;
 
+    @Column(unique = true)
     private String email;
 
     @Column
@@ -37,6 +41,7 @@ public class Members extends CommonEntity {
 
     private String address;
 
+    @Column(unique = true)
     private String contact;
 
     private String profileImageUrl;
