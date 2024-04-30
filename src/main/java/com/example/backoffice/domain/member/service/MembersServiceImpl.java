@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.member.service;
 
 import com.example.backoffice.domain.file.service.FilesService;
+import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
@@ -9,6 +10,7 @@ import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.repository.MembersRepository;
 import com.example.backoffice.global.jwt.dto.TokenDto;
 import com.example.backoffice.global.security.AuthenticationService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +28,15 @@ public class MembersServiceImpl implements MembersService{
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @PostConstruct
+    public void createAdminAccount(){
+        String rawPassword = "12341234";
+        String bcrytPassword = passwordEncoder.encode(rawPassword);
+        membersRepository.save(
+                MembersConverter.toAdminEntity(bcrytPassword)
+        );
+    }
+
     @Override
     @Transactional
     public MembersResponseDto.CreateMembersResponseDto signup(
@@ -35,9 +46,9 @@ public class MembersServiceImpl implements MembersService{
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
-        Members member = requestDto.toEntity(bCrytPassword);
+        Members member = MembersConverter.toEntity(requestDto, bCrytPassword);
         membersRepository.save(member);
-        return MembersResponseDto.CreateMembersResponseDto.from(member);
+        return MembersConverter.toCreateDto(member);
     }
 
     @Override
@@ -61,7 +72,7 @@ public class MembersServiceImpl implements MembersService{
     public MembersResponseDto.ReadMemberResponseDto readMemberInfo(
             Long memberId, Members member){
         Members matchedMember = findMember(member, memberId);
-        return MembersResponseDto.ReadMemberResponseDto.from(matchedMember);
+        return MembersConverter.toReadDto(matchedMember);
     }
 
 
@@ -78,7 +89,7 @@ public class MembersServiceImpl implements MembersService{
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
         member.updateMemberInfo(requestDto, bCrytPassword);
         Members updateMember = membersRepository.save(member);
-        return MembersResponseDto.UpdateMemberResponseDto.from(updateMember);
+        return MembersConverter.toUpdateDto(updateMember);
     }
 
     // 권한 변경
@@ -90,7 +101,7 @@ public class MembersServiceImpl implements MembersService{
         Members changeRoleMember = findMember(member, memberId);
         String document = filesService.createFileForMemberRole(file, changeRoleMember);
         membersRepository.save(changeRoleMember);
-        return MembersResponseDto.UpdateMemberRoleResponseDto.from(member, document);
+        return MembersConverter.toUpdateRoleDto(member, document);
     }
 
     // 프로필 이미지 업로드
@@ -104,7 +115,7 @@ public class MembersServiceImpl implements MembersService{
 
         member.updateProfileImage(profileImageUrl);
         membersRepository.save(member);
-        return MembersResponseDto.UpdateMemberProfileImageUrlResponseDto.from(member);
+        return MembersConverter.toUpdateProfileImageDto(member);
     }
 
     // 프로필 이미지 삭제
@@ -121,7 +132,7 @@ public class MembersServiceImpl implements MembersService{
         filesService.deleteImage(existMember.getProfileImageUrl());
         existMember.updateProfileImage(null);
 
-        return MembersResponseDto.DeleteMemberProfileImageResponseDto.from(member);
+        return MembersConverter.toDeleteProfileImageDto(member);
     }
 
     @Override

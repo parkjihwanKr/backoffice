@@ -25,17 +25,6 @@ public class MembersResponseDto {
         private String contact;
         private String address;
         private MemberRole role;
-
-        public static CreateMembersResponseDto from(Members member){
-            return CreateMembersResponseDto.builder()
-                    .email(member.getEmail())
-                    .memberName(member.getMemberName())
-                    .name(member.getMemberName())
-                    .contact(member.getContact())
-                    .role(member.getRole())
-                    .address(member.getAddress())
-                    .build();
-        }
     }
 
     @Getter
@@ -50,17 +39,6 @@ public class MembersResponseDto {
         private MemberRole role;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-
-        public static ReadMemberResponseDto from(Members member){
-            return ReadMemberResponseDto.builder()
-                    .email(member.getEmail())
-                    .address(member.getAddress())
-                    .memberName(member.getMemberName())
-                    .role(member.getRole())
-                    .createdAt(member.getCreatedAt())
-                    .modifiedAt(member.getModifiedAt())
-                    .build();
-        }
     }
 
     @Getter
@@ -76,19 +54,6 @@ public class MembersResponseDto {
         private String introduction;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-
-        public static UpdateMemberResponseDto from(Members member){
-            return UpdateMemberResponseDto.builder()
-                    .memberName(member.getMemberName())
-                    .name(member.getName())
-                    .address(member.getAddress())
-                    .contact(member.getContact())
-                    .email(member.getEmail())
-                    .introduction(member.getIntroduction())
-                    .createdAt(member.getCreatedAt())
-                    .modifiedAt(member.getModifiedAt())
-                    .build();
-        }
     }
 
     @Getter
@@ -98,13 +63,6 @@ public class MembersResponseDto {
     public static class UpdateMemberRoleResponseDto{
         private String fromMemberName;
         private String fileName;
-
-        public static UpdateMemberRoleResponseDto from(Members member, String document){
-            return UpdateMemberRoleResponseDto.builder()
-                    .fromMemberName(member.getMemberName())
-                    .fileName(document)
-                    .build();
-        }
     }
 
     @Getter
@@ -114,13 +72,6 @@ public class MembersResponseDto {
     public static class UpdateMemberProfileImageUrlResponseDto{
         private String fromMemberName;
         private String profileImageUrl;
-
-        public static UpdateMemberProfileImageUrlResponseDto from(Members member){
-            return UpdateMemberProfileImageUrlResponseDto.builder()
-                    .fromMemberName(member.getMemberName())
-                    .profileImageUrl(member.getProfileImageUrl())
-                    .build();
-        }
     }
 
     @Getter
@@ -129,11 +80,5 @@ public class MembersResponseDto {
     @AllArgsConstructor
     public static class DeleteMemberProfileImageResponseDto{
         private String fromMemberName;
-
-        public static DeleteMemberProfileImageResponseDto from(Members member){
-            return DeleteMemberProfileImageResponseDto.builder()
-                    .fromMemberName(member.getMemberName())
-                    .build();
-        }
     }
 }

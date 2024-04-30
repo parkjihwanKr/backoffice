@@ -34,18 +34,6 @@ public class MembersRequestDto {
         // private String password;
         private String passwordConfirm;
         private String contact;
-
-        public Members toEntity(String bcryptPassword) {
-            return Members.builder()
-                    .memberName(this.memberName)
-                    .name(this.name) // 이름을 name으로 설정하는 것이 맞는지 확인
-                    .role(MemberRole.USER) // 역할 설정, MemberRole.USER 또는 직접 설정
-                    .email(this.email)
-                    .address(this.address)
-                    .password(bcryptPassword) // 암호화된 비밀번호 사용
-                    .contact(this.contact)
-                    .build();
-        }
     }
 
     @Builder
