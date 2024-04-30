@@ -28,6 +28,7 @@ public class MembersServiceImpl implements MembersService{
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 관리자 설정
     @PostConstruct
     public void createAdminAccount(){
         String rawPassword = "12341234";
