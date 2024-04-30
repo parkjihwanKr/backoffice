@@ -33,7 +33,7 @@ public class BoardsServiceImpl implements BoardsService{
     @Transactional(readOnly = true)
     public Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable){
         Page<Boards> boardList = boardsRepository.findAll(pageable);
-        return BoardsResponseDto.ReadBoardListResponseDto.of(boardList);
+        return BoardsConverter.toReadDto(boardList);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class BoardsServiceImpl implements BoardsService{
     public BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId){
         Boards board = findById(boardId);
         incrementViewCount(board);
-        return BoardsResponseDto.ReadBoardResponseDto.from(board);
+        return BoardsConverter.toReadOneDto(board);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class BoardsServiceImpl implements BoardsService{
             filesService.createFileForBoard(files.get(i), board);
         }
         boardsRepository.save(board);
-        return BoardsResponseDto.CreateBoardResponseDto.from(board);
+        return BoardsConverter.toCreateDto(board);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class BoardsServiceImpl implements BoardsService{
         board.update(requestDto);
         filesService.createFileForBoard(requestDto.getFile(), board);
         boardsRepository.save(board);
-        return BoardsResponseDto.UpdateBoardResponseDto.from(board);
+        return BoardsConverter.toUpdateDto(board);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class BoardsServiceImpl implements BoardsService{
         board.updateFile(requestDto.getFile());
         filesService.createFileForBoard(requestDto.getFile(), board);
         boardsRepository.save(board);
-        return BoardsResponseDto.UpdateImageBoardResponseDto.from(board);
+        return BoardsConverter.toUpdateImageDto(board);
     }
 
     @Transactional(readOnly = true)
