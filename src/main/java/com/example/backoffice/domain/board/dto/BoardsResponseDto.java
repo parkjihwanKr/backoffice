@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BoardsResponseDto {
 
@@ -21,8 +22,8 @@ public class BoardsResponseDto {
     public static class ReadBoardListResponseDto {
         private String title;
         private String writer;
-        private Integer likeCount;
-        private Integer commentCount;
+        private Long likeCount;
+        private Long viewCount;
         private LocalDateTime modifiedAt;
 
         public static Page<ReadBoardListResponseDto> of(Page<Boards> boardPage){
@@ -30,8 +31,8 @@ public class BoardsResponseDto {
                 return ReadBoardListResponseDto.builder()
                         .title(board.getTitle())
                         .writer(board.getMember().getMemberName())
-                        .likeCount(board.getLikeList().size())
-                        .commentCount(board.getCommentList().size())
+                        .likeCount(board.getLikeCount())
+                        .viewCount(board.getViewCount())
                         .modifiedAt(board.getModifiedAt())
                         .build();
             });
@@ -52,15 +53,32 @@ public class BoardsResponseDto {
         private Integer likeCount;
         // CommentList
         private List<Comments> commentList;
-        private List<Files> imageList;
+        private List<String> fileList;
+        private Long viewCount;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
 
         public static ReadBoardResponseDto from(Boards board){
+
+            List<String> fileUrls = board.getFileList().stream()
+                    .map(Files::getUrl)
+                    .collect(Collectors.toList());
+
+            // Comments의 Comments까지 구현해야하기에 아직
+            /*List<Comments> commentContents = board.getCommentList().stream()
+                    .map(Comments::getContent)
+                    .collect(Collectors.toList());*/
+
             return ReadBoardResponseDto.builder()
-                    .likeCount(board.getLikeList().size())
-                    .writer(board.getMember().getMemberName())
+                    .title(board.getTitle())
                     .content(board.getContent())
+                    .writer(board.getMember().getMemberName())
+                    .likeCount(board.getLikeList().size())
+                    .viewCount(board.getViewCount())
                     .commentList(board.getCommentList())
-                    .imageList(board.getImageList())
+                    .fileList(fileUrls)
+                    .createdAt(board.getCreatedAt())
+                    .modifiedAt(board.getModifiedAt())
                     .build();
         }
     }
@@ -92,7 +110,7 @@ public class BoardsResponseDto {
         private String content;
         private String writer;
         private List<Comments> commentList;
-        private Integer likeCount;
+        private Long likeCount;
         private LocalDateTime createdAt;
 
         public static UpdateBoardResponseDto from(Boards board){
@@ -101,7 +119,7 @@ public class BoardsResponseDto {
                     .content(board.getContent())
                     .writer(board.getMember().getMemberName())
                     .commentList(board.getCommentList())
-                    .likeCount(board.getLikeCount())
+                    .likeCount(0L)
                     .createdAt(board.getCreatedAt())
                     .build();
         }
@@ -116,7 +134,7 @@ public class BoardsResponseDto {
         private String content;
         private String writer;
         private List<Comments> commentList;
-        private Integer likeCount;
+        private Long likeCount;
         private LocalDateTime createdAt;
 
         public static UpdateImageBoardResponseDto from(Boards board){
@@ -125,7 +143,7 @@ public class BoardsResponseDto {
                     .content(board.getContent())
                     .writer(board.getMember().getMemberName())
                     .commentList(board.getCommentList())
-                    .likeCount(board.getLikeCount())
+                    .likeCount(0L)
                     .createdAt(board.getCreatedAt())
                     .build();
         }

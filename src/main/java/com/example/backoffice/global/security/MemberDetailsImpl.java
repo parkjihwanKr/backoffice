@@ -31,12 +31,12 @@ public class MemberDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return this.members.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return members.getEmail();
+        return this.members.getMemberName();
     }
 
     @Override
