@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.comment.controller;
 
+import com.amazonaws.Response;
 import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.service.CommentsService;
@@ -22,6 +23,17 @@ public class CommentsController {
             @PathVariable Long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         CommentsResponseDto.CreateCommentsResponseDto responseDto =
                 commentsService.createComment(requestDto, boardId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(responseDto);
+    }
+
+    @PatchMapping("/{boardId}/comments/{commentId}")
+    public ResponseEntity<CommentsResponseDto.UpdateCommentsResponseDto> updateComment(
+            @RequestBody CommentsRequestDto.UpdateCommentsRequestDto requestDto,
+            @PathVariable Long boardId, @PathVariable Long commentId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        CommentsResponseDto.UpdateCommentsResponseDto responseDto =
+                commentsService.updateComment(boardId, commentId,
+                        requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
     }
 }

@@ -26,7 +26,7 @@ public class CommentsResponseDto {
     public static class UpdateCommentsResponseDto{
         private String writer;
         private String content;
-        private LocalDateTime createAt;
+        private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
 }

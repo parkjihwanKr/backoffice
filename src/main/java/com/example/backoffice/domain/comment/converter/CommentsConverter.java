@@ -26,4 +26,14 @@ public class CommentsConverter {
                 .createdAt(comment.getCreatedAt())
                 .build();
     }
+
+    public static CommentsResponseDto.UpdateCommentsResponseDto toUpdateDto(
+            Comments comment, Members member){
+        return CommentsResponseDto.UpdateCommentsResponseDto.builder()
+                .writer(member.getMemberName())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .modifiedAt(comment.getModifiedAt())
+                .build();
+    }
 }

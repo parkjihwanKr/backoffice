@@ -1,6 +1,8 @@
 package com.example.backoffice.domain.comment.entity;
 
 import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
+import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -29,4 +31,9 @@ public class Comments extends CommonEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Members member;
+
+    // entity method
+    public void update(CommentsRequestDto.UpdateCommentsRequestDto requestDto){
+        this.content = requestDto.getContent();
+    }
 }

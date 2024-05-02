@@ -9,4 +9,9 @@ public interface CommentsService {
     CommentsResponseDto.CreateCommentsResponseDto createComment(
             CommentsRequestDto.CreateCommentsRequestDto requestDto,
             Long boardId, Members member);
+
+    CommentsResponseDto.UpdateCommentsResponseDto updateComment(
+            Long boardId, Long commentId,
+            CommentsRequestDto.UpdateCommentsRequestDto requestDto,
+            Members member);
 }
