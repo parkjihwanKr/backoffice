@@ -87,6 +87,7 @@ public class BoardsServiceImpl implements BoardsService{
         return BoardsConverter.toUpdateDto(board, afterFileUrlList);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Boards findById(Long boardId) {
         return boardsRepository.findById(boardId).orElseThrow(

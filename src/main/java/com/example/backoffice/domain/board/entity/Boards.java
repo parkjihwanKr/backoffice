@@ -72,6 +72,10 @@ public class Boards extends CommonEntity {
         this.content = requestDto.getContent();
     }
 
+    public void addComment(Comments comment){
+        commentList.add(comment);
+    }
+
     public void addLike(){
         likeList.add(null);
         this.likeCount++;
