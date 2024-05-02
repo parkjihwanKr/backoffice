@@ -29,6 +29,7 @@ public class BoardsConverter {
             return BoardsResponseDto.ReadBoardListResponseDto.builder()
                     .title(board.getTitle())
                     .writer(board.getMember().getMemberName())
+                    .content(board.getContent())
                     .likeCount(board.getLikeCount())
                     .viewCount(board.getViewCount())
                     .createdAt(board.getCreatedAt())
@@ -50,34 +51,41 @@ public class BoardsConverter {
 
         return BoardsResponseDto.ReadBoardResponseDto.builder()
                 .title(board.getTitle())
-                .content(board.getContent())
                 .writer(board.getMember().getMemberName())
+                .content(board.getContent())
                 .likeCount(board.getLikeList().size())
                 .viewCount(board.getViewCount())
-                .commentList(board.getCommentList())
                 .fileList(fileUrls)
+                .commentList(board.getCommentList())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
                 .build();
     }
 
-    public static BoardsResponseDto.CreateBoardResponseDto toCreateDto(Boards board){
+    public static BoardsResponseDto.CreateBoardResponseDto toCreateDto(
+            Boards board, List<String> fileUrlList){
+
         return BoardsResponseDto.CreateBoardResponseDto.builder()
                 .writer(board.getMember().getMemberName())
                 .title(board.getTitle())
                 .content(board.getContent())
+                .fileList(fileUrlList)
                 .createdAt(board.getCreatedAt())
                 .build();
     }
 
-    public static BoardsResponseDto.UpdateBoardResponseDto toUpdateDto(Boards board){
+    public static BoardsResponseDto.UpdateBoardResponseDto toUpdateDto(Boards board, List<String> fileUrlList){
+
         return BoardsResponseDto.UpdateBoardResponseDto.builder()
                 .title(board.getTitle())
-                .content(board.getContent())
                 .writer(board.getMember().getMemberName())
+                .content(board.getContent())
+                .fileList(fileUrlList)
                 .commentList(board.getCommentList())
-                .likeCount(0L)
+                .likeCount(board.getLikeCount())
+                .viewCount(board.getViewCount())
                 .createdAt(board.getCreatedAt())
+                .modifiedAt(board.getModifiedAt())
                 .build();
     }
 

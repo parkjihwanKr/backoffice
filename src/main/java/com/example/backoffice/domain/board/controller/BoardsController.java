@@ -42,10 +42,8 @@ public class BoardsController {
     }
 
     // 게시글 게시
-    @PostMapping(
-            consumes = {MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.MULTIPART_FORM_DATA_VALUE
-            })
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<BoardsResponseDto.CreateBoardResponseDto> createBoard(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") @Valid BoardsRequestDto.CreateBoardRequestDto requestDto,
@@ -58,22 +56,16 @@ public class BoardsController {
     }
 
     // 게시글 수정
-    @PatchMapping("/{boardId}")
+    @PatchMapping(value = "/{boardId}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<BoardsResponseDto.UpdateBoardResponseDto> updateBoard(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody BoardsRequestDto.UpdateBoardRequestDto requestDto){
+            @RequestPart(value = "data") BoardsRequestDto.UpdateBoardRequestDto requestDto,
+            @RequestPart(value = "files") List<MultipartFile> files){
         BoardsResponseDto.UpdateBoardResponseDto responseDto
-                = boardsService.updateBoard(boardId, memberDetails.getMembers(), requestDto);
-        return ResponseEntity.ok(responseDto);
-    }
-
-    // 게시글 이미지 수정
-    @PatchMapping("/{boardId}/boardImage")
-    public ResponseEntity<BoardsResponseDto.UpdateImageBoardResponseDto> updateBoardImage(
-            @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody BoardsRequestDto.UpdateImageBoardRequestDto requestDto){
-        BoardsResponseDto.UpdateImageBoardResponseDto responseDto =
-                boardsService.updateBoardImage(boardId, memberDetails.getMembers(), requestDto);
+                = boardsService.updateBoard(
+                        boardId, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.ok(responseDto);
     }
 

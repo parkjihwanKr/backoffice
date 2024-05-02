@@ -23,6 +23,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class S3Util {
 
+    /*
+    S3에서는 수정하는 방법이 없음
+    */
+
     private final AmazonS3Client amazonS3Client;
 
     @Value("${YOUR_BUCKET_NAME}")
@@ -36,10 +40,20 @@ public class S3Util {
         return uploadFileOrImage(file);
     }
 
+    // fileUrl 형식 : https://pjhawss3bucket.s3.ap-northeast-2.amazonaws.com/eba046ba-6b29-463e-9649-ad75486e05b5_ec2.png
     public void removeFile(String fileUrl) {
-        String fileName = URLDecoder.decode(fileUrl, StandardCharsets.UTF_8)
-                .substring(fileUrl.indexOf("_"));
-        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        System.out.println(fileUrl);
+        try {
+            // URL 디코딩
+            String decodedUrl = URLDecoder.decode(fileUrl, StandardCharsets.UTF_8);
+            // "_" 다음 문자부터 시작하여 파일 이름 추출
+            int underscoreIndex = decodedUrl.lastIndexOf("/") + 1;
+            String fileName = decodedUrl.substring(underscoreIndex);
+            // S3에서 파일 삭제
+            amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        } catch (Exception e) {
+            throw new AWSCustomException(GlobalExceptionCode.AWS_S3_NOT_MATCHED_FILE_URL);
+        }
     }
 
     public void removeImage(String imageUrl){

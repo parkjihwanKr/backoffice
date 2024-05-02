@@ -7,12 +7,16 @@ import com.example.backoffice.domain.file.repository.FilesRepository;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.awss3.S3Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FilesServiceImpl implements FilesService {
 
@@ -45,12 +49,31 @@ public class FilesServiceImpl implements FilesService {
     }
 
     @Override
-    public void deleteFile(String fileUrl){
-        s3Util.removeFile(fileUrl);
+    @Transactional
+    public void deleteFile(Long boardId, List<String> fileUrlList){
+        List<Files> files = filesRepository.findByBoardId(boardId);
+
+        for (String fileUrl : fileUrlList) {
+            try {
+                s3Util.removeFile(fileUrl);
+            } catch (Exception e) {
+                log.error("S3에서 파일 삭제 실패: " + fileUrl, e);
+            }
+        }
+
+        files.forEach(file -> {
+            try {
+                filesRepository.delete(file);
+            } catch (Exception e) {
+                log.error("데이터베이스에서 파일 엔티티 삭제 실패: " + file.getUrl(), e);
+            }
+        });
     }
 
     @Override
+    @Transactional
     public void deleteImage(String imageUrl){
+        filesRepository.deleteByUrl(imageUrl);
         s3Util.removeImage(imageUrl);
     }
 }

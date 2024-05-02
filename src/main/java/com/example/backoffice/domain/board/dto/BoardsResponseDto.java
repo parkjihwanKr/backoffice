@@ -22,10 +22,12 @@ public class BoardsResponseDto {
     public static class ReadBoardListResponseDto {
         private String title;
         private String writer;
+        private String content;
         private Long likeCount;
         private Long viewCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        private List<String> fileList;
     }
 
     @Getter
@@ -56,6 +58,7 @@ public class BoardsResponseDto {
         private String title;
         private String content;
         private LocalDateTime createdAt;
+        private List<String> fileList;
     }
 
     @Getter
@@ -67,8 +70,11 @@ public class BoardsResponseDto {
         private String content;
         private String writer;
         private List<Comments> commentList;
+        private List<String> fileList;
         private Long likeCount;
+        private Long viewCount;
         private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
     }
 
     @Getter
