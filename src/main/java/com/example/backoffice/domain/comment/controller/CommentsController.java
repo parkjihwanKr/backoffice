@@ -4,8 +4,10 @@ import com.amazonaws.Response;
 import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.service.CommentsService;
+import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,5 +37,18 @@ public class CommentsController {
                 commentsService.updateComment(boardId, commentId,
                         requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
+    }
+
+    @DeleteMapping("/{boardId}/comments/{commentId}")
+    public ResponseEntity<CommonResponse<Void>> deleteComment(
+            @PathVariable Long boardId, @PathVariable Long commentId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        commentsService.deleteComment(boardId, commentId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponse<>(
+                        HttpStatus.OK,
+                        "게시글의 댓글이 삭제되었습니다."
+                )
+        );
     }
 }

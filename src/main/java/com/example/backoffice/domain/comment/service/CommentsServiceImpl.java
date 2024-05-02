@@ -41,19 +41,37 @@ public class CommentsServiceImpl implements CommentsService{
             Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
-        if(!comment.getBoard().getId().equals(board.getId())){
-            throw new CommentsCustomException(CommentsExceptionCode.NOT_MATCHED_BOARD_COMMENT);
-        }
-        if(!comment.getMember().getId().equals(member.getId())){
-            throw new CommentsCustomException(CommentsExceptionCode.NOT_MATCHED_MEMBER_COMMENT);
-        }
+        isMatchedBoard(comment, board);
+        isMatchedMember(comment, member);
         comment.update(requestDto);
         return CommentsConverter.toUpdateDto(comment, member);
+    }
+
+    @Override
+    @Transactional
+    public void deleteComment(Long boardId, Long commentId, Members member){
+        Boards board = boardsService.findById(boardId);
+        Comments comment = findById(commentId);
+        isMatchedBoard(comment, board);
+        isMatchedMember(comment, member);
+        commentsRepository.deleteById(commentId);
     }
 
     public Comments findById(Long commentId){
         return commentsRepository.findById(commentId).orElseThrow(
                 () -> new CommentsCustomException(CommentsExceptionCode.NOT_FOUND_COMMENT)
         );
+    }
+
+    private void isMatchedBoard(Comments comment, Boards board){
+        if(!comment.getBoard().getId().equals(board.getId())){
+            throw new CommentsCustomException(CommentsExceptionCode.NOT_MATCHED_BOARD_COMMENT);
+        }
+    }
+
+    private void isMatchedMember(Comments comment, Members member){
+        if(!comment.getMember().getId().equals(member.getId())){
+            throw new CommentsCustomException(CommentsExceptionCode.NOT_MATCHED_MEMBER_COMMENT);
+        }
     }
 }

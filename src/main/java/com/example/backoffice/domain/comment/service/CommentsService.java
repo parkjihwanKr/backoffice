@@ -14,4 +14,6 @@ public interface CommentsService {
             Long boardId, Long commentId,
             CommentsRequestDto.UpdateCommentsRequestDto requestDto,
             Members member);
+
+    void deleteComment(Long boardId, Long commentId, Members member);
 }
