@@ -87,6 +87,15 @@ public class BoardsServiceImpl implements BoardsService{
         return BoardsConverter.toUpdateDto(board, afterFileUrlList);
     }
 
+    @Override
+    @Transactional
+    public void deleteBoard(Long boardId, Members member){
+        Boards board = findById(boardId);
+        if(!member.getId().equals(board.getMember().getId())){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_MEMBER);
+        }
+        boardsRepository.deleteById(boardId);
+    }
     @Transactional(readOnly = true)
     public Boards findById(Long boardId) {
         return boardsRepository.findById(boardId).orElseThrow(

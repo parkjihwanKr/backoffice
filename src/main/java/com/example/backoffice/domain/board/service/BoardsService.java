@@ -11,13 +11,14 @@ import java.util.List;
 
 public interface BoardsService {
 
-    public Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable);
-    public BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId);
-    public BoardsResponseDto.CreateBoardResponseDto createBoard(
+    Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable);
+    BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId);
+    BoardsResponseDto.CreateBoardResponseDto createBoard(
             Members member, BoardsRequestDto.CreateBoardRequestDto requestDto,
             List<MultipartFile> files);
-    public BoardsResponseDto.UpdateBoardResponseDto updateBoard(
+    BoardsResponseDto.UpdateBoardResponseDto updateBoard(
             Long boardId, Members member,
             BoardsRequestDto.UpdateBoardRequestDto requestDto,
             List <MultipartFile> files);
+    void deleteBoard(Long boardId, Members member);
 }

@@ -3,6 +3,7 @@ package com.example.backoffice.domain.board.controller;
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.board.service.BoardsService;
+import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -71,10 +73,14 @@ public class BoardsController {
 
     // 게시글 삭제
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<BoardsResponseDto> deleteBoard(
-            @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody BoardsRequestDto requestDto){
-
-        return null;
+    public ResponseEntity<CommonResponse<Void>> deleteBoard(
+            @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        boardsService.deleteBoard(boardId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponse<>(
+                        HttpStatus.OK,
+                        "게시글 삭제 성공"
+                )
+        );
     }
 }
