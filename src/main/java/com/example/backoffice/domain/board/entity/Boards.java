@@ -72,10 +72,6 @@ public class Boards extends CommonEntity {
         this.content = requestDto.getContent();
     }
 
-    public void updateFile(MultipartFile file){
-        fileList.add(Files.builder().url(file.getOriginalFilename()).build());
-    }
-
     public void addLike(){
         likeList.add(null);
         this.likeCount++;

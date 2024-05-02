@@ -17,7 +17,7 @@ public interface BoardsService {
             Members member, BoardsRequestDto.CreateBoardRequestDto requestDto,
             List<MultipartFile> files);
     public BoardsResponseDto.UpdateBoardResponseDto updateBoard(
-            Long boardId, Members member, BoardsRequestDto.UpdateBoardRequestDto requestDto);
-    public BoardsResponseDto.UpdateImageBoardResponseDto updateBoardImage(
-            Long boardId, Members member, BoardsRequestDto.UpdateImageBoardRequestDto requestDto);
+            Long boardId, Members member,
+            BoardsRequestDto.UpdateBoardRequestDto requestDto,
+            List <MultipartFile> files);
 }

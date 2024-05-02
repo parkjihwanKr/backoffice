@@ -15,6 +15,7 @@ public enum GlobalExceptionCode {
     // AWS S3
     AWS_S3_FILE_UPLOAD_FAIL(HttpStatus.BAD_REQUEST, "S3-001", "파일 업로드에 실패하셨습니다."),
     AWS_S3_FILE_NAME_IS_BLANK(HttpStatus.BAD_REQUEST, "S3-002", "파일 이름은 공백일 수 없습니다."),
+    AWS_S3_NOT_MATCHED_FILE_URL(HttpStatus.BAD_REQUEST, "S3-003", "파일 이름 형식 오류입니다."),
 
     // Validate JWT Token
     INVALID_TOKEN_VALUE(HttpStatus.BAD_REQUEST, "JWT-001", "JWT 토큰 값이 유효하지 않습니다."),

@@ -7,6 +7,7 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
+import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.redis.RedisProvider;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -50,33 +52,39 @@ public class BoardsServiceImpl implements BoardsService{
             Members member, BoardsRequestDto.CreateBoardRequestDto requestDto,
             List<MultipartFile> files){
         Boards board = BoardsConverter.toEntity(requestDto, member);
+        List<String> fileUrlList = new ArrayList<>();
         for(int i = 0; i<files.size(); i++) {
-            filesService.createFileForBoard(files.get(i), board);
+            String fileName = filesService.createFileForBoard(files.get(i), board);
+            fileUrlList.add(fileName);
         }
         boardsRepository.save(board);
-        return BoardsConverter.toCreateDto(board);
+        return BoardsConverter.toCreateDto(board, fileUrlList);
     }
 
     @Override
     @Transactional
     public BoardsResponseDto.UpdateBoardResponseDto updateBoard(
             Long boardId, Members member,
-            BoardsRequestDto.UpdateBoardRequestDto requestDto){
+            BoardsRequestDto.UpdateBoardRequestDto requestDto,
+            List<MultipartFile> files){
         Boards board = findById(boardId);
         board.update(requestDto);
-        filesService.createFileForBoard(requestDto.getFile(), board);
-        boardsRepository.save(board);
-        return BoardsConverter.toUpdateDto(board);
-    }
+        // 삭제 전 urlList, 삭제 후 urlList
+        List<String> beforeFileUrlList = new ArrayList<>();
+        List<String> afterFileUrlList = new ArrayList<>();
 
-    @Override
-    public BoardsResponseDto.UpdateImageBoardResponseDto updateBoardImage(
-            Long boardId, Members member, BoardsRequestDto.UpdateImageBoardRequestDto requestDto){
-        Boards board = findById(boardId);
-        board.updateFile(requestDto.getFile());
-        filesService.createFileForBoard(requestDto.getFile(), board);
-        boardsRepository.save(board);
-        return BoardsConverter.toUpdateImageDto(board);
+        for(int i = 0; i<board.getFileList().size(); i++){
+            beforeFileUrlList.add(board.getFileList().get(i).getUrl());
+            System.out.println("fileUrlList.get(i) : "+beforeFileUrlList.get(i));
+        }
+        board.getFileList().clear();
+        filesService.deleteFile(board.getId(), beforeFileUrlList);
+        for(int i = 0; i<files.size(); i++) {
+            // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
+            String fileUrl = filesService.createFileForBoard(files.get(i), board);
+            afterFileUrlList.add(fileUrl);
+        }
+        return BoardsConverter.toUpdateDto(board, afterFileUrlList);
     }
 
     @Transactional(readOnly = true)
@@ -89,7 +97,6 @@ public class BoardsServiceImpl implements BoardsService{
     // 조회수 로직
     private void incrementViewCount(Boards board){
         String currentMemberName = authenticationService.getCurrentMemberName();
-        System.out.println("currentMemberName : "+ currentMemberName);
         String key = "boardId : " + board.getId() +
                 ", viewMemberName : " + currentMemberName;
 
@@ -101,7 +108,7 @@ public class BoardsServiceImpl implements BoardsService{
         if (currentCount == null) {
             currentCount = 0L;
         }
-        Long viewCount = 0L;
+        Long viewCount;
         // 게시글 작성자가 현재 로그인한 사용자와 같은 경우
         if (board.getMember().getMemberName().equals(currentMemberName)) {
             if (currentCount < 1) {

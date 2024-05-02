@@ -4,10 +4,12 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface FilesService {
-    public String createFileForMemberRole(MultipartFile file, Members member);
-    public String createFileForBoard(MultipartFile file, Boards board);
-    public String createImage(MultipartFile image);
-    public void deleteFile(String fileUrl);
-    public void deleteImage(String imageUrl);
+    String createFileForMemberRole(MultipartFile file, Members member);
+    String createFileForBoard(MultipartFile file, Boards board);
+    String createImage(MultipartFile image);
+    void deleteFile(Long boardId, List<String> fileList);
+    void deleteImage(String imageUrl);
 }
