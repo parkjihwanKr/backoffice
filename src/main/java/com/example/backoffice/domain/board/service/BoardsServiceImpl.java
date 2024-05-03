@@ -7,7 +7,6 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
-import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.redis.RedisProvider;
@@ -38,6 +37,7 @@ public class BoardsServiceImpl implements BoardsService{
         return BoardsConverter.toReadDto(boardList);
     }
 
+    // #1 feedback : 해당 부분 Page 관리 필요할 듯, comments, replies까지 관리하니까 보기 힘듦
     @Override
     @Transactional
     public BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId){
