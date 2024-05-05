@@ -41,7 +41,6 @@ public class Boards extends CommonEntity {
     @Column
     private Long likeCount;
 
-    // feat #1 조회수 ? 구현해보고 싶은데?
     // relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -71,6 +70,30 @@ public class Boards extends CommonEntity {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
     }
+
+    public void addComment(Comments comment){
+        commentList.add(comment);
+    }
+
+    public void addReply(Comments reply){
+        commentList.get(commentList.size()-1).getReplies().add(reply);
+    }
+
+    /*public void updateReply(Comments reply){
+        int commentListIndex = 0;
+        for(Comments comment : commentList){
+            int index = 0;
+            for (Comments testReply : comment.getReplies()) {
+                if (reply.getId().equals(testReply.getId())) {
+                    this.commentList.get(commentListIndex).getReplies()
+                            .get(index).update(reply.getContent());
+                    return;
+                }
+                index++;
+            }
+            commentListIndex++;
+        }
+    }*/
 
     public void addLike(){
         likeList.add(null);
