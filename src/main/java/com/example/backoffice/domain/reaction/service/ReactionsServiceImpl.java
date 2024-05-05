@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.reaction.service;
 
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.reaction.converter.ReactionsConverter;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
@@ -25,7 +26,8 @@ public class ReactionsServiceImpl implements ReactionsService{
     public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction
             (Long toMemberId, Members fromMember,
              ReactionsRequestDto.CreateMemberReactionsRequestDto requestDto){
-        Members toMember = membersService.isMatchedLoginMember(toMemberId, fromMember.getId());
+        Members toMember
+                = membersService.isMatchedLoginMember(toMemberId, fromMember.getId());
 
         Emoji emoji = isMatchedEmoji(requestDto);
 
@@ -38,6 +40,15 @@ public class ReactionsServiceImpl implements ReactionsService{
         return ReactionsConverter.toCreateMemberReactionDto(reaction, emoji.toString());
     }
 
+    @Override
+    @Transactional
+    public void deleteMemberReaction(
+            Long toMemberId, Long reactionId, Members fromMember){
+        membersService.isMatchedLoginMember(toMemberId, fromMember.getId());
+        Reactions reaction = findById(reactionId);
+        reactionsRepository.delete(reaction);
+    }
+
     private Emoji isMatchedEmoji(ReactionsRequestDto.CreateMemberReactionsRequestDto requestDto){
         Emoji emoji;
         try {
@@ -46,5 +57,11 @@ public class ReactionsServiceImpl implements ReactionsService{
         } catch (IllegalArgumentException e) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_MATCHED_EMOJI);
         }
+    }
+
+    public Reactions findById(Long reactionId){
+        return reactionsRepository.findById(reactionId).orElseThrow(
+                ()-> new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION)
+        );
     }
 }

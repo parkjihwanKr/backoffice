@@ -9,4 +9,7 @@ public interface ReactionsService {
     ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction(
             Long memberId, Members member,
             ReactionsRequestDto.CreateMemberReactionsRequestDto requestDto);
+
+    void deleteMemberReaction(
+            Long toMemberId, Long reactionId, Members fromMember);
 }

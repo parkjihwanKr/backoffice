@@ -3,8 +3,10 @@ package com.example.backoffice.domain.reaction.controller;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 import com.example.backoffice.domain.reaction.service.ReactionsService;
+import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,5 +27,19 @@ public class ReactionController {
                 reactionsService.createMemberReaction(
                         memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.ok().body(responseDto);
+    }
+
+    @DeleteMapping("/member/{memberId}/reactions/{reactionId}")
+    public ResponseEntity<CommonResponse<Void>> deleteMemberReaction(
+            @PathVariable Long memberId, @PathVariable Long reactionId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        reactionsService.deleteMemberReaction(
+                memberId, reactionId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponse<>(
+                        HttpStatus.OK,
+                        "멤버 사랑해요 취소 성공"
+                )
+        );
     }
 }
