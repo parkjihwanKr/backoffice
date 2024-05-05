@@ -1,6 +1,5 @@
 package com.example.backoffice.domain.comment.controller;
 
-import com.amazonaws.Response;
 import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.service.CommentsService;
@@ -14,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/boards")
+@RequestMapping("/api/v1")
 public class CommentsController {
 
     private final CommentsService commentsService;
 
-    @PostMapping("/{boardId}/comments")
+    @PostMapping("/boards/{boardId}/comments")
     public ResponseEntity<CommentsResponseDto.CreateCommentsResponseDto> createComment(
             @RequestBody CommentsRequestDto.CreateCommentsRequestDto requestDto,
             @PathVariable Long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
@@ -28,7 +27,7 @@ public class CommentsController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @PatchMapping("/{boardId}/comments/{commentId}")
+    @PatchMapping("/boards/{boardId}/comments/{commentId}")
     public ResponseEntity<CommentsResponseDto.UpdateCommentsResponseDto> updateComment(
             @RequestBody CommentsRequestDto.UpdateCommentsRequestDto requestDto,
             @PathVariable Long boardId, @PathVariable Long commentId,
@@ -39,7 +38,7 @@ public class CommentsController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @DeleteMapping("/{boardId}/comments/{commentId}")
+    @DeleteMapping("/boards/{boardId}/comments/{commentId}")
     public ResponseEntity<CommonResponse<Void>> deleteComment(
             @PathVariable Long boardId, @PathVariable Long commentId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
@@ -50,5 +49,16 @@ public class CommentsController {
                         "게시글의 댓글이 삭제되었습니다."
                 )
         );
+    }
+
+    @PostMapping("/boards/{boardId}/comments/{commentId}")
+    public ResponseEntity<CommentsResponseDto.CreateReplyResponseDto> createReply(
+            @PathVariable Long boardId, @PathVariable Long commentId,
+            @RequestBody CommentsRequestDto.CreateReplyRequestDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        CommentsResponseDto.CreateReplyResponseDto responseDto =
+                commentsService.createReply(boardId, commentId,
+                        requestDto, memberDetails.getMembers());
+        return ResponseEntity.ok().body(responseDto);
     }
 }

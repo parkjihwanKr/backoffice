@@ -22,4 +22,20 @@ public class CommentsRequestDto {
     public static class UpdateCommentsRequestDto {
         private String content;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateReplyRequestDto {
+        private String content;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateReplyRequestDto {
+        private String content;
+    }
 }

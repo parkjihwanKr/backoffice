@@ -36,4 +36,28 @@ public class CommentsConverter {
                 .modifiedAt(comment.getModifiedAt())
                 .build();
     }
+
+    public static Comments toChildEntity(
+            CommentsRequestDto.CreateReplyRequestDto requestDto,
+            Boards board, Members member){
+        return Comments.builder()
+                .member(member)
+                .board(board)
+                .content(requestDto.getContent())
+                .build();
+    }
+
+    public static CommentsResponseDto.CreateReplyResponseDto toCreateReplyDto(
+            Comments parentComment, Comments childComment, Members member){
+        return CommentsResponseDto.CreateReplyResponseDto.builder()
+                .toMemberName(member.getMemberName())
+                .parentContent(parentComment.getContent())
+                .parentCreatedAt(parentComment.getCreatedAt())
+                .parentModifiedAt(childComment.getModifiedAt())
+                .fromMemberName(member.getMemberName())
+                .childContent(childComment.getContent())
+                .childCreatedAt(parentComment.getCreatedAt())
+                .childModifiedAt(childComment.getModifiedAt())
+                .build();
+    }
 }

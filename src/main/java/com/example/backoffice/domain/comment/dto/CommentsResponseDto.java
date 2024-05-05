@@ -49,12 +49,12 @@ public class CommentsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateReplyResponseDto {
-        private String fromMemberName;
         private String toMemberName;
         private String parentContent;
-        private String childContent;
         private LocalDateTime parentCreatedAt;
         private LocalDateTime parentModifiedAt;
+        private String fromMemberName;
+        private String childContent;
         private LocalDateTime childCreatedAt;
         private LocalDateTime childModifiedAt;
     }

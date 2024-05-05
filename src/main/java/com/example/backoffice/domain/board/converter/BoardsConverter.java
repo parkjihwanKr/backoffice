@@ -41,40 +41,46 @@ public class BoardsConverter {
         });
     }
 
-    public static BoardsResponseDto.ReadBoardResponseDto toReadOneDto(Boards board){
-
+    public static BoardsResponseDto.ReadBoardResponseDto toReadOneDto(Boards board) {
         List<String> fileUrls = board.getFileList().stream()
                 .map(Files::getUrl)
                 .collect(Collectors.toList());
 
-        List<CommentsResponseDto.ReadBoardCommentResponseDto> commentList
-                = new ArrayList<>();
-        List<CommentsResponseDto.ReadCommentRepliesResponseDto> replyList
-                = new ArrayList<>();
+        List<CommentsResponseDto.ReadBoardCommentResponseDto> commentList = new ArrayList<>();
 
-        for(int i = 0; i<board.getCommentList().size(); i++){
-            for(int j = 0; j<board.getCommentList().get(i).getReplies().size(); j++){
-                replyList.add(
-                        CommentsResponseDto.ReadCommentRepliesResponseDto.builder()
-                                .replyId(null)
-                                .replyWriter(null)
-                                .replyContent(null)
-                                .replyCreatedAt(null)
-                                .replyModifiedAt(null)
-                                .build()
-                );
+        // 댓글 리스트를 순회하면서 최상위 댓글과 대댓글을 구분하여 처리
+        for (Comments comment : board.getCommentList()) {
+            Long parentId = comment.getParent().getId();  // parent는 null이 아님
+            Long commentId = comment.getId();
+
+            // 최상위 댓글이 맞는지
+            if (parentId.equals(commentId)) {
+                List<CommentsResponseDto.ReadCommentRepliesResponseDto> replyList = new ArrayList<>();
+
+                // 해당 댓글의 대댓글 찾기
+                for (Comments commentReply : board.getCommentList()) {
+                    // 대댓글 리스트에 추가
+                    if (commentReply.getParent().getId().equals(commentId) && !commentReply.getId().equals(commentId)) {
+                        replyList.add(CommentsResponseDto.ReadCommentRepliesResponseDto.builder()
+                                .replyId(commentReply.getId())
+                                .replyWriter(commentReply.getMember().getMemberName())
+                                .replyContent(commentReply.getContent())
+                                .replyCreatedAt(commentReply.getCreatedAt())
+                                .replyModifiedAt(commentReply.getModifiedAt())
+                                .build());
+                    }
+                }
+
+                // 최상위 댓글을 댓글 리스트에 추가
+                commentList.add(CommentsResponseDto.ReadBoardCommentResponseDto.builder()
+                        .commentId(commentId)
+                        .commentWriter(comment.getMember().getMemberName())
+                        .commentContent(comment.getContent())
+                        .commentCreatedAt(comment.getCreatedAt())
+                        .commentModifiedAt(comment.getModifiedAt())
+                        .replyList(replyList)
+                        .build());
             }
-
-            commentList.add(
-                    CommentsResponseDto.ReadBoardCommentResponseDto.builder()
-                            .commentId(board.getCommentList().get(i).getId())
-                            .commentWriter(board.getCommentList().get(i).getMember().getMemberName())
-                            .commentContent(board.getCommentList().get(i).getContent())
-                            .commentCreatedAt(board.getCommentList().get(i).getCreatedAt())
-                            .commentModifiedAt(board.getCommentList().get(i).getModifiedAt())
-                            .replyList(replyList)
-                            .build()
-            );
         }
 
         return BoardsResponseDto.ReadBoardResponseDto.builder()
@@ -89,6 +95,7 @@ public class BoardsConverter {
                 .modifiedAt(board.getModifiedAt())
                 .build();
     }
+
 
     public static BoardsResponseDto.CreateBoardResponseDto toCreateDto(
             Boards board, List<String> fileUrlList){

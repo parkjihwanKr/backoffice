@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @Builder
 @Entity
@@ -32,8 +34,23 @@ public class Comments extends CommonEntity {
     @JoinColumn(name = "member_id")
     private Members member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comments parent;  // 부모 댓글
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comments> replies;
+
     // entity method
     public void update(CommentsRequestDto.UpdateCommentsRequestDto requestDto){
         this.content = requestDto.getContent();
+    }
+
+    public void updateParent(Comments comment){
+        this.parent = comment;
+    }
+
+    public void addReply(Comments comment){
+        replies.add(comment);
     }
 }

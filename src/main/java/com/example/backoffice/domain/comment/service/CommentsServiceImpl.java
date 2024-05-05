@@ -29,6 +29,7 @@ public class CommentsServiceImpl implements CommentsService{
         Boards board = boardsService.findById(boardId);
         Comments comment = CommentsConverter.toEntity(requestDto, board, member);
         board.addComment(comment);
+        comment.updateParent(comment);
         commentsRepository.save(comment);
         return CommentsConverter.toCreateDto(comment, member);
     }
@@ -57,6 +58,25 @@ public class CommentsServiceImpl implements CommentsService{
         commentsRepository.deleteById(commentId);
     }
 
+    @Override
+    @Transactional
+    public CommentsResponseDto.CreateReplyResponseDto createReply(
+            Long boardId, Long commentId,
+            CommentsRequestDto.CreateReplyRequestDto requestDto,
+            Members member){
+        Boards board = boardsService.findById(boardId);
+        Comments comment = findById(commentId);
+        isMatchedBoard(comment, board);
+        Comments reply = CommentsConverter.toChildEntity(requestDto, board, member);
+        reply.updateParent(comment);
+        comment.addReply(reply);
+        board.addReply(comment);
+        commentsRepository.save(reply);
+        return CommentsConverter.toCreateReplyDto(comment, reply, member);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Comments findById(Long commentId){
         return commentsRepository.findById(commentId).orElseThrow(
                 () -> new CommentsCustomException(CommentsExceptionCode.NOT_FOUND_COMMENT)
