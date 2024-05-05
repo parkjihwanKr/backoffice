@@ -64,4 +64,8 @@ public class Members extends CommonEntity {
     public void updateProfileImage(String profileImageUrl){
         this.profileImageUrl = profileImageUrl;
     }
+
+    public void addEmoji(Reactions reaction){
+        this.reactionList.add(reaction);
+    }
 }

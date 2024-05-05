@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum Emoji {
-    USER(Emoji.MyEmoji.LOVE),
-    ADMIN(Emoji.MyEmoji.LIKE),
-    HOST(Emoji.MyEmoji.UNLIKE);
+    LOVE(Emoji.MyEmoji.LOVE),
+    LIKE(Emoji.MyEmoji.LIKE),
+    UNLIKE(Emoji.MyEmoji.UNLIKE);
 
     private final String myEmoji;
 

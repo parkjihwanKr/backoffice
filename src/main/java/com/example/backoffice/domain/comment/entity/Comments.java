@@ -43,9 +43,6 @@ public class Comments extends CommonEntity {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reactions> reactions;
 
-    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reactions> replyReactions;
-
     // entity method
     public void update(String content){
         this.content = content;
