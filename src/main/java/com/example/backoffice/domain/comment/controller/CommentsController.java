@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -71,5 +72,19 @@ public class CommentsController {
                 commentsService.updateReply(commentId, replyId,
                         requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
+    }
+
+    @DeleteMapping("/comments/{commentId}/replies/{replyId}")
+    public ResponseEntity<CommonResponse<Void>> deleteReply(
+            @PathVariable Long commentId, @PathVariable Long replyId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        commentsService.deleteReply(
+                commentId, replyId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponse<>(
+                        HttpStatus.OK,
+                        "대댓글 삭제 성공"
+                )
+        );
     }
 }

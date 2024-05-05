@@ -74,10 +74,10 @@ public class CommentsServiceImpl implements CommentsService{
             Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
-        isMatchedBoard(comment, board);
 
         Comments reply = CommentsConverter.toChildEntity(requestDto, board, member);
 
+        isMatchedBoard(comment, board);
         reply.updateParent(comment);
         comment.addReply(reply);
         board.addReply(comment);
@@ -94,7 +94,6 @@ public class CommentsServiceImpl implements CommentsService{
             Members member){
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
-        System.out.println("commentId : "+comment.getId()+" replyId : "+reply.getId());
         Boards board = boardsService.findById(comment.getBoard().getId());
 
         isMatchedBoard(comment, board);
@@ -103,6 +102,23 @@ public class CommentsServiceImpl implements CommentsService{
         reply.update(requestDto.getContent());
 
         return CommentsConverter.UpdateReplyDto(comment, reply, member);
+    }
+
+    @Override
+    @Transactional
+    public void deleteReply(Long commentId, Long replyId, Members member){
+        Comments comment = findById(commentId);
+        Comments reply = findById(replyId);
+        Boards board = boardsService.findById(comment.getBoard().getId());
+
+        isMatchedComment(comment, reply);
+        isMatchedBoard(comment, board);
+
+        // 대댓글 삭제 로직
+        comment.getReplies().removeIf(
+                commentReply -> commentReply.getId().equals(replyId));
+
+        commentsRepository.deleteById(replyId);
     }
 
     @Override

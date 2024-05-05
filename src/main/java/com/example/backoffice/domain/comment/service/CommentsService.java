@@ -29,5 +29,7 @@ public interface CommentsService {
             CommentsRequestDto.UpdateReplyRequestDto requestDto,
             Members member);
 
+    void deleteReply(Long commentId, Long replyId, Members member);
+
     Comments findById(Long commentId);
 }
