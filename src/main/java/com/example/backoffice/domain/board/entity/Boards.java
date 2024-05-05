@@ -78,6 +78,23 @@ public class Boards extends CommonEntity {
     public void addReply(Comments reply){
         commentList.get(commentList.size()-1).getReplies().add(reply);
     }
+
+    /*public void updateReply(Comments reply){
+        int commentListIndex = 0;
+        for(Comments comment : commentList){
+            int index = 0;
+            for (Comments testReply : comment.getReplies()) {
+                if (reply.getId().equals(testReply.getId())) {
+                    this.commentList.get(commentListIndex).getReplies()
+                            .get(index).update(reply.getContent());
+                    return;
+                }
+                index++;
+            }
+            commentListIndex++;
+        }
+    }*/
+
     public void addLike(){
         likeList.add(null);
         this.likeCount++;

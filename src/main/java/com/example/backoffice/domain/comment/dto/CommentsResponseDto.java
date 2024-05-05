@@ -52,11 +52,9 @@ public class CommentsResponseDto {
         private String toMemberName;
         private String parentContent;
         private LocalDateTime parentCreatedAt;
-        private LocalDateTime parentModifiedAt;
         private String fromMemberName;
         private String childContent;
         private LocalDateTime childCreatedAt;
-        private LocalDateTime childModifiedAt;
     }
 
     @Getter
@@ -69,5 +67,20 @@ public class CommentsResponseDto {
         private String replyContent;
         private LocalDateTime replyCreatedAt;
         private LocalDateTime replyModifiedAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateReplyResponseDto {
+        private String toMemberName;
+        private String parentContent;
+        private LocalDateTime parentCreatedAt;
+        private LocalDateTime parentModifiedAt;
+        private String fromMemberName;
+        private String childContent;
+        private LocalDateTime childCreatedAt;
+        private LocalDateTime childModifiedAt;
     }
 }

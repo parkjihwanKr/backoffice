@@ -50,7 +50,19 @@ public class CommentsConverter {
     public static CommentsResponseDto.CreateReplyResponseDto toCreateReplyDto(
             Comments parentComment, Comments childComment, Members member){
         return CommentsResponseDto.CreateReplyResponseDto.builder()
-                .toMemberName(member.getMemberName())
+                .toMemberName(parentComment.getMember().getMemberName())
+                .parentContent(parentComment.getContent())
+                .parentCreatedAt(parentComment.getCreatedAt())
+                .fromMemberName(member.getMemberName())
+                .childContent(childComment.getContent())
+                .childCreatedAt(parentComment.getCreatedAt())
+                .build();
+    }
+
+    public static CommentsResponseDto.UpdateReplyResponseDto UpdateReplyDto(
+            Comments parentComment, Comments childComment, Members member){
+        return CommentsResponseDto.UpdateReplyResponseDto.builder()
+                .toMemberName(parentComment.getMember().getMemberName())
                 .parentContent(parentComment.getContent())
                 .parentCreatedAt(parentComment.getCreatedAt())
                 .parentModifiedAt(childComment.getModifiedAt())

@@ -42,15 +42,15 @@ public class Comments extends CommonEntity {
     private List<Comments> replies;
 
     // entity method
-    public void update(CommentsRequestDto.UpdateCommentsRequestDto requestDto){
-        this.content = requestDto.getContent();
+    public void update(String content){
+        this.content = content;
     }
 
     public void updateParent(Comments comment){
         this.parent = comment;
     }
 
-    public void addReply(Comments comment){
-        replies.add(comment);
+    public void addReply(Comments reply){
+        this.replies.add(reply);
     }
 }

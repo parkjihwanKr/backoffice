@@ -111,6 +111,13 @@ public class BoardsConverter {
 
     public static BoardsResponseDto.UpdateBoardResponseDto toUpdateDto(Boards board, List<String> fileUrlList){
 
+        List<CommentsResponseDto.UpdateCommentsResponseDto> commentList = new ArrayList<>();
+        commentList.add(
+                CommentsResponseDto.UpdateCommentsResponseDto.builder()
+                        .content(board.getCommentList().get(0).getContent())
+                        .build()
+        );
+
         return BoardsResponseDto.UpdateBoardResponseDto.builder()
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())

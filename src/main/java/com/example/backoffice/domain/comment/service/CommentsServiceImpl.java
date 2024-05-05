@@ -28,9 +28,12 @@ public class CommentsServiceImpl implements CommentsService{
             Long boardId, Members member) {
         Boards board = boardsService.findById(boardId);
         Comments comment = CommentsConverter.toEntity(requestDto, board, member);
+
         board.addComment(comment);
         comment.updateParent(comment);
+
         commentsRepository.save(comment);
+
         return CommentsConverter.toCreateDto(comment, member);
     }
 
@@ -42,9 +45,12 @@ public class CommentsServiceImpl implements CommentsService{
             Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
+
         isMatchedBoard(comment, board);
         isMatchedMember(comment, member);
-        comment.update(requestDto);
+
+        comment.update(requestDto.getContent());
+
         return CommentsConverter.toUpdateDto(comment, member);
     }
 
@@ -53,8 +59,10 @@ public class CommentsServiceImpl implements CommentsService{
     public void deleteComment(Long boardId, Long commentId, Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
+
         isMatchedBoard(comment, board);
         isMatchedMember(comment, member);
+
         commentsRepository.deleteById(commentId);
     }
 
@@ -67,12 +75,34 @@ public class CommentsServiceImpl implements CommentsService{
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
         isMatchedBoard(comment, board);
+
         Comments reply = CommentsConverter.toChildEntity(requestDto, board, member);
+
         reply.updateParent(comment);
         comment.addReply(reply);
         board.addReply(comment);
+
         commentsRepository.save(reply);
         return CommentsConverter.toCreateReplyDto(comment, reply, member);
+    }
+
+    @Override
+    @Transactional
+    public CommentsResponseDto.UpdateReplyResponseDto updateReply(
+            Long commentId, Long replyId,
+            CommentsRequestDto.UpdateReplyRequestDto requestDto,
+            Members member){
+        Comments comment = findById(commentId);
+        Comments reply = findById(replyId);
+        System.out.println("commentId : "+comment.getId()+" replyId : "+reply.getId());
+        Boards board = boardsService.findById(comment.getBoard().getId());
+
+        isMatchedBoard(comment, board);
+        isMatchedComment(comment, reply);
+
+        reply.update(requestDto.getContent());
+
+        return CommentsConverter.UpdateReplyDto(comment, reply, member);
     }
 
     @Override
@@ -85,13 +115,23 @@ public class CommentsServiceImpl implements CommentsService{
 
     private void isMatchedBoard(Comments comment, Boards board){
         if(!comment.getBoard().getId().equals(board.getId())){
-            throw new CommentsCustomException(CommentsExceptionCode.NOT_MATCHED_BOARD_COMMENT);
+            throw new CommentsCustomException(
+                    CommentsExceptionCode.NOT_MATCHED_BOARD_COMMENT
+            );
         }
     }
 
     private void isMatchedMember(Comments comment, Members member){
         if(!comment.getMember().getId().equals(member.getId())){
-            throw new CommentsCustomException(CommentsExceptionCode.NOT_MATCHED_MEMBER_COMMENT);
+            throw new CommentsCustomException(
+                    CommentsExceptionCode.NOT_MATCHED_MEMBER_COMMENT
+            );
+        }
+    }
+
+    private void isMatchedComment(Comments comment, Comments reply){
+        if(comment.getId().equals(reply.getId())){
+            throw new CommentsCustomException(CommentsExceptionCode.IS_COMMENT);
         }
     }
 }

@@ -61,4 +61,15 @@ public class CommentsController {
                         requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
     }
+
+    @PatchMapping("/comments/{commentId}/replies/{replyId}")
+    public ResponseEntity<CommentsResponseDto.UpdateReplyResponseDto> updateReply(
+            @PathVariable Long commentId, @PathVariable Long replyId,
+            @RequestBody CommentsRequestDto.UpdateReplyRequestDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        CommentsResponseDto.UpdateReplyResponseDto responseDto =
+                commentsService.updateReply(commentId, replyId,
+                        requestDto, memberDetails.getMembers());
+        return ResponseEntity.ok().body(responseDto);
+    }
 }

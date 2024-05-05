@@ -24,5 +24,10 @@ public interface CommentsService {
             CommentsRequestDto.CreateReplyRequestDto requestDto,
             Members member);
 
+    CommentsResponseDto.UpdateReplyResponseDto updateReply(
+            Long commentId, Long replyId,
+            CommentsRequestDto.UpdateReplyRequestDto requestDto,
+            Members member);
+
     Comments findById(Long commentId);
 }
