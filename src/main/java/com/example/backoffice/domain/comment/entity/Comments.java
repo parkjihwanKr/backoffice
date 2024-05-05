@@ -1,9 +1,8 @@
 package com.example.backoffice.domain.comment.entity;
 
 import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
-import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,6 +39,12 @@ public class Comments extends CommonEntity {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comments> replies;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reactions> reactions;
+
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reactions> replyReactions;
 
     // entity method
     public void update(String content){
