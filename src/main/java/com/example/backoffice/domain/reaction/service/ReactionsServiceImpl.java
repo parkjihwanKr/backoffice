@@ -1,5 +1,8 @@
 package com.example.backoffice.domain.reaction.service;
 
+import com.example.backoffice.domain.board.converter.BoardsConverter;
+import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.board.service.BoardsService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.reaction.converter.ReactionsConverter;
@@ -20,8 +23,8 @@ public class ReactionsServiceImpl implements ReactionsService{
 
     private final ReactionsRepository reactionsRepository;
     private final MembersService membersService;
+    private final BoardsService boardsService;
 
-    // #feedback #2 : 2번 연속 'LOVE' 누르기, 취소 불가능하게
     @Override
     @Transactional
     public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction
@@ -34,10 +37,10 @@ public class ReactionsServiceImpl implements ReactionsService{
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
-        Emoji emoji = isMatchedEmoji(requestDto);
+        Emoji emoji = isMatchedMemberEmoji(requestDto.getEmoji());
 
         Reactions reaction
-                = ReactionsConverter.toEntity(toMember, fromMember, emoji);
+                = ReactionsConverter.toEntity(toMember, fromMember, emoji, null, null);
         reactionsRepository.save(reaction);
 
         toMember.addEmoji(reaction);
@@ -60,11 +63,57 @@ public class ReactionsServiceImpl implements ReactionsService{
         reactionsRepository.delete(reaction);
     }
 
-    private Emoji isMatchedEmoji(ReactionsRequestDto.CreateMemberReactionsRequestDto requestDto){
+    @Override
+    @Transactional
+    public ReactionsResponseDto.CreateBoardReactionResponseDto createBoardReaction(
+            Long boardId, Members fromMember,
+            ReactionsRequestDto.CreateBoardReactionRequestDto requestDto){
+
+        // 1. board 존재하는지
+        // 2. board 작성자와 이모지 반응을 주는 사람과 일치 하는지?
+        Boards board = boardsService.findById(boardId);
+        membersService.isMatchedLoginMember(
+                board.getMember().getId(), fromMember.getId());
+        Emoji emoji = isMatchedEmoji(requestDto.getEmoji());
+
+        if(reactionsRepository.existsByBoardAndReactorAndEmoji(
+                board, fromMember, emoji)){
+            throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
+        }
+
+        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, null);
+        board.addEmoji(reaction, emoji.toString());
+
+        return ReactionsConverter.toCreateBoardReactionDto(
+                fromMember, board, reaction, emoji.toString());
+    }
+
+    private Emoji isMatchedMemberEmoji(String memberEmoji){
         Emoji emoji;
         try {
-            emoji = Emoji.valueOf(requestDto.getEmoji().toUpperCase()); // 클라이언트로부터 받은 문자열을 Emoji enum으로 변환
-            return emoji;
+            emoji = Emoji.valueOf(memberEmoji.toUpperCase()); // 클라이언트로부터 받은 문자열을 Emoji enum으로 변환
+            if(emoji.toString().equals("LOVE")){
+                return emoji;
+            }else{
+                // 멤버는 "LOVE" 이모지를 제외하고 할 수 없음
+                throw new ReactionsCustomException(ReactionsExceptionCode.NOT_ACCEPTED_EMOJI);
+            }
+
+        } catch (IllegalArgumentException e) {
+            throw new ReactionsCustomException(ReactionsExceptionCode.NOT_MATCHED_EMOJI);
+        }
+    }
+
+    private Emoji isMatchedEmoji(String requestEmoji){
+        Emoji emoji;
+        try {
+            emoji = Emoji.valueOf(requestEmoji.toUpperCase()); // 클라이언트로부터 받은 문자열을 Emoji enum으로 변환
+            if(emoji.toString().equals("LIKE") || emoji.toString().equals("UNLIKE")){
+                return emoji;
+            }else{
+                // 게시글, 댓글, 대댓글은 "LIKE", "UNLIKE"만 사용 가능
+                throw new ReactionsCustomException(ReactionsExceptionCode.NOT_ACCEPTED_EMOJI);
+            }
         } catch (IllegalArgumentException e) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_MATCHED_EMOJI);
         }

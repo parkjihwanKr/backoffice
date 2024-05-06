@@ -42,4 +42,16 @@ public class ReactionController {
                 )
         );
     }
+
+    @PostMapping("/board/{boardId}/reactions")
+    public ResponseEntity<ReactionsResponseDto.CreateBoardReactionResponseDto> createBoardReaction(
+                    @PathVariable Long boardId,
+                    @RequestBody ReactionsRequestDto.CreateBoardReactionRequestDto requestDto,
+                    @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        ReactionsResponseDto.CreateBoardReactionResponseDto responseDto =
+                reactionsService.createBoardReaction(
+                        boardId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.ok().body(responseDto);
+    }
+
 }

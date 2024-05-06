@@ -40,6 +40,9 @@ public class Boards extends CommonEntity {
     @Column
     private Long likeCount;
 
+    @Column
+    private Long unLikeCount;
+
     // relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -75,8 +78,12 @@ public class Boards extends CommonEntity {
         commentList.get(commentList.size()-1).getReplies().add(reply);
     }
 
-    public void addLike(){
-        reactionList.add(null);
-        this.likeCount++;
+    public void addEmoji(Reactions reaction, String emoji){
+        reactionList.add(reaction);
+        if(emoji.equals("LIKE")){
+            this.likeCount++;
+        }else if(emoji.equals("UNLIKE")){
+            this.unLikeCount++;
+        }
     }
 }

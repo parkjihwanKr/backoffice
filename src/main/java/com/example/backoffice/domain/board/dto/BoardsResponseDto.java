@@ -21,6 +21,7 @@ public class BoardsResponseDto {
         private String writer;
         private String content;
         private Long likeCount;
+        private Long unLikeCount;
         private Long viewCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
@@ -37,11 +38,12 @@ public class BoardsResponseDto {
         private String title;
         private String content;
         // Like.count
-        private Integer likeCount;
+        private Long likeCount;
+        private Long unLikeCount;
+        private Long viewCount;
         // CommentList
         private List<CommentsResponseDto.ReadBoardCommentResponseDto> commentList;
         private List<String> fileList;
-        private Long viewCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -68,6 +70,7 @@ public class BoardsResponseDto {
         private List<Comments> commentList;
         private List<String> fileList;
         private Long likeCount;
+        private Long unLikeCount;
         private Long viewCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;

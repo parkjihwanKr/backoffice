@@ -14,4 +14,12 @@ public class ReactionsRequestDto {
     public static class CreateMemberReactionsRequestDto {
         private String emoji;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateBoardReactionRequestDto {
+        private String emoji;
+    }
 }

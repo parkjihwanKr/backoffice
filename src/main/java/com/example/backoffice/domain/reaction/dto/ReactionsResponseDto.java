@@ -19,4 +19,18 @@ public class ReactionsResponseDto {
         private String emoji;
         private LocalDateTime createdAt;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateBoardReactionResponseDto {
+        private String boardTitle;
+        private String boardContent;
+        private Long likeCount;
+        private Long unLikeCount;
+        private Long viewCount;
+        private String fromMemberName;
+        private String emoji;
+    }
 }

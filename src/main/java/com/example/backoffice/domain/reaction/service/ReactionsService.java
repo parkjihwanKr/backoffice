@@ -12,4 +12,9 @@ public interface ReactionsService {
 
     void deleteMemberReaction(
             Long toMemberId, Long reactionId, Members fromMember);
+
+    ReactionsResponseDto.CreateBoardReactionResponseDto createBoardReaction(
+            Long boardId, Members member,
+            ReactionsRequestDto.CreateBoardReactionRequestDto requestDto
+    );
 }

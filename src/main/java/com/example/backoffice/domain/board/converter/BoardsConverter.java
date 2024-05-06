@@ -22,6 +22,7 @@ public class BoardsConverter {
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .likeCount(0L)
+                .unLikeCount(0L)
                 .viewCount(0L)
                 .build();
     }
@@ -33,6 +34,7 @@ public class BoardsConverter {
                     .writer(board.getMember().getMemberName())
                     .content(board.getContent())
                     .likeCount(board.getLikeCount())
+                    .unLikeCount(board.getUnLikeCount())
                     .viewCount(board.getViewCount())
                     .createdAt(board.getCreatedAt())
                     .modifiedAt(board.getModifiedAt())
@@ -86,7 +88,8 @@ public class BoardsConverter {
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
                 .content(board.getContent())
-                .likeCount(board.getReactionList().size())
+                .likeCount(board.getLikeCount())
+                .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
                 .fileList(fileUrls)
                 .commentList(commentList)
@@ -124,6 +127,7 @@ public class BoardsConverter {
                 .fileList(fileUrlList)
                 .commentList(board.getCommentList())
                 .likeCount(board.getLikeCount())
+                .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())

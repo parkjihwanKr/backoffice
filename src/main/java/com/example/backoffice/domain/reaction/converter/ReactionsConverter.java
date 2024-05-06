@@ -1,5 +1,7 @@
 package com.example.backoffice.domain.reaction.converter;
 
+import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
@@ -10,11 +12,10 @@ public class ReactionsConverter {
 
     public static Reactions toEntity(
             Members toMember, Members fromMember,
-            Emoji emoji) {
-
+            Emoji emoji, Boards board, Comments comment) {
         return Reactions.builder()
-                .board(null)
-                .comment(null)
+                .board(board)
+                .comment(comment)
                 .member(toMember)
                 .reactor(fromMember)
                 .emoji(emoji)
@@ -24,12 +25,25 @@ public class ReactionsConverter {
     public static ReactionsResponseDto
             .CreateMemberReactionResponseDto toCreateMemberReactionDto(
                     Reactions reaction, String emoji){
-
         return ReactionsResponseDto.CreateMemberReactionResponseDto.builder()
                 .fromMemberName(reaction.getMember().getMemberName())
                 .toMemberName(reaction.getReactor().getMemberName())
                 .emoji(emoji)
                 .createdAt(reaction.getCreatedAt())
+                .build();
+    }
+
+    public static ReactionsResponseDto
+            .CreateBoardReactionResponseDto toCreateBoardReactionDto(
+                    Members fromMember, Boards board, Reactions reaction, String emoji){
+        return ReactionsResponseDto.CreateBoardReactionResponseDto.builder()
+                .boardTitle(board.getTitle())
+                .boardContent(board.getContent())
+                .likeCount(board.getLikeCount())
+                .unLikeCount(board.getUnLikeCount())
+                .viewCount(board.getViewCount())
+                .fromMemberName(fromMember.getMemberName())
+                .emoji(emoji)
                 .build();
     }
 }
