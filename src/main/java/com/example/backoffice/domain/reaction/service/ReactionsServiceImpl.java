@@ -1,7 +1,6 @@
 package com.example.backoffice.domain.reaction.service;
 
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.reaction.converter.ReactionsConverter;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
@@ -21,6 +20,8 @@ public class ReactionsServiceImpl implements ReactionsService{
 
     private final ReactionsRepository reactionsRepository;
     private final MembersService membersService;
+
+    // #feedback #2 : 2번 연속 'LOVE' 누르기, 취소 불가능하게
     @Override
     @Transactional
     public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction
@@ -28,11 +29,15 @@ public class ReactionsServiceImpl implements ReactionsService{
              ReactionsRequestDto.CreateMemberReactionsRequestDto requestDto){
         Members toMember
                 = membersService.isMatchedLoginMember(toMemberId, fromMember.getId());
+        if (reactionsRepository.existsByMemberAndReactorAndEmoji(
+                toMember, fromMember, Emoji.valueOf(requestDto.getEmoji().toUpperCase()))) {
+            throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
+        }
 
         Emoji emoji = isMatchedEmoji(requestDto);
 
-        Reactions reaction = ReactionsConverter.toEntity(
-                toMember, fromMember, emoji);
+        Reactions reaction
+                = ReactionsConverter.toEntity(toMember, fromMember, emoji);
         reactionsRepository.save(reaction);
 
         toMember.addEmoji(reaction);
@@ -44,8 +49,14 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public void deleteMemberReaction(
             Long toMemberId, Long reactionId, Members fromMember){
-        membersService.isMatchedLoginMember(toMemberId, fromMember.getId());
+        Members toMember = membersService.isMatchedLoginMember(toMemberId, fromMember.getId());
+        if (!reactionsRepository.existsByIdAndMemberAndReactor(reactionId, toMember, fromMember)) {
+            throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
+        }
         Reactions reaction = findById(reactionId);
+
+        toMember.deleteEmoji();
+
         reactionsRepository.delete(reaction);
     }
 

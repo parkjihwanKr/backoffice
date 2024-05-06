@@ -52,6 +52,8 @@ public class Members extends CommonEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reactions> reactionList;
 
+    private Long loveCount;
+
     public void updateMemberInfo(MembersRequestDto.UpdateMemberRequestDto requestDto, String bCrytPassword){
         this.name = requestDto.getName();
         this.password = bCrytPassword;
@@ -67,5 +69,10 @@ public class Members extends CommonEntity {
 
     public void addEmoji(Reactions reaction){
         this.reactionList.add(reaction);
+        this.loveCount++;
+    }
+
+    public void deleteEmoji(){
+        this.loveCount--;
     }
 }
