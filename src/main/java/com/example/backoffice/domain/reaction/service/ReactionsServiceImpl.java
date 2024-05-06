@@ -1,6 +1,5 @@
 package com.example.backoffice.domain.reaction.service;
 
-import com.example.backoffice.domain.board.converter.BoardsConverter;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.service.BoardsService;
 import com.example.backoffice.domain.member.entity.Members;
@@ -17,6 +16,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class ReactionsServiceImpl implements ReactionsService{
@@ -29,15 +32,16 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction
             (Long toMemberId, Members fromMember,
-             ReactionsRequestDto.CreateMemberReactionsRequestDto requestDto){
+             ReactionsRequestDto requestDto){
         Members toMember
-                = membersService.isMatchedLoginMember(toMemberId, fromMember.getId());
+                = membersService.validateMember(toMemberId, fromMember.getId());
+
         if (reactionsRepository.existsByMemberAndReactorAndEmoji(
                 toMember, fromMember, Emoji.valueOf(requestDto.getEmoji().toUpperCase()))) {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
-        Emoji emoji = isMatchedMemberEmoji(requestDto.getEmoji());
+        Emoji emoji = validateEmoji(requestDto.getEmoji(), Collections.singleton(Emoji.LOVE));
 
         Reactions reaction
                 = ReactionsConverter.toEntity(toMember, fromMember, emoji, null, null);
@@ -52,7 +56,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public void deleteMemberReaction(
             Long toMemberId, Long reactionId, Members fromMember){
-        Members toMember = membersService.isMatchedLoginMember(toMemberId, fromMember.getId());
+        Members toMember = membersService.validateMember(toMemberId, fromMember.getId());
         if (!reactionsRepository.existsByIdAndMemberAndReactor(reactionId, toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
@@ -67,14 +71,11 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public ReactionsResponseDto.CreateBoardReactionResponseDto createBoardReaction(
             Long boardId, Members fromMember,
-            ReactionsRequestDto.CreateBoardReactionRequestDto requestDto){
-
-        // 1. board 존재하는지
-        // 2. board 작성자와 이모지 반응을 주는 사람과 일치 하는지?
+            ReactionsRequestDto requestDto){
         Boards board = boardsService.findById(boardId);
-        membersService.isMatchedLoginMember(
+        membersService.validateMember(
                 board.getMember().getId(), fromMember.getId());
-        Emoji emoji = isMatchedEmoji(requestDto.getEmoji());
+        Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
         if(reactionsRepository.existsByBoardAndReactorAndEmoji(
                 board, fromMember, emoji)){
@@ -88,36 +89,37 @@ public class ReactionsServiceImpl implements ReactionsService{
                 fromMember, board, reaction, emoji.toString());
     }
 
-    private Emoji isMatchedMemberEmoji(String memberEmoji){
-        Emoji emoji;
+    @Override
+    @Transactional
+    public void deleteBoardReaction(Long boardId, Long reactionId, Members member){
+
+        // 1. 예외 검증
+        Boards board = boardsService.findById(boardId);
+        membersService.validateMember(board.getMember().getId(), member.getId());
+        if(!reactionsRepository.existsByIdAndBoardAndReactor(reactionId, board, member)){
+            throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
+        }
+
+        Reactions reaction = findById(reactionId);
+
+        board.deleteEmoji(reaction.getEmoji().toString());
+        reactionsRepository.deleteById(reactionId);
+        // membersService.isNotMatchedLoginMember(reaction.getReactor().getId(), member.getId());
+    }
+
+    private Emoji validateEmoji(String emojiStr, Set<Emoji> validEmojis) {
         try {
-            emoji = Emoji.valueOf(memberEmoji.toUpperCase()); // 클라이언트로부터 받은 문자열을 Emoji enum으로 변환
-            if(emoji.toString().equals("LOVE")){
+            Emoji emoji = Emoji.valueOf(emojiStr.toUpperCase());
+            if (validEmojis.contains(emoji)) {
                 return emoji;
-            }else{
-                // 멤버는 "LOVE" 이모지를 제외하고 할 수 없음
+            } else {
                 throw new ReactionsCustomException(ReactionsExceptionCode.NOT_ACCEPTED_EMOJI);
             }
-
         } catch (IllegalArgumentException e) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_MATCHED_EMOJI);
         }
     }
 
-    private Emoji isMatchedEmoji(String requestEmoji){
-        Emoji emoji;
-        try {
-            emoji = Emoji.valueOf(requestEmoji.toUpperCase()); // 클라이언트로부터 받은 문자열을 Emoji enum으로 변환
-            if(emoji.toString().equals("LIKE") || emoji.toString().equals("UNLIKE")){
-                return emoji;
-            }else{
-                // 게시글, 댓글, 대댓글은 "LIKE", "UNLIKE"만 사용 가능
-                throw new ReactionsCustomException(ReactionsExceptionCode.NOT_ACCEPTED_EMOJI);
-            }
-        } catch (IllegalArgumentException e) {
-            throw new ReactionsCustomException(ReactionsExceptionCode.NOT_MATCHED_EMOJI);
-        }
-    }
 
     public Reactions findById(Long reactionId){
         return reactionsRepository.findById(reactionId).orElseThrow(

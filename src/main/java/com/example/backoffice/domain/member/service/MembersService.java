@@ -34,5 +34,5 @@ public interface MembersService {
 
     Members findMember(Members member, Long memberId);
 
-    Members isMatchedLoginMember(Long toMemberId, Long fromMemberId);
+    Members validateMember(Long toMemberId, Long fromMemberId);
 }

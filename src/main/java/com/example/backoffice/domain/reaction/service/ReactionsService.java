@@ -8,13 +8,16 @@ public interface ReactionsService {
 
     ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction(
             Long memberId, Members member,
-            ReactionsRequestDto.CreateMemberReactionsRequestDto requestDto);
+            ReactionsRequestDto requestDto);
 
     void deleteMemberReaction(
             Long toMemberId, Long reactionId, Members fromMember);
 
     ReactionsResponseDto.CreateBoardReactionResponseDto createBoardReaction(
             Long boardId, Members member,
-            ReactionsRequestDto.CreateBoardReactionRequestDto requestDto
+            ReactionsRequestDto requestDto
     );
+
+    void deleteBoardReaction(
+            Long boardId, Long reactionId, Members member);
 }

@@ -5,21 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReactionsRequestDto {
 
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CreateMemberReactionsRequestDto {
-        private String emoji;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CreateBoardReactionRequestDto {
-        private String emoji;
-    }
+    private String emoji;
 }

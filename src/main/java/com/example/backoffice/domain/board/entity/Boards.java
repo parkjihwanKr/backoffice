@@ -86,4 +86,13 @@ public class Boards extends CommonEntity {
             this.unLikeCount++;
         }
     }
+
+    public void deleteEmoji(String emoji){
+        if(emoji.equals("LIKE")){
+            this.likeCount--;
+        }
+        if(emoji.equals("UNLIKE")){
+            this.unLikeCount--;
+        }
+    }
 }

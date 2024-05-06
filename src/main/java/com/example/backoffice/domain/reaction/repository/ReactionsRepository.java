@@ -16,4 +16,7 @@ public interface ReactionsRepository extends JpaRepository<Reactions, Long> {
 
     boolean existsByBoardAndReactorAndEmoji(
             Boards board, Members fromMember, Emoji emoji);
+
+    boolean existsByIdAndBoardAndReactor(
+            Long reactionId, Boards board, Members member);
 }
