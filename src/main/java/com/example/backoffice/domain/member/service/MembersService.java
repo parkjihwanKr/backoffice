@@ -31,4 +31,8 @@ public interface MembersService {
             Long memberId, Members member);
 
     void deleteMember(Long memberId, Members member);
+
+    Members findMember(Members member, Long memberId);
+
+    Members validateMember(Long toMemberId, Long fromMemberId);
 }

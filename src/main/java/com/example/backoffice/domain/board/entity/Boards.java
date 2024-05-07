@@ -3,7 +3,7 @@ package com.example.backoffice.domain.board.entity;
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.entity.Files;
-import com.example.backoffice.domain.like.entity.Likes;
+import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,9 @@ public class Boards extends CommonEntity {
     @Column
     private Long likeCount;
 
-    // feat #1 조회수 ? 구현해보고 싶은데?
+    @Column
+    private Long unLikeCount;
+
     // relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -53,7 +54,7 @@ public class Boards extends CommonEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Likes> likeList = new ArrayList<>();
+    private List<Reactions> reactionList = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -64,16 +65,34 @@ public class Boards extends CommonEntity {
         this.viewCount++;
     }
 
-    public void updateViewCount(Long redisViewCount){
-        this.viewCount = redisViewCount;
-    }
     public void update(BoardsRequestDto.UpdateBoardRequestDto requestDto){
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
     }
 
-    public void addLike(){
-        likeList.add(null);
-        this.likeCount++;
+    public void addComment(Comments comment){
+        commentList.add(comment);
+    }
+
+    public void addReply(Comments reply){
+        commentList.get(commentList.size()-1).getReplyList().add(reply);
+    }
+
+    public void addEmoji(Reactions reaction, String emoji){
+        reactionList.add(reaction);
+        if(emoji.equals("LIKE")){
+            this.likeCount++;
+        }else if(emoji.equals("UNLIKE")){
+            this.unLikeCount++;
+        }
+    }
+
+    public void deleteEmoji(String emoji){
+        if(emoji.equals("LIKE")){
+            this.likeCount--;
+        }
+        if(emoji.equals("UNLIKE")){
+            this.unLikeCount--;
+        }
     }
 }

@@ -1,17 +1,14 @@
 package com.example.backoffice.domain.board.dto;
 
-import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
-import com.example.backoffice.domain.file.entity.Files;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class BoardsResponseDto {
 
@@ -24,10 +21,10 @@ public class BoardsResponseDto {
         private String writer;
         private String content;
         private Long likeCount;
+        private Long unLikeCount;
         private Long viewCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-        private List<String> fileList;
     }
 
     @Getter
@@ -41,11 +38,12 @@ public class BoardsResponseDto {
         private String title;
         private String content;
         // Like.count
-        private Integer likeCount;
-        // CommentList
-        private List<Comments> commentList;
-        private List<String> fileList;
+        private Long likeCount;
+        private Long unLikeCount;
         private Long viewCount;
+        // CommentList
+        private List<CommentsResponseDto.ReadBoardCommentResponseDto> commentList;
+        private List<String> fileList;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -72,6 +70,7 @@ public class BoardsResponseDto {
         private List<Comments> commentList;
         private List<String> fileList;
         private Long likeCount;
+        private Long unLikeCount;
         private Long viewCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;

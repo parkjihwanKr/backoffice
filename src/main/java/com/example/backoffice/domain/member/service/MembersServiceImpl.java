@@ -151,4 +151,15 @@ public class MembersServiceImpl implements MembersService{
         }
         return member;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members validateMember(Long toMemberId, Long fromMemberId){
+        if(toMemberId.equals(fromMemberId)){
+            throw new MembersCustomException(MembersExceptionCode.MATCHED_LOGIN_MEMBER);
+        }
+        return membersRepository.findById(toMemberId).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+        );
+    }
 }

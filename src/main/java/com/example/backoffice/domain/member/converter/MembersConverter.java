@@ -27,6 +27,7 @@ public class MembersConverter {
                 .role(MemberRole.USER) // 역할 설정, MemberRole.USER 또는 직접 설정
                 .email(requestDto.getEmail())
                 .address(requestDto.getAddress())
+                .loveCount(0L)
                 .password(bcryptPassword) // 암호화된 비밀번호 사용
                 .contact(requestDto.getContact())
                 .build();
@@ -49,6 +50,7 @@ public class MembersConverter {
                 .address(member.getAddress())
                 .memberName(member.getMemberName())
                 .role(member.getRole())
+                .loveCount(member.getLoveCount())
                 .createdAt(member.getCreatedAt())
                 .modifiedAt(member.getModifiedAt())
                 .build();
