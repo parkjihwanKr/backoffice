@@ -23,9 +23,12 @@ public interface ReactionsService {
 
     ReactionsResponseDto.CreateCommentReactionResponseDto createCommentReaction(
             Long boardId, Long commentId, Members member,
-            ReactionsRequestDto requestDto
-    );
+            ReactionsRequestDto requestDto);
 
     void deleteCommentReaction(
             Long commentId, Long reactionId, Members member);
+
+    ReactionsResponseDto.CreateReplyReactionResponseDto createReplyReaction(
+            Long commentId, Long reactionId, Members member,
+            ReactionsRequestDto requestDto);
 }

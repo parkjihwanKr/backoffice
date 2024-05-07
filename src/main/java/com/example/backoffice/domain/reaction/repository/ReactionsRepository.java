@@ -26,4 +26,5 @@ public interface ReactionsRepository extends JpaRepository<Reactions, Long> {
 
     boolean existsByIdAndCommentAndReactor(
             Long reactionId, Comments comment, Members fromMember);
+
 }

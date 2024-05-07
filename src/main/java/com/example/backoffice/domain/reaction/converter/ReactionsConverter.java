@@ -58,4 +58,16 @@ public class ReactionsConverter {
                 .emoji(emoji)
                 .build();
     }
+
+    public static ReactionsResponseDto
+            .CreateReplyReactionResponseDto toCreateReplyReactionDto(
+                    Comments reply, Members fromMember, String emoji){
+        return ReactionsResponseDto.CreateReplyReactionResponseDto.builder()
+                .replyContent(reply.getContent())
+                .likeCount(reply.getLikeCount())
+                .unLikeCount(reply.getUnLikeCount())
+                .fromMemberName(fromMember.getMemberName())
+                .emoji(emoji)
+                .build();
+    }
 }

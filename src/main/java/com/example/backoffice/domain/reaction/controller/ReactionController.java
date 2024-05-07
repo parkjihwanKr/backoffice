@@ -95,4 +95,16 @@ public class ReactionController {
                 )
         );
     }
+
+    @PostMapping("/comments/{commentId}/replies/{replyId}/reactions")
+    public ResponseEntity<ReactionsResponseDto.CreateReplyReactionResponseDto> createReplyReaction(
+            @PathVariable Long commentId, @PathVariable Long replyId,
+            @RequestBody ReactionsRequestDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        ReactionsResponseDto.CreateReplyReactionResponseDto responseDto =
+                reactionsService.createReplyReaction(
+                        commentId, replyId, memberDetails.getMembers(), requestDto);
+
+        return ResponseEntity.ok().body(responseDto);
+    }
 }

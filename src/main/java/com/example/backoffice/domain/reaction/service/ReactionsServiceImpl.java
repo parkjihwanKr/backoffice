@@ -136,7 +136,7 @@ public class ReactionsServiceImpl implements ReactionsService{
             Long commentId, Long reactionId, Members fromMember){
         Comments comment = commentsService.findById(commentId);
 
-        if(reactionsRepository.existsByIdAndCommentAndReactor(
+        if(!reactionsRepository.existsByIdAndCommentAndReactor(
                 reactionId, comment, fromMember)){
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
@@ -144,6 +144,28 @@ public class ReactionsServiceImpl implements ReactionsService{
         comment.deleteEmoji(commentEmoji);
 
         reactionsRepository.deleteById(reactionId);
+    }
+
+    @Override
+    @Transactional
+    public ReactionsResponseDto.CreateReplyReactionResponseDto createReplyReaction(
+            Long commentId, Long replyId, Members fromMember,
+            ReactionsRequestDto requestDto){
+        commentsService.findById(commentId);
+        Comments reply = commentsService.findById(replyId);
+
+        Emoji replyEmoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
+
+        if(reactionsRepository.existsByCommentAndReactorAndEmoji(
+                reply, fromMember, replyEmoji)){
+            throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
+        }
+
+        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, replyEmoji, null, reply);
+        reactionsRepository.save(reaction);
+
+        reply.addEmoji(reaction, reaction.toString());
+        return ReactionsConverter.toCreateReplyReactionDto(reply, fromMember, replyEmoji.toString());
     }
 
     private Emoji validateEmoji(String emojiStr, Set<Emoji> validEmojis) {

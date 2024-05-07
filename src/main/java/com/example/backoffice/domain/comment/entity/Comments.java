@@ -72,10 +72,10 @@ public class Comments extends CommonEntity {
 
     public void deleteEmoji(String emoji){
         if(emoji.equals("LIKE")){
-            this.likeCount++;
+            this.likeCount--;
         }
         if(emoji.equals("UNLIKE")){
-            this.unLikeCount++;
+            this.unLikeCount--;
         }
     }
 }
