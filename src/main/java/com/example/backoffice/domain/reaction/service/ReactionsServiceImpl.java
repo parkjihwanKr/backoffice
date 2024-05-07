@@ -63,11 +63,9 @@ public class ReactionsServiceImpl implements ReactionsService{
         if (!reactionsRepository.existsByIdAndMemberAndReactor(reactionId, toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
-        Reactions reaction = findById(reactionId);
-
         toMember.deleteEmoji();
 
-        reactionsRepository.delete(reaction);
+        reactionsRepository.deleteById(reactionId);
     }
 
     @Override
@@ -127,11 +125,25 @@ public class ReactionsServiceImpl implements ReactionsService{
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
-        // boards가 변경 감지를 못하고 있음, 이거 확인해봐야함
         Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, comment);
         comment.addEmoji(reaction, emoji.toString());
-        // board.updateComment(comment);
         return ReactionsConverter.toCreateCommentReactionDto(comment, fromMember, emoji.toString());
+    }
+
+    @Override
+    @Transactional
+    public void deleteCommentReaction(
+            Long commentId, Long reactionId, Members fromMember){
+        Comments comment = commentsService.findById(commentId);
+
+        if(reactionsRepository.existsByIdAndCommentAndReactor(
+                reactionId, comment, fromMember)){
+            throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
+        }
+        String commentEmoji = findById(reactionId).getEmoji().toString();
+        comment.deleteEmoji(commentEmoji);
+
+        reactionsRepository.deleteById(reactionId);
     }
 
     private Emoji validateEmoji(String emojiStr, Set<Emoji> validEmojis) {

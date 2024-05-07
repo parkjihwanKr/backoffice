@@ -81,4 +81,18 @@ public class ReactionController {
                         boardId, commentId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.ok().body(responseDto);
     }
+
+    @DeleteMapping("/comments/{commentId}/reactions/{reactionId}")
+    public ResponseEntity<CommonResponse<Void>> deleteCommentReaction(
+            @PathVariable Long commentId, @PathVariable Long reactionId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        reactionsService.deleteCommentReaction(
+                commentId, reactionId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponse<>(
+                        HttpStatus.OK,
+                        "댓글 리액션 삭제 성공"
+                )
+        );
+    }
 }

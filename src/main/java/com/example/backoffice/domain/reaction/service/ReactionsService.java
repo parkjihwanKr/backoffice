@@ -25,4 +25,7 @@ public interface ReactionsService {
             Long boardId, Long commentId, Members member,
             ReactionsRequestDto requestDto
     );
+
+    void deleteCommentReaction(
+            Long commentId, Long reactionId, Members member);
 }
