@@ -164,7 +164,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         Reactions reaction = ReactionsConverter.toEntity(null, fromMember, replyEmoji, null, reply);
         reactionsRepository.save(reaction);
 
-        reply.addEmoji(reaction, reaction.toString());
+        reply.addEmoji(reaction, replyEmoji.toString());
         return ReactionsConverter.toCreateReplyReactionDto(reply, fromMember, replyEmoji.toString());
     }
 
