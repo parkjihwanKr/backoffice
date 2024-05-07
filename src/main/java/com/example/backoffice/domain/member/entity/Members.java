@@ -3,6 +3,7 @@ package com.example.backoffice.domain.member.entity;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -48,6 +49,11 @@ public class Members extends CommonEntity {
 
     private String introduction;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reactions> reactionList;
+
+    private Long loveCount;
+
     public void updateMemberInfo(MembersRequestDto.UpdateMemberRequestDto requestDto, String bCrytPassword){
         this.name = requestDto.getName();
         this.password = bCrytPassword;
@@ -59,5 +65,14 @@ public class Members extends CommonEntity {
 
     public void updateProfileImage(String profileImageUrl){
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void addEmoji(Reactions reaction){
+        this.reactionList.add(reaction);
+        this.loveCount++;
+    }
+
+    public void deleteEmoji(){
+        this.loveCount--;
     }
 }

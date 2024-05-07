@@ -9,7 +9,6 @@ import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +22,7 @@ public class BoardsConverter {
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .likeCount(0L)
+                .unLikeCount(0L)
                 .viewCount(0L)
                 .build();
     }
@@ -34,6 +34,7 @@ public class BoardsConverter {
                     .writer(board.getMember().getMemberName())
                     .content(board.getContent())
                     .likeCount(board.getLikeCount())
+                    .unLikeCount(board.getUnLikeCount())
                     .viewCount(board.getViewCount())
                     .createdAt(board.getCreatedAt())
                     .modifiedAt(board.getModifiedAt())
@@ -65,6 +66,8 @@ public class BoardsConverter {
                                 .replyId(commentReply.getId())
                                 .replyWriter(commentReply.getMember().getMemberName())
                                 .replyContent(commentReply.getContent())
+                                .likeCount(commentReply.getLikeCount())
+                                .unLikeCount(commentReply.getUnLikeCount())
                                 .replyCreatedAt(commentReply.getCreatedAt())
                                 .replyModifiedAt(commentReply.getModifiedAt())
                                 .build());
@@ -76,6 +79,8 @@ public class BoardsConverter {
                         .commentId(commentId)
                         .commentWriter(comment.getMember().getMemberName())
                         .commentContent(comment.getContent())
+                        .likeCount(comment.getLikeCount())
+                        .unLikeCount(comment.getUnLikeCount())
                         .commentCreatedAt(comment.getCreatedAt())
                         .commentModifiedAt(comment.getModifiedAt())
                         .replyList(replyList)
@@ -87,7 +92,8 @@ public class BoardsConverter {
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
                 .content(board.getContent())
-                .likeCount(board.getLikeList().size())
+                .likeCount(board.getLikeCount())
+                .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
                 .fileList(fileUrls)
                 .commentList(commentList)
@@ -125,6 +131,7 @@ public class BoardsConverter {
                 .fileList(fileUrlList)
                 .commentList(board.getCommentList())
                 .likeCount(board.getLikeCount())
+                .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())

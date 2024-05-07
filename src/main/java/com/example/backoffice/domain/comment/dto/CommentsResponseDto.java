@@ -18,6 +18,8 @@ public class CommentsResponseDto {
         private Long commentId;
         private String commentWriter;
         private String commentContent;
+        private Long likeCount;
+        private Long unLikeCount;
         private LocalDateTime commentCreatedAt;
         private LocalDateTime commentModifiedAt;
         private List<ReadCommentRepliesResponseDto> replyList;
@@ -40,6 +42,8 @@ public class CommentsResponseDto {
     public static class UpdateCommentsResponseDto{
         private String writer;
         private String content;
+        private Long likeCount;
+        private Long unLikeCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -65,6 +69,8 @@ public class CommentsResponseDto {
         private Long replyId;
         private String replyWriter;
         private String replyContent;
+        private Long likeCount;
+        private Long unLikeCount;
         private LocalDateTime replyCreatedAt;
         private LocalDateTime replyModifiedAt;
     }
@@ -78,9 +84,13 @@ public class CommentsResponseDto {
         private String parentContent;
         private LocalDateTime parentCreatedAt;
         private LocalDateTime parentModifiedAt;
+        private Long parentLikeCount;
+        private Long parentUnLikeCount;
         private String fromMemberName;
         private String childContent;
         private LocalDateTime childCreatedAt;
         private LocalDateTime childModifiedAt;
+        private Long childLikeCount;
+        private Long childUnLikeCount;
     }
 }

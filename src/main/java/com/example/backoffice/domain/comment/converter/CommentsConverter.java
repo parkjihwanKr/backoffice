@@ -14,6 +14,8 @@ public class CommentsConverter {
         return Comments.builder()
                 .member(member)
                 .board(board)
+                .likeCount(0L)
+                .unLikeCount(0L)
                 .content(requestDto.getContent())
                 .build();
     }
@@ -32,6 +34,8 @@ public class CommentsConverter {
         return CommentsResponseDto.UpdateCommentsResponseDto.builder()
                 .writer(member.getMemberName())
                 .content(comment.getContent())
+                .likeCount(comment.getLikeCount())
+                .unLikeCount(comment.getUnLikeCount())
                 .createdAt(comment.getCreatedAt())
                 .modifiedAt(comment.getModifiedAt())
                 .build();
@@ -43,6 +47,8 @@ public class CommentsConverter {
         return Comments.builder()
                 .member(member)
                 .board(board)
+                .likeCount(0L)
+                .unLikeCount(0L)
                 .content(requestDto.getContent())
                 .build();
     }
@@ -65,11 +71,14 @@ public class CommentsConverter {
                 .toMemberName(parentComment.getMember().getMemberName())
                 .parentContent(parentComment.getContent())
                 .parentCreatedAt(parentComment.getCreatedAt())
-                .parentModifiedAt(childComment.getModifiedAt())
+                .parentModifiedAt(parentComment.getModifiedAt())
+                .parentLikeCount(parentComment.getLikeCount())
                 .fromMemberName(member.getMemberName())
                 .childContent(childComment.getContent())
-                .childCreatedAt(parentComment.getCreatedAt())
+                .childCreatedAt(childComment.getCreatedAt())
                 .childModifiedAt(childComment.getModifiedAt())
+                .childLikeCount(childComment.getLikeCount())
+                .childUnLikeCount(childComment.getUnLikeCount())
                 .build();
     }
 }

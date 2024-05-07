@@ -37,6 +37,7 @@ public class MembersResponseDto {
         private String email;
         private String address;
         private MemberRole role;
+        private Long loveCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -52,6 +53,7 @@ public class MembersResponseDto {
         private String contact;
         private String address;
         private String introduction;
+        private Long loveCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
