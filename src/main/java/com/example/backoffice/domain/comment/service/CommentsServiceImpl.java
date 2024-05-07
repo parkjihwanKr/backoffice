@@ -115,7 +115,7 @@ public class CommentsServiceImpl implements CommentsService{
         isMatchedBoard(comment, board);
 
         // 대댓글 삭제 로직
-        comment.getReplies().removeIf(
+        comment.getReplyList().removeIf(
                 commentReply -> commentReply.getId().equals(replyId));
 
         commentsRepository.deleteById(replyId);

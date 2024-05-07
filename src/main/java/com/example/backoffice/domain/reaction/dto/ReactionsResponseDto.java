@@ -33,4 +33,16 @@ public class ReactionsResponseDto {
         private String fromMemberName;
         private String emoji;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateCommentReactionResponseDto {
+        private String commentContent;
+        private Long likeCount;
+        private Long unLikeCount;
+        private String fromMemberName;
+        private String emoji;
+    }
 }

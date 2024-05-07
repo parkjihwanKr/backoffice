@@ -2,6 +2,8 @@ package com.example.backoffice.domain.reaction.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.service.BoardsService;
+import com.example.backoffice.domain.comment.entity.Comments;
+import com.example.backoffice.domain.comment.service.CommentsService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.reaction.converter.ReactionsConverter;
@@ -27,6 +29,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     private final ReactionsRepository reactionsRepository;
     private final MembersService membersService;
     private final BoardsService boardsService;
+    private final CommentsService commentsService;
 
     @Override
     @Transactional
@@ -105,6 +108,30 @@ public class ReactionsServiceImpl implements ReactionsService{
         board.deleteEmoji(reaction.getEmoji().toString());
         reactionsRepository.deleteById(reactionId);
         // membersService.isNotMatchedLoginMember(reaction.getReactor().getId(), member.getId());
+    }
+
+    @Override
+    @Transactional
+    public ReactionsResponseDto.CreateCommentReactionResponseDto createCommentReaction(
+            Long boardId, Long commentId, Members fromMember,
+            ReactionsRequestDto requestDto){
+
+        // 1. 예외 처리
+        Boards board = boardsService.findById(boardId);
+        Comments comment = commentsService.findById(commentId);
+
+        Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
+
+        if(reactionsRepository.existsByCommentAndReactorAndEmoji(
+                comment, fromMember, emoji)){
+            throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
+        }
+
+        // boards가 변경 감지를 못하고 있음, 이거 확인해봐야함
+        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, comment);
+        comment.addEmoji(reaction, emoji.toString());
+        // board.updateComment(comment);
+        return ReactionsConverter.toCreateCommentReactionDto(comment, fromMember, emoji.toString());
     }
 
     private Emoji validateEmoji(String emojiStr, Set<Emoji> validEmojis) {

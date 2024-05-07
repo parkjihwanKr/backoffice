@@ -20,4 +20,9 @@ public interface ReactionsService {
 
     void deleteBoardReaction(
             Long boardId, Long reactionId, Members member);
+
+    ReactionsResponseDto.CreateCommentReactionResponseDto createCommentReaction(
+            Long boardId, Long commentId, Members member,
+            ReactionsRequestDto requestDto
+    );
 }

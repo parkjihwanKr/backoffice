@@ -66,6 +66,8 @@ public class BoardsConverter {
                                 .replyId(commentReply.getId())
                                 .replyWriter(commentReply.getMember().getMemberName())
                                 .replyContent(commentReply.getContent())
+                                .likeCount(commentReply.getLikeCount())
+                                .unLikeCount(commentReply.getUnLikeCount())
                                 .replyCreatedAt(commentReply.getCreatedAt())
                                 .replyModifiedAt(commentReply.getModifiedAt())
                                 .build());
@@ -77,6 +79,8 @@ public class BoardsConverter {
                         .commentId(commentId)
                         .commentWriter(comment.getMember().getMemberName())
                         .commentContent(comment.getContent())
+                        .likeCount(comment.getLikeCount())
+                        .unLikeCount(comment.getUnLikeCount())
                         .commentCreatedAt(comment.getCreatedAt())
                         .commentModifiedAt(comment.getModifiedAt())
                         .replyList(replyList)

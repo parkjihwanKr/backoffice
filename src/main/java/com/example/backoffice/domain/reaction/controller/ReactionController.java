@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Member;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -67,5 +69,16 @@ public class ReactionController {
                         "게시글 이모지 삭제 성공"
                 )
         );
+    }
+
+    @PostMapping("/boards/{boardId}/comments/{commentId}/reactions")
+    public ResponseEntity<ReactionsResponseDto.CreateCommentReactionResponseDto> createCommentReaction(
+            @PathVariable Long boardId, @PathVariable Long commentId,
+            @RequestBody ReactionsRequestDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        ReactionsResponseDto.CreateCommentReactionResponseDto responseDto =
+                reactionsService.createCommentReaction(
+                        boardId, commentId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.ok().body(responseDto);
     }
 }
