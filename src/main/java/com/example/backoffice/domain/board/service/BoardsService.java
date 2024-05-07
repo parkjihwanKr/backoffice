@@ -2,6 +2,7 @@ package com.example.backoffice.domain.board.service;
 
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
+import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +22,6 @@ public interface BoardsService {
             BoardsRequestDto.UpdateBoardRequestDto requestDto,
             List <MultipartFile> files);
     void deleteBoard(Long boardId, Members member);
+
+    Boards findById(Long boardId);
 }

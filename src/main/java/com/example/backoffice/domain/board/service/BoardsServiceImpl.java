@@ -7,7 +7,6 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
-import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.redis.RedisProvider;
