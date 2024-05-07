@@ -39,8 +39,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         Members toMember
                 = membersService.validateMember(toMemberId, fromMember.getId());
 
-        if (reactionsRepository.existsByMemberAndReactorAndEmoji(
-                toMember, fromMember, Emoji.valueOf(requestDto.getEmoji().toUpperCase()))) {
+        if (reactionsRepository.existsByMemberAndReactor(toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
@@ -78,8 +77,8 @@ public class ReactionsServiceImpl implements ReactionsService{
                 board.getMember().getId(), fromMember.getId());
         Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
-        if(reactionsRepository.existsByBoardAndReactorAndEmoji(
-                board, fromMember, emoji)){
+        if(reactionsRepository.existsByBoardAndReactor(
+                board, fromMember)){
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
@@ -120,8 +119,8 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
-        if(reactionsRepository.existsByCommentAndReactorAndEmoji(
-                comment, fromMember, emoji)){
+        if(reactionsRepository.existsByCommentAndReactor(
+                comment, fromMember)){
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
@@ -157,8 +156,8 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         Emoji replyEmoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
-        if(reactionsRepository.existsByCommentAndReactorAndEmoji(
-                reply, fromMember, replyEmoji)){
+        if(reactionsRepository.existsByCommentAndReactor(
+                reply, fromMember)){
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 

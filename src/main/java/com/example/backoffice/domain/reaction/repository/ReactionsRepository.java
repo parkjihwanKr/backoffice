@@ -9,22 +9,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReactionsRepository extends JpaRepository<Reactions, Long> {
 
-    boolean existsByMemberAndReactorAndEmoji(
-            Members toMember, Members fromMember, Emoji emoji);
+    boolean existsByMemberAndReactor(
+            Members toMember, Members fromMember);
 
     boolean existsByIdAndMemberAndReactor(
             Long reactionId, Members toMember, Members fromMember);
 
-    boolean existsByBoardAndReactorAndEmoji(
-            Boards board, Members fromMember, Emoji emoji);
+    boolean existsByBoardAndReactor(
+            Boards board, Members fromMember);
 
     boolean existsByIdAndBoardAndReactor(
             Long reactionId, Boards board, Members fromMember);
 
-    boolean existsByCommentAndReactorAndEmoji(
-            Comments comment, Members fromMember, Emoji emoji);
+    boolean existsByCommentAndReactor(
+            Comments comment, Members fromMember);
 
     boolean existsByIdAndCommentAndReactor(
-            Long reactionId, Comments comment, Members fromMember);
+            Long reactionId, Comments commentOrReply, Members fromMember);
 
 }
