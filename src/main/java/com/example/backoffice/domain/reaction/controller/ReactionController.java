@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.reflect.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +38,7 @@ public class ReactionController {
         return ResponseEntity.ok().body(
                 new CommonResponse<>(
                         HttpStatus.OK,
-                        "멤버 사랑해요 취소 성공"
+                        "멤버 리액션 취소 성공"
                 )
         );
     }
@@ -66,7 +63,7 @@ public class ReactionController {
         return ResponseEntity.ok().body(
                 new CommonResponse<>(
                         HttpStatus.OK,
-                        "게시글 이모지 삭제 성공"
+                        "게시글 리액션 삭제 성공"
                 )
         );
     }
@@ -106,5 +103,19 @@ public class ReactionController {
                         commentId, replyId, memberDetails.getMembers(), requestDto);
 
         return ResponseEntity.ok().body(responseDto);
+    }
+
+    @DeleteMapping("/replies/{replyId}/reactions/{reactionId}")
+    public ResponseEntity<CommonResponse<Void>> deleteReplyReaction(
+            @PathVariable Long replyId, @PathVariable Long reactionId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        reactionsService.deleteReplyReaction(
+                replyId, reactionId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponse<>(
+                        HttpStatus.OK,
+                        "대댓글 리액션 취소 성공"
+                )
+        );
     }
 }

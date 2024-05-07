@@ -135,12 +135,13 @@ public class ReactionsServiceImpl implements ReactionsService{
     public void deleteCommentReaction(
             Long commentId, Long reactionId, Members fromMember){
         Comments comment = commentsService.findById(commentId);
+        Reactions reaction = findById(reactionId);
 
         if(!reactionsRepository.existsByIdAndCommentAndReactor(
                 reactionId, comment, fromMember)){
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
-        String commentEmoji = findById(reactionId).getEmoji().toString();
+        String commentEmoji = reaction.getEmoji().toString();
         comment.deleteEmoji(commentEmoji);
 
         reactionsRepository.deleteById(reactionId);
@@ -166,6 +167,23 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         reply.addEmoji(reaction, reaction.toString());
         return ReactionsConverter.toCreateReplyReactionDto(reply, fromMember, replyEmoji.toString());
+    }
+
+    @Override
+    @Transactional
+    public void deleteReplyReaction(
+            Long replyId, Long reactionId, Members fromMember){
+        Comments reply = commentsService.findById(replyId);
+        Reactions reaction = findById(reactionId);
+
+        if(!reactionsRepository.existsByIdAndCommentAndReactor(
+                reactionId, reply, fromMember)){
+            throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
+        }
+
+        String replyEmoji = reaction.getEmoji().toString();
+        reply.deleteEmoji(replyEmoji);
+        reactionsRepository.deleteById(reactionId);
     }
 
     private Emoji validateEmoji(String emojiStr, Set<Emoji> validEmojis) {

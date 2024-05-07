@@ -31,4 +31,7 @@ public interface ReactionsService {
     ReactionsResponseDto.CreateReplyReactionResponseDto createReplyReaction(
             Long commentId, Long reactionId, Members member,
             ReactionsRequestDto requestDto);
+
+    void deleteReplyReaction(
+            Long replyId, Long reactionId, Members member);
 }
