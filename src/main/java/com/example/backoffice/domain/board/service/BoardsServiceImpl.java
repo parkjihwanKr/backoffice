@@ -37,7 +37,6 @@ public class BoardsServiceImpl implements BoardsService{
         return BoardsConverter.toReadDto(boardList);
     }
 
-    // #1 feedback : 해당 부분 Page 관리 필요할 듯, comments, replies까지 관리하니까 보기 힘듦
     @Override
     @Transactional
     public BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId){
@@ -88,6 +87,14 @@ public class BoardsServiceImpl implements BoardsService{
     }
 
     @Override
+    @Transactional
+    public void deleteBoard(Long boardId, Members member){
+        Boards board = findById(boardId);
+        if(!member.getId().equals(board.getMember().getId())){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_MEMBER);
+        }
+        boardsRepository.deleteById(boardId);
+    }
     @Transactional(readOnly = true)
     public Boards findById(Long boardId) {
         return boardsRepository.findById(boardId).orElseThrow(

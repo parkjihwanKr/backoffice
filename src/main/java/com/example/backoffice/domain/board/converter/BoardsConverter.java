@@ -118,11 +118,15 @@ public class BoardsConverter {
     public static BoardsResponseDto.UpdateBoardResponseDto toUpdateDto(Boards board, List<String> fileUrlList){
 
         List<CommentsResponseDto.UpdateCommentsResponseDto> commentList = new ArrayList<>();
-        commentList.add(
-                CommentsResponseDto.UpdateCommentsResponseDto.builder()
-                        .content(board.getCommentList().get(0).getContent())
-                        .build()
-        );
+        if(!board.getCommentList().isEmpty()){
+            for(int i = 0; i<board.getCommentList().size(); i++){
+                commentList.add(
+                        CommentsResponseDto.UpdateCommentsResponseDto.builder()
+                                .content(board.getCommentList().get(i).getContent())
+                                .build()
+                );
+            }
+        }
 
         return BoardsResponseDto.UpdateBoardResponseDto.builder()
                 .title(board.getTitle())
