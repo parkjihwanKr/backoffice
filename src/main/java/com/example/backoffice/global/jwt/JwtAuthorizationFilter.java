@@ -27,22 +27,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final RedisProvider redisProvider;
 
-    /*@Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-        String token = jwtProvider.getJwtFromHeader(req);
-        log.info("accessToken : "+token);
-        if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
-            try {
-                String username = jwtProvider.getUsernameFromToken(token);
-                authenticationService.setAuthentication(username);
-                log.info("username : "+username);
-            } catch (Exception e) {
-                log.error("Cannot set user authentication: {}", e.getMessage());
-            }
-        }
-        filterChain.doFilter(req, res);
-    }*/
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = jwtProvider.getJwtFromHeader(request);
@@ -65,7 +49,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String authName = authentication.getName();
         String refreshTokenKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+authName;
         // RefreshToken : name
-        // String refreshTokenKey = getRefreshTokenKey(authName);
         if(!redisProvider.existsByUsername(refreshTokenKey)){
             return;
         }

@@ -48,20 +48,7 @@ public class RedisProvider {
     }
 
     public String getRefreshTokenValue(String key){
-        // Long isExpiredRefreshToken = redisTemplateForToken.getExpire(key);
         return redisTemplateForToken.opsForValue().get(key).toString();
-    }
-
-    public <T> void saveViewCount(String key, T value){
-        String valueString = null;
-        try{
-            valueString =
-                    !(value instanceof String) ? objectMapper.writeValueAsString(value) : (String) value;
-        }catch (JsonProcessingException e){
-            throw new RuntimeException();
-        }
-
-        redisTemplateForToken.opsForValue().set(key, valueString);
     }
 
     // 토큰 삭제
@@ -78,11 +65,6 @@ public class RedisProvider {
     // 조회수 증가
     public Long incrementViewCount(String key) {
         return redisTemplateForViewCount.opsForValue().increment(key, 1);
-    }
-
-    // 조회수 감소
-    public Long decreaseViewCount(String key){
-        return redisTemplateForViewCount.opsForValue().decrement(key);
     }
 
     // 조회수 가져오기
