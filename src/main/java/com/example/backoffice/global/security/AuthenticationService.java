@@ -22,17 +22,17 @@ public class AuthenticationService {
     private final RedisProvider redisProvider;
     private final MemberDetailsServiceImpl memberDetailsService;
 
-    public TokenDto generateAuthToken(String memberName) {
+    /*public TokenDto generateAuthToken(String memberName) {
         // Authentication 객체 생성 및 SecurityContext에 설정
         Authentication authentication = createAuthentication(memberName);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         // JWT 토큰 생성
         TokenDto tokenDto = jwtProvider.createToken(memberName, MemberRole.USER);
         jwtProvider.setTokenForCookie(tokenDto);
 
         // Redis에 Refresh Token 저장
-        String refreshTokenKey = "refreshToken : " + memberName;
+        String refreshTokenKey = jwtProvider.REFRESH_TOKEN_HEADER +" : "+ memberName;
+
         redisProvider.saveToken(
                 refreshTokenKey,
                 Math.toIntExact(
@@ -41,7 +41,7 @@ public class AuthenticationService {
         );
 
         return tokenDto;
-    }
+    }*/
 
     public void setAuthentication(String username){
         Authentication authentication = createAuthentication(username);

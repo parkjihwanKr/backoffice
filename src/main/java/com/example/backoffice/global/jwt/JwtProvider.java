@@ -90,9 +90,9 @@ public class JwtProvider {
     }
 
     public boolean validateToken(String token) {
+        log.info("validateToken method start!");
         log.info("token : "+ token);
         try {
-            log.info("validateToken");
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
@@ -123,6 +123,16 @@ public class JwtProvider {
     public String getJwtFromHeader(HttpServletRequest req){
         String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
         log.info("bearer_token : "+bearerToken);
+        return removeBearerPrefix(bearerToken);
+    }
+
+    public String getRefreshTokenFromHeader(HttpServletRequest req){
+        String refreshToken = req.getHeader(REFRESH_TOKEN_HEADER);
+        log.info("refresh_token : "+refreshToken);
+        return removeBearerPrefix(refreshToken);
+    }
+
+    private String removeBearerPrefix(String bearerToken){
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)){
             return bearerToken.substring(7);
         }

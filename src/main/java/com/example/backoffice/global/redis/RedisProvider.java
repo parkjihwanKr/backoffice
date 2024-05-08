@@ -47,6 +47,11 @@ public class RedisProvider {
         }
     }
 
+    public String getRefreshTokenValue(String key){
+        // Long isExpiredRefreshToken = redisTemplateForToken.getExpire(key);
+        return redisTemplateForToken.opsForValue().get(key).toString();
+    }
+
     public <T> void saveViewCount(String key, T value){
         String valueString = null;
         try{

@@ -18,13 +18,14 @@ import java.io.IOException;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final MemberDetailsServiceImpl memberDetailsService;
     private final AuthenticationService authenticationService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtProvider.getJwtFromHeader(req);
-        log.info("token : "+token);
+        String refreshToken = jwtProvider.getRefreshTokenFromHeader(req);
+        log.info("accessToken : "+token);
+        log.info("refreshToken : "+refreshToken);
         if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
             try {
                 String username = jwtProvider.getUsernameFromToken(token);
