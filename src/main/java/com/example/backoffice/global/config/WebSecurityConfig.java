@@ -3,8 +3,9 @@ package com.example.backoffice.global.config;
 import com.example.backoffice.global.jwt.JwtAuthenticationFilter;
 import com.example.backoffice.global.jwt.JwtAuthorizationFilter;
 import com.example.backoffice.global.jwt.JwtProvider;
-import com.example.backoffice.global.security.AuthenticationService;
-import com.example.backoffice.global.security.MemberDetailsServiceImpl;
+import com.example.backoffice.global.redis.RedisProvider;
+import com.example.backoffice.global.security.CustomLogoutHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -25,11 +29,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final JwtProvider jwtProvider;
-    private final MemberDetailsServiceImpl memberDetailsService;
-    private final AuthenticationService authenticationService;
+    private final RedisProvider redisProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
-    // private final CustomAuthenticationSuccessFilter successFilter;
-    // private final CustomAuthenticationFailureHandler failureHandler;
+    private final CustomLogoutHandler customLogoutHandler;
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -42,14 +44,14 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider, redisProvider);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtProvider, memberDetailsService, authenticationService);
+        return new JwtAuthorizationFilter(jwtProvider, redisProvider);
     }
 
     @Bean
@@ -60,19 +62,33 @@ public class WebSecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                //.cors(corsConfigure -> corsConfigure.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors
+                        .configurationSource(request -> {
+                            CorsConfiguration configuration = new CorsConfiguration();
+                            // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
+                            configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
+                            configuration.setAllowedHeaders(Arrays.asList("Authorization", "RefreshToken", "Cache-Control", "Content-Type"));
+                            return configuration;
+                        })
+                )
                 .authorizeHttpRequests((requests) -> requests
-                        // 다 인증 없이 허용 -> 추후 변경 예정
-                        // fix #1 webSecurityConfig : requestMatchers 변경
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/api/v1/logout").authenticated()
+                        .requestMatchers("/api/v1/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .logout((logout) -> logout
+                        .logoutUrl("/api/v1/logout")
+                        .addLogoutHandler(customLogoutHandler)
+                        .deleteCookies("remember-me")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        })
                 )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
         ;
-        // 필터 관리
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        // 필터 순서 조정
+        http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

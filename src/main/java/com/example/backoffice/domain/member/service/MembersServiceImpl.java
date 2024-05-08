@@ -8,8 +8,6 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.repository.MembersRepository;
-import com.example.backoffice.global.jwt.dto.TokenDto;
-import com.example.backoffice.global.security.AuthenticationService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class MembersServiceImpl implements MembersService{
 
     private final FilesService filesService;
-    private final AuthenticationService authenticationService;
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
 
     // 관리자 설정
     @PostConstruct
     public void createAdminAccount(){
+        if(membersRepository.existsById(1L)){
+            return;
+        }
         String rawPassword = "12341234";
         String bcrytPassword = passwordEncoder.encode(rawPassword);
         membersRepository.save(
@@ -50,22 +50,6 @@ public class MembersServiceImpl implements MembersService{
         Members member = MembersConverter.toEntity(requestDto, bCrytPassword);
         membersRepository.save(member);
         return MembersConverter.toCreateDto(member);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public void login(MembersRequestDto.LoginMemberRequestDto requestDto){
-        Members loginMember = membersRepository.findByMemberName(requestDto.getMemberName()).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
-        );
-
-        if (!passwordEncoder.matches(requestDto.getPassword(), loginMember.getPassword())) {
-            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
-        }
-
-        TokenDto token = authenticationService.generateAuthToken(requestDto.getMemberName());
-        log.info("Access token : "+token.getAccessToken());
-        log.info("Refresh token : "+token.getRefreshToken());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.example.backoffice.global.jwt.dto.TokenDto;
 import com.example.backoffice.global.security.MemberDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,14 +13,23 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Getter
 @Slf4j
@@ -65,10 +75,6 @@ public class JwtProvider {
                 .signWith(key, signatureAlgorithm)
                 .compact();
 
-        // 여기 안들어옴
-        // log.info("accessToken : "+accessToken);
-        // log.info("refreshToken : "+refreshToken);
-
         return TokenDto.of(accessToken, refreshToken);
     }
 
@@ -85,30 +91,61 @@ public class JwtProvider {
         cookie.setPath("/");
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
-
         return cookie;
     }
 
-    public boolean validateToken(String token) {
+    public JwtStatus validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return JwtStatus.ACCESS;
+        } catch (UnsupportedJwtException | MalformedJwtException e) {
+            log.error(e.getMessage());
+            return JwtStatus.FAIL;
+        } catch (SignatureException e) {
+            log.error(e.getMessage());
+            return JwtStatus.FAIL;
+        } catch (ExpiredJwtException e) {
+            log.error(e.getMessage());
+            return JwtStatus.EXPIRED;
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return JwtStatus.FAIL;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return JwtStatus.FAIL;
+        }
+    }
+
+    /*public boolean validateToken(String token) {
+        log.info("validateToken method start!");
         log.info("token : "+ token);
         try {
-            log.info("validateToken");
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+            throw new JwtCustomException(GlobalExceptionCode.INVALID_SIGNATURE);
         } catch (ExpiredJwtException e) {
-            log.error("Expired JWT token, 만료된 JWT token 입니다.");
+            throw new JwtCustomException(GlobalExceptionCode.EXPIRED_JWT_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+            throw new JwtCustomException(GlobalExceptionCode.UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException e) {
-            log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+            throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
         }
-        return false;
-    }
+    }*/
     public Claims getUserInfoFromToken(String token) {
         log.info("getUserInfoFromToken");
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public String getUsernameFromToken(String token) {
@@ -123,9 +160,36 @@ public class JwtProvider {
     public String getJwtFromHeader(HttpServletRequest req){
         String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
         log.info("bearer_token : "+bearerToken);
+        return removeBearerPrefix(bearerToken);
+    }
+
+    public String substringToken(String tokenValue) {
+        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
+            return tokenValue.substring(7);
+        }
+        throw new NullPointerException("Not Found Token");
+    }
+
+    public String removeBearerPrefix(String bearerToken){
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)){
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    public Authentication getAuthentication(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get(AUTHORIZATION_KEY).toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+        UserDetails user = memberDetailsService.loadUserByUsername(claims.getSubject());
+        return new UsernamePasswordAuthenticationToken(user, null, authorities);
     }
 }

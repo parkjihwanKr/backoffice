@@ -28,15 +28,6 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<CommonResponse<Void>> login(
-            @RequestBody MembersRequestDto.LoginMemberRequestDto requestDto){
-        membersService.login(requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse<>(HttpStatus.OK, "로그인 성공!")
-        );
-    }
-
     @GetMapping("/members/{memberId}/profile")
     public ResponseEntity<MembersResponseDto.ReadMemberResponseDto> readMemberInfo(
             @PathVariable Long memberId,

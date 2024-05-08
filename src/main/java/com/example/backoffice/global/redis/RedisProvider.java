@@ -47,6 +47,11 @@ public class RedisProvider {
         }
     }
 
+    public String getRefreshTokenValue(String key){
+        // Long isExpiredRefreshToken = redisTemplateForToken.getExpire(key);
+        return redisTemplateForToken.opsForValue().get(key).toString();
+    }
+
     public <T> void saveViewCount(String key, T value){
         String valueString = null;
         try{
@@ -62,6 +67,12 @@ public class RedisProvider {
     // 토큰 삭제
     public void deleteToken(String key) {
         redisTemplateForToken.delete(key);
+    }
+
+    // username이 아니라 key로 찾아야함
+    public boolean existsByUsername(String key) {
+        String refreshToken = redisTemplateForToken.opsForValue().get(key).toString();
+        return refreshToken != null && !refreshToken.isEmpty();
     }
 
     // 조회수 증가
