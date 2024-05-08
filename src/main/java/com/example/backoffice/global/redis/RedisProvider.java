@@ -69,6 +69,12 @@ public class RedisProvider {
         redisTemplateForToken.delete(key);
     }
 
+    // username이 아니라 key로 찾아야함
+    public boolean existsByUsername(String key) {
+        String refreshToken = redisTemplateForToken.opsForValue().get(key).toString();
+        return refreshToken != null && !refreshToken.isEmpty();
+    }
+
     // 조회수 증가
     public Long incrementViewCount(String key) {
         return redisTemplateForViewCount.opsForValue().increment(key, 1);

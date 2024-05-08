@@ -3,6 +3,7 @@ package com.example.backoffice.global.security;
 import com.example.backoffice.global.exception.AuthenticationCustomException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.jwt.JwtProvider;
+import com.example.backoffice.global.jwt.JwtStatus;
 import com.example.backoffice.global.redis.RedisProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,7 +34,7 @@ public class CustomLogoutHandler implements LogoutHandler {
             String authMemberName = jwtProvider.getUsernameFromToken(tokenValue);
             String redisTokenKey
                     = JwtProvider.REFRESH_TOKEN_HEADER+" : " +authMemberName;
-            if(jwtProvider.validateToken(tokenValue) &&
+            if(jwtProvider.validateToken(tokenValue).equals(JwtStatus.ACCESS) &&
                     redisProvider.getRefreshTokenValue(redisTokenKey).equals(null)){
                 // 3. 보안을 위해 로그아웃하면 refreshToken 삭제
                 redisProvider.deleteToken(redisTokenKey);

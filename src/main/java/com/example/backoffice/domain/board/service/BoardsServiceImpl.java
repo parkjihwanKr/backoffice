@@ -10,10 +10,10 @@ import com.example.backoffice.domain.board.repository.BoardsRepository;
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.redis.RedisProvider;
-import com.example.backoffice.global.security.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +28,6 @@ public class BoardsServiceImpl implements BoardsService{
     private final BoardsRepository boardsRepository;
     private final FilesService filesService;
     private final RedisProvider redisProvider;
-    private final AuthenticationService authenticationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -104,7 +103,8 @@ public class BoardsServiceImpl implements BoardsService{
 
     // 조회수 로직
     private void incrementViewCount(Boards board){
-        String currentMemberName = authenticationService.getCurrentMemberName();
+        String currentMemberName
+                = SecurityContextHolder.getContext().getAuthentication().getName();
         String key = "boardId : " + board.getId() +
                 ", viewMemberName : " + currentMemberName;
 

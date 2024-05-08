@@ -4,8 +4,7 @@ import com.example.backoffice.global.jwt.JwtAuthenticationFilter;
 import com.example.backoffice.global.jwt.JwtAuthorizationFilter;
 import com.example.backoffice.global.jwt.JwtProvider;
 import com.example.backoffice.global.redis.RedisProvider;
-import com.example.backoffice.global.security.*;
-import jakarta.servlet.http.HttpServletRequest;
+import com.example.backoffice.global.security.CustomLogoutHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,16 +15,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
@@ -37,7 +30,6 @@ public class WebSecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final RedisProvider redisProvider;
-    private final AuthenticationService authenticationService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomLogoutHandler customLogoutHandler;
     @Bean
@@ -59,7 +51,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtProvider, authenticationService);
+        return new JwtAuthorizationFilter(jwtProvider, redisProvider);
     }
 
     @Bean

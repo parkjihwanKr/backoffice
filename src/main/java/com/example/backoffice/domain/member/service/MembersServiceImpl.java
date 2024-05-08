@@ -8,8 +8,6 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.repository.MembersRepository;
-import com.example.backoffice.global.jwt.dto.TokenDto;
-import com.example.backoffice.global.security.AuthenticationService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
