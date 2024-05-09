@@ -13,6 +13,7 @@ public enum MembersExceptionCode {
     NOT_BLANK_IMAGE_FILE(HttpStatus.BAD_REQUEST, "MEMBER-004", "멤버가 올린 프로필 이미지 파일은 존재해야합니다."),
     NOT_MATCHED_IMAGE_FILE(HttpStatus.BAD_REQUEST, "MEMBER-005", "멤버가 올린 프로필 이미지 파일의 확장자가 이미지 파일이 아닙니다."),
     MATCHED_LOGIN_MEMBER(HttpStatus.BAD_REQUEST, "MEMBER-006", "해당 멤버는 자기 자신입니다."),
+    EXISTS_MEMBER(HttpStatus.BAD_REQUEST, "MEMBER-007", "이미 존재하는 멤버입니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -26,18 +26,77 @@ public class MemberRepositoryTest {
                 .memberName("notLoginMember")
                 .password("12341234")
                 .email("test1@naver.com")
+                .address("어딘시 어딘구")
+                .contact("010-2222-3333")
                 .build();
 
         membersRepository.save(member);
     }
 
     @Test
-    @DisplayName("MemberRepository setUp test success")
+    @DisplayName("setUp Success")
     public void setUpTestSuccess(){
         // given -> 데이터
         Optional<Members> member = membersRepository.findById(1L);
         // when -> 증명하고 싶은 메서드
         // then -> 증명 과정
         Assertions.assertThat(1L).isEqualTo(member.get().getId());
+    }
+
+    @Test
+    @DisplayName("save Success")
+    public void saveSuccess(){
+        // given
+        String memberName = "parkjihwan";
+        String password = "12341234";
+        Members member = Members.builder()
+                .id(2L)
+                .name(memberName)
+                .password(password)
+                .build();
+        // when
+        Members saveMember = membersRepository.save(member);
+        // then
+        Assertions.assertThat(saveMember.getName()).isEqualTo(memberName);
+        Assertions.assertThat(saveMember.getPassword()).isEqualTo(password);
+    }
+
+    @Test
+    @DisplayName("findByMemberName Success")
+    public void findByMemberNameSuccess(){
+        // given
+        String memberName = "testtest";
+        Members member = Members.builder()
+                .id(2L)
+                .memberName(memberName)
+                .build();
+        membersRepository.save(member);
+
+        // when
+        membersRepository.findByMemberName(memberName);
+
+        // then
+        Assertions.assertThat(member.getMemberName()).isEqualTo(memberName);
+    }
+
+    @Test
+    @DisplayName("findByEmailOrMemberNameOrAddressOrContact Success")
+    public void findByEmailOrMemberNameOrAddressOrContactSuccess(){
+        // given
+        String address = "어딘시 어딘구";
+        String email = "test1@naver.com";
+        String memberName = "notLoginMember";
+        String contact = "010-2222-3333";
+
+        // when
+        Optional<Members> member
+                = membersRepository.findByEmailOrMemberNameOrAddressOrContact(
+                        email, memberName, address, contact);
+
+        // then
+        Assertions.assertThat(member.get().getMemberName()).isEqualTo(memberName);
+        Assertions.assertThat(member.get().getEmail()).isEqualTo(email);
+        Assertions.assertThat(member.get().getContact()).isEqualTo(contact);
+        Assertions.assertThat(member.get().getAddress()).isEqualTo(address);
     }
 }

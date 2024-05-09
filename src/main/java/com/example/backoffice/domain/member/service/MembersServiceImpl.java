@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Member;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -38,6 +40,7 @@ public class MembersServiceImpl implements MembersService{
         );
     }
 
+    // 타당성 검사 추가
     @Override
     @Transactional
     public MembersResponseDto.CreateMembersResponseDto signup(
@@ -46,6 +49,14 @@ public class MembersServiceImpl implements MembersService{
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
+        Members duplicateInfoMember
+                = membersRepository.findByEmailOrMemberNameOrAddressOrContact(
+                        requestDto.getEmail(), requestDto.getMemberName(),
+                requestDto.getAddress(), requestDto.getContact()).orElse(null);
+        if(duplicateInfoMember != null){
+            throw new MembersCustomException(MembersExceptionCode.EXISTS_MEMBER);
+        }
+
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
         Members member = MembersConverter.toEntity(requestDto, bCrytPassword);
         membersRepository.save(member);
@@ -123,9 +134,7 @@ public class MembersServiceImpl implements MembersService{
     @Override
     @Transactional
     public void deleteMember(Long memberId, Members loginMember){
-        if(!memberId.equals(loginMember.getId())){
-            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
-        }
+        findMember(loginMember, memberId);
         membersRepository.deleteById(memberId);
     }
 
