@@ -40,4 +40,40 @@ public class MemberRepositoryTest {
         // then -> 증명 과정
         Assertions.assertThat(1L).isEqualTo(member.get().getId());
     }
+
+    @Test
+    @DisplayName("MemberRepository save test Success")
+    public void saveSuccess(){
+        // given
+        String memberName = "parkjihwan";
+        String password = "12341234";
+        Members member = Members.builder()
+                .id(2L)
+                .name(memberName)
+                .password(password)
+                .build();
+        // when
+        Members saveMember = membersRepository.save(member);
+        // then
+        Assertions.assertThat(saveMember.getName()).isEqualTo(memberName);
+        Assertions.assertThat(saveMember.getPassword()).isEqualTo(password);
+    }
+
+    @Test
+    @DisplayName("MemberRepository findByMemberNameSuccess Success")
+    public void findByMemberNameSuccess(){
+        // given
+        String memberName = "testtest";
+        Members member = Members.builder()
+                .id(2L)
+                .memberName(memberName)
+                .build();
+        membersRepository.save(member);
+
+        // when
+        membersRepository.findByMemberName(memberName);
+
+        // then
+        Assertions.assertThat(member.getMemberName()).isEqualTo(memberName);
+    }
 }
