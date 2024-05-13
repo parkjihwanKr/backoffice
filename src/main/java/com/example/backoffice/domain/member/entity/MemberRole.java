@@ -5,9 +5,11 @@ import lombok.Getter;
 @Getter
 public enum MemberRole {
 
-    USER(Authority.USER),
-    ADMIN(Authority.ADMIN),
-    HOST(Authority.HOST);
+    HR(Authority.HR),
+    FINANCE(Authority.FINANCE),
+    IT(Authority.IT),
+    MARKETING(Authority.MARKETING),
+    SALES(Authority.SALES);
 
     private final String authority;
 
@@ -16,9 +18,10 @@ public enum MemberRole {
     }
 
     public static class Authority {
-
-        public static final String USER = "ROLE_USER";
-        public static final String ADMIN = "ROLE_ADMIN";
-        public static final String HOST = "ROLE_HOST";
+        public static final String FINANCE = "ROLE_FINANCE";
+        public static final String IT = "ROLE_IT";
+        public static final String SALES = "ROLE_SALES";
+        public static final String MARKETING = "ROLE_MARKETING";
+        public static final String HR = "ROLE_HR";
     }
 }
