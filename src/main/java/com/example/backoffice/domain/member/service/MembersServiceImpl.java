@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.member.service;
 
+import com.example.backoffice.domain.admin.service.AdminService;
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
@@ -26,6 +27,7 @@ public class MembersServiceImpl implements MembersService{
     private final FilesService filesService;
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AdminService adminService;
 
     // 관리자 설정
     @PostConstruct
@@ -35,9 +37,9 @@ public class MembersServiceImpl implements MembersService{
         }
         String rawPassword = "12341234";
         String bcrytPassword = passwordEncoder.encode(rawPassword);
-        membersRepository.save(
-                MembersConverter.toAdminEntity(bcrytPassword)
-        );
+        Members mainAdmin = MembersConverter.toAdminEntity(bcrytPassword);
+        membersRepository.save(mainAdmin);
+        adminService.saveMainAdmin(mainAdmin);
     }
 
     // 타당성 검사 추가
@@ -83,7 +85,9 @@ public class MembersServiceImpl implements MembersService{
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
-        member.updateMemberInfo(requestDto, bCrytPassword);
+        member.updateMemberInfo(
+                requestDto.getName(), requestDto.getEmail(), requestDto.getAddress(),
+                requestDto.getContact(), requestDto.getIntroduction(), bCrytPassword);
         Members updateMember = membersRepository.save(member);
         return MembersConverter.toUpdateDto(updateMember);
     }

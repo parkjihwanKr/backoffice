@@ -54,13 +54,18 @@ public class Members extends CommonEntity {
 
     private Long loveCount;
 
-    public void updateMemberInfo(MembersRequestDto.UpdateMemberRequestDto requestDto, String bCrytPassword){
-        this.name = requestDto.getName();
+    // 직책
+    private String position;
+
+    public void updateMemberInfo(
+            String name, String email, String address,
+            String contact, String introduction, String bCrytPassword){
+        this.name = name;
         this.password = bCrytPassword;
-        this.email = requestDto.getEmail();
-        this.address = requestDto.getAddress();
-        this.contact = requestDto.getContact();
-        this.introduction = requestDto.getIntroduction();
+        this.email = email;
+        this.address = address;
+        this.contact = contact;
+        this.introduction = introduction;
     }
 
     public void updateProfileImage(String profileImageUrl){
@@ -72,6 +77,9 @@ public class Members extends CommonEntity {
         this.loveCount++;
     }
 
+    public void updatePosition(String position){
+        this.position = position;
+    }
     public void deleteEmoji(){
         this.loveCount--;
     }
