@@ -142,6 +142,14 @@ public class MembersServiceImpl implements MembersService{
         membersRepository.deleteById(memberId);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Members findById(Long memberId){
+        return membersRepository.findById(memberId).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+        );
+    }
+
     public Members findMember(Members member, Long memberId){
         if(!member.getId().equals(memberId)){
             throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
