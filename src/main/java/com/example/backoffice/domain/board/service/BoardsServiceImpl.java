@@ -9,7 +9,7 @@ import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.global.redis.RedisProvider;
+import com.example.backoffice.global.redis.ViewCountRedisProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +27,7 @@ public class BoardsServiceImpl implements BoardsService{
 
     private final BoardsRepository boardsRepository;
     private final FilesService filesService;
-    private final RedisProvider redisProvider;
+    private final ViewCountRedisProvider viewCountRedisProvider;
 
     @Override
     @Transactional(readOnly = true)
@@ -112,7 +112,7 @@ public class BoardsServiceImpl implements BoardsService{
         // member에 따른 조회 수를 expireDate 없이 redis에서 관리할 것
         // 해당 관리를 스케줄러를 통해 1달이 지나면 가능하게 변경할 것
 
-        Long currentCount = redisProvider.getViewCount(key);
+        Long currentCount = viewCountRedisProvider.getViewCount(key);
         if (currentCount == null) {
             currentCount = 0L;
         }
@@ -120,13 +120,13 @@ public class BoardsServiceImpl implements BoardsService{
         // 게시글 작성자가 현재 로그인한 사용자와 같은 경우
         if (board.getMember().getMemberName().equals(currentMemberName)) {
             if (currentCount < 1) {
-                viewCount = redisProvider.incrementViewCount(key);
+                viewCount = viewCountRedisProvider.incrementViewCount(key);
                 board.incrementViewCount();
             }
         } else {
             // 게시글 작성자가 현재 로그인한 사용자와 다른 경우
             if (currentCount < 3) {
-                viewCount = redisProvider.incrementViewCount(key);
+                viewCount = viewCountRedisProvider.incrementViewCount(key);
                 board.incrementViewCount();
             }
         }

@@ -24,7 +24,7 @@ public class MembersConverter {
         return Members.builder()
                 .memberName(requestDto.getMemberName())
                 .name(requestDto.getName()) // 이름을 name으로 설정하는 것이 맞는지 확인
-                .role(MemberRole.USER) // 역할 설정, MemberRole.USER 또는 직접 설정
+                .role(MemberRole.HR) // 역할 설정, MemberRole.USER 또는 직접 설정
                 .email(requestDto.getEmail())
                 .address(requestDto.getAddress())
                 .loveCount(0L)
