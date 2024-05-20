@@ -88,7 +88,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         board.addEmoji(reaction, emoji.toString());
 
         return ReactionsConverter.toCreateBoardReactionDto(
-                fromMember, board, reaction, emoji.toString());
+                fromMember, board, emoji.toString());
     }
 
     @Override
@@ -106,7 +106,6 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         board.deleteEmoji(reaction.getEmoji().toString());
         reactionsRepository.deleteById(reactionId);
-        // membersService.isNotMatchedLoginMember(reaction.getReactor().getId(), member.getId());
     }
 
     @Override
