@@ -3,6 +3,7 @@ package com.example.backoffice.global.jwt;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.redis.RedisProvider;
+import com.example.backoffice.global.redis.TokenRedisProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ import java.net.URLEncoder;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final RedisProvider redisProvider;
+    private final TokenRedisProvider tokenRedisProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -49,7 +50,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String authName = authentication.getName();
         String refreshTokenKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+authName;
         // RefreshToken : name
-        if(!redisProvider.existsByUsername(refreshTokenKey)){
+        if(!tokenRedisProvider.existsByUsername(refreshTokenKey)){
             return;
         }
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -72,7 +73,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     // Refresh Token이 멀쩡할 시 새로 발급
     private void makeNewAccessToken(String tokenValue, HttpServletResponse response) throws UnsupportedEncodingException {
         Authentication authentication = jwtProvider.getAuthentication(tokenValue);
-        if (redisProvider.existsByUsername(authentication.getName())) {
+        if (tokenRedisProvider.existsByUsername(authentication.getName())) {
             String newAccessToken = jwtProvider.createToken(authentication.getName(), null)
                     .getAccessToken();
             String accessToken = URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");
