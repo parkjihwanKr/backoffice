@@ -3,6 +3,7 @@ package com.example.backoffice.global.jwt;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.redis.RedisProvider;
+import com.example.backoffice.global.redis.TokenRedisProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,23 +26,7 @@ import java.net.URLEncoder;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final RedisProvider redisProvider;
-
-    /*@Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-        String token = jwtProvider.getJwtFromHeader(req);
-        log.info("accessToken : "+token);
-        if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
-            try {
-                String username = jwtProvider.getUsernameFromToken(token);
-                authenticationService.setAuthentication(username);
-                log.info("username : "+username);
-            } catch (Exception e) {
-                log.error("Cannot set user authentication: {}", e.getMessage());
-            }
-        }
-        filterChain.doFilter(req, res);
-    }*/
+    private final TokenRedisProvider tokenRedisProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -65,8 +50,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String authName = authentication.getName();
         String refreshTokenKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+authName;
         // RefreshToken : name
-        // String refreshTokenKey = getRefreshTokenKey(authName);
-        if(!redisProvider.existsByUsername(refreshTokenKey)){
+        if(!tokenRedisProvider.existsByUsername(refreshTokenKey)){
             return;
         }
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -89,7 +73,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     // Refresh Token이 멀쩡할 시 새로 발급
     private void makeNewAccessToken(String tokenValue, HttpServletResponse response) throws UnsupportedEncodingException {
         Authentication authentication = jwtProvider.getAuthentication(tokenValue);
-        if (redisProvider.existsByUsername(authentication.getName())) {
+        if (tokenRedisProvider.existsByUsername(authentication.getName())) {
             String newAccessToken = jwtProvider.createToken(authentication.getName(), null)
                     .getAccessToken();
             String accessToken = URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");

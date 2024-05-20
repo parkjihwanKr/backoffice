@@ -4,15 +4,12 @@ import com.example.backoffice.global.exception.AuthenticationCustomException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.jwt.JwtProvider;
 import com.example.backoffice.global.jwt.JwtStatus;
-import com.example.backoffice.global.redis.RedisProvider;
+import com.example.backoffice.global.redis.TokenRedisProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class CustomLogoutHandler implements LogoutHandler {
 
     private final JwtProvider jwtProvider;
-    private final RedisProvider redisProvider;
+    private final TokenRedisProvider tokenRedisProvider;
     // 3. accessToken, refreshToken 삭제
     // 4. logout 진행
     @Override
@@ -35,9 +32,9 @@ public class CustomLogoutHandler implements LogoutHandler {
             String redisTokenKey
                     = JwtProvider.REFRESH_TOKEN_HEADER+" : " +authMemberName;
             if(jwtProvider.validateToken(tokenValue).equals(JwtStatus.ACCESS) &&
-                    redisProvider.getRefreshTokenValue(redisTokenKey).equals(null)){
+                    tokenRedisProvider.getRefreshTokenValue(redisTokenKey).equals(null)){
                 // 3. 보안을 위해 로그아웃하면 refreshToken 삭제
-                redisProvider.deleteToken(redisTokenKey);
+                tokenRedisProvider.deleteToken(redisTokenKey);
                 log.info("logout success!");
             }
         }catch(Exception e){

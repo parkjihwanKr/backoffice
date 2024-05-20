@@ -119,26 +119,6 @@ public class JwtProvider {
         }
     }
 
-    /*public boolean validateToken(String token) {
-        log.info("validateToken method start!");
-        log.info("token : "+ token);
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            throw new JwtCustomException(GlobalExceptionCode.INVALID_SIGNATURE);
-        } catch (ExpiredJwtException e) {
-            throw new JwtCustomException(GlobalExceptionCode.EXPIRED_JWT_TOKEN);
-        } catch (UnsupportedJwtException e) {
-            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-            throw new JwtCustomException(GlobalExceptionCode.UNSUPPORTED_JWT_TOKEN);
-        } catch (IllegalArgumentException e) {
-            throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
-        }
-    }*/
     public Claims getUserInfoFromToken(String token) {
         log.info("getUserInfoFromToken");
         return Jwts.parserBuilder()
@@ -161,13 +141,6 @@ public class JwtProvider {
         String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
         log.info("bearer_token : "+bearerToken);
         return removeBearerPrefix(bearerToken);
-    }
-
-    public String substringToken(String tokenValue) {
-        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
-            return tokenValue.substring(7);
-        }
-        throw new NullPointerException("Not Found Token");
     }
 
     public String removeBearerPrefix(String bearerToken){
