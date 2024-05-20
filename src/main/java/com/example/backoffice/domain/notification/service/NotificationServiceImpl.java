@@ -3,9 +3,10 @@ package com.example.backoffice.domain.notification.service;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.converter.NotificationConverter;
-import com.example.backoffice.domain.notification.dto.NotificationRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationResponseDto;
 import com.example.backoffice.domain.notification.entity.Notification;
+import com.example.backoffice.domain.notification.exception.NotificationCustomException;
+import com.example.backoffice.domain.notification.exception.NotificationExceptionCode;
 import com.example.backoffice.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +24,34 @@ public class NotificationServiceImpl implements NotificationService{
     @Override
     @Transactional
     public NotificationResponseDto.CreateNotificationResponseDto createNotification(
-            Long memberId, Members fromMember,
-            NotificationRequestDto.CreateNotificationRequestDto requestDto){
+            Long memberId, Members fromMember){
 
-        log.info("test 1");
         Members toMember = membersService.findById(memberId);
 
-        log.info("test 2");
         Notification notification = NotificationConverter.toEntity(
-                toMember.getMemberName(), fromMember.getMemberName(),
-                requestDto.getMessage());
-        log.info("test 3");
+                toMember.getMemberName(), fromMember.getMemberName());
         notificationRepository.save(notification);
 
-        log.info("test 4");
-        return NotificationConverter.toCreateNotificationDto(notification);
+        return NotificationConverter.toCreateOneDto(notification);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public NotificationResponseDto.ReadNotificationResponseDto readOne(
+            Long memberId, String notificationId, Members member){
+        // 1. 로그인 사용자와 일치하는지
+        membersService.findMember(member, memberId);
+        // 2. 해당 알림이 존재하는지
+        Notification notification = findById(notificationId);
+
+        notification.isRead();
+        return NotificationConverter.toReadOne(notification);
+    }
+
+    @Transactional(readOnly = true)
+    public Notification findById(String notificationId){
+        return notificationRepository.findById(notificationId).orElseThrow(
+                ()-> new NotificationCustomException(NotificationExceptionCode.NOT_FOUND_NOTIFICATION)
+        );
     }
 }

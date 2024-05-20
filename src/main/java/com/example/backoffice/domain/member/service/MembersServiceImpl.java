@@ -150,6 +150,7 @@ public class MembersServiceImpl implements MembersService{
         );
     }
 
+    @Override
     public Members findMember(Members member, Long memberId){
         if(!member.getId().equals(memberId)){
             throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);

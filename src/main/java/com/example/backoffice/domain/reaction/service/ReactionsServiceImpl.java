@@ -6,6 +6,7 @@ import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.comment.service.CommentsService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.notification.service.NotificationService;
 import com.example.backoffice.domain.reaction.converter.ReactionsConverter;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
@@ -30,6 +31,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     private final MembersService membersService;
     private final BoardsService boardsService;
     private final CommentsService commentsService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -50,7 +52,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         reactionsRepository.save(reaction);
 
         toMember.addEmoji(reaction);
-
+        notificationService.createNotification(toMemberId, toMember);
         return ReactionsConverter.toCreateMemberReactionDto(reaction, emoji.toString());
     }
 

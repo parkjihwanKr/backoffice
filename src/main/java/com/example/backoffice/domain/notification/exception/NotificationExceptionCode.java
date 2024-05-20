@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum NotificationExceptionCode {
-    NOT_XXX_XXX(HttpStatus.BAD_REQUEST, "NOTIFICATION-001", "XXX."),
+    NOT_FOUND_NOTIFICATION(HttpStatus.BAD_REQUEST, "NOTIFICATION-001", "해당 알림을 찾을 수 없습니다."),
 
     ;
 

@@ -1,12 +1,13 @@
 package com.example.backoffice.domain.notification.controller;
 
-import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.notification.dto.NotificationRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationResponseDto;
 import com.example.backoffice.domain.notification.service.NotificationService;
+import com.example.backoffice.global.common.CommonResponse;
+import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,21 +20,24 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    // Member Love Notification
-    @PostMapping("/members/{memberId}/notifications")
-    public ResponseEntity<NotificationResponseDto.CreateNotificationResponseDto> createNotification(
-            @PathVariable Long memberId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody NotificationRequestDto.CreateNotificationRequestDto requestDto){
-        NotificationResponseDto.CreateNotificationResponseDto responseDto
-                = notificationService.createNotification(
-                        memberId, memberDetails.getMembers(), requestDto);
-        return ResponseEntity.ok().body(responseDto);
+    // 알림 단건 조회
+    @GetMapping("/members/{memberId}/notifications/{notificationId}")
+    public ResponseEntity<CommonResponseDto<NotificationResponseDto.ReadNotificationResponseDto>> readOne(
+            @PathVariable Long memberId, @PathVariable String notificationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        NotificationResponseDto.ReadNotificationResponseDto responseDto
+                = notificationService.readOne(memberId, notificationId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponseDto<>(
+                        responseDto,
+                        responseDto.getFromMemberName()+"님께서 메세지를 전송하셨습니다.",
+                        200
+                )
+        );
     }
-    // Board Like Notification
+    // 알림 리스트 조회
 
-    // Comment Like Notification
+    // 읽지 않은 알림 리스트 조회
 
-    // Co-comment Like Notification
-
+    // 읽은 알림 리스트 조회
 }

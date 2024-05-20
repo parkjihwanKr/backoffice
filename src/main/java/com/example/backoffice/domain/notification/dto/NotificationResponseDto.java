@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 public class NotificationResponseDto {
 
     @Getter
@@ -15,5 +17,16 @@ public class NotificationResponseDto {
         private String message;
         private String toMemberName;
         private String fromMemberName;
+        private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadNotificationResponseDto {
+        private String toMemberName;
+        private String fromMemberName;
+        private LocalDateTime createdAt;
     }
 }
