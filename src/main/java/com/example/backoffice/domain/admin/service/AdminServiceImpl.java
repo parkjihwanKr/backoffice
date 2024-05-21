@@ -1,6 +1,9 @@
 package com.example.backoffice.domain.admin.service;
 
 import com.example.backoffice.domain.admin.converter.AdminConverter;
+import com.example.backoffice.domain.admin.entity.Admin;
+import com.example.backoffice.domain.admin.exception.AdminCustomException;
+import com.example.backoffice.domain.admin.exception.AdminExceptionCode;
 import com.example.backoffice.domain.admin.repository.AdminRepository;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
@@ -26,5 +29,13 @@ public class AdminServiceImpl implements AdminService{
     @Transactional
     public void updateMemberRole(Long adminId){
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Admin findById(Long adminId){
+        return adminRepository.findById(adminId).orElseThrow(
+                ()-> new AdminCustomException(AdminExceptionCode.NOT_FOUND_ADMIN)
+        );
     }
 }
