@@ -95,7 +95,7 @@ public class ReactionsServiceImpl implements ReactionsService{
                 new NotificationData(board.getMember(), fromMember, board, null, null);
         notificationService.createNotification(boardsNotification, NotificationType.BOARD);
         return ReactionsConverter.toCreateBoardReactionDto(
-                fromMember, board, reaction, emoji.toString());
+                fromMember, board, emoji.toString());
     }
 
     @Override
