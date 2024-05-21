@@ -6,6 +6,8 @@ import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.comment.service.CommentsService;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.notification.entity.NotificationData;
+import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.service.NotificationService;
 import com.example.backoffice.domain.reaction.converter.ReactionsConverter;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
@@ -35,9 +37,8 @@ public class ReactionsServiceImpl implements ReactionsService{
 
     @Override
     @Transactional
-    public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction
-            (Long toMemberId, Members fromMember,
-             ReactionsRequestDto requestDto){
+    public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction(
+            Long toMemberId, Members fromMember, ReactionsRequestDto requestDto){
         Members toMember
                 = membersService.validateMember(toMemberId, fromMember.getId());
 
@@ -52,7 +53,10 @@ public class ReactionsServiceImpl implements ReactionsService{
         reactionsRepository.save(reaction);
 
         toMember.addEmoji(reaction);
-        notificationService.createNotification(toMemberId, toMember);
+        // toMember, fromMember 정보가 notification으로 다 넘어가기에 Member Domain은 null 가능
+        NotificationData membersNotification =
+                new NotificationData(toMember, fromMember, null, null, null);
+        notificationService.createNotification(membersNotification, NotificationType.MEMBER);
         return ReactionsConverter.toCreateMemberReactionDto(reaction, emoji.toString());
     }
 
@@ -87,6 +91,9 @@ public class ReactionsServiceImpl implements ReactionsService{
         Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, null);
         board.addEmoji(reaction, emoji.toString());
 
+        NotificationData boardsNotification =
+                new NotificationData(board.getMember(), fromMember, board, null, null);
+        notificationService.createNotification(boardsNotification, NotificationType.BOARD);
         return ReactionsConverter.toCreateBoardReactionDto(
                 fromMember, board, reaction, emoji.toString());
     }
@@ -106,7 +113,6 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         board.deleteEmoji(reaction.getEmoji().toString());
         reactionsRepository.deleteById(reactionId);
-        // membersService.isNotMatchedLoginMember(reaction.getReactor().getId(), member.getId());
     }
 
     @Override
@@ -128,6 +134,10 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, comment);
         comment.addEmoji(reaction, emoji.toString());
+        NotificationData commentsNotification =
+                new NotificationData(
+                        board.getMember(), fromMember, board, comment, null);
+        notificationService.createNotification(commentsNotification, NotificationType.COMMENT);
         return ReactionsConverter.toCreateCommentReactionDto(comment, fromMember, emoji.toString());
     }
 
@@ -153,7 +163,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     public ReactionsResponseDto.CreateReplyReactionResponseDto createReplyReaction(
             Long commentId, Long replyId, Members fromMember,
             ReactionsRequestDto requestDto){
-        commentsService.findById(commentId);
+        Comments comment = commentsService.findById(commentId);
         Comments reply = commentsService.findById(replyId);
 
         Emoji replyEmoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
@@ -167,6 +177,10 @@ public class ReactionsServiceImpl implements ReactionsService{
         reactionsRepository.save(reaction);
 
         reply.addEmoji(reaction, replyEmoji.toString());
+        NotificationData replyNotification =
+                new NotificationData(
+                        comment.getBoard().getMember(), fromMember, null, comment, reply);
+        notificationService.createNotification(replyNotification, NotificationType.REPLY);
         return ReactionsConverter.toCreateReplyReactionDto(reply, fromMember, replyEmoji.toString());
     }
 

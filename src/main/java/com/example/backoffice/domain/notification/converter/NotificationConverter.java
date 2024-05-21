@@ -2,14 +2,18 @@ package com.example.backoffice.domain.notification.converter;
 
 import com.example.backoffice.domain.notification.dto.NotificationResponseDto;
 import com.example.backoffice.domain.notification.entity.Notification;
+import com.example.backoffice.domain.notification.entity.NotificationType;
 
 public class NotificationConverter {
 
     public static Notification toEntity(
-            String toMemberName, String fromMemberName){
+            String toMemberName, String fromMemberName, String message,
+            NotificationType notificationType){
         return Notification.builder()
                 .toMemberName(toMemberName)
                 .fromMemberName(fromMemberName)
+                .message(message)
+                .notificationType(notificationType)
                 .isRead(false)
                 .build();
     }
