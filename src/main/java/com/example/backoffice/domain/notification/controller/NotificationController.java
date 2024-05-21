@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -29,9 +31,21 @@ public class NotificationController {
                 = notificationService.readOne(memberId, notificationId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
                 new CommonResponseDto<>(
-                        responseDto,
-                        responseDto.getFromMemberName()+"님께서 메세지를 전송하셨습니다.",
-                        200
+                        responseDto, "알림 단건 조회 성공", 200
+                )
+        );
+    }
+    // 알림 삭제
+    @DeleteMapping("/members/{memberId}/notifications")
+    public ResponseEntity<CommonResponseDto<Void>> deleteNotifications(
+            @PathVariable Long memberId,
+            @RequestParam List<String> notificationIds,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        notificationService.deleteNotification(
+                memberId, notificationIds, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponseDto<>(
+                        null, "알림 삭제 성공", 200
                 )
         );
     }

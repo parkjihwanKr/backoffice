@@ -16,6 +16,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -50,6 +52,19 @@ public class NotificationServiceImpl implements NotificationService{
 
         notification.isRead();
         return NotificationConverter.toReadOne(notification);
+    }
+
+    @Override
+    @Transactional
+    public void deleteNotification(Long memberId, List<String> notificationIds, Members member){
+        // 1. 로그인 사용자와 일치하는지
+        membersService.findMember(member, memberId);
+        // 2. 해당 알림이 존재하는지
+        for (String id : notificationIds) {
+            String notificationId
+                    = findById(id).getId();
+            notificationRepository.deleteById(notificationId);
+        }
     }
 
     @Transactional(readOnly = true)
