@@ -2,9 +2,12 @@ package com.example.backoffice.domain.member.service;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.global.security.MemberDetailsImpl;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Map;
 
 public interface MembersService {
 
@@ -35,4 +38,8 @@ public interface MembersService {
     Members findMember(Members member, Long memberId);
 
     Members validateMember(Long toMemberId, Long fromMemberId);
+
+    Map<String, MemberRole> findMemberNameListExcludingDepartmentListAndIdList(
+            List<MemberRole> excludedDepartmentList,
+            List<Long> excludedIdList);
 }

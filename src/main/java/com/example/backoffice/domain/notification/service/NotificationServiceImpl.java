@@ -1,8 +1,12 @@
 package com.example.backoffice.domain.notification.service;
 
+import com.example.backoffice.domain.admin.entity.Admin;
+import com.example.backoffice.domain.admin.service.AdminService;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.converter.NotificationConverter;
+import com.example.backoffice.domain.notification.dto.NotificationRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationResponseDto;
 import com.example.backoffice.domain.notification.entity.Notification;
 import com.example.backoffice.domain.notification.entity.NotificationData;
@@ -16,7 +20,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -25,6 +31,7 @@ public class NotificationServiceImpl implements NotificationService{
 
     private final NotificationRepository notificationRepository;
     private final MembersService membersService;
+    private final AdminService adminService;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
@@ -67,6 +74,36 @@ public class NotificationServiceImpl implements NotificationService{
         }
     }
 
+    @Override
+    @Transactional
+    public NotificationResponseDto.CreateNotificationListResponseDto createAdminNotification(
+            Long adminId, Members member,
+            NotificationRequestDto.CreateNotificationRequestDto requestDto){
+        // 1. 해당 어드민 계정이 맞는지 -> 멤버 검증까지 같이 됨
+        Admin mainAdmin = adminService.findById(adminId);
+        // 2. excludeMemberRole에 따라 해당 Role은 제외한 멤버 정보를 가져옴
+        // 해당 부분은 제외한 역할의 MemberName과 해당 Member의 역할만 가져온 Map
+        Map<String, MemberRole> memberNamesAndRoles
+                = membersService.findMemberNameListExcludingDepartmentListAndIdList(
+                        requestDto.getExcludedMemberRole(), requestDto.getExcludedMemberIdList());
+
+        List<Notification> notificationList = new ArrayList<>();
+        memberNamesAndRoles.forEach((memberName, memberRole) -> {
+            Notification notification = NotificationConverter.toEntity(
+                    memberName, // Map의 key
+                    member.getMemberName(), // From Member
+                    requestDto.getMessage(), // 메시지 내용
+                    NotificationType.MEMBER, // 알림 타입
+                    memberRole // Map의 value
+            );
+            notificationRepository.save(notification);
+            notificationList.add(notification);
+            sendNotificationToUser(memberName, notification);
+        });
+        // 해당 memberRoleList 테스트 후, 설정 예정
+        return NotificationConverter.toCreateDto(mainAdmin, null, notificationList);
+    }
+
     @Transactional(readOnly = true)
     public Notification findById(String notificationId){
         return notificationRepository.findById(notificationId).orElseThrow(
@@ -74,7 +111,7 @@ public class NotificationServiceImpl implements NotificationService{
         );
     }
 
-    public Notification generateMessageAndEntity(
+    private Notification generateMessageAndEntity(
             NotificationData notificationData, NotificationType domainType){
         return switch (domainType) {
             case MEMBER -> {
@@ -84,7 +121,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        memberMessage, domainType);
+                        memberMessage, domainType, notificationData.getToMember().getRole());
             }
             case BOARD -> {
                 String boardMessage
@@ -94,7 +131,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        boardMessage, domainType);
+                        boardMessage, domainType, notificationData.getToMember().getRole());
             }
             case COMMENT -> {
                 String commentMessage
@@ -105,7 +142,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        commentMessage, domainType);
+                        commentMessage, domainType, notificationData.getToMember().getRole());
             }
             case REPLY -> {
                 String replyMessage
@@ -116,7 +153,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        replyMessage, domainType);
+                        replyMessage, domainType, notificationData.getToMember().getRole());
             }
             default -> throw new NotificationCustomException(NotificationExceptionCode.NOT_MATCHED_REACTION_TYPE);
         };

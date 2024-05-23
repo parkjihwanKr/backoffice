@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.notification.entity;
 
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,6 +30,9 @@ public class Notification extends CommonEntity {
 
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
+
+    @Enumerated(EnumType.STRING)
+    private MemberRole memberRole;
 
     public void isRead(){
         this.isRead = true;

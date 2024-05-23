@@ -1,17 +1,17 @@
 package com.example.backoffice.domain.notification.controller;
 
+import com.example.backoffice.domain.notification.dto.NotificationRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationResponseDto;
 import com.example.backoffice.domain.notification.service.NotificationService;
-import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 @Slf4j
@@ -49,6 +49,18 @@ public class NotificationController {
                 )
         );
     }
+    // 관리자 전용 단체 메세지 전달
+    @PostMapping("/admins/{adminId}/notifications")
+    public ResponseEntity<NotificationResponseDto.CreateNotificationListResponseDto> createAdminNotification(
+            @PathVariable Long adminId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody NotificationRequestDto.CreateNotificationRequestDto requestDto){
+        NotificationResponseDto.CreateNotificationListResponseDto responseDto
+                = notificationService.createAdminNotification(
+                        adminId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.ok().body(responseDto);
+    }
+
     // 알림 리스트 조회
 
     // 읽지 않은 알림 리스트 조회
