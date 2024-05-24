@@ -75,6 +75,26 @@ public class NotificationController {
         return ResponseEntity.ok().body(responseDto);
     }
     // 읽지 않은 알림 리스트 조회
+    @GetMapping("/members/{memberId}/notifications/unread")
+    public ResponseEntity<Page<NotificationResponseDto.ReadNotificationListResponseDto>> readUnReadNotificationList(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 10) Pageable pageable){
+        Page<NotificationResponseDto.ReadNotificationListResponseDto> responseDto
+                = notificationService.readUnreadList(
+                        memberId, memberDetails.getMembers(), pageable);
+        return ResponseEntity.ok().body(responseDto);
+    }
 
     // 읽은 알림 리스트 조회
+    @GetMapping("/members/{memberId}/notifications/read")
+    public ResponseEntity<Page<NotificationResponseDto.ReadNotificationListResponseDto>> readReadNotificationList(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
+        Page<NotificationResponseDto.ReadNotificationListResponseDto> responseDto
+                = notificationService.readReadList(
+                memberId, memberDetails.getMembers(), pageable);
+        return ResponseEntity.ok().body(responseDto);
+    }
 }

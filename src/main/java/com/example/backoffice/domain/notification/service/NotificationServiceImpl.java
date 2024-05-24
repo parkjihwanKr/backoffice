@@ -52,20 +52,6 @@ public class NotificationServiceImpl implements NotificationService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NotificationResponseDto.ReadNotificationListResponseDto> readList(
-            Long memberId, Members member, Pageable pageable){
-        // 1. 로그인 사용자와 일치하는지
-        Members matchedMember
-                = membersService.findMember(member, memberId);
-
-        Page<Notification> notificationPage = notificationRepository.findByFromMemberNameIn(
-                matchedMember.getMemberName(), pageable);
-
-        return NotificationConverter.toReadListDto(notificationPage);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public NotificationResponseDto.ReadNotificationResponseDto readOne(
             Long memberId, String notificationId, Members member){
         // 1. 로그인 사용자와 일치하는지
@@ -120,6 +106,50 @@ public class NotificationServiceImpl implements NotificationService{
         return NotificationConverter.toCreateDto(mainAdmin, null, notificationList);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<NotificationResponseDto.ReadNotificationListResponseDto> readList(
+            Long memberId, Members member, Pageable pageable){
+        // 1. 로그인 사용자와 일치하는지
+        Members matchedMember
+                = membersService.findMember(member, memberId);
+
+        Page<Notification> notificationPage = notificationRepository.findByFromMemberNameIn(
+                matchedMember.getMemberName(), pageable);
+
+        return NotificationConverter.toReadListDto(notificationPage);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<NotificationResponseDto.ReadNotificationListResponseDto> readUnreadList(
+            Long memberId, Members member, Pageable pageable){
+        // 1. 로그인 사용자와 일치하는지
+        Members matchedMember
+                = membersService.findMember(member, memberId);
+
+        Page<Notification> notificationPage
+                = notificationRepository.findByFromMemberNameInAndIsRead(
+                        matchedMember.getMemberName(), false, pageable);
+
+        return NotificationConverter.toReadListDto(notificationPage);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<NotificationResponseDto.ReadNotificationListResponseDto> readReadList(
+            Long memberId, Members member, Pageable pageable){
+        // 1. 로그인 사용자와 일치하는지
+        Members matchedMember
+                = membersService.findMember(member, memberId);
+
+        Page<Notification> notificationPage
+                = notificationRepository.findByFromMemberNameInAndIsRead(
+                        matchedMember.getMemberName(), true, pageable);
+
+        return NotificationConverter.toReadListDto(notificationPage);
+    }
     @Transactional(readOnly = true)
     public Notification findById(String notificationId){
         return notificationRepository.findById(notificationId).orElseThrow(

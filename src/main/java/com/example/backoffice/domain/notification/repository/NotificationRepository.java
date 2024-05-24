@@ -11,4 +11,8 @@ public interface NotificationRepository extends MongoRepository<Notification, St
 
     Page<Notification> findByFromMemberNameIn(
             String fromMemberName, Pageable pageable);
+
+    Page<Notification> findByFromMemberNameInAndIsRead(
+            String fromMemberName, Boolean isRead, Pageable pageable);
 }
+
