@@ -6,6 +6,8 @@ import com.example.backoffice.domain.notification.dto.NotificationResponseDto;
 import com.example.backoffice.domain.notification.entity.Notification;
 import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -20,6 +22,9 @@ public interface NotificationService {
     NotificationResponseDto.CreateNotificationListResponseDto createAdminNotification(
             Long adminId, Members member,
             NotificationRequestDto.CreateNotificationRequestDto requestDto);
+
+    Page<NotificationResponseDto.ReadNotificationListResponseDto> readList(
+            Long memberId, Members member, Pageable pageable);
 
     void deleteNotification(
             Long memberId, List<String> notificationIds, Members member);

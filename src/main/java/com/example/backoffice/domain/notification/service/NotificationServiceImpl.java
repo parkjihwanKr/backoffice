@@ -16,6 +16,8 @@ import com.example.backoffice.domain.notification.exception.NotificationExceptio
 import com.example.backoffice.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +52,20 @@ public class NotificationServiceImpl implements NotificationService{
 
     @Override
     @Transactional(readOnly = true)
+    public Page<NotificationResponseDto.ReadNotificationListResponseDto> readList(
+            Long memberId, Members member, Pageable pageable){
+        // 1. 로그인 사용자와 일치하는지
+        Members matchedMember
+                = membersService.findMember(member, memberId);
+
+        Page<Notification> notificationPage = notificationRepository.findByFromMemberNameIn(
+                matchedMember.getMemberName(), pageable);
+
+        return NotificationConverter.toReadListDto(notificationPage);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public NotificationResponseDto.ReadNotificationResponseDto readOne(
             Long memberId, String notificationId, Members member){
         // 1. 로그인 사용자와 일치하는지
@@ -58,7 +74,7 @@ public class NotificationServiceImpl implements NotificationService{
         Notification notification = findById(notificationId);
 
         notification.isRead();
-        return NotificationConverter.toReadOne(notification);
+        return NotificationConverter.toReadOneDto(notification);
     }
 
     @Override

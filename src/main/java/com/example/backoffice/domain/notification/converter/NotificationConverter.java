@@ -5,6 +5,7 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.notification.dto.NotificationResponseDto;
 import com.example.backoffice.domain.notification.entity.Notification;
 import com.example.backoffice.domain.notification.entity.NotificationType;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class NotificationConverter {
                 .build();
     }
 
-    public static NotificationResponseDto.ReadNotificationResponseDto toReadOne(
+    public static NotificationResponseDto.ReadNotificationResponseDto toReadOneDto(
             Notification notification){
 
         return NotificationResponseDto.ReadNotificationResponseDto.builder()
@@ -59,5 +60,15 @@ public class NotificationConverter {
                 .toMemberName(mainAdmin.getMember().getMemberName())
                 .fromMemberNameList(fromMemberNameList)
                 .build();
+    }
+
+    public static Page<NotificationResponseDto.ReadNotificationListResponseDto> toReadListDto(
+            Page<Notification> notificationPage){
+        return notificationPage.map(
+                notification -> NotificationResponseDto.ReadNotificationListResponseDto.builder()
+                        .toMemberName(notification.getToMemberName())
+                        .fromMemberName(notification.getFromMemberName())
+                        .createdAt(notification.getCreatedAt())
+                        .build());
     }
 }

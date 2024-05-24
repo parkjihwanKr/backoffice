@@ -7,11 +7,14 @@ import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Member;
 import java.util.List;
 
 @Slf4j
@@ -62,7 +65,15 @@ public class NotificationController {
     }
 
     // 알림 리스트 조회
-
+    @GetMapping("/members/{memberId}/notifications")
+    public ResponseEntity<Page<NotificationResponseDto.ReadNotificationListResponseDto>> readNotificationList(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+        Page<NotificationResponseDto.ReadNotificationListResponseDto> responseDto
+                = notificationService.readList(memberId, memberDetails.getMembers(), pageable);
+        return ResponseEntity.ok().body(responseDto);
+    }
     // 읽지 않은 알림 리스트 조회
 
     // 읽은 알림 리스트 조회

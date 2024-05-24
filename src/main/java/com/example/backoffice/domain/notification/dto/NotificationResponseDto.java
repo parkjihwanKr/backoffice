@@ -49,4 +49,14 @@ public class NotificationResponseDto {
         private MemberRole memberRole;
         private LocalDateTime createdAt;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadNotificationListResponseDto {
+        private String toMemberName;
+        private String fromMemberName;
+        private LocalDateTime createdAt;
+    }
 }
