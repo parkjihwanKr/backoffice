@@ -9,6 +9,7 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
+import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.repository.MembersRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Member;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +60,19 @@ public class MembersServiceImpl implements MembersService{
                         requestDto.getEmail(), requestDto.getMemberName(),
                 requestDto.getAddress(), requestDto.getContact()).orElse(null);
         if(duplicateInfoMember != null){
-            throw new MembersCustomException(MembersExceptionCode.EXISTS_MEMBER);
+            MembersExceptionEnum exceptionType = findExceptionType(requestDto, duplicateInfoMember);
+            switch (exceptionType) {
+                case EMAIL
+                        -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_EMAIL);
+                case ADDRESS
+                        -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_ADDRESS);
+                case MEMBER_NAME
+                        -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_MEMBER_NAME);
+                case CONTACT
+                        -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
+                default
+                        -> log.error("Not Found Exception Error : " + exceptionType);
+            }
         }
 
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
@@ -188,5 +199,22 @@ public class MembersServiceImpl implements MembersService{
             memberNameMap.put(member.getMemberName(), member.getRole());
         }
         return memberNameMap;
+    }
+
+    private MembersExceptionEnum findExceptionType(
+            MembersRequestDto.CreateMembersRequestDto requestDto, Members duplicatedInfoMember){
+        if(requestDto.getContact().equals(duplicatedInfoMember.getContact())){
+            return MembersExceptionEnum.CONTACT;
+        }
+        if(requestDto.getEmail().equals(duplicatedInfoMember.getEmail())){
+            return MembersExceptionEnum.EMAIL;
+        }
+        if(requestDto.getAddress().equals(duplicatedInfoMember.getAddress())){
+            return MembersExceptionEnum.ADDRESS;
+        }
+        if(requestDto.getMemberName().equals(duplicatedInfoMember.getMemberName())){
+            return MembersExceptionEnum.MEMBER_NAME;
+        }
+        return null;
     }
 }
