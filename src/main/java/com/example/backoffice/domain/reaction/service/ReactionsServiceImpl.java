@@ -136,7 +136,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         comment.addEmoji(reaction, emoji.toString());
         NotificationData commentsNotification =
                 new NotificationData(
-                        board.getMember(), fromMember, board, comment, null);
+                        comment.getMember(), fromMember, board, comment, null);
         notificationService.createNotification(commentsNotification, NotificationType.COMMENT);
         return ReactionsConverter.toCreateCommentReactionDto(comment, fromMember, emoji.toString());
     }
@@ -179,7 +179,8 @@ public class ReactionsServiceImpl implements ReactionsService{
         reply.addEmoji(reaction, replyEmoji.toString());
         NotificationData replyNotification =
                 new NotificationData(
-                        comment.getBoard().getMember(), fromMember, null, comment, reply);
+                        reply.getMember(), fromMember,
+                        reply.getParent().getBoard(), comment, reply);
         notificationService.createNotification(replyNotification, NotificationType.REPLY);
         return ReactionsConverter.toCreateReplyReactionDto(reply, fromMember, replyEmoji.toString());
     }
