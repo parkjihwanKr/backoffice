@@ -9,6 +9,9 @@ import java.util.Optional;
 
 public interface NotificationRepository extends MongoRepository<Notification, String> {
 
+    Optional<Notification> findByIdAndToMemberName(
+            String notificationId, String toMemberName);
+
     Page<Notification> findByFromMemberNameIn(
             String fromMemberName, Pageable pageable);
 

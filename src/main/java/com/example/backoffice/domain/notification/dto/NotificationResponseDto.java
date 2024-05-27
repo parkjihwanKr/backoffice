@@ -47,8 +47,10 @@ public class NotificationResponseDto {
     public static class ReadNotificationResponseDto {
         private String toMemberName;
         private String fromMemberName;
-        private MemberRole memberRole;
+        private MemberRole toMemberRole;
         private LocalDateTime createdAt;
+        private Boolean isRead;
+        private String message;
     }
 
     @Getter

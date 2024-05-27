@@ -42,8 +42,10 @@ public class NotificationConverter {
         return NotificationResponseDto.ReadNotificationResponseDto.builder()
                 .fromMemberName(notification.getFromMemberName())
                 .toMemberName(notification.getToMemberName())
-                .memberRole(notification.getFromMemberRole())
+                .toMemberRole(notification.getFromMemberRole())
                 .createdAt(notification.getCreatedAt())
+                .isRead(notification.getIsRead())
+                .message(notification.getMessage())
                 .build();
     }
 

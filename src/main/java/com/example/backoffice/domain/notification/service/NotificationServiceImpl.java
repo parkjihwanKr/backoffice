@@ -56,15 +56,22 @@ public class NotificationServiceImpl implements NotificationService{
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public NotificationResponseDto.ReadNotificationResponseDto readOne(
             Long memberId, String notificationId, Members member){
         // 1. 로그인 사용자와 일치하는지
         membersService.findMember(member, memberId);
-        // 2. 해당 알림이 존재하는지
-        Notification notification = findById(notificationId);
 
+        // 2. 해당 알림이 존재하는지
+        Notification notification
+                = notificationRepository.findByIdAndToMemberName(
+                        notificationId, member.getMemberName()).orElseThrow(
+                ()-> new NotificationCustomException(
+                        NotificationExceptionCode.NOT_FOUND_NOTIFICATION)
+        );
         notification.isRead();
+        // MongoDB는 repository.save를 사용해서 변경을 해야함
+        notificationRepository.save(notification);
         return NotificationConverter.toReadOneDto(notification);
     }
 

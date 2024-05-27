@@ -42,7 +42,7 @@ public class NotificationController {
     @DeleteMapping("/members/{memberId}/notifications")
     public ResponseEntity<CommonResponseDto<Void>> deleteNotifications(
             @PathVariable Long memberId,
-            @RequestParam List<String> notificationIds,
+            @RequestBody List<String> notificationIds,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         notificationService.deleteNotification(
                 memberId, notificationIds, memberDetails.getMembers());
@@ -54,14 +54,18 @@ public class NotificationController {
     }
     // 관리자 전용 단체 메세지 전달
     @PostMapping("/admins/{adminId}/notifications")
-    public ResponseEntity<NotificationResponseDto.CreateNotificationListResponseDto> createAdminNotification(
+    public ResponseEntity<CommonResponseDto<NotificationResponseDto.CreateNotificationListResponseDto>> createAdminNotification(
             @PathVariable Long adminId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody NotificationRequestDto.CreateNotificationRequestDto requestDto){
         NotificationResponseDto.CreateNotificationListResponseDto responseDto
                 = notificationService.createAdminNotification(
                         adminId, memberDetails.getMembers(), requestDto);
-        return ResponseEntity.ok().body(responseDto);
+        return ResponseEntity.ok().body(
+                new CommonResponseDto<>(
+                        responseDto, "전체 알림 전송 성공", 200
+                )
+        );
     }
 
     // 알림 리스트 조회
