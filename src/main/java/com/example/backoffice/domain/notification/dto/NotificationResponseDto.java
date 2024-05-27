@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public class NotificationResponseDto {
 
@@ -33,10 +34,10 @@ public class NotificationResponseDto {
     @AllArgsConstructor
     public static class CreateNotificationListResponseDto {
         private String message;
-        private String toMemberName;
-        private List<String> fromMemberNameList;
-        private List<MemberRole> fromMemberRoleList;
-        private AdminRole adminRole;
+        private String fromMemberName;
+        private List<String> toMemberNameList;
+        private Set<MemberRole> toMemberRoleList;
+        private AdminRole fromAdminRole;
     }
 
     @Getter

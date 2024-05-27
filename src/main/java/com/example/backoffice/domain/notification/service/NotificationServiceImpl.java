@@ -22,9 +22,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -92,25 +90,41 @@ public class NotificationServiceImpl implements NotificationService{
         Admin mainAdmin = adminService.findById(adminId);
         // 2. excludeMemberRole에 따라 해당 Role은 제외한 멤버 정보를 가져옴
         // 해당 부분은 제외한 역할의 MemberName과 해당 Member의 역할만 가져온 Map
+
+        // 어차피 자기 자신에게는 알림이 안가게 해야하기에 빈 공간에 넣어주는 걸로
+        if(requestDto.getExcludedMemberIdList().isEmpty()){
+            requestDto.getExcludedMemberIdList().add(member.getId());
+        }
+        // 문제 상황 :
+        // 1. ADMIN(자기 자신) 또한 알림 메세지에 들어감 -> 자기 자신은 알림에 넣지 않는 식으로 변경 o
+        // 2. excludedIdList가 null이면 오류가 뜸 -> 빈칸 리스트가 들어갈 수 있게 조정 o
+        // 3. Notifcation jpaRepository에 왜 들어가는지 모르겠음. -> test settings 때문
         Map<String, MemberRole> memberNamesAndRoles
                 = membersService.findMemberNameListExcludingDepartmentListAndIdList(
                         requestDto.getExcludedMemberRole(), requestDto.getExcludedMemberIdList());
 
+        Set<MemberRole> memberRoleList = new HashSet<>();
         List<Notification> notificationList = new ArrayList<>();
+        String message = requestDto.getMessage();
+
         memberNamesAndRoles.forEach((memberName, memberRole) -> {
-            Notification notification = NotificationConverter.toEntity(
-                    memberName, // Map의 key
-                    member.getMemberName(), // From Member
-                    requestDto.getMessage(), // 메시지 내용
-                    NotificationType.MEMBER, // 알림 타입
-                    memberRole // Map의 value
-            );
-            notificationRepository.save(notification);
-            notificationList.add(notification);
-            sendNotificationToUser(memberName, notification);
+            // 메세지를 만든 본인은 알림에 등록되지 않음
+            if(!member.getMemberName().equals(memberName)){
+                Notification notification = NotificationConverter.toEntity(
+                        memberName, // Map의 key
+                        member.getMemberName(), // From Member
+                        message, // 메시지 내용
+                        NotificationType.MEMBER, // 알림 타입
+                        memberRole // Map의 value
+                );
+                notificationRepository.save(notification);
+                memberRoleList.add(memberRole);
+                notificationList.add(notification);
+                sendNotificationToUser(memberName, notification);
+            }
         });
         // 해당 memberRoleList 테스트 후, 설정 예정
-        return NotificationConverter.toCreateDto(mainAdmin, null, notificationList);
+        return NotificationConverter.toCreateDto(mainAdmin, memberRoleList, notificationList, message);
     }
 
     @Override

@@ -18,7 +18,7 @@ public enum MembersExceptionCode {
     MATCHED_MEMBER_INFO_CONTACT(HttpStatus.BAD_REQUEST, "MEMBER-009", "이미 존재하는 멤버 연락처 정보입니다."),
     MATCHED_MEMBER_INFO_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER-010", "이미 존재하는 멤버 이메일 정보입니다."),
     MATCHED_MEMBER_INFO_MEMBER_NAME(HttpStatus.BAD_REQUEST, "MEMBER-011", "이미 존재하는 멤버 이름 정보입니다."),
-
+    INVALID_MEMBER_IDS(HttpStatus.BAD_REQUEST, "MEMBER-012", "유효하지 않은 멤버 아이디 리스트입니다."),
     ;
 
     private final HttpStatus httpStatus;

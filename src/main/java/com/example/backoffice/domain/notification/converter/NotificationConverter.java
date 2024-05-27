@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class NotificationConverter {
 
@@ -47,18 +48,19 @@ public class NotificationConverter {
     }
 
     public static NotificationResponseDto.CreateNotificationListResponseDto toCreateDto(
-            Admin mainAdmin, List<MemberRole> memberRoleList, List<Notification> notificationList){
-        List<String> fromMemberNameList = new ArrayList<>();
+            Admin mainAdmin, Set<MemberRole> memberRoleList,
+            List<Notification> notificationList, String message){
+        List<String> toMemberNameList = new ArrayList<>();
         for (Notification notification : notificationList) {
-            fromMemberNameList.add(
-                    notification.getFromMemberName());
+            toMemberNameList.add(
+                    notification.getToMemberName());
         }
         return NotificationResponseDto.CreateNotificationListResponseDto.builder()
-                .message(notificationList.get(0).getMessage())
-                .adminRole(mainAdmin.getRole())
-                .fromMemberRoleList(memberRoleList)
-                .toMemberName(mainAdmin.getMember().getMemberName())
-                .fromMemberNameList(fromMemberNameList)
+                .message(message)
+                .fromAdminRole(mainAdmin.getRole())
+                .fromMemberName(mainAdmin.getMember().getMemberName())
+                .toMemberRoleList(memberRoleList)
+                .toMemberNameList(toMemberNameList)
                 .build();
     }
 
