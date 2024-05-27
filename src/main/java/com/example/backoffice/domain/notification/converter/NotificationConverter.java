@@ -20,7 +20,7 @@ public class NotificationConverter {
                 .fromMemberName(fromMemberName)
                 .message(message)
                 .notificationType(notificationType)
-                .memberRole(memberRole)
+                .fromMemberRole(memberRole)
                 .isRead(false)
                 .build();
     }
@@ -30,7 +30,7 @@ public class NotificationConverter {
         return NotificationResponseDto.CreateNotificationResponseDto.builder()
                 .toMemberName(notification.getToMemberName())
                 .fromMemberName(notification.getFromMemberName())
-                .memberRole(notification.getMemberRole())
+                .memberRole(notification.getFromMemberRole())
                 .createdAt(notification.getCreatedAt())
                 .build();
     }
@@ -41,7 +41,7 @@ public class NotificationConverter {
         return NotificationResponseDto.ReadNotificationResponseDto.builder()
                 .fromMemberName(notification.getFromMemberName())
                 .toMemberName(notification.getToMemberName())
-                .memberRole(notification.getMemberRole())
+                .memberRole(notification.getFromMemberRole())
                 .createdAt(notification.getCreatedAt())
                 .build();
     }

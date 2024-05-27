@@ -41,6 +41,13 @@ public class NotificationServiceImpl implements NotificationService{
     public NotificationResponseDto.CreateNotificationResponseDto createNotification(
             NotificationData notificationData, NotificationType domainType){
 
+        // 자기 자신에게 '사랑해요' -> 이미 ReactionException으로 막혀 있음.
+        // 자기 자신의 게시글, 댓글, 대댓글의 '좋아요'는 할 수 있되
+        // 알림은 저장하지 않고 자기 자신의 알림에 뜨지 않기에 return null
+        if(notificationData.getToMember().getMemberName()
+                .equals(notificationData.getFromMember().getMemberName())){
+            return null;
+        }
         Notification notification
                 = generateMessageAndEntity(notificationData, domainType);
         notificationRepository.save(notification);
@@ -167,7 +174,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        memberMessage, domainType, notificationData.getToMember().getRole());
+                        memberMessage, domainType, notificationData.getFromMember().getRole());
             }
             case BOARD -> {
                 String boardMessage
@@ -177,7 +184,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        boardMessage, domainType, notificationData.getToMember().getRole());
+                        boardMessage, domainType, notificationData.getFromMember().getRole());
             }
             case COMMENT -> {
                 String commentMessage
@@ -188,7 +195,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        commentMessage, domainType, notificationData.getToMember().getRole());
+                        commentMessage, domainType, notificationData.getFromMember().getRole());
             }
             case REPLY -> {
                 String replyMessage
@@ -199,7 +206,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        replyMessage, domainType, notificationData.getToMember().getRole());
+                        replyMessage, domainType, notificationData.getFromMember().getRole());
             }
             default -> throw new NotificationCustomException(NotificationExceptionCode.NOT_MATCHED_REACTION_TYPE);
         };

@@ -32,7 +32,7 @@ public class Notification extends CommonEntity {
     private NotificationType notificationType;
 
     @Enumerated(EnumType.STRING)
-    private MemberRole memberRole;
+    private MemberRole fromMemberRole;
 
     public void isRead(){
         this.isRead = true;
