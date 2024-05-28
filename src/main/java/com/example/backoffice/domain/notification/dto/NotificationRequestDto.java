@@ -19,4 +19,12 @@ public class NotificationRequestDto {
         private List<Long> excludedMemberIdList;
         private List<MemberRole> excludedMemberRole;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DeleteNotificationRequestDto {
+        private List<String> notificationIds;
+    }
 }

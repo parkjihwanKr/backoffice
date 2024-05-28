@@ -77,11 +77,13 @@ public class NotificationServiceImpl implements NotificationService{
 
     @Override
     @Transactional
-    public void deleteNotification(Long memberId, List<String> notificationIds, Members member){
+    public void deleteNotification(
+            Long memberId, NotificationRequestDto.DeleteNotificationRequestDto requestDto,
+            Members member){
         // 1. 로그인 사용자와 일치하는지
         membersService.findMember(member, memberId);
         // 2. 해당 알림이 존재하는지
-        for (String id : notificationIds) {
+        for (String id : requestDto.getNotificationIds()) {
             String notificationId
                     = findById(id).getId();
             notificationRepository.deleteById(notificationId);

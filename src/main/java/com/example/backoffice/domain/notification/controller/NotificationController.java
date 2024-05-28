@@ -42,10 +42,10 @@ public class NotificationController {
     @DeleteMapping("/members/{memberId}/notifications")
     public ResponseEntity<CommonResponseDto<Void>> deleteNotifications(
             @PathVariable Long memberId,
-            @RequestBody List<String> notificationIds,
+            @RequestBody NotificationRequestDto.DeleteNotificationRequestDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         notificationService.deleteNotification(
-                memberId, notificationIds, memberDetails.getMembers());
+                memberId, requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(
                 new CommonResponseDto<>(
                         null, "알림 삭제 성공", 200

@@ -32,7 +32,8 @@ public interface NotificationService {
     Page<NotificationResponseDto.ReadNotificationListResponseDto> readReadList(
             Long memberId, Members member, Pageable pageable);
     void deleteNotification(
-            Long memberId, List<String> notificationIds, Members member);
+            Long memberId, NotificationRequestDto.DeleteNotificationRequestDto requestDto,
+            Members member);
 
     Notification findById(String notificationId);
 }
