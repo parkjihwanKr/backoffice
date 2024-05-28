@@ -12,10 +12,10 @@ public interface NotificationRepository extends MongoRepository<Notification, St
     Optional<Notification> findByIdAndToMemberName(
             String notificationId, String toMemberName);
 
-    Page<Notification> findByFromMemberNameIn(
-            String fromMemberName, Pageable pageable);
+    Page<Notification> findByToMemberName(
+            String toMemberName, Pageable pageable);
 
-    Page<Notification> findByFromMemberNameInAndIsRead(
-            String fromMemberName, Boolean isRead, Pageable pageable);
+    Page<Notification> findByToMemberNameAndIsRead(
+            String toMemberName, Boolean isRead, Pageable pageable);
 }
 

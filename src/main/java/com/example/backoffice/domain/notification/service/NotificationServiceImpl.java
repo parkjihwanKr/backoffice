@@ -144,8 +144,15 @@ public class NotificationServiceImpl implements NotificationService{
         Members matchedMember
                 = membersService.findMember(member, memberId);
 
-        Page<Notification> notificationPage = notificationRepository.findByFromMemberNameIn(
-                matchedMember.getMemberName(), pageable);
+        System.out.println("here? notificationPage");
+
+        Page<Notification> notificationPage
+                = notificationRepository.findByToMemberName(
+                        matchedMember.getMemberName(), pageable);
+
+        // 추가: notificationPage의 크기와 내용 출력
+        System.out.println("Notification Page Size: " + notificationPage.getSize());
+        System.out.println("Notification Page Total Elements: " + notificationPage.getTotalElements());
 
         return NotificationConverter.toReadListDto(notificationPage);
     }
@@ -160,7 +167,7 @@ public class NotificationServiceImpl implements NotificationService{
                 = membersService.findMember(member, memberId);
 
         Page<Notification> notificationPage
-                = notificationRepository.findByFromMemberNameInAndIsRead(
+                = notificationRepository.findByToMemberNameAndIsRead(
                         matchedMember.getMemberName(), false, pageable);
 
         return NotificationConverter.toReadListDto(notificationPage);
@@ -175,7 +182,7 @@ public class NotificationServiceImpl implements NotificationService{
                 = membersService.findMember(member, memberId);
 
         Page<Notification> notificationPage
-                = notificationRepository.findByFromMemberNameInAndIsRead(
+                = notificationRepository.findByToMemberNameAndIsRead(
                         matchedMember.getMemberName(), true, pageable);
 
         return NotificationConverter.toReadListDto(notificationPage);
