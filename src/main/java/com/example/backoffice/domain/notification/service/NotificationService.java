@@ -35,5 +35,8 @@ public interface NotificationService {
             Long memberId, NotificationRequestDto.DeleteNotificationRequestDto requestDto,
             Members member);
 
+    List<NotificationResponseDto.ReadNotificationListResponseDto> readAll(
+            Long memberId, Members member);
+
     Notification findById(String notificationId);
 }

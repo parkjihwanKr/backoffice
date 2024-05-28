@@ -187,6 +187,27 @@ public class NotificationServiceImpl implements NotificationService{
 
         return NotificationConverter.toReadListDto(notificationPage);
     }
+
+    @Override
+    @Transactional
+    public List<NotificationResponseDto.ReadNotificationListResponseDto> readAll(Long memberId, Members member){
+        // 1. 로그인 사용자와 일치하는지
+        Members matchedMember
+                = membersService.findMember(member, memberId);
+
+        List<Notification> notificationList
+                = notificationRepository.findByToMemberNameAndIsRead(
+                        matchedMember.getMemberName(), false, null)
+                .stream().toList();
+
+        notificationList.forEach(
+                notification -> notification.isRead());
+
+        notificationRepository.saveAll(notificationList);
+
+        return NotificationConverter.toReadAllDto(notificationList);
+    }
+
     @Transactional(readOnly = true)
     public Notification findById(String notificationId){
         return notificationRepository.findById(notificationId).orElseThrow(

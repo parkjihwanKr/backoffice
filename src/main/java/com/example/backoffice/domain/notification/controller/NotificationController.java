@@ -101,4 +101,17 @@ public class NotificationController {
                 memberId, memberDetails.getMembers(), pageable);
         return ResponseEntity.ok().body(responseDto);
     }
+
+    @PostMapping("/members/{memberId}/notifications/unread")
+    public ResponseEntity<CommonResponseDto<List<NotificationResponseDto.ReadNotificationListResponseDto>>> readAll(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        List<NotificationResponseDto.ReadNotificationListResponseDto> responseDtoList
+                = notificationService.readAll(memberId, memberDetails.getMembers());
+        return ResponseEntity.ok().body(
+                new CommonResponseDto<>(
+                        responseDtoList, "모든 알림 리스트 읽기 성공", 200
+                )
+        );
+    }
 }

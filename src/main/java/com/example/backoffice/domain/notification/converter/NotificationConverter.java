@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class NotificationConverter {
 
@@ -73,6 +74,19 @@ public class NotificationConverter {
                         .toMemberName(notification.getToMemberName())
                         .fromMemberName(notification.getFromMemberName())
                         .createdAt(notification.getCreatedAt())
+                        .isRead(notification.getIsRead())
                         .build());
+    }
+
+    public static List<NotificationResponseDto.ReadNotificationListResponseDto> toReadAllDto(
+            List<Notification> notificationList){
+        return notificationList.stream()
+                .map(notification -> NotificationResponseDto.ReadNotificationListResponseDto.builder()
+                        .toMemberName(notification.getToMemberName())
+                        .fromMemberName(notification.getFromMemberName())
+                        .createdAt(notification.getCreatedAt())
+                        .isRead(notification.getIsRead())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

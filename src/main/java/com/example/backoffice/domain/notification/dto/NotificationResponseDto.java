@@ -61,5 +61,6 @@ public class NotificationResponseDto {
         private String toMemberName;
         private String fromMemberName;
         private LocalDateTime createdAt;
+        private Boolean isRead;
     }
 }
