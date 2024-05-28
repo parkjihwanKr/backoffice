@@ -5,6 +5,7 @@ import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Member;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -180,6 +183,30 @@ public class MembersServiceImpl implements MembersService{
         return membersRepository.findById(toMemberId).orElseThrow(
                 ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, MemberRole> findMemberNameListExcludingDepartmentListAndIdList(
+            List<MemberRole> excludedDepartmentList,
+            List<Long> excludedIdList){
+        // 해당 리스트에 대한 member가 있는지 확인
+        List<Members> memberList = membersRepository.findAllById(excludedIdList);
+        // 해당 memberList에 저장된 Member와 excludedIdList의 사이즈가 다르면
+        // 특정 아이디에 대한 정보가 없다.
+        if(memberList.size() != excludedIdList.size()){
+            throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
+        }
+
+        List<Members> memberListExcludingDepartmentAndId
+                = membersRepository.findByRoleNotInAndIdNotIn(
+                        excludedDepartmentList, excludedIdList);
+        Map<String, MemberRole> memberNameMap = new HashMap<>();
+
+        for(Members member : memberListExcludingDepartmentAndId){
+            memberNameMap.put(member.getMemberName(), member.getRole());
+        }
+        return memberNameMap;
     }
 
     private MembersExceptionEnum findExceptionType(

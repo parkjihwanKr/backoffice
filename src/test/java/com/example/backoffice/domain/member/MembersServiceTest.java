@@ -64,7 +64,7 @@ public class MembersServiceTest {
                         .memberName("test User NickName")
                         .contact("010-2222-1212")
                         .profileImageUrl(" ")
-                        .role(MemberRole.USER)
+                        .role(MemberRole.HR)
                         .build()
         );
         Authentication authentication
@@ -341,7 +341,7 @@ public class MembersServiceTest {
         Members member = Members.builder()
                 .id(1L)
                 .name("test name")
-                .role(MemberRole.USER)
+                .role(MemberRole.HR)
                 .build();
 
         MultipartFile file
@@ -374,7 +374,7 @@ public class MembersServiceTest {
         Members member = Members.builder()
                 .id(1L)
                 .name("test name")
-                .role(MemberRole.USER)
+                .role(MemberRole.HR)
                 .build();
 
         MultipartFile image
@@ -471,7 +471,7 @@ public class MembersServiceTest {
                 .memberName("test User NickName")
                 .contact("010-2222-1212")
                 .profileImageUrl(" ")
-                .role(MemberRole.USER)
+                .role(MemberRole.HR)
                 .build();
 
         // when

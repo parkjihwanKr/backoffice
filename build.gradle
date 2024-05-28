@@ -48,6 +48,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
 	// database : mongodb
+	// websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
