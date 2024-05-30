@@ -1,7 +1,7 @@
 package com.example.backoffice.domain.notification.service;
 
-import com.example.backoffice.domain.admin.entity.Admin;
 import com.example.backoffice.domain.admin.service.AdminService;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
@@ -96,7 +96,9 @@ public class NotificationServiceImpl implements NotificationService{
             Long adminId, Members member,
             NotificationRequestDto.CreateNotificationRequestDto requestDto){
         // 1. 해당 어드민 계정이 맞는지 -> 멤버 검증까지 같이 됨
-        Admin mainAdmin = adminService.findById(adminId);
+        Members admin = membersService.findAdmin(
+                adminId, member.getRole(), member.getMemberDepartment());
+
         // 2. excludeMemberRole에 따라 해당 Role은 제외한 멤버 정보를 가져옴
         // 해당 부분은 제외한 역할의 MemberName과 해당 Member의 역할만 가져온 Map
 
@@ -108,15 +110,15 @@ public class NotificationServiceImpl implements NotificationService{
         // 1. ADMIN(자기 자신) 또한 알림 메세지에 들어감 -> 자기 자신은 알림에 넣지 않는 식으로 변경 o
         // 2. excludedIdList가 null이면 오류가 뜸 -> 빈칸 리스트가 들어갈 수 있게 조정 o
         // 3. Notifcation jpaRepository에 왜 들어가는지 모르겠음. -> test settings 때문
-        Map<String, MemberRole> memberNamesAndRoles
+        Map<String, MemberDepartment> memberNamesAndDepartment
                 = membersService.findMemberNameListExcludingDepartmentListAndIdList(
-                        requestDto.getExcludedMemberRole(), requestDto.getExcludedMemberIdList());
+                        requestDto.getExcludedMemberDepartment(), requestDto.getExcludedMemberIdList());
 
-        Set<MemberRole> memberRoleList = new HashSet<>();
+        Set<MemberDepartment> memberDepartmentSet = new HashSet<>();
         List<Notification> notificationList = new ArrayList<>();
         String message = requestDto.getMessage();
 
-        memberNamesAndRoles.forEach((memberName, memberRole) -> {
+        memberNamesAndDepartment.forEach((memberName, memberDepartment) -> {
             // 메세지를 만든 본인은 알림에 등록되지 않음
             if(!member.getMemberName().equals(memberName)){
                 Notification notification = NotificationConverter.toEntity(
@@ -124,16 +126,16 @@ public class NotificationServiceImpl implements NotificationService{
                         member.getMemberName(), // From Member
                         message, // 메시지 내용
                         NotificationType.MEMBER, // 알림 타입
-                        memberRole // Map의 value
+                        memberDepartment // Map의 value
                 );
                 notificationRepository.save(notification);
-                memberRoleList.add(memberRole);
+                memberDepartmentSet.add(memberDepartment);
                 notificationList.add(notification);
                 sendNotificationToUser(memberName, notification);
             }
         });
         // 해당 memberRoleList 테스트 후, 설정 예정
-        return NotificationConverter.toCreateDto(mainAdmin, memberRoleList, notificationList, message);
+        return NotificationConverter.toCreateDto(admin, memberDepartmentSet, notificationList, message);
     }
 
     @Override
@@ -225,7 +227,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        memberMessage, domainType, notificationData.getFromMember().getRole());
+                        memberMessage, domainType, notificationData.getFromMember().getMemberDepartment());
             }
             case BOARD -> {
                 String boardMessage
@@ -235,7 +237,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        boardMessage, domainType, notificationData.getFromMember().getRole());
+                        boardMessage, domainType, notificationData.getFromMember().getMemberDepartment());
             }
             case COMMENT -> {
                 String commentMessage
@@ -246,7 +248,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        commentMessage, domainType, notificationData.getFromMember().getRole());
+                        commentMessage, domainType, notificationData.getFromMember().getMemberDepartment());
             }
             case REPLY -> {
                 String replyMessage
@@ -257,7 +259,7 @@ public class NotificationServiceImpl implements NotificationService{
                 yield NotificationConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        replyMessage, domainType, notificationData.getFromMember().getRole());
+                        replyMessage, domainType, notificationData.getFromMember().getMemberDepartment());
             }
             default -> throw new NotificationCustomException(NotificationExceptionCode.NOT_MATCHED_REACTION_TYPE);
         };

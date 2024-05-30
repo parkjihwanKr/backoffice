@@ -1,6 +1,6 @@
 package com.example.backoffice.domain.notification.dto;
 
-import com.example.backoffice.domain.admin.entity.AdminRole;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,8 +22,8 @@ public class NotificationResponseDto {
         private String message;
         private String toMemberName;
         private String fromMemberName;
-        private MemberRole memberRole;
-        private AdminRole adminRole;
+        private MemberDepartment memberDepartment;
+        private MemberDepartment adminRole;
         private LocalDateTime createdAt;
     }
 
@@ -36,8 +36,8 @@ public class NotificationResponseDto {
         private String message;
         private String fromMemberName;
         private List<String> toMemberNameList;
-        private Set<MemberRole> toMemberRoleList;
-        private AdminRole fromAdminRole;
+        private Set<MemberDepartment> toMemberDepartmentSet;
+        private MemberRole fromAdminRole;
     }
 
     @Getter
@@ -47,7 +47,7 @@ public class NotificationResponseDto {
     public static class ReadNotificationResponseDto {
         private String toMemberName;
         private String fromMemberName;
-        private MemberRole toMemberRole;
+        private MemberDepartment fromMemberDepartment;
         private LocalDateTime createdAt;
         private Boolean isRead;
         private String message;

@@ -2,6 +2,8 @@ package com.example.backoffice.domain.member.converter;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 
@@ -11,12 +13,16 @@ public class MembersConverter {
         return Members.builder()
                 .memberName("admin")
                 .name("admin")
+                .loveCount(0L)
                 .role(MemberRole.ADMIN)
                 .email("admin@test.com")
                 .address("admin시 admin동")
                 .introduction("admin이다")
+                .memberDepartment(MemberDepartment.HR)
                 .password(bcrytPassword)
                 .contact("010-0000-0000")
+                .position(MemberPosition.CEO)
+                .salary(20000000L)
                 .build();
     }
     public static Members toEntity(
@@ -24,7 +30,9 @@ public class MembersConverter {
         return Members.builder()
                 .memberName(requestDto.getMemberName())
                 .name(requestDto.getName()) // 이름을 name으로 설정하는 것이 맞는지 확인
-                .role(MemberRole.HR) // 역할 설정, MemberRole.USER 또는 직접 설정
+                .role(MemberRole.USER) // 역할 설정, MemberRole.USER 또는 직접 설정
+                .memberDepartment(MemberDepartment.HR)
+                .position(MemberPosition.INTERN)
                 .email(requestDto.getEmail())
                 .address(requestDto.getAddress())
                 .loveCount(0L)

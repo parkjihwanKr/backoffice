@@ -1,10 +1,10 @@
 package com.example.backoffice.domain.member.service;
 
-import com.example.backoffice.domain.admin.service.AdminService;
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
@@ -31,7 +31,6 @@ public class MembersServiceImpl implements MembersService{
     private final FilesService filesService;
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AdminService adminService;
 
     // 관리자 설정
     @PostConstruct
@@ -43,7 +42,6 @@ public class MembersServiceImpl implements MembersService{
         String bcrytPassword = passwordEncoder.encode(rawPassword);
         Members mainAdmin = MembersConverter.toAdminEntity(bcrytPassword);
         membersRepository.save(mainAdmin);
-        adminService.saveMainAdmin(mainAdmin);
     }
 
     // 타당성 검사 추가
@@ -114,9 +112,9 @@ public class MembersServiceImpl implements MembersService{
     public MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
             Long memberId, Members member,
             MultipartFile file){
-        Members changeRoleMember = findMember(member, memberId);
-        String document = filesService.createFileForMemberRole(file, changeRoleMember);
-        membersRepository.save(changeRoleMember);
+        Members updateMember = findMember(member, memberId);
+        String document = filesService.createFileForMemberRole(file, updateMember);
+        membersRepository.save(updateMember);
         return MembersConverter.toUpdateRoleDto(member, document);
     }
 
@@ -187,8 +185,8 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public Map<String, MemberRole> findMemberNameListExcludingDepartmentListAndIdList(
-            List<MemberRole> excludedDepartmentList,
+    public Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
+            List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList){
         // 해당 리스트에 대한 member가 있는지 확인
         List<Members> memberList = membersRepository.findAllById(excludedIdList);
@@ -199,12 +197,12 @@ public class MembersServiceImpl implements MembersService{
         }
 
         List<Members> memberListExcludingDepartmentAndId
-                = membersRepository.findByRoleNotInAndIdNotIn(
+                = membersRepository.findByMemberDepartmentNotInAndIdNotIn(
                         excludedDepartmentList, excludedIdList);
-        Map<String, MemberRole> memberNameMap = new HashMap<>();
+        Map<String, MemberDepartment> memberNameMap = new HashMap<>();
 
         for(Members member : memberListExcludingDepartmentAndId){
-            memberNameMap.put(member.getMemberName(), member.getRole());
+            memberNameMap.put(member.getMemberName(), member.getMemberDepartment());
         }
         return memberNameMap;
     }
@@ -224,5 +222,15 @@ public class MembersServiceImpl implements MembersService{
             return MembersExceptionEnum.MEMBER_NAME;
         }
         return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findAdmin(
+            Long adminId, MemberRole role, MemberDepartment department){
+        return membersRepository.findByIdAndRoleAndMemberDepartment(adminId, role, department)
+                .orElseThrow(
+                        ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+                );
     }
 }

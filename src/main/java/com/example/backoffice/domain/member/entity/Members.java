@@ -1,12 +1,12 @@
 package com.example.backoffice.domain.member.entity;
 
-import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.member.dto.MembersRequestDto;
-import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -55,7 +55,16 @@ public class Members extends CommonEntity {
     private Long loveCount;
 
     // 직책
-    private String position;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private MemberPosition position;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private MemberDepartment memberDepartment;
+
+    // 급여
+    private Long salary;
 
     public void updateMemberInfo(
             String name, String email, String address,
@@ -77,9 +86,6 @@ public class Members extends CommonEntity {
         this.loveCount++;
     }
 
-    public void updatePosition(String position){
-        this.position = position;
-    }
     public void deleteEmoji(){
         this.loveCount--;
     }
