@@ -1,21 +1,21 @@
 package com.example.backoffice.domain.notification.repository;
 
-import com.example.backoffice.domain.notification.entity.Notification;
+import com.example.backoffice.domain.notification.entity.Notifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
 
-public interface NotificationRepository extends MongoRepository<Notification, String> {
+public interface NotificationsRepository extends MongoRepository<Notifications, String> {
 
-    Optional<Notification> findByIdAndToMemberName(
+    Optional<Notifications> findByIdAndToMemberName(
             String notificationId, String toMemberName);
 
-    Page<Notification> findByToMemberName(
+    Page<Notifications> findByToMemberName(
             String toMemberName, Pageable pageable);
 
-    Page<Notification> findByToMemberNameAndIsRead(
+    Page<Notifications> findByToMemberNameAndIsRead(
             String toMemberName, Boolean isRead, Pageable pageable);
 }
 

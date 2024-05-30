@@ -1,7 +1,6 @@
 package com.example.backoffice.domain.notification.entity;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
-import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "notifications")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notification extends CommonEntity {
+public class Notifications extends CommonEntity {
 
     @Id
     private String id;

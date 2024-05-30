@@ -45,4 +45,7 @@ public interface MembersServiceFacade {
 
     /*Members findAdmin(
             Long adminId, MemberRole role, MemberDepartment department);*/
+
+    Members findAdmin(
+            Long adminId, MemberRole role, MemberDepartment department);
 }

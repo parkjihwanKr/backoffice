@@ -1,7 +1,6 @@
 package com.example.backoffice.domain.notification.dto;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
-import com.example.backoffice.domain.member.entity.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-public class NotificationRequestDto {
+public class NotificationsRequestDto {
 
     @Getter
     @Builder

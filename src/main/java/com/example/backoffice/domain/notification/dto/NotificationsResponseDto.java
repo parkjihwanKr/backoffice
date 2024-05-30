@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-public class NotificationResponseDto {
+public class NotificationsResponseDto {
 
     // 멤버, 게시글, 댓글, 대댓글 리액션에 대한 알림 요청
     @Getter

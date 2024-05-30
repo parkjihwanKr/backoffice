@@ -20,9 +20,6 @@ public interface MembersService {
 
     Members validateMember(Long toMemberId, Long fromMemberId);
 
-    Members findAdmin(
-            Long adminId, MemberRole role, MemberDepartment department);
-
     Members findByEmailOrMemberNameOrAddressOrContact(
             String email, String memberName, String address, String contact);
 
@@ -37,4 +34,7 @@ public interface MembersService {
     List<Members> findByMemberDepartmentNotInAndIdNotIn(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList);
+
+    Members findByIdAndRoleAndMemberDepartment(
+            Long adminId, MemberRole role, MemberDepartment department);
 }
