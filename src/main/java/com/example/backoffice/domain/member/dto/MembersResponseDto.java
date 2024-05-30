@@ -62,7 +62,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberRoleResponseDto{
+    public static class UpdateMemberAttributeResponseDto{
         private String fromMemberName;
         private String fileName;
     }

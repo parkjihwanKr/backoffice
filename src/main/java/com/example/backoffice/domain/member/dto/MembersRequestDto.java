@@ -1,5 +1,7 @@
 package com.example.backoffice.domain.member.dto;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import jakarta.validation.constraints.Pattern;
@@ -9,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.aspectj.weaver.Member;
+import org.springframework.web.multipart.MultipartFile;
 
 public class MembersRequestDto {
 
@@ -39,6 +42,18 @@ public class MembersRequestDto {
     public static class LoginMemberRequestDto{
         private String memberName;
         private String password;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateMemberAttributeRequestDto {
+        private String memberName;
+        private MemberRole role;
+        private MemberDepartment department;
+        private MemberPosition position;
+        private MultipartFile file;
     }
 
     @Builder

@@ -12,27 +12,7 @@ import java.util.Map;
 
 public interface MembersService {
 
-    MembersResponseDto.CreateMembersResponseDto signup(
-            MembersRequestDto.CreateMembersRequestDto requestDto);
-
-    MembersResponseDto.ReadMemberResponseDto readMemberInfo(
-            Long memberId, Members member);
-
-    MembersResponseDto.UpdateMemberResponseDto updateMember(
-            Long memberId,  Members Member,
-            MembersRequestDto.UpdateMemberRequestDto requestDto);
-
-    MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
-            Long memberId, Members member,
-            MultipartFile file);
-
-    MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateMemberProfileImageUrl(
-            Long memberId, Members member, MultipartFile image);
-
-    MembersResponseDto.DeleteMemberProfileImageResponseDto deleteMemberProfileImage(
-            Long memberId, Members member);
-
-    void deleteMember(Long memberId, Members member);
+    void signup(Members member);
 
     Members findById(Long memberId);
 
@@ -40,10 +20,21 @@ public interface MembersService {
 
     Members validateMember(Long toMemberId, Long fromMemberId);
 
-    Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
-            List<MemberDepartment> excludedDepartmentList,
-            List<Long> excludedIdList);
-
     Members findAdmin(
             Long adminId, MemberRole role, MemberDepartment department);
+
+    Members findByEmailOrMemberNameOrAddressOrContact(
+            String email, String memberName, String address, String contact);
+
+    Boolean existsById(Long memberId);
+
+    Members save(Members member);
+
+    void deleteById(Long memberId);
+
+    List<Members> findAllById(List<Long> excludedIdList);
+
+    List<Members> findByMemberDepartmentNotInAndIdNotIn(
+            List<MemberDepartment> excludedDepartmentList,
+            List<Long> excludedIdList);
 }
