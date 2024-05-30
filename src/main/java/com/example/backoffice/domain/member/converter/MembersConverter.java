@@ -77,8 +77,8 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberRoleResponseDto toUpdateRoleDto(Members member, String document){
-        return MembersResponseDto.UpdateMemberRoleResponseDto.builder()
+    public static MembersResponseDto.UpdateMemberAttributeResponseDto toUpdateAttributeDto(Members member, String document){
+        return MembersResponseDto.UpdateMemberAttributeResponseDto.builder()
                 .fromMemberName(member.getMemberName())
                 .fileName(document)
                 .build();
