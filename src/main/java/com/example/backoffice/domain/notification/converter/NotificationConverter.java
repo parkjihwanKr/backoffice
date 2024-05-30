@@ -1,7 +1,8 @@
 package com.example.backoffice.domain.notification.converter;
 
-import com.example.backoffice.domain.admin.entity.Admin;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.notification.dto.NotificationResponseDto;
 import com.example.backoffice.domain.notification.entity.Notification;
 import com.example.backoffice.domain.notification.entity.NotificationType;
@@ -16,13 +17,13 @@ public class NotificationConverter {
 
     public static Notification toEntity(
             String toMemberName, String fromMemberName, String message,
-            NotificationType notificationType, MemberRole memberRole){
+            NotificationType notificationType, MemberDepartment memberDepartment){
         return Notification.builder()
                 .toMemberName(toMemberName)
                 .fromMemberName(fromMemberName)
                 .message(message)
                 .notificationType(notificationType)
-                .fromMemberRole(memberRole)
+                .fromMemberDepartment(memberDepartment)
                 .isRead(false)
                 .build();
     }
@@ -32,7 +33,6 @@ public class NotificationConverter {
         return NotificationResponseDto.CreateNotificationResponseDto.builder()
                 .toMemberName(notification.getToMemberName())
                 .fromMemberName(notification.getFromMemberName())
-                .memberRole(notification.getFromMemberRole())
                 .createdAt(notification.getCreatedAt())
                 .build();
     }
@@ -43,7 +43,7 @@ public class NotificationConverter {
         return NotificationResponseDto.ReadNotificationResponseDto.builder()
                 .fromMemberName(notification.getFromMemberName())
                 .toMemberName(notification.getToMemberName())
-                .toMemberRole(notification.getFromMemberRole())
+                .fromMemberDepartment(notification.getFromMemberDepartment())
                 .createdAt(notification.getCreatedAt())
                 .isRead(notification.getIsRead())
                 .message(notification.getMessage())
@@ -51,7 +51,7 @@ public class NotificationConverter {
     }
 
     public static NotificationResponseDto.CreateNotificationListResponseDto toCreateDto(
-            Admin mainAdmin, Set<MemberRole> memberRoleList,
+            Members mainAdmin, Set<MemberDepartment> memberDepartmentSet,
             List<Notification> notificationList, String message){
         List<String> toMemberNameList = new ArrayList<>();
         for (Notification notification : notificationList) {
@@ -61,8 +61,8 @@ public class NotificationConverter {
         return NotificationResponseDto.CreateNotificationListResponseDto.builder()
                 .message(message)
                 .fromAdminRole(mainAdmin.getRole())
-                .fromMemberName(mainAdmin.getMember().getMemberName())
-                .toMemberRoleList(memberRoleList)
+                .fromMemberName(mainAdmin.getMemberName())
+                .toMemberDepartmentSet(memberDepartmentSet)
                 .toMemberNameList(toMemberNameList)
                 .build();
     }
