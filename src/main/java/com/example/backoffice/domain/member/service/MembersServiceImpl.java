@@ -57,7 +57,7 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public Members findAdmin(
+    public Members findByIdAndRoleAndMemberDepartment(
             Long adminId, MemberRole role, MemberDepartment department){
         return membersRepository.findByIdAndRoleAndMemberDepartment(adminId, role, department)
                 .orElseThrow(

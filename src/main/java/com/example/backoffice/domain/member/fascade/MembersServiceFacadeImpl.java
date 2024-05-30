@@ -5,12 +5,12 @@ import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.service.MembersService;
-import com.example.backoffice.domain.notification.service.NotificationService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -172,6 +172,13 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
         }
         return membersService.findById(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findAdmin(
+            Long adminId, MemberRole role, MemberDepartment department){
+        return membersService.findByIdAndRoleAndMemberDepartment(adminId, role, department);
     }
 
     @Override
