@@ -1,14 +1,11 @@
 package com.example.backoffice.domain.member.service;
 
-import com.example.backoffice.domain.member.dto.MembersRequestDto;
-import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 public interface MembersService {
 
@@ -16,9 +13,7 @@ public interface MembersService {
 
     Members findById(Long memberId);
 
-    Members findMember(Members member, Long memberId);
-
-    Members validateMember(Long toMemberId, Long fromMemberId);
+    Members checkMemberId(Long toMemberId, Long fromMemberId);
 
     Members findByEmailOrMemberNameOrAddressOrContact(
             String email, String memberName, String address, String contact);
@@ -29,12 +24,14 @@ public interface MembersService {
 
     void deleteById(Long memberId);
 
-    List<Members> findAllById(List<Long> excludedIdList);
+    List<Members> findAllById(List<Long> memberIdList);
 
-    List<Members> findByMemberDepartmentNotInAndIdNotIn(
+    List<Members> findByDepartmentNotInAndIdNotIn(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList);
 
-    Members findByIdAndRoleAndMemberDepartment(
+    Members findByIdAndRoleAndDepartment(
             Long adminId, MemberRole role, MemberDepartment department);
+
+    Members findByRoleAndPosition(MemberRole role, MemberPosition position);
 }

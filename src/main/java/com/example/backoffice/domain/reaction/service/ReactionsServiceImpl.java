@@ -41,7 +41,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction(
             Long toMemberId, Members fromMember, ReactionsRequestDto requestDto){
         Members toMember
-                = membersService.validateMember(toMemberId, fromMember.getId());
+                = membersService.checkMemberId(fromMember.getId(), toMemberId);
 
         if (reactionsRepository.existsByMemberAndReactor(toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
@@ -65,7 +65,8 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public void deleteMemberReaction(
             Long toMemberId, Long reactionId, Members fromMember){
-        Members toMember = membersService.validateMember(toMemberId, fromMember.getId());
+        Members toMember
+                = membersService.checkMemberId(fromMember.getId(), toMemberId);
         if (!reactionsRepository.existsByIdAndMemberAndReactor(reactionId, toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
@@ -80,8 +81,8 @@ public class ReactionsServiceImpl implements ReactionsService{
             Long boardId, Members fromMember,
             ReactionsRequestDto requestDto){
         Boards board = boardsService.findById(boardId);
-        membersService.validateMember(
-                board.getMember().getId(), fromMember.getId());
+        membersService.checkMemberId(
+                fromMember.getId(), board.getMember().getId());
         Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
         if(reactionsRepository.existsByBoardAndReactor(
@@ -105,7 +106,7 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         // 1. 예외 검증
         Boards board = boardsService.findById(boardId);
-        membersService.validateMember(board.getMember().getId(), member.getId());
+        membersService.checkMemberId(member.getId(), board.getMember().getId());
         if(!reactionsRepository.existsByIdAndBoardAndReactor(reactionId, board, member)){
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }

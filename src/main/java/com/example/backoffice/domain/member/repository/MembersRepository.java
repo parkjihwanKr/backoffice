@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.member.repository;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,9 +15,11 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
     Optional<Members> findByEmailOrMemberNameOrAddressOrContact(
             String email, String memberName, String address, String contact);
 
-    List<Members> findByMemberDepartmentNotInAndIdNotIn(
+    List<Members> findByDepartmentNotInAndIdNotIn(
             List<MemberDepartment> excludedDepartmentList, List<Long> excludedIdList);
 
-    Optional<Members> findByIdAndRoleAndMemberDepartment(
+    Optional<Members> findByIdAndRoleAndDepartment(
             Long memberId, MemberRole role, MemberDepartment department);
+
+    Optional<Members> findByRoleAndPosition(MemberRole role, MemberPosition position);
 }

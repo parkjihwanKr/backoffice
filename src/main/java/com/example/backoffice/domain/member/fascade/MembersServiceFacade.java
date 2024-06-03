@@ -33,19 +33,16 @@ public interface MembersServiceFacade {
 
     void deleteMember(Long memberId, Members member);
 
-    Members findById(Long memberId);
-
     Members findMember(Members member, Long memberId);
-
-    Members validateMember(Long toMemberId, Long fromMemberId);
 
     Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList);
 
-    /*Members findAdmin(
-            Long adminId, MemberRole role, MemberDepartment department);*/
-
     Members findAdmin(
             Long adminId, MemberRole role, MemberDepartment department);
+
+    MembersResponseDto.UpdateMemberSalaryResponseDto updateSalary(
+            Long memberId, Members loginMember,
+            MembersRequestDto.UpdateMemberSalaryRequestDto requestDto);
 }

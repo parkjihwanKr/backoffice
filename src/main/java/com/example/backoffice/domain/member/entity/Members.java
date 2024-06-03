@@ -61,7 +61,7 @@ public class Members extends CommonEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private MemberDepartment memberDepartment;
+    private MemberDepartment department;
 
     // 급여
     private Long salary;
@@ -79,6 +79,17 @@ public class Members extends CommonEntity {
 
     public void updateProfileImage(String profileImageUrl){
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateAttribute(
+            MemberRole role, MemberDepartment department, MemberPosition position){
+        this.role = role;
+        this.department = department;
+        this.position = position;
+    }
+
+    public void updateSalary(Long salary){
+        this.salary = salary;
     }
 
     public void addEmoji(Reactions reaction){
