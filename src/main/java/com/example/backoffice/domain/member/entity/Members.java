@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.member.entity;
 
+import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -49,9 +50,6 @@ public class Members extends CommonEntity {
 
     private String introduction;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reactions> reactionList;
-
     private Long loveCount;
 
     // 직책
@@ -71,6 +69,12 @@ public class Members extends CommonEntity {
 
     // 휴가 상태
     private Boolean onVacation;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reactions> reactionList;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Events> eventList;
 
     public void updateMemberInfo(
             String name, String email, String address,
