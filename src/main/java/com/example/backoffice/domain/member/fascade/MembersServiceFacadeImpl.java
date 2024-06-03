@@ -113,29 +113,29 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     @Override
     @Transactional
     public MembersResponseDto.UpdateMemberAttributeResponseDto updateAttribute(
-            Long memberId, Members member,
+            Long memberId, Members loginMember,
             MembersRequestDto.UpdateMemberAttributeRequestDto requestDto){
         // 1. 로그인 멤버가 해당 부서, 직위, 급여를 바꿀 수 있는 권한인지? -> Role : Admin이면 바꿀 수 있음
         // 단, 바꾸려는 인물이 직책이 Manager로 승진하는 것이라면 MAIN_ADMIN밖에 권한이 없음
 
         if(requestDto.getPosition().equals(MemberPosition.MANAGER)){
             // 해당 조건을 달성하지 못하면
-            if(!member.getRole().equals(MemberRole.MAIN_ADMIN)
-                    && member.getPosition().equals(MemberPosition.CEO)){
+            if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
+                    && loginMember.getPosition().equals(MemberPosition.CEO)){
                 throw new MembersCustomException(
                         MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
             membersService.findByRoleAndPosition(
-                    member.getRole(), member.getPosition());
+                    loginMember.getRole(), loginMember.getPosition());
         } else{
-            if(!member.getRole().equals(MemberRole.MAIN_ADMIN)
-                    && !member.getRole().equals(MemberRole.ADMIN)){
+            if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
+                    && !loginMember.getRole().equals(MemberRole.ADMIN)){
                 throw new MembersCustomException(
                         MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
         }
         // 2. 바꾸려는 인물이 존재하는지?
-        Members updateMember = findMember(member, memberId);
+        Members updateMember = findMember(loginMember, memberId);
         String document
                 = filesService.createFileForMemberRole(
                 requestDto.getFile(), updateMember);
@@ -143,6 +143,10 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         updateMember.updateAttribute(
                 requestDto.getRole(), requestDto.getDepartment(),
                 requestDto.getPosition());
+
+        notificationsService.saveByMemberInfo(
+                loginMember.getMemberName(), updateMember.getMemberName(),
+                updateMember.getDepartment());
 
         return MembersConverter.toUpdateAttributeDto(updateMember, document);
     }
@@ -162,7 +166,13 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         if((loginMember.getDepartment().equals(MemberDepartment.FINANCE) &&
                 loginMember.getPosition().equals(MemberPosition.MANAGER))
                 || loginMember.getPosition().equals(MemberPosition.CEO)){
+
             updateMember.updateSalary(requestDto.getSalary());
+
+            notificationsService.saveByMemberInfo(
+                    loginMember.getMemberName(), updateMember.getMemberName(),
+                    updateMember.getDepartment());
+
             return MembersConverter.toUpdateSalaryDto(updateMember);
         }else{
             throw new MembersCustomException(
