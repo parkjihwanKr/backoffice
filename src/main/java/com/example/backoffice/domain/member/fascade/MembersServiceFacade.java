@@ -45,4 +45,8 @@ public interface MembersServiceFacade {
     MembersResponseDto.UpdateMemberSalaryResponseDto updateSalary(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateMemberSalaryRequestDto requestDto);
+
+    MembersResponseDto.UpdateMemberVacationDaysResponseDto updateVacationDays(
+            Long memberId, Members loginMember,
+            MembersRequestDto.UpdateMemberVacationDaysRequestDto requestDto);
 }

@@ -118,7 +118,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         // 1. 로그인 멤버가 해당 부서, 직위, 급여를 바꿀 수 있는 권한인지? -> Role : Admin이면 바꿀 수 있음
         // 단, 바꾸려는 인물이 직책이 Manager로 승진하는 것이라면 MAIN_ADMIN밖에 권한이 없음
 
-        if(requestDto.getPosition().equals(MemberPosition.MANAGER)){
+        if(!loginMember.getPosition().equals(MemberPosition.MANAGER)){
             // 해당 조건을 달성하지 못하면
             if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
                     && loginMember.getPosition().equals(MemberPosition.CEO)){
@@ -179,6 +179,25 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
                     MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
         }
     }
+
+    @Override
+    @Transactional
+    public MembersResponseDto.UpdateMemberVacationDaysResponseDto updateVacationDays(
+            Long memberId, Members loginMember,
+            MembersRequestDto.UpdateMemberVacationDaysRequestDto requestDto){
+        // 1. 로그인한 사용자가 자기 자신인지
+        findMember(loginMember, memberId);
+
+        // 2. 휴가 요청 일 수가 휴가 잔여 일 수가 같거나 많은지?
+        if(loginMember.getVacationDays() < requestDto.getVacationDays()){
+            throw new MembersCustomException(MembersExceptionCode.INSUFFICIENT_VACATION_DAYS);
+        }
+
+        // 3. 모든 멤버의 휴가가 30%가 초과하여 갈 수 없음
+
+        return null;
+    }
+
 
     // 프로필 이미지 업로드
     @Override

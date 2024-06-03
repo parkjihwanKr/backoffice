@@ -66,6 +66,12 @@ public class Members extends CommonEntity {
     // 급여
     private Long salary;
 
+    // 휴가, 해당 부분은 21억 넘을 이유 없음.
+    private Integer vacationDays;
+
+    // 휴가 상태
+    private Boolean onVacation;
+
     public void updateMemberInfo(
             String name, String email, String address,
             String contact, String introduction, String bCrytPassword){

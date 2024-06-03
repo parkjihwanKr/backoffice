@@ -83,6 +83,16 @@ public class MembersResponseDto {
         private MemberDepartment memberDepartment;
         private Long changedSalary;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateMemberVacationDaysResponseDto {
+        // 잔여 휴가 일 수
+        private Integer vacationDays;
+    }
+
     @Getter
     @Builder
     @NoArgsConstructor

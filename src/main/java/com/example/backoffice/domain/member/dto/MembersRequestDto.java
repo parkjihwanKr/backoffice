@@ -67,6 +67,15 @@ public class MembersRequestDto {
         private Long salary;
     }
 
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateMemberVacationDaysRequestDto {
+        // 잔여 휴가 일 수
+        private Integer vacationDays;
+    }
+
     @Builder
     @Getter
     @AllArgsConstructor

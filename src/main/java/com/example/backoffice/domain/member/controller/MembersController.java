@@ -78,6 +78,22 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    // 휴가 요청
+    @PatchMapping("/members/{memberId}/vacation")
+    public ResponseEntity<CommonResponse<MembersResponseDto.UpdateMemberVacationDaysResponseDto>> updateVactionDays(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody MembersRequestDto.UpdateMemberVacationDaysRequestDto requestDto){
+        MembersResponseDto.UpdateMemberVacationDaysResponseDto responseDto =
+                membersServiceFacade.updateVacationDays(
+                        memberId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        HttpStatus.OK, "검토 후 변경 예정입니다.", responseDto
+                )
+        );
+    }
+
     @PatchMapping("/members/{memberId}/profileImage")
     public ResponseEntity<MembersResponseDto.UpdateMemberProfileImageUrlResponseDto> updateProfile(
             @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,

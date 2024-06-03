@@ -21,6 +21,7 @@ public enum MembersExceptionCode {
     INVALID_MEMBER_IDS(HttpStatus.BAD_REQUEST, "MEMBER-012", "유효하지 않은 멤버 아이디 리스트입니다."),
     NOT_MATCHED_INFO(HttpStatus.BAD_REQUEST, "MEMBER-013", "해당 멤버 정보와 일치하지 않습니다."),
     RESTRICTED_ACCESS_MEMBER(HttpStatus.BAD_REQUEST, "MEMBER-014", "해당 멤버는 접근 권한이 없습니다."),
+    INSUFFICIENT_VACATION_DAYS(HttpStatus.BAD_REQUEST, "MEMBER-015","해당 멤버는 충분한 휴가 일수가 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
