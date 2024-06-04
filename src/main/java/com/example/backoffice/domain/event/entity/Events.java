@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.event.entity;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -26,10 +27,21 @@ public class Events extends CommonEntity {
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private Boolean isDeleted;
-    private LocalDateTime deletedAt;
+    private MemberDepartment department;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Members member;
+
+    // entity method
+    public void update(
+            String title, String description,
+            MemberDepartment department, LocalDateTime startDate,
+            LocalDateTime endDate){
+        this.title = title;
+        this.description = description;
+        this.department = department;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

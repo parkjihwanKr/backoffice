@@ -7,6 +7,9 @@ import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.Members;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EventsConverter {
 
@@ -19,25 +22,65 @@ public class EventsConverter {
     }
 
     public static Events toEntity(
-            EventsRequestDto.CreateCompanyEventsRequestDto requestDto,
+            EventsRequestDto.CreateDepartmentEventsRequestDto requestDto,
             EventDateRangeDto eventDateRangeDto, Members member){
         return Events.builder()
                 .title(requestDto.getTitle())
                 .description(requestDto.getDescription())
                 .member(member)
-                .isDeleted(false)
                 .startDate(eventDateRangeDto.getStartDate())
                 .endDate(eventDateRangeDto.getEndDate())
                 .build();
     }
 
-    public static EventsResponseDto.CreateCompanyEventResponseDto toCreateCompanyDto(Events event){
-        return EventsResponseDto.CreateCompanyEventResponseDto.builder()
+    public static EventsResponseDto.CreateDepartmentEventResponseDto toCreateDepartmentDto(Events event){
+        return EventsResponseDto.CreateDepartmentEventResponseDto.builder()
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .createdAt(event.getCreatedAt())
+                .build();
+    }
+
+    public static List<EventsResponseDto.ReadCompanyMonthEventResponseDto> toReadCompanyMonthDto(
+            List<Events> eventList){
+        List<EventsResponseDto.ReadCompanyMonthEventResponseDto> eventResponseDtoList = new ArrayList<>();
+        for (Events events : eventList) {
+            eventResponseDtoList.add(
+                    EventsResponseDto.ReadCompanyMonthEventResponseDto.builder()
+                            .title(events.getTitle())
+                            .startDate(events.getStartDate())
+                            .endDate(events.getEndDate())
+                            .createdAt(events.getCreatedAt())
+                            .build()
+            );
+        }
+        return eventResponseDtoList;
+    }
+
+    public static EventsResponseDto.ReadCompanyEventResponseDto toReadCompanyDto(
+            Events event){
+        return EventsResponseDto.ReadCompanyEventResponseDto.builder()
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .createdAt(event.getCreatedAt())
+                .modifiedAt(event.getModifiedAt())
+                .build();
+    }
+
+    public static EventsResponseDto.UpdateDepartmentEventResponseDto toUpdateCompanyDto(
+            Events event){
+        return EventsResponseDto.UpdateDepartmentEventResponseDto.builder()
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .department(event.getDepartment())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .createdAt(event.getCreatedAt())
+                .modifiedAt(event.getModifiedAt())
                 .build();
     }
 }

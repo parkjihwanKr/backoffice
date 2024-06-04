@@ -5,10 +5,22 @@ import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.Members;
 
+import java.util.List;
+
 public interface EventsService {
 
-    EventsResponseDto.CreateCompanyEventResponseDto createCompanyEvent(
-            Members member, EventsRequestDto.CreateCompanyEventsRequestDto requestDto);
+    EventsResponseDto.CreateDepartmentEventResponseDto createDepartmentEvent(
+            Members loginMember, EventsRequestDto.CreateDepartmentEventsRequestDto requestDto);
+
+    List<EventsResponseDto.ReadCompanyMonthEventResponseDto> readCompanyMonthEvent(
+            Long year, Long month);
+
+    EventsResponseDto.ReadCompanyEventResponseDto readCompanyEvent(
+            Long eventId);
+
+    EventsResponseDto.UpdateDepartmentEventResponseDto updateDepartmentEvent(
+            Long eventId, Members loginMember,
+            EventsRequestDto.UpdateDepartmentEventRequestDto requestDto);
 
     Events findById(Long eventId);
 }

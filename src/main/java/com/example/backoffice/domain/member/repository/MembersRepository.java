@@ -22,4 +22,6 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
             Long memberId, MemberRole role, MemberDepartment department);
 
     Optional<Members> findByRoleAndPosition(MemberRole role, MemberPosition position);
+
+    Optional<Members> findByMemberDepartment(MemberDepartment department);
 }
