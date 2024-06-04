@@ -52,12 +52,20 @@ public class EventsServiceImplV1 implements EventsService{
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventsResponseDto.ReadCompanyMonthEventResponseDto> readCompanyMonthEvent(
+    public EventsResponseDto.ReadCompanyEventResponseDto readCompanyEvent(
+            Long eventId){
+        Events event = findById(eventId);
+        return EventsConverter.toReadCompanyDto(event);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventsResponseDto.ReadCompanyEventResponseDto> readCompanyMonthEvent(
             Long year, Long month){
         // 해당 날짜의 정보를 가지고 오는데, 만약 2024-06-23~07-02까지의 프로젝트라면?
         // 해당 이벤트를 가지고 오는지? 아닌지 확인해야함
-        LocalDateTime start = YearMonth.of(
-                year.intValue(), month.intValue()).atDay(1).atStartOfDay();
+        LocalDateTime start
+                = YearMonth.of(year.intValue(), month.intValue()).atDay(1).atStartOfDay();
         LocalDateTime end = start.plusMonths(1).minusNanos(1);
         List<Events> eventList = eventsRepository.findAllByStartDateBetween(start, end);
 
@@ -66,10 +74,14 @@ public class EventsServiceImplV1 implements EventsService{
 
     @Override
     @Transactional(readOnly = true)
-    public EventsResponseDto.ReadCompanyEventResponseDto readCompanyEvent(
-            Long eventId){
-        Events event = findById(eventId);
-        return EventsConverter.toReadCompanyDto(event);
+    public List<List<EventsResponseDto.ReadCompanyEventResponseDto>> readCompanyYearEvent(
+            Long year){
+        LocalDateTime start
+                = YearMonth.of(year.intValue(), 1).atDay(1).atStartOfDay();
+        LocalDateTime end = YearMonth.of(year.intValue(), 12).atEndOfMonth().atTime(23, 59, 59);
+        List<Events> eventList = eventsRepository.findAllByStartDateBetween(start, end);
+
+        return EventsConverter.toReadCompanyYearDto(eventList);
     }
 
     @Override
@@ -132,7 +144,6 @@ public class EventsServiceImplV1 implements EventsService{
 
         return EventsConverter.toEventDateRangeDto(startEventDate, endEventDate);
     }
-
 
     private void validateMemberDepartment(
             Members loginMember, MemberDepartment department) {

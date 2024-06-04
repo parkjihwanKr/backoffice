@@ -7,9 +7,11 @@ import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.Members;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EventsConverter {
 
@@ -43,12 +45,12 @@ public class EventsConverter {
                 .build();
     }
 
-    public static List<EventsResponseDto.ReadCompanyMonthEventResponseDto> toReadCompanyMonthDto(
+    public static List<EventsResponseDto.ReadCompanyEventResponseDto> toReadCompanyMonthDto(
             List<Events> eventList){
-        List<EventsResponseDto.ReadCompanyMonthEventResponseDto> eventResponseDtoList = new ArrayList<>();
+        List<EventsResponseDto.ReadCompanyEventResponseDto> eventResponseDtoList = new ArrayList<>();
         for (Events events : eventList) {
             eventResponseDtoList.add(
-                    EventsResponseDto.ReadCompanyMonthEventResponseDto.builder()
+                    EventsResponseDto.ReadCompanyEventResponseDto.builder()
                             .title(events.getTitle())
                             .startDate(events.getStartDate())
                             .endDate(events.getEndDate())
@@ -57,6 +59,31 @@ public class EventsConverter {
             );
         }
         return eventResponseDtoList;
+    }
+
+    public static List<List<EventsResponseDto.ReadCompanyEventResponseDto>> toReadCompanyYearDto(
+            List<Events> eventList) {
+        List<List<EventsResponseDto.ReadCompanyEventResponseDto>> yearEvents = new ArrayList<>();
+
+        for (Month month : Month.values()) {
+            List<EventsResponseDto.ReadCompanyEventResponseDto> monthlyEvents = new ArrayList<>();
+            for (Events event : eventList) {
+                if (event.getStartDate().getMonth().equals(month)) {
+                    monthlyEvents.add(
+                            EventsResponseDto.ReadCompanyEventResponseDto.builder()
+                                    .title(event.getTitle())
+                                    .description(event.getDescription())
+                                    .startDate(event.getStartDate())
+                                    .endDate(event.getEndDate())
+                                    .createdAt(event.getCreatedAt())
+                                    .modifiedAt(event.getModifiedAt())
+                                    .build()
+                    );
+                }
+            }
+            yearEvents.add(monthlyEvents);
+        }
+        return yearEvents;
     }
 
     public static EventsResponseDto.ReadCompanyEventResponseDto toReadCompanyDto(

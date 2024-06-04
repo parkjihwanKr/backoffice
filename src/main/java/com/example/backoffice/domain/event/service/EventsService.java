@@ -12,8 +12,11 @@ public interface EventsService {
     EventsResponseDto.CreateDepartmentEventResponseDto createDepartmentEvent(
             Members loginMember, EventsRequestDto.CreateDepartmentEventsRequestDto requestDto);
 
-    List<EventsResponseDto.ReadCompanyMonthEventResponseDto> readCompanyMonthEvent(
+    List<EventsResponseDto.ReadCompanyEventResponseDto> readCompanyMonthEvent(
             Long year, Long month);
+
+    List<List<EventsResponseDto.ReadCompanyEventResponseDto>> readCompanyYearEvent(
+            Long year);
 
     EventsResponseDto.ReadCompanyEventResponseDto readCompanyEvent(
             Long eventId);

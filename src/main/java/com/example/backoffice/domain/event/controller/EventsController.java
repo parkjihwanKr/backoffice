@@ -20,15 +20,6 @@ public class EventsController {
 
     private final EventsService eventsService;
 
-    // 회사 일정 1달 조회
-    @GetMapping("/events/years/{year}/months/{month}")
-    public ResponseEntity<List<EventsResponseDto.ReadCompanyMonthEventResponseDto>> readCompanyMonthEvent(
-            @PathVariable Long year, @PathVariable Long month){
-        List<EventsResponseDto.ReadCompanyMonthEventResponseDto> responseDtoList
-                = eventsService.readCompanyMonthEvent(year, month);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
-    }
-
     // 회사 일정 한개 상세 조회
     @GetMapping("/events/{eventId}")
     public ResponseEntity<EventsResponseDto.ReadCompanyEventResponseDto> readCompanyEvent(
@@ -37,16 +28,24 @@ public class EventsController {
                 = eventsService.readCompanyEvent(eventId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
-    // 회사 일정 1년 조회
-    /*@GetMapping("/events/years/{year}")
-    public ResponseEntity<EventsResponseDto.ReadCompanyYearEventResponseDto> readCompanyYearEvent(
-            @PathVariable Long year,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
 
-        return null;
-    }   */
+    // 회사 일정 1달 조회
+    @GetMapping("/events/years/{year}/months/{month}")
+    public ResponseEntity<List<EventsResponseDto.ReadCompanyEventResponseDto>> readCompanyMonthEvent(
+            @PathVariable Long year, @PathVariable Long month){
+        List<EventsResponseDto.ReadCompanyEventResponseDto> responseDtoList
+                = eventsService.readCompanyMonthEvent(year, month);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
 
-    // 부서 일정 생성
+    // 회사 일정 1년 조회, 캘린더 1~12월을 한 번에 출력
+    @GetMapping("/events/years/{year}")
+    public ResponseEntity<List<List<EventsResponseDto.ReadCompanyEventResponseDto>>> readCompanyYearEvent(
+            @PathVariable Long year){
+        List<List<EventsResponseDto.ReadCompanyEventResponseDto>> responseDto
+                = eventsService.readCompanyYearEvent(year);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
     // 부서 일정 부분 수정
     @PatchMapping("/events/{eventId}")
@@ -58,9 +57,10 @@ public class EventsController {
                 = eventsService.updateDepartmentEvent(eventId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
     // 부서 일정 1달 생성
     @PostMapping("/events")
-    public ResponseEntity<EventsResponseDto.CreateDepartmentEventResponseDto> createDepartmetEvent(
+    public ResponseEntity<EventsResponseDto.CreateDepartmentEventResponseDto> createDepartmentEvent(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @ModelAttribute EventsRequestDto.CreateDepartmentEventsRequestDto requestDto){
         EventsResponseDto.CreateDepartmentEventResponseDto responseDto
@@ -68,8 +68,6 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 부서 일정 1달 조회
-    // 부서 일정 부분 수정
     // 부서 일정 부분 삭제
     // 부서 일정 1달 삭제
     // 1달 휴가 생성
