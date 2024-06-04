@@ -14,6 +14,7 @@ public enum EventsExceptionCode {
     RESTRICTED_DATE_RANGE(HttpStatus.BAD_REQUEST, "EVENT-004", "휴가를 나갈 수 없는 날입니다."),
     INVALID_DEPARTMENT(HttpStatus.BAD_REQUEST, "EVENT-005", "해당 멤버는 해당 부서의 이벤트를 생성할 수 없습니다."),
     INVALID_EVENT_CRUD_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "EVENT-006","해당 이벤트 처리 방식 오류입니다."),
+    NO_PERMISSION_TO_DELETE_EVENT(HttpStatus.FORBIDDEN, "EVENT-007", "해당 멤버는 해당 부서의 일정을 삭제할 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

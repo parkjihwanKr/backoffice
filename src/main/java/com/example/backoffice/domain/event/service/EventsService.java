@@ -25,5 +25,7 @@ public interface EventsService {
             Long eventId, Members loginMember,
             EventsRequestDto.UpdateDepartmentEventRequestDto requestDto);
 
+    void deleteDepartmentEvent(Long eventId, Members member);
+
     Events findById(Long eventId);
 }

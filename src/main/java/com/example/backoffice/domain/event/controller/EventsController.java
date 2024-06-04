@@ -3,6 +3,7 @@ package com.example.backoffice.domain.event.controller;
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.service.EventsService;
+import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -69,6 +70,17 @@ public class EventsController {
     }
 
     // 부서 일정 부분 삭제
+    @DeleteMapping("/events/{eventId}")
+    public ResponseEntity<CommonResponseDto<Void>> deleteDepartmentEvent(
+            @PathVariable Long eventId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        eventsService.deleteDepartmentEvent(eventId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponseDto<>(
+                        null, "부서 일정 삭제 성공", 200
+                )
+        );
+    }
     // 부서 일정 1달 삭제
     // 1달 휴가 생성
     // 1달 휴가 일정 조회

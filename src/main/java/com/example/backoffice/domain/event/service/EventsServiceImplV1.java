@@ -38,6 +38,7 @@ public class EventsServiceImplV1 implements EventsService{
     @Transactional
     public EventsResponseDto.CreateDepartmentEventResponseDto createDepartmentEvent(
             Members loginMember, EventsRequestDto.CreateDepartmentEventsRequestDto requestDto){
+        membersService.findById(loginMember.getId());
         // 요청 받는 날짜가 다음달로부터 시작되는 날인지?
         validateMemberDepartment(loginMember, requestDto.getDepartment());
 
@@ -105,6 +106,19 @@ public class EventsServiceImplV1 implements EventsService{
                 eventDateRangeDto.getEndDate());
 
         return EventsConverter.toUpdateCompanyDto(event);
+    }
+
+    @Override
+    @Transactional
+    public void deleteDepartmentEvent(Long eventId, Members loginMember){
+        // 검증
+        membersService.findById(loginMember.getId());
+        Events event = findById(eventId);
+        if(!loginMember.getDepartment().equals(event.getDepartment())
+                || loginMember.getPosition().equals(MemberPosition.CEO)){
+            throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
+        }
+        eventsRepository.deleteById(eventId);
     }
 
     @Override
