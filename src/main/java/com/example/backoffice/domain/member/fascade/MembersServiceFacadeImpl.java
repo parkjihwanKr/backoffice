@@ -180,25 +180,6 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         }
     }
 
-    @Override
-    @Transactional
-    public MembersResponseDto.UpdateMemberVacationDaysResponseDto updateVacationDays(
-            Long memberId, Members loginMember,
-            MembersRequestDto.UpdateMemberVacationDaysRequestDto requestDto){
-        // 1. 로그인한 사용자가 자기 자신인지
-        findMember(loginMember, memberId);
-
-        // 2. 휴가 요청 일 수가 휴가 잔여 일 수가 같거나 많은지?
-        if(loginMember.getVacationDays() < requestDto.getVacationDays()){
-            throw new MembersCustomException(MembersExceptionCode.INSUFFICIENT_VACATION_DAYS);
-        }
-
-        // 3. 모든 멤버의 휴가가 30%가 초과하여 갈 수 없음
-
-        return null;
-    }
-
-
     // 프로필 이미지 업로드
     @Override
     @Transactional
