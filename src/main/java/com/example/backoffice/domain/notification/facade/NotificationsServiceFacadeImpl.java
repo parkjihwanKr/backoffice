@@ -240,6 +240,26 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                         notificationData.getFromMember().getMemberName(),
                         replyMessage, domainType, notificationData.getFromMember().getDepartment());
             }
+            case EVENT -> {
+                String eventMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 "+ notificationData.getEvent().getTitle()
+                        + "에 대한 일정을 등록하셨습니다.";
+                yield NotificationsConverter.toEntity(
+                        notificationData.getToMember().getMemberName(),
+                        notificationData.getFromMember().getMemberName(),
+                        eventMessage, domainType, notificationData.getFromMember().getDepartment());
+            }
+            case URGENT_VACATION_EVENT -> {
+                String urgentVacationMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 긴급하게 휴가를 요청하셨습니다.";
+                yield NotificationsConverter.toEntity(
+                        notificationData.getToMember().getMemberName(),
+                        notificationData.getFromMember().getMemberName(),
+                        urgentVacationMessage, domainType, notificationData.getFromMember().getDepartment());
+            }
+
             default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);
         };
     }

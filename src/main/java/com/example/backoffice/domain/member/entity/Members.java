@@ -65,7 +65,7 @@ public class Members extends CommonEntity {
     private Long salary;
 
     // 휴가, 해당 부분은 21억 넘을 이유 없음.
-    private Integer vacationDays;
+    private Integer remainingVacationDays;
 
     // 휴가 상태
     private Boolean onVacation;

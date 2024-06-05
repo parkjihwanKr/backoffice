@@ -91,6 +91,12 @@ public class EventsController {
     }
 
     // 1달 휴가 일정 조회
+    @GetMapping("vacations/{vacationId}")
+    public ResponseEntity<EventsResponseDto.ReadVacationResponseDto> readVacationEvent(
+            @PathVariable Long vacationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        return null;
+    }
     // 1달 휴가 일정 부분 수정
     // 1달 휴가 일정 삭제
     // 1달 휴가 일정 부분 삭제

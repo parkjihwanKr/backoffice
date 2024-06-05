@@ -4,7 +4,6 @@ import com.example.backoffice.domain.event.converter.EventsConverter;
 import com.example.backoffice.domain.event.dto.EventDateRangeDto;
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
-import com.example.backoffice.domain.event.entity.EventCrudType;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
@@ -15,14 +14,13 @@ import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
-import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
-import com.example.backoffice.domain.notification.service.NotificationsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -136,7 +134,7 @@ public class EventsServiceImplV1 implements EventsService{
         EventDateRangeDto eventDateRangeDto
                 = validateVacationDate(
                         loginMember, requestDto.getStartDate(), requestDto.getEndDate(),
-                        requestDto.getUrgent(), requestDto.getReason());
+                        requestDto.getUrgent());
 
         String message = loginMember.getMemberName()+"님의 휴가 요청";
 
@@ -144,6 +142,14 @@ public class EventsServiceImplV1 implements EventsService{
                 message, requestDto.getReason(),
                 eventDateRangeDto, loginMember, EventType.MEMBER_VACATION);
 
+        Members hrManager
+                = membersService.findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.HR);
+        notificationsServiceFacade.createNotification(
+                NotificationsConverter.toNotificationData(
+                        hrManager, loginMember, null, null, null, event),
+                NotificationType.URGENT_VACATION_EVENT);
+
+        eventsRepository.save(event);
         return EventsConverter.toCreateVacationDto(event, requestDto.getUrgent());
     }
 
@@ -155,8 +161,7 @@ public class EventsServiceImplV1 implements EventsService{
         );
     }
 
-    public EventDateRangeDto validateEventDate(
-            String startDate, String endDate) {
+    public EventDateRangeDto validateEventDate(String startDate, String endDate) {
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime startEventDate = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
@@ -175,23 +180,35 @@ public class EventsServiceImplV1 implements EventsService{
     }
 
     public EventDateRangeDto validateVacationDate(
-            Members loginMember, String startDate, String endDate, Boolean urgent, String urgentReason){
+            Members loginMember, String startDate, String endDate, Boolean urgent){
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime startEventDate = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
         LocalDateTime endEventDate = LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
 
+        // 1. 시작날이 7일 이전 일때 긴급함 표시가 없을 때
         if(startEventDate.isBefore(now.plusDays(7)) && !urgent){
-            throw new EventsCustomException(EventsExceptionCode.INVALID_START_DATE);
-        }else if(startEventDate.isBefore(now.plusDays(7)) && urgent){
-            Members toMember
-                    = membersService.findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.HR);
-            notificationsServiceFacade.createNotification(
-                    NotificationsConverter.toNotificationData(
-                            toMember, loginMember, null, null, null),
-                    NotificationType.URGENT_VACATION_EVENT);
+            throw new EventsCustomException(
+                    EventsExceptionCode.INVALID_START_DATE_OR_PRESS_URGENT_BUTTON);
         }
 
+        // 2. 시작날이 7일 또는 7일 후일 때 긴급함 표시가 되어 있을 때
+        if((startEventDate.isEqual(now.plusDays(7))
+                || startEventDate.isAfter(now.plusDays(7))) && urgent){
+            throw new EventsCustomException(EventsExceptionCode.INVALID_URGENT);
+        }
+
+        // 3. 멤버의 잔여 휴가가 총 일수보다 길 때
+        long vacationDays = Duration.between(startEventDate, endEventDate).toDays();
+        if(loginMember.getRemainingVacationDays() < (int)vacationDays){
+            throw new EventsCustomException(EventsExceptionCode.INSUFFICIENT_VACATION_DAYS);
+        }
+        // 4. 휴가 총 설정이 30일이 넘어갈 때
+        if(vacationDays > 30){
+            throw new EventsCustomException(EventsExceptionCode.INVALID_VACATION_DAYS);
+        }
+
+        // 5. 휴가 시작날이 휴가 끝나는 날보다 느릴 때
         if (!startEventDate.isBefore(endEventDate)) {
             throw new EventsCustomException(EventsExceptionCode.END_DATE_BEFORE_START_DATE);
         }

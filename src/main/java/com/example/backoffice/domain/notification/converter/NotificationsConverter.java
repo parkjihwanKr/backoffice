@@ -2,6 +2,7 @@ package com.example.backoffice.domain.notification.converter;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.entity.Comments;
+import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
@@ -32,13 +33,14 @@ public class NotificationsConverter {
 
     public static NotificationData toNotificationData(
             Members toMember, Members fromMember,
-            Boards board, Comments comment, Comments reply){
+            Boards board, Comments comment, Comments reply, Events event){
         return NotificationData.builder()
                 .toMember(toMember)
                 .fromMember(fromMember)
                 .board(board)
                 .comment(comment)
                 .reply(reply)
+                .event(event)
                 .build();
     }
 
