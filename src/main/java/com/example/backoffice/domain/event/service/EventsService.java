@@ -27,5 +27,8 @@ public interface EventsService {
 
     void deleteDepartmentEvent(Long eventId, Members member);
 
+    EventsResponseDto.CreateVacationResponseDto createVacationEvent(
+            Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto);
+
     Events findById(Long eventId);
 }

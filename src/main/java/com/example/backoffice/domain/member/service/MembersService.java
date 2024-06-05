@@ -34,4 +34,6 @@ public interface MembersService {
             Long adminId, MemberRole role, MemberDepartment department);
 
     Members findByRoleAndPosition(MemberRole role, MemberPosition position);
+
+    Members findByPositionAndDepartment(MemberPosition position, MemberDepartment department);
 }

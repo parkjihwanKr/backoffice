@@ -76,4 +76,16 @@ public class EventsResponseDto {
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateVacationResponseDto {
+        private String title;
+        private String description;
+        private Boolean urgent;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
 }

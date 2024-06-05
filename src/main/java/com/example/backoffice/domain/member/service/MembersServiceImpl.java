@@ -106,4 +106,13 @@ public class MembersServiceImpl implements MembersService{
                 ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
         );
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByPositionAndDepartment(
+            MemberPosition position, MemberDepartment department){
+        return membersRepository.findByPositionAndDepartment(position, department).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+        );
+    }
 }

@@ -7,7 +7,6 @@ import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -81,8 +80,16 @@ public class EventsController {
                 )
         );
     }
-    // 부서 일정 1달 삭제
-    // 1달 휴가 생성
+    // 멤버 개인 휴가 생성
+    @PostMapping("vacations")
+    public ResponseEntity<EventsResponseDto.CreateVacationResponseDto> createVacationEvent(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody EventsRequestDto.CreateVacationRequestDto requestDto){
+        EventsResponseDto.CreateVacationResponseDto responseDto =
+                eventsService.createVacationEvent(memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
     // 1달 휴가 일정 조회
     // 1달 휴가 일정 부분 수정
     // 1달 휴가 일정 삭제

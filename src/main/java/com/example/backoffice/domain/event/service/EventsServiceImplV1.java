@@ -5,6 +5,7 @@ import com.example.backoffice.domain.event.dto.EventDateRangeDto;
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.EventCrudType;
+import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
 import com.example.backoffice.domain.event.exception.EventsExceptionCode;
@@ -13,6 +14,10 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.notification.converter.NotificationsConverter;
+import com.example.backoffice.domain.notification.entity.NotificationData;
+import com.example.backoffice.domain.notification.entity.NotificationType;
+import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
 import com.example.backoffice.domain.notification.service.NotificationsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +33,7 @@ import java.util.List;
 public class EventsServiceImplV1 implements EventsService{
 
     private final MembersService membersService;
-    private final NotificationsService notificationsService;
+    private final NotificationsServiceFacade notificationsServiceFacade;
     private final EventsRepository eventsRepository;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER
@@ -39,14 +44,16 @@ public class EventsServiceImplV1 implements EventsService{
     public EventsResponseDto.CreateDepartmentEventResponseDto createDepartmentEvent(
             Members loginMember, EventsRequestDto.CreateDepartmentEventsRequestDto requestDto){
         membersService.findById(loginMember.getId());
-        // 요청 받는 날짜가 다음달로부터 시작되는 날인지?
+
+        // 바로 오늘 이전의 날짜가 아니라면 일정을 생성할 수 있게
         validateMemberDepartment(loginMember, requestDto.getDepartment());
 
         EventDateRangeDto eventDateRangeDto
-                = validateEventDate(requestDto.getStartDate(),
-                requestDto.getEndDate(), EventCrudType.CREATE);
+                = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
 
-        Events event = EventsConverter.toEntity(requestDto, eventDateRangeDto, loginMember);
+        Events event = EventsConverter.toEntity(
+                requestDto.getTitle(), requestDto.getDescription(),
+                eventDateRangeDto, loginMember, EventType.DEPARTMENT);
         eventsRepository.save(event);
         return EventsConverter.toCreateDepartmentDto(event);
     }
@@ -97,8 +104,7 @@ public class EventsServiceImplV1 implements EventsService{
         validateMemberDepartment(loginMember, requestDto.getDepartment());
 
         EventDateRangeDto eventDateRangeDto
-                = validateEventDate(requestDto.getStartDate(),
-                requestDto.getEndDate(), EventCrudType.UPDATE);
+                = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
 
         event.update(
                 requestDto.getTitle(), requestDto.getDescription(),
@@ -122,6 +128,26 @@ public class EventsServiceImplV1 implements EventsService{
     }
 
     @Override
+    @Transactional
+    public EventsResponseDto.CreateVacationResponseDto createVacationEvent(
+            Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto){
+        membersService.findById(loginMember.getId());
+
+        EventDateRangeDto eventDateRangeDto
+                = validateVacationDate(
+                        loginMember, requestDto.getStartDate(), requestDto.getEndDate(),
+                        requestDto.getUrgent(), requestDto.getReason());
+
+        String message = loginMember.getMemberName()+"님의 휴가 요청";
+
+        Events event = EventsConverter.toEntity(
+                message, requestDto.getReason(),
+                eventDateRangeDto, loginMember, EventType.MEMBER_VACATION);
+
+        return EventsConverter.toCreateVacationDto(event, requestDto.getUrgent());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Events findById(Long eventId){
         return eventsRepository.findById(eventId).orElseThrow(
@@ -130,28 +156,42 @@ public class EventsServiceImplV1 implements EventsService{
     }
 
     public EventDateRangeDto validateEventDate(
-            String startDate, String endDate, EventCrudType crudType) {
+            String startDate, String endDate) {
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime startEventDate = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
         LocalDateTime endEventDate = LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
 
-        switch (crudType) {
-            case CREATE:
-                if (!startEventDate.getMonth().equals(now.plusMonths(1).getMonth())) {
-                    throw new EventsCustomException(EventsExceptionCode.INVALID_START_DATE);
-                }
-                break;
-            case UPDATE:
-                if (startEventDate.isBefore(now)) {
-                    throw new EventsCustomException(EventsExceptionCode.INVALID_START_DATE);
-                }
-                break;
-            default:
-                throw new EventsCustomException(EventsExceptionCode.INVALID_EVENT_CRUD_TYPE);
+        if (startEventDate.isBefore(now)) {
+            throw new EventsCustomException(EventsExceptionCode.INVALID_START_DATE);
         }
 
         // 2. 시작날이 마지막 날보다 더 빠른지?
+        if (!startEventDate.isBefore(endEventDate)) {
+            throw new EventsCustomException(EventsExceptionCode.END_DATE_BEFORE_START_DATE);
+        }
+
+        return EventsConverter.toEventDateRangeDto(startEventDate, endEventDate);
+    }
+
+    public EventDateRangeDto validateVacationDate(
+            Members loginMember, String startDate, String endDate, Boolean urgent, String urgentReason){
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime startEventDate = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
+        LocalDateTime endEventDate = LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
+
+        if(startEventDate.isBefore(now.plusDays(7)) && !urgent){
+            throw new EventsCustomException(EventsExceptionCode.INVALID_START_DATE);
+        }else if(startEventDate.isBefore(now.plusDays(7)) && urgent){
+            Members toMember
+                    = membersService.findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.HR);
+            notificationsServiceFacade.createNotification(
+                    NotificationsConverter.toNotificationData(
+                            toMember, loginMember, null, null, null),
+                    NotificationType.URGENT_VACATION_EVENT);
+        }
+
         if (!startEventDate.isBefore(endEventDate)) {
             throw new EventsCustomException(EventsExceptionCode.END_DATE_BEFORE_START_DATE);
         }
@@ -163,7 +203,7 @@ public class EventsServiceImplV1 implements EventsService{
             Members loginMember, MemberDepartment department) {
         if (!department.equals(loginMember.getDepartment())
                 && !loginMember.getPosition().equals(MemberPosition.CEO)) {
-            throw new EventsCustomException(EventsExceptionCode.INVALID_DEPARTMENT);
+            throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_CREATE_EVENT);
         }
     }
 }

@@ -4,8 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum EventCrudType {
-    CREATE(eventLabelTypes.CREATE),
-    UPDATE(eventLabelTypes.UPDATE);
+    CREATE_DEPARTMENT(eventLabelTypes.CREATE_DEPARTMENT),
+    UPDATE_DEPARTMENT(eventLabelTypes.UPDATE_DEPARTMENT),
+    CREATE_VACATION(eventLabelTypes.CREATE_VACATION),
+    UPDATE_VACATION(eventLabelTypes.UPDATE_VACATION)
+    ;
 
     private final String label;
 
@@ -14,7 +17,9 @@ public enum EventCrudType {
     }
 
     public static class eventLabelTypes{
-        public static final String CREATE = "이벤트 생성";
-        public static final String UPDATE = "이벤트 수정";
+        public static final String CREATE_DEPARTMENT = "부서 이벤트 생성";
+        public static final String UPDATE_DEPARTMENT = "부서 이벤트 수정";
+        public static final String CREATE_VACATION = "휴가 이벤트 생성";
+        public static final String UPDATE_VACATION = "휴가 이벤트 수정";
     }
 }

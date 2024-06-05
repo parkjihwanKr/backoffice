@@ -1,8 +1,11 @@
 package com.example.backoffice.domain.notification.converter;
 
+import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
+import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.entity.Notifications;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,18 @@ public class NotificationsConverter {
                 .notificationType(notificationType)
                 .fromMemberDepartment(memberDepartment)
                 .isRead(false)
+                .build();
+    }
+
+    public static NotificationData toNotificationData(
+            Members toMember, Members fromMember,
+            Boards board, Comments comment, Comments reply){
+        return NotificationData.builder()
+                .toMember(toMember)
+                .fromMember(fromMember)
+                .board(board)
+                .comment(comment)
+                .reply(reply)
                 .build();
     }
 

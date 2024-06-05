@@ -27,7 +27,12 @@ public class Events extends CommonEntity {
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+
+    @Enumerated(EnumType.STRING)
     private MemberDepartment department;
+
+    @Enumerated(EnumType.STRING)
+    private EventType eventType;
 
     @ManyToOne
     @JoinColumn(name = "member_id")

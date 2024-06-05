@@ -1,13 +1,14 @@
 package com.example.backoffice.domain.event.dto;
 
+import com.example.backoffice.domain.event.exception.annotation.UrgentReasonRequired;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
 
 public class EventsRequestDto {
 
@@ -37,5 +38,22 @@ public class EventsRequestDto {
         private String endDate;
         private MultipartFile file;
         private MemberDepartment department;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @UrgentReasonRequired
+    public static class CreateVacationRequestDto {
+        private String title;
+        @NotNull
+        private String startDate;
+        @NotNull
+        private String endDate;
+        @NotNull
+        private Boolean urgent;
+        // urgent를 true로 체크한 사람에 한정해서 사유를 적어야함.
+        private String reason;
     }
 }

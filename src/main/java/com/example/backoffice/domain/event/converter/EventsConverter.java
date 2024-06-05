@@ -3,6 +3,7 @@ package com.example.backoffice.domain.event.converter;
 import com.example.backoffice.domain.event.dto.EventDateRangeDto;
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
+import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.Members;
 
@@ -24,14 +25,15 @@ public class EventsConverter {
     }
 
     public static Events toEntity(
-            EventsRequestDto.CreateDepartmentEventsRequestDto requestDto,
-            EventDateRangeDto eventDateRangeDto, Members member){
+            String title, String description,
+            EventDateRangeDto eventDateRangeDto, Members member, EventType eventType){
         return Events.builder()
-                .title(requestDto.getTitle())
-                .description(requestDto.getDescription())
+                .title(title)
+                .description(description)
                 .member(member)
                 .startDate(eventDateRangeDto.getStartDate())
                 .endDate(eventDateRangeDto.getEndDate())
+                .eventType(eventType)
                 .build();
     }
 
@@ -108,6 +110,17 @@ public class EventsConverter {
                 .endDate(event.getEndDate())
                 .createdAt(event.getCreatedAt())
                 .modifiedAt(event.getModifiedAt())
+                .build();
+    }
+
+    public static EventsResponseDto.CreateVacationResponseDto toCreateVacationDto(
+            Events event, Boolean urgent){
+        return EventsResponseDto.CreateVacationResponseDto.builder()
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .urgent(urgent)
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
                 .build();
     }
 }
