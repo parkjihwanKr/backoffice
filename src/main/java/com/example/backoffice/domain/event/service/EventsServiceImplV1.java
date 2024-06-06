@@ -105,7 +105,7 @@ public class EventsServiceImplV1 implements EventsService{
         event.update(
                 requestDto.getTitle(), requestDto.getDescription(),
                 requestDto.getDepartment(), eventDateRangeDto.getStartDate(),
-                eventDateRangeDto.getEndDate());
+                eventDateRangeDto.getEndDate(), EventType.DEPARTMENT);
 
         return EventsConverter.toUpdateCompanyDto(event);
     }
@@ -158,6 +158,24 @@ public class EventsServiceImplV1 implements EventsService{
         membersService.findById(loginMember.getId());
         List<Events> eventList = readMonthEvent(year, month, EventType.MEMBER_VACATION);
         return EventsConverter.toReadVacationMonthDto(eventList);
+    }
+
+    @Override
+    @Transactional
+    public EventsResponseDto.UpdateVacationResponseDto updateVacationEvent(
+            Long vacationId, Members loginMember,
+            EventsRequestDto.UpdateVacationEventRequestDto requestDto){
+        membersService.findById(loginMember.getId());
+        Events vacation = findById(vacationId);
+        EventDateRangeDto eventDateRangeDto = validateVacationDate(
+                        loginMember, requestDto.getStartDate(),
+                        requestDto.getEndDate(), requestDto.getUrgent());
+
+        String vacationTitle = loginMember.getMemberName()+ "님의 휴가 계획";
+        vacation.update(vacationTitle, requestDto.getReason(), loginMember.getDepartment(),
+                eventDateRangeDto.getStartDate(), eventDateRangeDto.getEndDate(), EventType.MEMBER_VACATION);
+
+        return EventsConverter.toUpdateVacationDto(vacation, loginMember.getMemberName());
     }
 
     @Override

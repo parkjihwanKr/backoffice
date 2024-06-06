@@ -32,5 +32,9 @@ public interface EventsService {
 
     List<EventsResponseDto.ReadVacationResponseDto> readVacationMonthEvent(
             Long year, Long month, Members loginMember);
+
+    EventsResponseDto.UpdateVacationResponseDto updateVacationEvent(
+            Long vacationId, Members loginMember,
+            EventsRequestDto.UpdateVacationEventRequestDto requestDto);
     Events findById(Long eventId);
 }

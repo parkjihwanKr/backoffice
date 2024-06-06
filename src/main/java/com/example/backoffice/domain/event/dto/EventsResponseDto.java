@@ -98,4 +98,14 @@ public class EventsResponseDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateVacationResponseDto {
+        private String vacationMemberName;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
 }

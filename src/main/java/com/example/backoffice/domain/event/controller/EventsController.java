@@ -100,6 +100,16 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
     // 1달 휴가 일정 부분 수정
+    @PatchMapping("vacations/{eventId}")
+    public ResponseEntity<EventsResponseDto.UpdateVacationResponseDto> updateVacationEvent(
+            @PathVariable Long eventId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody EventsRequestDto.UpdateVacationEventRequestDto requestDto){
+        EventsResponseDto.UpdateVacationResponseDto responseDto
+                = eventsService.updateVacationEvent(
+                        eventId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
     // 1달 휴가 일정 삭제
     // 1달 휴가 일정 부분 삭제
     // 해당 날짜에 휴가 나가 있는 인원 조회

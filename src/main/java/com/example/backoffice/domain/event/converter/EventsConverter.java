@@ -135,4 +135,13 @@ public class EventsConverter {
         }
         return responseDtoList;
     }
+
+    public static EventsResponseDto.UpdateVacationResponseDto toUpdateVacationDto(
+            Events vacation, String memberName){
+        return EventsResponseDto.UpdateVacationResponseDto.builder()
+                .vacationMemberName(memberName)
+                .startDate(vacation.getStartDate())
+                .endDate(vacation.getEndDate())
+                .build();
+    }
 }

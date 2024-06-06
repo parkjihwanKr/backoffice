@@ -56,4 +56,19 @@ public class EventsRequestDto {
         // urgent를 true로 체크한 사람에 한정해서 사유를 적어야함.
         private String reason;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @UrgentReasonRequired
+    public static class UpdateVacationEventRequestDto {
+        @NotNull
+        private String startDate;
+        @NotNull
+        private String endDate;
+        @NotNull
+        private Boolean urgent;
+        private String reason;
+    }
 }
