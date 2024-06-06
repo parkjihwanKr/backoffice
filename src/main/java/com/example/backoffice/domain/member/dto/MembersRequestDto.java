@@ -4,12 +4,12 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.aspectj.weaver.Member;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,11 +49,31 @@ public class MembersRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateMemberAttributeRequestDto {
+        @NotNull
         private String memberName;
+        private Long salary;
         private MemberRole role;
         private MemberDepartment department;
         private MemberPosition position;
         private MultipartFile file;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateMemberSalaryRequestDto{
+        private String memberName;
+        private Long salary;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateMemberVacationDaysRequestDto {
+        // 잔여 휴가 일 수
+        private Integer vacationDays;
     }
 
     @Builder

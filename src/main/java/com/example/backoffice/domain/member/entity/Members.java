@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.member.entity;
 
+import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -49,9 +50,6 @@ public class Members extends CommonEntity {
 
     private String introduction;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reactions> reactionList;
-
     private Long loveCount;
 
     // 직책
@@ -61,10 +59,22 @@ public class Members extends CommonEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private MemberDepartment memberDepartment;
+    private MemberDepartment department;
 
     // 급여
     private Long salary;
+
+    // 휴가, 해당 부분은 21억 넘을 이유 없음.
+    private Integer remainingVacationDays;
+
+    // 휴가 상태
+    private Boolean onVacation;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reactions> reactionList;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Events> eventList;
 
     public void updateMemberInfo(
             String name, String email, String address,
@@ -79,6 +89,17 @@ public class Members extends CommonEntity {
 
     public void updateProfileImage(String profileImageUrl){
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateAttribute(
+            MemberRole role, MemberDepartment department, MemberPosition position){
+        this.role = role;
+        this.department = department;
+        this.position = position;
+    }
+
+    public void updateSalary(Long salary){
+        this.salary = salary;
     }
 
     public void addEmoji(Reactions reaction){

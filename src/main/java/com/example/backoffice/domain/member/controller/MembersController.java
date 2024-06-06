@@ -61,9 +61,21 @@ public class MembersController {
                         memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
-                        HttpStatus.OK, "증빙 서류 검토 후, 권한이 변경됩니다.", responseDto
+                        HttpStatus.OK, "해당 사항이 변경되었습니다.", responseDto
                 )
         );
+    }
+
+    // 급여 변경
+    @PatchMapping("/members/{memberId}/attribute/salary")
+    public ResponseEntity<MembersResponseDto.UpdateMemberSalaryResponseDto> updateSalary(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody MembersRequestDto.UpdateMemberSalaryRequestDto requestDto){
+        MembersResponseDto.UpdateMemberSalaryResponseDto responseDto =
+                membersServiceFacade.updateSalary(
+                        memberId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PatchMapping("/members/{memberId}/profileImage")

@@ -41,7 +41,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction(
             Long toMemberId, Members fromMember, ReactionsRequestDto requestDto){
         Members toMember
-                = membersService.validateMember(toMemberId, fromMember.getId());
+                = membersService.checkMemberId(fromMember.getId(), toMemberId);
 
         if (reactionsRepository.existsByMemberAndReactor(toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
@@ -56,7 +56,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         toMember.addEmoji(reaction);
         // toMember, fromMember 정보가 notification으로 다 넘어가기에 Member Domain은 null 가능
         NotificationData membersNotification =
-                new NotificationData(toMember, fromMember, null, null, null);
+                new NotificationData(toMember, fromMember, null, null, null, null);
         notificationsServiceFacade.createNotification(membersNotification, NotificationType.MEMBER);
         return ReactionsConverter.toCreateMemberReactionDto(reaction, emoji.toString());
     }
@@ -65,7 +65,8 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public void deleteMemberReaction(
             Long toMemberId, Long reactionId, Members fromMember){
-        Members toMember = membersService.validateMember(toMemberId, fromMember.getId());
+        Members toMember
+                = membersService.checkMemberId(fromMember.getId(), toMemberId);
         if (!reactionsRepository.existsByIdAndMemberAndReactor(reactionId, toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
@@ -80,8 +81,8 @@ public class ReactionsServiceImpl implements ReactionsService{
             Long boardId, Members fromMember,
             ReactionsRequestDto requestDto){
         Boards board = boardsService.findById(boardId);
-        membersService.validateMember(
-                board.getMember().getId(), fromMember.getId());
+        membersService.checkMemberId(
+                fromMember.getId(), board.getMember().getId());
         Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
         if(reactionsRepository.existsByBoardAndReactor(
@@ -93,7 +94,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         board.addEmoji(reaction, emoji.toString());
 
         NotificationData boardsNotification =
-                new NotificationData(board.getMember(), fromMember, board, null, null);
+                new NotificationData(board.getMember(), fromMember, board, null, null, null);
         notificationsServiceFacade.createNotification(boardsNotification, NotificationType.BOARD);
         return ReactionsConverter.toCreateBoardReactionDto(
                 fromMember, board, emoji.toString());
@@ -105,7 +106,7 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         // 1. 예외 검증
         Boards board = boardsService.findById(boardId);
-        membersService.validateMember(board.getMember().getId(), member.getId());
+        membersService.checkMemberId(member.getId(), board.getMember().getId());
         if(!reactionsRepository.existsByIdAndBoardAndReactor(reactionId, board, member)){
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
@@ -137,7 +138,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         comment.addEmoji(reaction, emoji.toString());
         NotificationData commentsNotification =
                 new NotificationData(
-                        comment.getMember(), fromMember, board, comment, null);
+                        comment.getMember(), fromMember, board, comment, null, null);
         notificationsServiceFacade.createNotification(commentsNotification, NotificationType.COMMENT);
         return ReactionsConverter.toCreateCommentReactionDto(comment, fromMember, emoji.toString());
     }
@@ -181,7 +182,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         NotificationData replyNotification =
                 new NotificationData(
                         reply.getMember(), fromMember,
-                        reply.getParent().getBoard(), comment, reply);
+                        reply.getParent().getBoard(), comment, reply, null);
         notificationsServiceFacade.createNotification(replyNotification, NotificationType.REPLY);
         return ReactionsConverter.toCreateReplyReactionDto(reply, fromMember, replyEmoji.toString());
     }

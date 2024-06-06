@@ -88,7 +88,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
             NotificationsRequestDto.CreateNotificationRequestDto requestDto){
         // 1. 해당 어드민 계정이 맞는지 -> 멤버 검증까지 같이 됨
         Members admin = membersServiceFacade.findAdmin(
-                adminId, member.getRole(), member.getMemberDepartment());
+                adminId, member.getRole(), member.getDepartment());
 
         // 2. excludeMemberRole에 따라 해당 Role은 제외한 멤버 정보를 가져옴
         // 해당 부분은 제외한 역할의 MemberName과 해당 Member의 역할만 가져온 Map
@@ -206,7 +206,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 yield NotificationsConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        memberMessage, domainType, notificationData.getFromMember().getMemberDepartment());
+                        memberMessage, domainType, notificationData.getFromMember().getDepartment());
             }
             case BOARD -> {
                 String boardMessage
@@ -216,7 +216,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 yield NotificationsConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        boardMessage, domainType, notificationData.getFromMember().getMemberDepartment());
+                        boardMessage, domainType, notificationData.getFromMember().getDepartment());
             }
             case COMMENT -> {
                 String commentMessage
@@ -227,7 +227,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 yield NotificationsConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        commentMessage, domainType, notificationData.getFromMember().getMemberDepartment());
+                        commentMessage, domainType, notificationData.getFromMember().getDepartment());
             }
             case REPLY -> {
                 String replyMessage
@@ -238,8 +238,28 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 yield NotificationsConverter.toEntity(
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
-                        replyMessage, domainType, notificationData.getFromMember().getMemberDepartment());
+                        replyMessage, domainType, notificationData.getFromMember().getDepartment());
             }
+            case EVENT -> {
+                String eventMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 "+ notificationData.getEvent().getTitle()
+                        + "에 대한 일정을 등록하셨습니다.";
+                yield NotificationsConverter.toEntity(
+                        notificationData.getToMember().getMemberName(),
+                        notificationData.getFromMember().getMemberName(),
+                        eventMessage, domainType, notificationData.getFromMember().getDepartment());
+            }
+            case URGENT_VACATION_EVENT -> {
+                String urgentVacationMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 긴급하게 휴가를 요청하셨습니다.";
+                yield NotificationsConverter.toEntity(
+                        notificationData.getToMember().getMemberName(),
+                        notificationData.getFromMember().getMemberName(),
+                        urgentVacationMessage, domainType, notificationData.getFromMember().getDepartment());
+            }
+
             default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);
         };
     }

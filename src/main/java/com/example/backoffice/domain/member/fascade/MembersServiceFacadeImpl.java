@@ -5,12 +5,14 @@ import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.notification.service.NotificationsService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
 
     private final FilesService filesService;
     private final MembersService membersService;
+    private final NotificationsService notificationsService;
     private final PasswordEncoder passwordEncoder;
     @PostConstruct
     public void createAdminAccount(){
@@ -57,7 +60,8 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
                 requestDto.getEmail(), requestDto.getMemberName(),
                 requestDto.getAddress(), requestDto.getContact());
         if(duplicatedInfoMember != null){
-            MembersExceptionEnum exceptionType = findExceptionType(requestDto, duplicatedInfoMember);
+            MembersExceptionEnum exceptionType
+                    = findExceptionType(requestDto, duplicatedInfoMember);
             switch (exceptionType) {
                 case EMAIL
                         -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_EMAIL);
@@ -67,8 +71,8 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
                         -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_MEMBER_NAME);
                 case CONTACT
                         -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
-                default
-                        -> log.error("Not Found Exception Error : " + exceptionType);
+                case NULL
+                        -> log.info("Not Found Exception!");
             }
         }
 
@@ -109,18 +113,71 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     @Override
     @Transactional
     public MembersResponseDto.UpdateMemberAttributeResponseDto updateAttribute(
-            Long memberId, Members member,
+            Long memberId, Members loginMember,
             MembersRequestDto.UpdateMemberAttributeRequestDto requestDto){
         // 1. 로그인 멤버가 해당 부서, 직위, 급여를 바꿀 수 있는 권한인지? -> Role : Admin이면 바꿀 수 있음
         // 단, 바꾸려는 인물이 직책이 Manager로 승진하는 것이라면 MAIN_ADMIN밖에 권한이 없음
 
+        if(!loginMember.getPosition().equals(MemberPosition.MANAGER)){
+            // 해당 조건을 달성하지 못하면
+            if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
+                    && loginMember.getPosition().equals(MemberPosition.CEO)){
+                throw new MembersCustomException(
+                        MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+            }
+            membersService.findByRoleAndPosition(
+                    loginMember.getRole(), loginMember.getPosition());
+        } else{
+            if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
+                    && !loginMember.getRole().equals(MemberRole.ADMIN)){
+                throw new MembersCustomException(
+                        MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+            }
+        }
         // 2. 바꾸려는 인물이 존재하는지?
-        Members updateMember = findMember(member, memberId);
+        Members updateMember = findMember(loginMember, memberId);
         String document
                 = filesService.createFileForMemberRole(
                 requestDto.getFile(), updateMember);
-        // membersRepository.save(updateMember);
-        return MembersConverter.toUpdateAttributeDto(member, document);
+
+        updateMember.updateAttribute(
+                requestDto.getRole(), requestDto.getDepartment(),
+                requestDto.getPosition());
+
+        notificationsService.saveByMemberInfo(
+                loginMember.getMemberName(), updateMember.getMemberName(),
+                updateMember.getDepartment());
+
+        return MembersConverter.toUpdateAttributeDto(updateMember, document);
+    }
+
+    @Override
+    @Transactional
+    public MembersResponseDto.UpdateMemberSalaryResponseDto updateSalary(
+            Long memberId, Members loginMember,
+            MembersRequestDto.UpdateMemberSalaryRequestDto requestDto){
+        // 1. 로그인 멤버가 바꾸려는 인물과 동일 인물이면 안됨
+        // 2. 로그인 멤버가 자기 자신의 급여를 바꿀 순 없음
+        Members updateMember
+                = membersService.checkMemberId(loginMember.getId(), memberId);
+
+        // 3. 로그인 멤버가 바꿀 권한이 있는지
+        // 권한 : 부서가 재정부의 부장이거나 사장인 경우만 가능
+        if((loginMember.getDepartment().equals(MemberDepartment.FINANCE) &&
+                loginMember.getPosition().equals(MemberPosition.MANAGER))
+                || loginMember.getPosition().equals(MemberPosition.CEO)){
+
+            updateMember.updateSalary(requestDto.getSalary());
+
+            notificationsService.saveByMemberInfo(
+                    loginMember.getMemberName(), updateMember.getMemberName(),
+                    updateMember.getDepartment());
+
+            return MembersConverter.toUpdateSalaryDto(updateMember);
+        }else{
+            throw new MembersCustomException(
+                    MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+        }
     }
 
     // 프로필 이미지 업로드
@@ -161,12 +218,6 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Members findById(Long memberId){
-        return membersService.findById(memberId);
-    }
-
-    @Override
     public Members findMember(Members member, Long memberId){
         if(!member.getId().equals(memberId)){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
@@ -178,16 +229,8 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     @Transactional(readOnly = true)
     public Members findAdmin(
             Long adminId, MemberRole role, MemberDepartment department){
-        return membersService.findByIdAndRoleAndMemberDepartment(adminId, role, department);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members validateMember(Long toMemberId, Long fromMemberId){
-        if(toMemberId.equals(fromMemberId)){
-            throw new MembersCustomException(MembersExceptionCode.MATCHED_LOGIN_MEMBER);
-        }
-        return membersService.findById(toMemberId);
+        return membersService.findByIdAndRoleAndDepartment(
+                adminId, role, department);
     }
 
     @Override
@@ -204,12 +247,12 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         }
 
         List<Members> memberListExcludingDepartmentAndId
-                = membersService.findByMemberDepartmentNotInAndIdNotIn(
+                = membersService.findByDepartmentNotInAndIdNotIn(
                 excludedDepartmentList, excludedIdList);
         Map<String, MemberDepartment> memberNameMap = new HashMap<>();
 
         for(Members member : memberListExcludingDepartmentAndId){
-            memberNameMap.put(member.getMemberName(), member.getMemberDepartment());
+            memberNameMap.put(member.getMemberName(), member.getDepartment());
         }
         return memberNameMap;
     }
@@ -228,6 +271,6 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         if(requestDto.getMemberName().equals(duplicatedInfoMember.getMemberName())){
             return MembersExceptionEnum.MEMBER_NAME;
         }
-        return null;
+        return MembersExceptionEnum.NULL;
     }
 }

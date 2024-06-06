@@ -7,7 +7,9 @@ public enum NotificationType {
     MEMBER(Domain.MEMBER),
     BOARD(Domain.BOARD),
     COMMENT(Domain.COMMENT),
-    REPLY(Domain.REPLY)
+    REPLY(Domain.REPLY),
+    EVENT(Domain.EVENT),
+    URGENT_VACATION_EVENT(Domain.URGENT_VACATION_EVENT)
     ;
 
     private final String domain;
@@ -22,5 +24,7 @@ public enum NotificationType {
         public static final String BOARD = "BOARD";
         public static final String COMMENT = "COMMENT";
         public static final String REPLY = "REPLY";
+        public static final String EVENT = "EVENT";
+        public static final String URGENT_VACATION_EVENT = "VACATION EVENT";
     }
 }

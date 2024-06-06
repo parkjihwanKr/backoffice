@@ -1,5 +1,8 @@
 package com.example.backoffice.domain.notification.service;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.notification.converter.NotificationsConverter;
+import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.entity.Notifications;
 import com.example.backoffice.domain.notification.exception.NotificationsCustomException;
 import com.example.backoffice.domain.notification.exception.NotificationsExceptionCode;
@@ -66,5 +69,16 @@ public class NotificationsServiceImpl implements NotificationsService {
         return notificationRepository.findById(notificationId).orElseThrow(
                 ()-> new NotificationsCustomException(NotificationsExceptionCode.NOT_FOUND_NOTIFICATION)
         );
+    }
+
+    @Override
+    @Transactional
+    public Notifications saveByMemberInfo(
+            String fromMemberName, String toMemberName, MemberDepartment fromMemberDepartment){
+        Notifications notifications = NotificationsConverter.toEntity(
+                toMemberName, fromMemberName,
+                toMemberName+"님께서 최근 바뀐 정보가 있습니다.",
+                NotificationType.MEMBER, fromMemberDepartment);
+        return notificationRepository.save(notifications);
     }
 }

@@ -18,7 +18,7 @@ public class MembersConverter {
                 .email("admin@test.com")
                 .address("admin시 admin동")
                 .introduction("admin이다")
-                .memberDepartment(MemberDepartment.HR)
+                .department(MemberDepartment.HR)
                 .password(bcrytPassword)
                 .contact("010-0000-0000")
                 .position(MemberPosition.CEO)
@@ -31,7 +31,7 @@ public class MembersConverter {
                 .memberName(requestDto.getMemberName())
                 .name(requestDto.getName()) // 이름을 name으로 설정하는 것이 맞는지 확인
                 .role(MemberRole.USER) // 역할 설정, MemberRole.USER 또는 직접 설정
-                .memberDepartment(MemberDepartment.HR)
+                .department(MemberDepartment.HR)
                 .position(MemberPosition.INTERN)
                 .email(requestDto.getEmail())
                 .address(requestDto.getAddress())
@@ -77,10 +77,25 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberAttributeResponseDto toUpdateAttributeDto(Members member, String document){
+    public static MembersResponseDto.UpdateMemberAttributeResponseDto toUpdateAttributeDto(
+            Members member, String document){
         return MembersResponseDto.UpdateMemberAttributeResponseDto.builder()
-                .fromMemberName(member.getMemberName())
+                .memberName(member.getMemberName())
                 .fileName(document)
+                .memberPosition(member.getPosition())
+                .memberRole(member.getRole())
+                .memberDepartment(member.getDepartment())
+                .build();
+    }
+
+    public static MembersResponseDto.UpdateMemberSalaryResponseDto toUpdateSalaryDto(
+            Members member){
+        return MembersResponseDto.UpdateMemberSalaryResponseDto.builder()
+                .memberDepartment(member.getDepartment())
+                .memberName(member.getMemberName())
+                .memberRole(member.getRole())
+                .memberPosition(member.getPosition())
+                .changedSalary(member.getSalary())
                 .build();
     }
 
