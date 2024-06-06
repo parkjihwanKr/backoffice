@@ -19,6 +19,8 @@ public enum EventsExceptionCode {
     INVALID_URGENT(HttpStatus.BAD_REQUEST, "EVENT-009", "7일 이후의 휴가 요청은 '긴급함' 표시를 제거해주세요."),
     INSUFFICIENT_VACATION_DAYS(HttpStatus.BAD_REQUEST, "EVENT-010", "해당 멤버의 잔여 휴가 일 수가 충분하지 않습니다."),
     INVALID_VACATION_DAYS(HttpStatus.BAD_REQUEST, "EVENT-011", "휴가를 30일 이상 설정할 수 없습니다."),
+    NO_PERMISSION_TO_READ_EVENT(HttpStatus.BAD_REQUEST, "EVENT-012", "해당 멤버는 휴가 일정을 읽을 자격이 없습니다."),
+    EXCEEDS_VACATION_RATE_LIMIT(HttpStatus.BAD_REQUEST, "EVENT-013", "해당 휴가 날짜에 과도한 휴가 인원이 있어 제한합니다."),
     ;
 
     private final HttpStatus httpStatus;

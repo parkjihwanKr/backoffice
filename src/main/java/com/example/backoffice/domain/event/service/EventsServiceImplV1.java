@@ -68,12 +68,10 @@ public class EventsServiceImplV1 implements EventsService{
     @Transactional(readOnly = true)
     public List<EventsResponseDto.ReadCompanyEventResponseDto> readCompanyMonthEvent(
             Long year, Long month){
-        // 해당 날짜의 정보를 가지고 오는데, 만약 2024-06-23~07-02까지의 프로젝트라면?
-        // 해당 이벤트를 가지고 오는지? 아닌지 확인해야함
-        LocalDateTime start
-                = YearMonth.of(year.intValue(), month.intValue()).atDay(1).atStartOfDay();
-        LocalDateTime end = start.plusMonths(1).minusNanos(1);
-        List<Events> eventList = eventsRepository.findAllByStartDateBetween(start, end);
+        // 해당 날짜의 정보를 가지고 오는데
+        // 만약 2024-05-31~06-02 또는 2024-06-23~07-02까지의 프로젝트라면?
+        // 해당 이벤트를 가지고 오는지? 아닌지 확인해야함 -> 가져옴
+        List<Events> eventList = readMonthEvent(year, month, EventType.DEPARTMENT);
 
         return EventsConverter.toReadCompanyMonthDto(eventList);
     }
@@ -143,7 +141,7 @@ public class EventsServiceImplV1 implements EventsService{
                 eventDateRangeDto, loginMember, EventType.MEMBER_VACATION);
 
         Members hrManager
-                = membersService.findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.HR);
+                = membersService.findHRManager();
         notificationsServiceFacade.createNotification(
                 NotificationsConverter.toNotificationData(
                         hrManager, loginMember, null, null, null, event),
@@ -151,6 +149,15 @@ public class EventsServiceImplV1 implements EventsService{
 
         eventsRepository.save(event);
         return EventsConverter.toCreateVacationDto(event, requestDto.getUrgent());
+    }
+
+    @Override
+    @Transactional
+    public List<EventsResponseDto.ReadVacationResponseDto> readVacationMonthEvent(
+            Long year, Long month, Members loginMember){
+        membersService.findById(loginMember.getId());
+        List<Events> eventList = readMonthEvent(year, month, EventType.MEMBER_VACATION);
+        return EventsConverter.toReadVacationMonthDto(eventList);
     }
 
     @Override
@@ -179,7 +186,7 @@ public class EventsServiceImplV1 implements EventsService{
         return EventsConverter.toEventDateRangeDto(startEventDate, endEventDate);
     }
 
-    public EventDateRangeDto validateVacationDate(
+    private EventDateRangeDto validateVacationDate(
             Members loginMember, String startDate, String endDate, Boolean urgent){
         LocalDateTime now = LocalDateTime.now();
 
@@ -204,7 +211,7 @@ public class EventsServiceImplV1 implements EventsService{
             throw new EventsCustomException(EventsExceptionCode.INSUFFICIENT_VACATION_DAYS);
         }
         // 4. 휴가 총 설정이 30일이 넘어갈 때
-        if(vacationDays > 30){
+        if(vacationDays >= 30){
             throw new EventsCustomException(EventsExceptionCode.INVALID_VACATION_DAYS);
         }
 
@@ -213,6 +220,20 @@ public class EventsServiceImplV1 implements EventsService{
             throw new EventsCustomException(EventsExceptionCode.END_DATE_BEFORE_START_DATE);
         }
 
+        // 6. 전 직원의 휴가율이 30% 이상일 때 -> 휴가를 제한해야함.
+        Long memberTotalCount = membersService.findMemberTotalCount();
+
+        // startDate ~ endDate까지 해당 휴가 나가있는 이벤트를 list 출력
+        for(long i = 0; i<vacationDays; i++){
+            LocalDateTime customStartDate = startEventDate.plusDays(i);
+            long vacationingMembersCount
+                    = eventsRepository.countVacationingMembers(customStartDate);
+
+            double vacationRate = (double) (vacationingMembersCount / memberTotalCount);
+            if(vacationRate > 0.3){
+                throw new EventsCustomException(EventsExceptionCode.EXCEEDS_VACATION_RATE_LIMIT);
+            }
+        }
         return EventsConverter.toEventDateRangeDto(startEventDate, endEventDate);
     }
 
@@ -222,5 +243,14 @@ public class EventsServiceImplV1 implements EventsService{
                 && !loginMember.getPosition().equals(MemberPosition.CEO)) {
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_CREATE_EVENT);
         }
+    }
+
+    private List<Events> readMonthEvent(Long year, Long month, EventType eventType){
+        LocalDateTime start
+                = YearMonth.of(year.intValue(), month.intValue()).atDay(1).atStartOfDay();
+        LocalDateTime end = start.plusMonths(1).minusNanos(1);
+
+        return eventsRepository.findAllByEventTypeAndStartDateBetween(
+                eventType, start, end);
     }
 }

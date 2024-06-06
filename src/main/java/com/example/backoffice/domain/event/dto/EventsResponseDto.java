@@ -94,6 +94,8 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadVacationResponseDto {
-
+        private String vacationMemberName;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
     }
 }

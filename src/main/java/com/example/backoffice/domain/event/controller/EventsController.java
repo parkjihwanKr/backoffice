@@ -91,13 +91,16 @@ public class EventsController {
     }
 
     // 1달 휴가 일정 조회
-    @GetMapping("vacations/{vacationId}")
-    public ResponseEntity<EventsResponseDto.ReadVacationResponseDto> readVacationEvent(
-            @PathVariable Long vacationId,
+    @GetMapping("vacations/years/{year}/months/{month}")
+    public ResponseEntity<List<EventsResponseDto.ReadVacationResponseDto>> readVacationMonthEvent(
+            @PathVariable Long year, @PathVariable Long month,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        return null;
+        List<EventsResponseDto.ReadVacationResponseDto> responseDtoList =
+                eventsService.readVacationMonthEvent(year, month, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
     // 1달 휴가 일정 부분 수정
     // 1달 휴가 일정 삭제
     // 1달 휴가 일정 부분 삭제
+    // 해당 날짜에 휴가 나가 있는 인원 조회
 }

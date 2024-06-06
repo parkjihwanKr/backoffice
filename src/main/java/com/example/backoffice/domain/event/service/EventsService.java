@@ -30,5 +30,7 @@ public interface EventsService {
     EventsResponseDto.CreateVacationResponseDto createVacationEvent(
             Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto);
 
+    List<EventsResponseDto.ReadVacationResponseDto> readVacationMonthEvent(
+            Long year, Long month, Members loginMember);
     Events findById(Long eventId);
 }

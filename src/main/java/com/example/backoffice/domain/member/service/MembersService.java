@@ -35,5 +35,9 @@ public interface MembersService {
 
     Members findByRoleAndPosition(MemberRole role, MemberPosition position);
 
-    Members findByPositionAndDepartment(MemberPosition position, MemberDepartment department);
+    Members findHRManager();
+
+    Long findMemberTotalCount();
+
+    Long findVacationingMembersCount();
 }

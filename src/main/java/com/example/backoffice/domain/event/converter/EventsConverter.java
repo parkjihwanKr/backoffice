@@ -1,7 +1,6 @@
 package com.example.backoffice.domain.event.converter;
 
 import com.example.backoffice.domain.event.dto.EventDateRangeDto;
-import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
@@ -11,8 +10,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class EventsConverter {
 
@@ -122,5 +119,20 @@ public class EventsConverter {
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .build();
+    }
+
+    public static List<EventsResponseDto.ReadVacationResponseDto> toReadVacationMonthDto(
+            List<Events> eventList){
+        List<EventsResponseDto.ReadVacationResponseDto> responseDtoList = new ArrayList<>();
+        for(Events event : eventList){
+            responseDtoList.add(
+                    EventsResponseDto.ReadVacationResponseDto.builder()
+                            .vacationMemberName(event.getMember().getMemberName())
+                            .startDate(event.getStartDate())
+                            .endDate(event.getEndDate())
+                            .build()
+            );
+        }
+        return responseDtoList;
     }
 }

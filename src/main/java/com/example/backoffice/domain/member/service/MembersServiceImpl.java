@@ -109,10 +109,21 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByPositionAndDepartment(
-            MemberPosition position, MemberDepartment department){
-        return membersRepository.findByPositionAndDepartment(position, department).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
-        );
+    public Members findHRManager(){
+        return membersRepository.findByPositionAndDepartment(
+                MemberPosition.MANAGER, MemberDepartment.HR).orElseThrow(
+                        () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long findMemberTotalCount(){
+        return membersRepository.count();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long findVacationingMembersCount(){
+        return (long) membersRepository.findAllByOnVacation(true).size();
     }
 }
