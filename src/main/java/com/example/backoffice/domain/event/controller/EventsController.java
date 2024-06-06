@@ -99,7 +99,7 @@ public class EventsController {
                 eventsService.readVacationMonthEvent(year, month, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
-    // 1달 휴가 일정 부분 수정
+    // 개인 휴가 일정 부분 수정
     @PatchMapping("/vacations/{eventId}")
     public ResponseEntity<EventsResponseDto.UpdateVacationResponseDto> updateVacationEvent(
             @PathVariable Long eventId,
@@ -111,7 +111,7 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 1달 휴가 일정 부분 삭제
+    // 개인 휴가 일정 부분 삭제
     @DeleteMapping("/vacations/{eventId}")
     public ResponseEntity<CommonResponseDto<Void>> deleteVacationEvent(
             @PathVariable Long eventId,
@@ -123,7 +123,7 @@ public class EventsController {
                 )
         );
     }
-    // 해당 날짜 달력 클릭 시, 휴가 나가 있는 인원이 조회
+    // 해당 날짜 달력 클릭 시, 휴가 나가 있는 인원 조회
     @GetMapping("/vacations/years/{year}/month/{month}/days/{day}")
     public ResponseEntity<List<EventsResponseDto.ReadVacationResponseDto>> readVacationMemberList(
             @PathVariable Long year, @PathVariable Long month, @PathVariable Long day,
