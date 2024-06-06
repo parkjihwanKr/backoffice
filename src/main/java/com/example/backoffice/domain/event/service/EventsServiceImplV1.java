@@ -4,6 +4,7 @@ import com.example.backoffice.domain.event.converter.EventsConverter;
 import com.example.backoffice.domain.event.dto.EventDateRangeDto;
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
+import com.example.backoffice.domain.event.entity.EventCrudType;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
@@ -167,6 +168,11 @@ public class EventsServiceImplV1 implements EventsService{
             EventsRequestDto.UpdateVacationEventRequestDto requestDto){
         membersService.findById(loginMember.getId());
         Events vacation = findById(vacationId);
+
+        // 해당 이벤트의 주인이 로그인한 사람인지?
+        validateMemberPermission(
+                loginMember, vacation.getMember().getId(), EventCrudType.UPDATE_VACATION);
+
         EventDateRangeDto eventDateRangeDto = validateVacationDate(
                         loginMember, requestDto.getStartDate(),
                         requestDto.getEndDate(), requestDto.getUrgent());
@@ -176,6 +182,17 @@ public class EventsServiceImplV1 implements EventsService{
                 eventDateRangeDto.getStartDate(), eventDateRangeDto.getEndDate(), EventType.MEMBER_VACATION);
 
         return EventsConverter.toUpdateVacationDto(vacation, loginMember.getMemberName());
+    }
+
+    @Override
+    @Transactional
+    public void deleteVacationEvent(Long vacationId, Members loginMember){
+        // 검증
+        membersService.findById(loginMember.getId());
+        findById(vacationId);
+        validateMemberPermission(loginMember, vacationId, EventCrudType.DELETE_VACATION);
+
+        eventsRepository.deleteById(vacationId);
     }
 
     @Override
@@ -270,5 +287,28 @@ public class EventsServiceImplV1 implements EventsService{
 
         return eventsRepository.findAllByEventTypeAndStartDateBetween(
                 eventType, start, end);
+    }
+
+    private void validateMemberPermission(
+            Members loginMember, Long vacationMemberId, EventCrudType eventCrudType){
+        switch (eventCrudType) {
+            case UPDATE_VACATION : {
+                if (loginMember.getId().equals(vacationMemberId)) {
+                    throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_UPDATE_EVENT);
+                }
+            }
+            case DELETE_VACATION : {
+                if (loginMember.getId().equals(vacationMemberId)) {
+                    break;
+                }else if(loginMember.getPosition().equals(MemberPosition.MANAGER)
+                        && loginMember.getDepartment().equals(MemberDepartment.HR)){
+                    // 인사 부장이면 모든 멤버의 휴가를 삭제할 권한이 존재
+                    break;
+                }else{
+                    throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
+                }
+            }
+            default: throw new EventsCustomException(EventsExceptionCode.INVALID_EVENT_CRUD_TYPE);
+        }
     }
 }

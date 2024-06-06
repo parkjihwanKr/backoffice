@@ -81,7 +81,7 @@ public class EventsController {
         );
     }
     // 멤버 개인 휴가 생성
-    @PostMapping("vacations")
+    @PostMapping("/vacations")
     public ResponseEntity<EventsResponseDto.CreateVacationResponseDto> createVacationEvent(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EventsRequestDto.CreateVacationRequestDto requestDto){
@@ -91,7 +91,7 @@ public class EventsController {
     }
 
     // 1달 휴가 일정 조회
-    @GetMapping("vacations/years/{year}/months/{month}")
+    @GetMapping("/vacations/years/{year}/months/{month}")
     public ResponseEntity<List<EventsResponseDto.ReadVacationResponseDto>> readVacationMonthEvent(
             @PathVariable Long year, @PathVariable Long month,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
@@ -100,7 +100,7 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
     // 1달 휴가 일정 부분 수정
-    @PatchMapping("vacations/{eventId}")
+    @PatchMapping("/vacations/{eventId}")
     public ResponseEntity<EventsResponseDto.UpdateVacationResponseDto> updateVacationEvent(
             @PathVariable Long eventId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -110,7 +110,18 @@ public class EventsController {
                         eventId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
-    // 1달 휴가 일정 삭제
+
     // 1달 휴가 일정 부분 삭제
+    @DeleteMapping("/vacations/{eventId}")
+    public ResponseEntity<CommonResponseDto<Void>> deleteVacationEvent(
+            @PathVariable Long eventId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        eventsService.deleteVacationEvent(eventId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponseDto<>(
+                        null, "휴가 등록 취소 성공", 200
+                )
+        );
+    }
     // 해당 날짜에 휴가 나가 있는 인원 조회
 }

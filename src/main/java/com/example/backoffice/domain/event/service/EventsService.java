@@ -36,5 +36,8 @@ public interface EventsService {
     EventsResponseDto.UpdateVacationResponseDto updateVacationEvent(
             Long vacationId, Members loginMember,
             EventsRequestDto.UpdateVacationEventRequestDto requestDto);
+
+    void deleteVacationEvent(Long vacationId, Members loginMember);
+
     Events findById(Long eventId);
 }
