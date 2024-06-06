@@ -39,5 +39,8 @@ public interface EventsService {
 
     void deleteVacationEvent(Long vacationId, Members loginMember);
 
+    List<EventsResponseDto.ReadVacationResponseDto> readVacationMemberList(
+            Long year, Long month, Long day, Members loginMember);
+
     Events findById(Long eventId);
 }

@@ -144,4 +144,19 @@ public class EventsConverter {
                 .endDate(vacation.getEndDate())
                 .build();
     }
+
+    public static List<EventsResponseDto.ReadVacationResponseDto> toReadVacationMemberListDto(
+            List<Events> eventList){
+        List<EventsResponseDto.ReadVacationResponseDto> responseDtoList = new ArrayList<>();
+        for(Events event : eventList){
+            responseDtoList.add(
+                    EventsResponseDto.ReadVacationResponseDto.builder()
+                            .vacationMemberName(event.getMember().getMemberName())
+                            .startDate(event.getStartDate())
+                            .endDate(event.getEndDate())
+                            .build()
+            );
+        }
+        return responseDtoList;
+    }
 }

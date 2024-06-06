@@ -123,5 +123,14 @@ public class EventsController {
                 )
         );
     }
-    // 해당 날짜에 휴가 나가 있는 인원 조회
+    // 해당 날짜 달력 클릭 시, 휴가 나가 있는 인원이 조회
+    @GetMapping("/vacations/years/{year}/month/{month}/days/{day}")
+    public ResponseEntity<List<EventsResponseDto.ReadVacationResponseDto>> readVacationMemberList(
+            @PathVariable Long year, @PathVariable Long month, @PathVariable Long day,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        List<EventsResponseDto.ReadVacationResponseDto> responseDtoList
+                = eventsService.readVacationMemberList(
+                        year, month, day, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
 }

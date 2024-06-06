@@ -197,6 +197,22 @@ public class EventsServiceImplV1 implements EventsService{
 
     @Override
     @Transactional(readOnly = true)
+    public List<EventsResponseDto.ReadVacationResponseDto> readVacationMemberList(
+            Long year, Long month, Long day, Members loginMember) {
+        membersService.findById(loginMember.getId());
+
+        LocalDateTime startOfDay = LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 0, 0, 0);
+        LocalDateTime endOfDay = startOfDay.withHour(23).withMinute(59).withSecond(59);
+
+        List<Events> eventList = eventsRepository.findAllByEventTypeAndStartDateBetween(
+                EventType.MEMBER_VACATION, startOfDay, endOfDay);
+
+        return EventsConverter.toReadVacationMemberListDto(eventList);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
     public Events findById(Long eventId){
         return eventsRepository.findById(eventId).orElseThrow(
                 ()-> new EventsCustomException(EventsExceptionCode.NOT_FOUND_EVENT)
