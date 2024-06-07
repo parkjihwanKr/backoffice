@@ -44,5 +44,9 @@ public interface EventsService {
 
     Events findById(Long eventId);
 
-    Events findByTitle(String eventTitle);
+    List<Events> findAllByEventTypeAndStartDateBetween(
+            Long year, Long month, Long day);
+
+    List<Events> findAllByEventTypeAndEndDateBefore(
+            Long year, Long month, Long day);
 }

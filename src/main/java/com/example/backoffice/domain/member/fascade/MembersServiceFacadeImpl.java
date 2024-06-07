@@ -273,4 +273,18 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         }
         return MembersExceptionEnum.NULL;
     }
+
+    @Override
+    @Transactional
+    public void updateOnVacationFalse(String memberName){
+        Members member = membersService.findByMemberName(memberName);
+        member.updateOnVacation(false);
+    }
+
+    @Override
+    @Transactional
+    public void updateOnVacationTrue(String memberName){
+        Members member = membersService.findByMemberName(memberName);
+        member.updateOnVacation(true);
+    }
 }

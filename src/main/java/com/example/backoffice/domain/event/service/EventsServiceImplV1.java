@@ -201,28 +201,16 @@ public class EventsServiceImplV1 implements EventsService{
             Long year, Long month, Long day, Members loginMember) {
         membersService.findById(loginMember.getId());
 
-        LocalDateTime startOfDay = LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 0, 0, 0);
-        LocalDateTime endOfDay = startOfDay.withHour(23).withMinute(59).withSecond(59);
-
-        List<Events> eventList = eventsRepository.findAllByEventTypeAndStartDateBetween(
-                EventType.MEMBER_VACATION, startOfDay, endOfDay);
+        List<Events> eventList
+                = findAllByEventTypeAndStartDateBetween(year, month, day);
 
         return EventsConverter.toReadVacationMemberListDto(eventList);
     }
-
 
     @Override
     @Transactional(readOnly = true)
     public Events findById(Long eventId){
         return eventsRepository.findById(eventId).orElseThrow(
-                ()-> new EventsCustomException(EventsExceptionCode.NOT_FOUND_EVENT)
-        );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Events findByTitle(String eventTitle){
-        return eventsRepository.findByTitle(eventTitle).orElseThrow(
                 ()-> new EventsCustomException(EventsExceptionCode.NOT_FOUND_EVENT)
         );
     }
@@ -334,5 +322,27 @@ public class EventsServiceImplV1 implements EventsService{
             }
             default: throw new EventsCustomException(EventsExceptionCode.INVALID_EVENT_CRUD_TYPE);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Events> findAllByEventTypeAndStartDateBetween(
+            Long year, Long month, Long day){
+        LocalDateTime startOfDay = LocalDateTime.of(
+                year.intValue(), month.intValue(), day.intValue(), 0, 0, 0);
+        LocalDateTime endOfDay = startOfDay.withHour(23).withMinute(59).withSecond(59);
+
+        return eventsRepository.findAllByEventTypeAndStartDateBetween(
+                EventType.MEMBER_VACATION, startOfDay, endOfDay);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Events> findAllByEventTypeAndEndDateBefore(Long year, Long month, Long day) {
+        LocalDateTime endOfDay = LocalDateTime.of(
+                year.intValue(), month.intValue(), day.intValue(), 23, 59, 59);
+
+        return eventsRepository.findAllByEventTypeAndEndDateBefore(
+                EventType.MEMBER_VACATION, endOfDay);
     }
 }

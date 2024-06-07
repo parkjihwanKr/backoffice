@@ -45,4 +45,8 @@ public interface MembersServiceFacade {
     MembersResponseDto.UpdateMemberSalaryResponseDto updateSalary(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateMemberSalaryRequestDto requestDto);
+
+    void updateOnVacationFalse(String memberName);
+
+    void updateOnVacationTrue(String memberName);
 }
