@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Events extends CommonEntity {
 
+    // fields
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,6 +35,7 @@ public class Events extends CommonEntity {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
+    // relations
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Members member;

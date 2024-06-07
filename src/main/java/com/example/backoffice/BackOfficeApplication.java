@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableJpaRepositories(
 		basePackages = {
+				"com.example.backoffice.domain.favorite.repository",
 				"com.example.backoffice.domain.event.repository",
 				"com.example.backoffice.domain.board.repository",
 				"com.example.backoffice.domain.comment.repository",

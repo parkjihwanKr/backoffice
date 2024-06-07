@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EventsRepository extends JpaRepository<Events, Long>, EventsRepositoryQuery {
 
@@ -14,4 +15,6 @@ public interface EventsRepository extends JpaRepository<Events, Long>, EventsRep
 
     List<Events> findAllByEventTypeAndStartDateBetween(
             EventType eventType, LocalDateTime startDate, LocalDateTime endTime);
+
+    Optional<Events> findByTitle(String eventTitle);
 }

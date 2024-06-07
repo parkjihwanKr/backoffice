@@ -219,6 +219,14 @@ public class EventsServiceImplV1 implements EventsService{
         );
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Events findByTitle(String eventTitle){
+        return eventsRepository.findByTitle(eventTitle).orElseThrow(
+                ()-> new EventsCustomException(EventsExceptionCode.NOT_FOUND_EVENT)
+        );
+    }
+
     public EventDateRangeDto validateEventDate(String startDate, String endDate) {
         LocalDateTime now = LocalDateTime.now();
 

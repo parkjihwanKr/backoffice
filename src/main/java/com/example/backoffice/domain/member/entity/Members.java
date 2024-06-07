@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.member.entity;
 
 import com.example.backoffice.domain.event.entity.Events;
+import com.example.backoffice.domain.favorite.entity.Favorities;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -75,6 +76,9 @@ public class Members extends CommonEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Events> eventList;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorities> favoritieList;
 
     public void updateMemberInfo(
             String name, String email, String address,
