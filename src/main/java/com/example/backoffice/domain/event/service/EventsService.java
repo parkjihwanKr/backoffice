@@ -43,4 +43,6 @@ public interface EventsService {
             Long year, Long month, Long day, Members loginMember);
 
     Events findById(Long eventId);
+
+    Events findByTitle(String eventTitle);
 }
