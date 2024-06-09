@@ -50,4 +50,6 @@ public class Scheduler {
     public void updateRemainingVacationDays(){
         membersServiceFacade.updateRemainingVacation();
     }
+
+    // 사용자 활동
 }
