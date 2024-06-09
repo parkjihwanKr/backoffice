@@ -40,4 +40,6 @@ public interface MembersService {
     Long findMemberTotalCount();
 
     Members findByMemberName(String memberName);
+
+    List<Members> findAll();
 }

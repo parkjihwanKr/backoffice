@@ -19,7 +19,8 @@ public class Scheduler {
 
     private final MembersServiceFacade membersServiceFacade;
     private final EventsService eventsService;
-    // 매일 오전 00시마다 member 휴가 이벤트
+
+    // 매일 오전 00시마다 member 휴가 상태 체크
     @Transactional
     // 초 분 시 일 월 요일
     @Scheduled(cron = "0 0 0 * * *")
@@ -41,5 +42,12 @@ public class Scheduler {
         for (Events event : startedVacationList) {
             membersServiceFacade.updateOnVacationTrue(event.getMember().getMemberName());
         }
+    }
+
+    @Transactional
+    // 매달 1일 00시 10분
+    @Scheduled(cron = "0 10 0 1 * *")
+    public void updateRemainingVacationDays(){
+        membersServiceFacade.updateRemainingVacation();
     }
 }

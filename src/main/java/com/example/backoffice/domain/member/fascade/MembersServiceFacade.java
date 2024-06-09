@@ -49,4 +49,6 @@ public interface MembersServiceFacade {
     void updateOnVacationFalse(String memberName);
 
     void updateOnVacationTrue(String memberName);
+
+    void updateRemainingVacation();
 }

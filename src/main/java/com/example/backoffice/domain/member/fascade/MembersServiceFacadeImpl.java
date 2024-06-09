@@ -287,4 +287,13 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         Members member = membersService.findByMemberName(memberName);
         member.updateOnVacation(true);
     }
+
+    @Override
+    @Transactional
+    public void updateRemainingVacation(){
+        List<Members> memberList = membersService.findAll();
+        for(Members member : memberList){
+            member.updateRemainingVacation();
+        }
+    }
 }

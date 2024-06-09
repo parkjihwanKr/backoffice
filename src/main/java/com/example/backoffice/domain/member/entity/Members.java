@@ -118,4 +118,8 @@ public class Members extends CommonEntity {
     public void updateOnVacation(Boolean onVacation){
         this.onVacation = onVacation;
     }
+
+    public void updateRemainingVacation(){
+        this.remainingVacationDays++;
+    }
 }
