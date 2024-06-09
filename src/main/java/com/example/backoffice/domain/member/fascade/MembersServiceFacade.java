@@ -5,6 +5,8 @@ import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.global.scheduler.ScheduledEventType;
+import com.example.backoffice.global.scheduler.Scheduler;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -50,5 +52,5 @@ public interface MembersServiceFacade {
 
     void updateOnVacationTrue(String memberName);
 
-    void updateRemainingVacation();
+    void updateRemainingVacationDays(ScheduledEventType scheduledEventType);
 }

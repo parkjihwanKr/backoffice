@@ -122,4 +122,8 @@ public class Members extends CommonEntity {
     public void updateRemainingVacation(){
         this.remainingVacationDays++;
     }
+
+    public void updateRemainingVacationYearly(){
+        this.remainingVacationDays += 5;
+    }
 }

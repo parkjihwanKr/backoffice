@@ -44,12 +44,17 @@ public class Scheduler {
         }
     }
 
+    // 매달 1일 자정 10분
     @Transactional
-    // 매달 1일 00시 10분
     @Scheduled(cron = "0 10 0 1 * *")
-    public void updateRemainingVacationDays(){
-        membersServiceFacade.updateRemainingVacation();
+    public void updateRemainingVacationDaysMonthly() {
+        membersServiceFacade.updateRemainingVacationDays(ScheduledEventType.MONTHLY_UPDATE);
     }
 
-    // 사용자 활동
+    // 매년 1월 1일 00시 10분
+    @Transactional
+    @Scheduled(cron = "0 20 0 1 1 *")
+    public void updateRemainingVacationDaysYearly() {
+        membersServiceFacade.updateRemainingVacationDays(ScheduledEventType.YEARLY_UPDATE);
+    }
 }

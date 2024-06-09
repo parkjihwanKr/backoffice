@@ -13,6 +13,10 @@ import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.service.NotificationsService;
+import com.example.backoffice.global.exception.CustomException;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.SchedulerCustomException;
+import com.example.backoffice.global.scheduler.ScheduledEventType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -290,10 +294,22 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
 
     @Override
     @Transactional
-    public void updateRemainingVacation(){
+    public void updateRemainingVacationDays(
+            ScheduledEventType scheduledEventType){
         List<Members> memberList = membersService.findAll();
-        for(Members member : memberList){
-            member.updateRemainingVacation();
+        switch (scheduledEventType) {
+            case MONTHLY_UPDATE -> {
+                for(Members member : memberList){
+                    member.updateRemainingVacation();
+                }
+            }
+            case YEARLY_UPDATE -> {
+                for(Members member : memberList){
+                    member.updateRemainingVacationYearly();
+                }
+            }
+            default ->
+                throw new SchedulerCustomException(GlobalExceptionCode.NOT_FOUND_SCHEDULER_EVENT_TYPE);
         }
     }
 }
