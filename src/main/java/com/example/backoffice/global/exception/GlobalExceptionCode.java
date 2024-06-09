@@ -31,6 +31,8 @@ public enum GlobalExceptionCode {
     NOT_SERIALIZED_JSON(HttpStatus.BAD_REQUEST, "JSON-001", "직렬화가 되지 않습니다."),
     NOT_DESERIALIZED_JSON(HttpStatus.BAD_REQUEST, "JSON-002", "역직렬화가 되지 않습니다."),
 
+    // Scheduler
+    NOT_FOUND_SCHEDULER_EVENT_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "SCHEDULER-001","해당 스케줄러에 없는 이벤트 타입입니다."),
     ;
 
     private final HttpStatus httpStatus;

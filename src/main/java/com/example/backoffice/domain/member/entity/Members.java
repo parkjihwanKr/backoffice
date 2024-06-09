@@ -114,4 +114,16 @@ public class Members extends CommonEntity {
     public void deleteEmoji(){
         this.loveCount--;
     }
+
+    public void updateOnVacation(Boolean onVacation){
+        this.onVacation = onVacation;
+    }
+
+    public void updateRemainingVacation(){
+        this.remainingVacationDays++;
+    }
+
+    public void updateRemainingVacationYearly(){
+        this.remainingVacationDays += 5;
+    }
 }

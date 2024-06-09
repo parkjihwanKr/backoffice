@@ -39,5 +39,7 @@ public interface MembersService {
 
     Long findMemberTotalCount();
 
-    Long findVacationingMembersCount();
+    Members findByMemberName(String memberName);
+
+    List<Members> findAll();
 }

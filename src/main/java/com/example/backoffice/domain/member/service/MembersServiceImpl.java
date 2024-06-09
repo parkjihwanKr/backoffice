@@ -123,7 +123,15 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public Long findVacationingMembersCount(){
-        return (long) membersRepository.findAllByOnVacation(true).size();
+    public Members findByMemberName(String memberName){
+        return membersRepository.findByMemberName(memberName).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAll(){
+        return membersRepository.findAll();
     }
 }
