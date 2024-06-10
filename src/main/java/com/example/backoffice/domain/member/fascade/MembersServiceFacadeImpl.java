@@ -76,7 +76,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
                 case CONTACT
                         -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
                 case NULL
-                        -> log.info("Not Found Exception!");
+                        -> throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_EXCEPTION_TYPE);
             }
         }
 
