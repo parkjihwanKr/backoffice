@@ -3,9 +3,13 @@ package com.example.backoffice.domain.file.service;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.file.converter.FilesConverter;
 import com.example.backoffice.domain.file.entity.Files;
+import com.example.backoffice.domain.file.exception.FilesExceptionCode;
+import com.example.backoffice.domain.file.exception.FilesCustomException;
 import com.example.backoffice.domain.file.repository.FilesRepository;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.awss3.S3Util;
+import com.example.backoffice.global.exception.AWSCustomException;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -58,6 +62,7 @@ public class FilesServiceImpl implements FilesService {
                 s3Util.removeFile(fileUrl);
             } catch (Exception e) {
                 log.error("S3에서 파일 삭제 실패: " + fileUrl, e);
+                throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_DELETE_FAIL);
             }
         }
 
@@ -66,6 +71,7 @@ public class FilesServiceImpl implements FilesService {
                 filesRepository.delete(file);
             } catch (Exception e) {
                 log.error("데이터베이스에서 파일 엔티티 삭제 실패: " + file.getUrl(), e);
+                throw new FilesCustomException(FilesExceptionCode.FILE_ENTITY_DELETE_FAIL);
             }
         });
     }
