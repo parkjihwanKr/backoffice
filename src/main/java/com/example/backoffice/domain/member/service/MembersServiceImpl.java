@@ -100,15 +100,6 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByRoleAndPosition(
-            MemberRole role, MemberPosition position) {
-        return membersRepository.findByRoleAndPosition(role, position).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
-        );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Members findHRManager(){
         return membersRepository.findByPositionAndDepartment(
                 MemberPosition.MANAGER, MemberDepartment.HR).orElseThrow(
@@ -125,13 +116,20 @@ public class MembersServiceImpl implements MembersService{
     @Transactional(readOnly = true)
     public Members findByMemberName(String memberName){
         return membersRepository.findByMemberName(memberName).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
-        );
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Members> findAll(){
         return membersRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByDepartmentAndPosition(
+            MemberDepartment department, MemberPosition position){
+        return membersRepository.findByDepartmentAndPosition(department, position).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 }

@@ -9,7 +9,6 @@ import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
-import com.example.backoffice.domain.notification.service.NotificationsService;
 import com.example.backoffice.domain.reaction.converter.ReactionsConverter;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
@@ -56,7 +55,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         toMember.addEmoji(reaction);
         // toMember, fromMember 정보가 notification으로 다 넘어가기에 Member Domain은 null 가능
         NotificationData membersNotification =
-                new NotificationData(toMember, fromMember, null, null, null, null);
+                new NotificationData(toMember, fromMember, null, null, null, null, null);
         notificationsServiceFacade.createNotification(membersNotification, NotificationType.MEMBER);
         return ReactionsConverter.toCreateMemberReactionDto(reaction, emoji.toString());
     }
@@ -94,7 +93,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         board.addEmoji(reaction, emoji.toString());
 
         NotificationData boardsNotification =
-                new NotificationData(board.getMember(), fromMember, board, null, null, null);
+                new NotificationData(board.getMember(), fromMember, board, null, null, null, null);
         notificationsServiceFacade.createNotification(boardsNotification, NotificationType.BOARD);
         return ReactionsConverter.toCreateBoardReactionDto(
                 fromMember, board, emoji.toString());
@@ -138,7 +137,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         comment.addEmoji(reaction, emoji.toString());
         NotificationData commentsNotification =
                 new NotificationData(
-                        comment.getMember(), fromMember, board, comment, null, null);
+                        comment.getMember(), fromMember, board, comment, null, null, null);
         notificationsServiceFacade.createNotification(commentsNotification, NotificationType.COMMENT);
         return ReactionsConverter.toCreateCommentReactionDto(comment, fromMember, emoji.toString());
     }
@@ -182,7 +181,7 @@ public class ReactionsServiceImpl implements ReactionsService{
         NotificationData replyNotification =
                 new NotificationData(
                         reply.getMember(), fromMember,
-                        reply.getParent().getBoard(), comment, reply, null);
+                        reply.getParent().getBoard(), comment, reply, null, null);
         notificationsServiceFacade.createNotification(replyNotification, NotificationType.REPLY);
         return ReactionsConverter.toCreateReplyReactionDto(reply, fromMember, replyEmoji.toString());
     }

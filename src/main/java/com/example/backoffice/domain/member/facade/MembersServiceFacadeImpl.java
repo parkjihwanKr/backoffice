@@ -123,13 +123,12 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
 
         if(!loginMember.getPosition().equals(MemberPosition.MANAGER)){
             // 해당 조건을 달성하지 못하면
-            if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
-                    && loginMember.getPosition().equals(MemberPosition.CEO)){
+            if(!loginMember.getPosition().equals(MemberPosition.CEO)){
                 throw new MembersCustomException(
                         MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
-            membersService.findByRoleAndPosition(
-                    loginMember.getRole(), loginMember.getPosition());
+            membersService.findByDepartmentAndPosition(
+                    loginMember.getDepartment(), loginMember.getPosition());
         } else{
             if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
                     && !loginMember.getRole().equals(MemberRole.ADMIN)){

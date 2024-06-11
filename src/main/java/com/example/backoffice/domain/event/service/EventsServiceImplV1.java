@@ -145,7 +145,7 @@ public class EventsServiceImplV1 implements EventsService{
                 = membersService.findHRManager();
         notificationsServiceFacade.createNotification(
                 NotificationsConverter.toNotificationData(
-                        hrManager, loginMember, null, null, null, event),
+                        hrManager, loginMember, null, null, null, event, null),
                 NotificationType.URGENT_VACATION_EVENT);
 
         eventsRepository.save(event);

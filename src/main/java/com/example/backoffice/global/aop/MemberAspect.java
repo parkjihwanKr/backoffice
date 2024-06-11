@@ -1,15 +1,26 @@
 package com.example.backoffice.global.aop;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.notification.converter.NotificationsConverter;
+import com.example.backoffice.domain.notification.entity.NotificationType;
+import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
 import com.example.backoffice.global.audit.entity.AuditLogType;
 import com.example.backoffice.global.audit.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -19,7 +30,8 @@ import org.springframework.stereotype.Component;
 public class MemberAspect {
 
     private final AuditLogService auditLogService;
-
+    private final MembersService membersService;
+    private final NotificationsServiceFacade notificationsServiceFacade;
     /* @PARAM
     JoinPoint -> 각 메서드들의 파라미터들을 가져옴
     joinPoint.getArg[0] -> 첫 번째 파라미터 ...
@@ -39,6 +51,32 @@ public class MemberAspect {
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))", returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
         log.info("Executed: " + joinPoint.getSignature().toShortString() + ", Returned: " + result);
+    }
+
+    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))", throwing = "error")
+    public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
+        String errorMessage
+                = "Exception in: " + joinPoint.getSignature().toShortString() +" "+ error;
+        log.error(errorMessage, error);
+
+        if (error instanceof MembersCustomException exception) {
+            if (exception.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR) {
+                // 실시간 알림 전송
+                Members ceo = membersService.findByDepartmentAndPosition(
+                        MemberDepartment.HR, MemberPosition.CEO);
+                Members itManager = membersService.findByDepartmentAndPosition(
+                        MemberDepartment.IT, MemberPosition.MANAGER);
+                notificationsServiceFacade.createNotification(
+                        NotificationsConverter.toNotificationData(
+                                itManager, ceo, null, null, null, null,
+                                errorMessage),
+                        NotificationType.URGENT_SERVER_ISSUE);
+            }
+        }
+
+        String currentMemberName = getCurrentMemberName();
+        auditLogService.saveLogEvent(
+                AuditLogType.MEMBER_ERROR, currentMemberName, errorMessage);
     }
 
     // 각 멤버의 로그인이 아니라 Authentication.authenticate()는
@@ -138,5 +176,13 @@ public class MemberAspect {
         auditLogService.saveLogEvent(
                 AuditLogType.UPLOAD_MEMBER_FILE,
                 loginMember.getMemberName(), message);
+    }
+
+    private String getCurrentMemberName(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName();
+        }
+        return "anonymousUser";
     }
 }

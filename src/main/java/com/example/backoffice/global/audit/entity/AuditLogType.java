@@ -12,6 +12,7 @@ public enum AuditLogType {
     CHANGE_MEMBER_SALARY(eventLabel.CHANGE_MEMBER_SALARY),
     CHANGE_MEMBER_REMAINING_VACATION_DAY(eventLabel.CHANGE_MEMBER_REMAINING_VACATION_DAY),
     UPLOAD_MEMBER_FILE(eventLabel.UPLOAD_MEMBER_FILE),
+    MEMBER_ERROR(eventLabel.MEMBER_ERROR),
     CHANGE_BOARD_FILE(eventLabel.CHANGE_BOARD_FILE),
     CHANGE_EVENT(eventLabel.CHANGE_EVENT),
     CHANGE_SECURITY_SETTINGS(eventLabel.CHANGE_SECURITY_SETTINGS)
@@ -32,6 +33,7 @@ public enum AuditLogType {
         public static final String CHANGE_MEMBER_ATTRIBUTE = "CHANGE_MEMBER_ATTRIBUTE";
         public static final String CHANGE_MEMBER_REMAINING_VACATION_DAY = "CHANGE_REMAINING_VACATION_DAY";
         public static final String UPLOAD_MEMBER_FILE = "CHANGE_MEMBER_FILE";
+        public static final String MEMBER_ERROR = "MEMBER_ERROR";
         public static final String CHANGE_BOARD_FILE = "CHANGE_BOARD_FILE";
         public static final String CHANGE_EVENT = "CHANGE_EVENT";
         public static final String CHANGE_SECURITY_SETTINGS = "CHANGE_SECURITY_SETTINGS";
