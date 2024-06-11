@@ -2,7 +2,7 @@ package com.example.backoffice.domain.notification.facade;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.fascade.MembersServiceFacade;
+import com.example.backoffice.domain.member.facade.MembersServiceFacade;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.dto.NotificationsRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;

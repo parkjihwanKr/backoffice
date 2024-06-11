@@ -7,14 +7,14 @@ public enum AuditLogType {
     LOGIN(eventLabel.LOGIN),
     LOGOUT(eventLabel.LOGOUT),
     SIGNUP(eventLabel.SIGNUP),
-    PASSWORD_CHANGE(eventLabel.PASSWORD_CHANGE),
-    DEPARTMENT_CHANGE(eventLabel.DEPARTMENT_CHANGE),
-    POSITION_CHANGE(eventLabel.POSITION_CHANGE),
-    SALARY_CHANGE(eventLabel.SALARY_CHANGE),
-    REMAINING_VACATION_DAY_CHANGE(eventLabel.REMAINING_VACATION_DAY_CHANGE),
-    FILE_CHANGE(eventLabel.FILE_CHANGE),
-    EVENT_CHANGE(eventLabel.EVENT_CHANGE),
-    SECURITY_SETTINGS_CHANGE(eventLabel.SECURITY_SETTINGS_CHANGE)
+    DELETE_MEMBER(eventLabel.DELETE_MEMBER),
+    CHANGE_MEMBER_ATTRIBUTE(eventLabel.CHANGE_MEMBER_ATTRIBUTE),
+    CHANGE_MEMBER_SALARY(eventLabel.CHANGE_MEMBER_SALARY),
+    CHANGE_MEMBER_REMAINING_VACATION_DAY(eventLabel.CHANGE_MEMBER_REMAINING_VACATION_DAY),
+    UPLOAD_MEMBER_FILE(eventLabel.UPLOAD_MEMBER_FILE),
+    CHANGE_BOARD_FILE(eventLabel.CHANGE_BOARD_FILE),
+    CHANGE_EVENT(eventLabel.CHANGE_EVENT),
+    CHANGE_SECURITY_SETTINGS(eventLabel.CHANGE_SECURITY_SETTINGS)
     ;
 
     private final String label;
@@ -27,13 +27,13 @@ public enum AuditLogType {
         public static final String LOGIN = "LOGIN";
         public static final String LOGOUT = "LOGOUT";
         public static final String SIGNUP = "SIGNUP";
-        public static final String PASSWORD_CHANGE = "PASSWORD_CHANGE";
-        public static final String DEPARTMENT_CHANGE = "DEPARTMENT_CHANGE";
-        public static final String POSITION_CHANGE = "POSITION_CHANGE";
-        public static final String SALARY_CHANGE = "SALARY_CHANGE";
-        public static final String REMAINING_VACATION_DAY_CHANGE = "REMAINING_VACATION_DAY_CHANGE";
-        public static final String FILE_CHANGE = "FILE_CHANGE";
-        public static final String EVENT_CHANGE = "EVENT_CHANGE";
-        public static final String SECURITY_SETTINGS_CHANGE = "SECURITY_SETTINGS_CHANGE";
+        public static final String DELETE_MEMBER = "DELETE_MEMBER";
+        public static final String CHANGE_MEMBER_SALARY = "CHANGE_MEMBER_SALARY";
+        public static final String CHANGE_MEMBER_ATTRIBUTE = "CHANGE_MEMBER_ATTRIBUTE";
+        public static final String CHANGE_MEMBER_REMAINING_VACATION_DAY = "CHANGE_REMAINING_VACATION_DAY";
+        public static final String UPLOAD_MEMBER_FILE = "CHANGE_MEMBER_FILE";
+        public static final String CHANGE_BOARD_FILE = "CHANGE_BOARD_FILE";
+        public static final String CHANGE_EVENT = "CHANGE_EVENT";
+        public static final String CHANGE_SECURITY_SETTINGS = "CHANGE_SECURITY_SETTINGS";
     }
 }
