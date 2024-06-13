@@ -22,6 +22,7 @@ public enum MembersExceptionCode {
     NOT_MATCHED_INFO(HttpStatus.BAD_REQUEST, "MEMBER-013", "해당 멤버 정보와 일치하지 않습니다."),
     RESTRICTED_ACCESS_MEMBER(HttpStatus.BAD_REQUEST, "MEMBER-014", "해당 멤버는 접근 권한이 없습니다."),
     INSUFFICIENT_VACATION_DAYS(HttpStatus.BAD_REQUEST, "MEMBER-015","해당 멤버는 충분한 휴가 일수가 없습니다."),
+    NOT_FOUND_EXCEPTION_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER-016", "유효하지 않은 예외 처리 방법입니다."),
     ;
 
     private final HttpStatus httpStatus;

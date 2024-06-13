@@ -1,4 +1,4 @@
-package com.example.backoffice.domain.member.fascade;
+package com.example.backoffice.domain.member.facade;
 
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.converter.MembersConverter;
@@ -13,7 +13,6 @@ import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.service.NotificationsService;
-import com.example.backoffice.global.exception.CustomException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.SchedulerCustomException;
 import com.example.backoffice.global.scheduler.ScheduledEventType;
@@ -76,7 +75,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
                 case CONTACT
                         -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
                 case NULL
-                        -> log.info("Not Found Exception!");
+                        -> throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_EXCEPTION_TYPE);
             }
         }
 
@@ -124,13 +123,12 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
 
         if(!loginMember.getPosition().equals(MemberPosition.MANAGER)){
             // 해당 조건을 달성하지 못하면
-            if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
-                    && loginMember.getPosition().equals(MemberPosition.CEO)){
+            if(!loginMember.getPosition().equals(MemberPosition.CEO)){
                 throw new MembersCustomException(
                         MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
-            membersService.findByRoleAndPosition(
-                    loginMember.getRole(), loginMember.getPosition());
+            membersService.findByDepartmentAndPosition(
+                    loginMember.getDepartment(), loginMember.getPosition());
         } else{
             if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
                     && !loginMember.getRole().equals(MemberRole.ADMIN)){

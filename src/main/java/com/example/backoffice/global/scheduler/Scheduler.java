@@ -2,7 +2,7 @@ package com.example.backoffice.global.scheduler;
 
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.service.EventsService;
-import com.example.backoffice.domain.member.fascade.MembersServiceFacade;
+import com.example.backoffice.domain.member.facade.MembersServiceFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;

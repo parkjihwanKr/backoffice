@@ -141,12 +141,7 @@ public class EventsServiceImplV1 implements EventsService{
                 message, requestDto.getReason(),
                 eventDateRangeDto, loginMember, EventType.MEMBER_VACATION);
 
-        Members hrManager
-                = membersService.findHRManager();
-        notificationsServiceFacade.createNotification(
-                NotificationsConverter.toNotificationData(
-                        hrManager, loginMember, null, null, null, event),
-                NotificationType.URGENT_VACATION_EVENT);
+        sendUrgentEventForHRManager(requestDto.getUrgent(), loginMember, event);
 
         eventsRepository.save(event);
         return EventsConverter.toCreateVacationDto(event, requestDto.getUrgent());
@@ -176,6 +171,8 @@ public class EventsServiceImplV1 implements EventsService{
         EventDateRangeDto eventDateRangeDto = validateVacationDate(
                         loginMember, requestDto.getStartDate(),
                         requestDto.getEndDate(), requestDto.getUrgent());
+
+        sendUrgentEventForHRManager(requestDto.getUrgent(), loginMember, vacation);
 
         String vacationTitle = loginMember.getMemberName()+ "님의 휴가 계획";
         vacation.update(vacationTitle, requestDto.getReason(), loginMember.getDepartment(),
@@ -277,7 +274,8 @@ public class EventsServiceImplV1 implements EventsService{
                     = eventsRepository.countVacationingMembers(customStartDate);
 
             double vacationRate = (double) (vacationingMembersCount / memberTotalCount);
-            if(vacationRate > 0.3){
+            // 긴급함 표시가 없고 전 직원 휴가율이 30%이상일 때
+            if(vacationRate > 0.3 && !urgent){
                 throw new EventsCustomException(EventsExceptionCode.EXCEEDS_VACATION_RATE_LIMIT);
             }
         }
@@ -344,5 +342,15 @@ public class EventsServiceImplV1 implements EventsService{
 
         return eventsRepository.findAllByEventTypeAndEndDateBefore(
                 EventType.MEMBER_VACATION, endOfDay);
+    }
+
+    private void sendUrgentEventForHRManager(Boolean urgent, Members loginMember, Events event){
+        if(urgent){
+            Members hrManager = membersService.findHRManager();
+            notificationsServiceFacade.createNotification(
+                    NotificationsConverter.toNotificationData(
+                            hrManager, loginMember, null, null, null, event, null),
+                    NotificationType.URGENT_VACATION_EVENT);
+        }
     }
 }

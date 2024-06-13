@@ -33,8 +33,6 @@ public interface MembersService {
     Members findByIdAndRoleAndDepartment(
             Long adminId, MemberRole role, MemberDepartment department);
 
-    Members findByRoleAndPosition(MemberRole role, MemberPosition position);
-
     Members findHRManager();
 
     Long findMemberTotalCount();
@@ -42,4 +40,7 @@ public interface MembersService {
     Members findByMemberName(String memberName);
 
     List<Members> findAll();
+
+    Members findByDepartmentAndPosition(
+            MemberDepartment department, MemberPosition position);
 }

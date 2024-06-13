@@ -33,7 +33,8 @@ public class NotificationsConverter {
 
     public static NotificationData toNotificationData(
             Members toMember, Members fromMember,
-            Boards board, Comments comment, Comments reply, Events event){
+            Boards board, Comments comment, Comments reply, Events event,
+            String message){
         return NotificationData.builder()
                 .toMember(toMember)
                 .fromMember(fromMember)
@@ -41,15 +42,7 @@ public class NotificationsConverter {
                 .comment(comment)
                 .reply(reply)
                 .event(event)
-                .build();
-    }
-
-    public static NotificationsResponseDto.CreateNotificationResponseDto toCreateOneDto(
-            Notifications notification){
-        return NotificationsResponseDto.CreateNotificationResponseDto.builder()
-                .toMemberName(notification.getToMemberName())
-                .fromMemberName(notification.getFromMemberName())
-                .createdAt(notification.getCreatedAt())
+                .message(message)
                 .build();
     }
 
