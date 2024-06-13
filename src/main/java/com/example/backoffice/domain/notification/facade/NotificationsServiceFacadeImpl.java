@@ -45,7 +45,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 = generateMessageAndEntity(notificationData, domainType);
         notificationsService.save(notification);
 
-        sendNotificationToUser(
+        sendNotificationForUser(
                 notificationData.getToMember().getMemberName(), notification);
     }
 
@@ -121,7 +121,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 notificationsService.save(notification);
                 memberDepartmentSet.add(memberDepartment);
                 notificationList.add(notification);
-                sendNotificationToUser(memberName, notification);
+                sendNotificationForUser(memberName, notification);
             }
         });
         // 해당 memberRoleList 테스트 후, 설정 예정
@@ -258,7 +258,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                         notificationData.getFromMember().getMemberName(),
                         urgentVacationMessage, domainType, notificationData.getFromMember().getDepartment());
             }
-            case URGENT_SERVER_ISSUE -> {
+            case URGENT_SERVER_ERROR -> {
                 String urgentServerIssueMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 긴급하게 서버 이슈 메세지를 전달하셨습니다. //"
@@ -273,7 +273,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
         };
     }
 
-    private void sendNotificationToUser(String toMemberName, Notifications notification){
+    private void sendNotificationForUser(String toMemberName, Notifications notification){
         simpMessagingTemplate.convertAndSendToUser(toMemberName, "/queue/notifications", notification);
     }
 }

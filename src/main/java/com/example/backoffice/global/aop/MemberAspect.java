@@ -68,7 +68,7 @@ public class MemberAspect extends CommonAspect{
                         NotificationsConverter.toNotificationData(
                                 itManager, ceo, null, null, null, null,
                                 errorMessage),
-                        NotificationType.URGENT_SERVER_ISSUE);
+                        NotificationType.URGENT_SERVER_ERROR);
             }
         }
 
