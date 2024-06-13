@@ -17,7 +17,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -30,32 +29,18 @@ public class MemberAspect extends CommonAspect{
     private final AuditLogService auditLogService;
     private final MembersService membersService;
     private final NotificationsServiceFacade notificationsServiceFacade;
-    /* @PARAM
-    JoinPoint -> 각 메서드들의 파라미터들을 가져옴
-    joinPoint.getArg[0] -> 첫 번째 파라미터 ...
-    jointPoint.getArg[n] -> n-1 번째 파라미터
 
-    @Before : 메서드 실행 전
-    @After : 메서드 실행 후
-    @AfterReturning : 메서드가 정상적으로 종료된 후
-    @AfterThrowing : 메서드가 예외 처리가 된 후
-    */
-
-    @Before("execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))")
-    public void logBefore(JoinPoint joinPoint) {
-        log.info("실행 중: " + joinPoint.getSignature().toShortString());
-    }
-
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))", returning = "result")
-    public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        log.info("실행 후 : " + joinPoint.getSignature().toShortString() + ", 결과 : " + result);
-    }
-
-    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))", throwing = "error")
+    // CommonAspect 관리
+    // 장점 1-1) 중복 코드를 줄일 수 있음
+    // 장점 1-2) 유지 보수 용이
+    // 단점 1-1) 필요하지 않은 로직 또한 예외에 민감하게 반응 -> 이로 인해 오버헤드 발생 가능성 높음
+    // 단점 1-2) 설명의 복잡성 -> Enum으로 설명을 간단하게 할 순 있음
+    // 단점 1-3) 불변성을 보장할 수 없음 -> 해당 로직으로 인하여 DomainAspect는 CommonAspect를 상속받는데
+    // 의존성 주입을 받을 때, final이라는 키워드를 빼고 상속받아야함
+    // 이로 인하여 도메인별 예외 처리를 담당
+    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.member.facade(..))", throwing = "error")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
-        String errorMessage
-                = "예외 : " + getCurrentMethodName(joinPoint) +" "+ error;
-        log.error(errorMessage, error);
+        String errorMessage = createErrorMessage(joinPoint, error);
 
         if (error instanceof MembersCustomException exception) {
             if (exception.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR) {
@@ -72,10 +57,22 @@ public class MemberAspect extends CommonAspect{
             }
         }
 
-        String loginMemberName = getLoginMemberName();
+        String currentMemberName = getLoginMemberName();
         auditLogService.saveLogEvent(
-                AuditLogType.MEMBER_ERROR, loginMemberName, errorMessage);
+                AuditLogType.MEMBER_ERROR, currentMemberName, errorMessage);
     }
+
+
+    /* @PARAM
+    JoinPoint -> 각 메서드들의 파라미터들을 가져옴
+    joinPoint.getArg[0] -> 첫 번째 파라미터 ...
+    jointPoint.getArg[n] -> n-1 번째 파라미터
+
+    @Before : 메서드 실행 전
+    @After : 메서드 실행 후
+    @AfterReturning : 메서드가 정상적으로 종료된 후
+    @AfterThrowing : 메서드가 예외 처리가 된 후
+    */
 
     // 각 멤버의 로그인이 아니라 Authentication.authenticate()는
     // 인증된 사용자가 제대로 된 url로 접속해 들어가는지를 확인

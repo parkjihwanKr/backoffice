@@ -14,6 +14,9 @@ public enum AuditLogType {
     UPLOAD_MEMBER_FILE(eventLabel.UPLOAD_MEMBER_FILE),
     MEMBER_ERROR(eventLabel.MEMBER_ERROR),
     FILE_ERROR(eventLabel.FILE_ERROR),
+    CREATE_FILE(eventLabel.CREATE_FILE),
+    UPDATE_FILE(eventLabel.UPDATE_FILE),
+    DELETE_FILE(eventLabel.DELETE_FILE),
     CREATE_MEMBER_VACATION(eventLabel.CREATE_MEMBER_VACATION),
     UPDATE_MEMBER_VACATION(eventLabel.UPDATE_MEMBER_VACATION),
     CHANGE_BOARD_FILE(eventLabel.CHANGE_BOARD_FILE),
@@ -38,6 +41,9 @@ public enum AuditLogType {
         public static final String UPLOAD_MEMBER_FILE = "CHANGE_MEMBER_FILE";
         public static final String MEMBER_ERROR = "MEMBER_ERROR";
         public static final String FILE_ERROR = "FILE_ERROR";
+        public static final String CREATE_FILE = "CREATE_FILE";
+        public static final String UPDATE_FILE = "UPDATE_FILE";
+        public static final String DELETE_FILE = "DELETE_FILE";
         public static final String CREATE_MEMBER_VACATION = "CREATE_MEMBER_VACATION";
         public static final String UPDATE_MEMBER_VACATION = "UPDATE_MEMBER_VACATION";
         public static final String CHANGE_BOARD_FILE = "CHANGE_BOARD_FILE";

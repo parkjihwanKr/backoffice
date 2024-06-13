@@ -1,7 +1,14 @@
 package com.example.backoffice.global.aop;
 
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
+import com.example.backoffice.domain.event.exception.EventsCustomException;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.notification.converter.NotificationsConverter;
+import com.example.backoffice.domain.notification.entity.NotificationType;
+import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
 import com.example.backoffice.global.audit.entity.AuditLogType;
 import com.example.backoffice.global.audit.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +17,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -20,23 +27,32 @@ import org.springframework.stereotype.Component;
 public class EventAspect extends CommonAspect{
 
     private final AuditLogService auditLogService;
+    private final MembersService membersService;
+    private final NotificationsServiceFacade notificationsServiceFacade;
 
-    @Before("execution(* com.example.backoffice.domain.event.service.*(..))")
-    public void logBefore(JoinPoint joinPoint) {
-        log.info("실행 중 : " + getCurrentMethodName(joinPoint));
-    }
-
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesService.*(..))", returning = "result")
-    public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        log.info("실행 후 : " + getCurrentMethodName(joinPoint) + ", 결과 : " + result);
-    }
-
-    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesService.*(..))", throwing = "error")
+    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.event.service(..))", throwing = "error")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
-        String errorMessage
-                = "예외 : " + getCurrentMethodName(joinPoint) +" "+ error;
-        log.error(errorMessage, error);
-        auditLogService.saveLogEvent(AuditLogType.FILE_ERROR, getLoginMemberName(), errorMessage);
+        String errorMessage = createErrorMessage(joinPoint, error);
+
+        // 해당 관련 오류는 없지만 확장의 가능성이 있기에 임시로 만듦.
+        if (error instanceof EventsCustomException exception) {
+            if (exception.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR){
+                // 실시간 알림 전송
+                Members ceo = membersService.findByDepartmentAndPosition(
+                        MemberDepartment.HR, MemberPosition.CEO);
+                Members itManager = membersService.findByDepartmentAndPosition(
+                        MemberDepartment.IT, MemberPosition.MANAGER);
+                notificationsServiceFacade.createNotification(
+                        NotificationsConverter.toNotificationData(
+                                itManager, ceo, null, null, null, null,
+                                errorMessage),
+                        NotificationType.URGENT_SERVER_ERROR);
+            }
+        }
+
+        String currentMemberName = getLoginMemberName();
+        auditLogService.saveLogEvent(
+                AuditLogType.MEMBER_ERROR, currentMemberName, errorMessage);
     }
 
     // 개인 휴가에 대한 이벤트만 고려
