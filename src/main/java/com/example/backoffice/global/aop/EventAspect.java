@@ -30,7 +30,7 @@ public class EventAspect extends CommonAspect{
     private final MembersService membersService;
     private final NotificationsServiceFacade notificationsServiceFacade;
 
-    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.event.service(..))", throwing = "error")
+    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.event.service.EventsServiceImplV1.*(..))", throwing = "error")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
         String errorMessage = createErrorMessage(joinPoint, error);
 

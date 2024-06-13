@@ -38,7 +38,7 @@ public class MemberAspect extends CommonAspect{
     // 단점 1-3) 불변성을 보장할 수 없음 -> 해당 로직으로 인하여 DomainAspect는 CommonAspect를 상속받는데
     // 의존성 주입을 받을 때, final이라는 키워드를 빼고 상속받아야함
     // 이로 인하여 도메인별 예외 처리를 담당
-    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.member.facade(..))", throwing = "error")
+    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))", throwing = "error")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
         String errorMessage = createErrorMessage(joinPoint, error);
 

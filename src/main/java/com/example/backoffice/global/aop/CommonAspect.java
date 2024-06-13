@@ -13,16 +13,16 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class CommonAspect {
-    @Before("execution(* com.example.backoffice.domain.file.service.FilesService.*(..))" +
-            " || execution(* com.example.backoffice.domain.member.service.MembersService.*(..))" +
-            " || execution(* com.example.backoffice.domain.event.service.EventsService.*(..))")
+    @Before("execution(* com.example.backoffice.domain.file.service.FilesServiceImpl.*(..))" +
+            " || execution(* com.example.backoffice.domain.member.service.MembersServiceImpl.*(..))" +
+            " || execution(* com.example.backoffice.domain.event.service.EventsServiceImplV1.*(..))")
     public void logBefore(JoinPoint joinPoint) {
         log.info("실행 중 : " + getCurrentMethodName(joinPoint));
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesService.*(..))" +
-            " || execution(* com.example.backoffice.domain.member.service.MembersService.*(..))" +
-            " || execution(* com.example.backoffice.domain.event.service.EventsService.*(..))",
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesServiceImpl.*(..))" +
+            " || execution(* com.example.backoffice.domain.member.service.MembersServiceImpl.*(..))" +
+            " || execution(* com.example.backoffice.domain.event.service.EventsServiceImplV1.*(..))",
             returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
         log.info("실행 후 : " + getCurrentMethodName(joinPoint) + ", 결과 : " + result);

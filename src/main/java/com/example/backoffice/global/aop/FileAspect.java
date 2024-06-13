@@ -29,7 +29,7 @@ public class FileAspect extends CommonAspect{
     private final MembersService membersService;
     private final NotificationsServiceFacade notificationsServiceFacade;
 
-    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.file.service(..))", throwing = "error")
+    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesServiceImpl.*(..))", throwing = "error")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
         String errorMessage = createErrorMessage(joinPoint, error);
 
@@ -56,7 +56,7 @@ public class FileAspect extends CommonAspect{
 
     // 파일 관련해서는 모든 로그를 찍도록 설정
     // createFileForMemberRole, createFileForBoard, createImage, deleteFile, deleteImage
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesServiceImpl(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesServiceImpl.*(..))")
     public void logAfterAllMethod(JoinPoint joinPoint){
         String methodName = getCurrentMethodName(joinPoint);
         String message = "";
