@@ -19,15 +19,13 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class MemberAspect {
+public class MemberAspect extends CommonAspect{
 
     private final AuditLogService auditLogService;
     private final MembersService membersService;
@@ -45,18 +43,18 @@ public class MemberAspect {
 
     @Before("execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))")
     public void logBefore(JoinPoint joinPoint) {
-        log.info("Executing: " + joinPoint.getSignature().toShortString());
+        log.info("실행 중: " + joinPoint.getSignature().toShortString());
     }
 
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))", returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        log.info("Executed: " + joinPoint.getSignature().toShortString() + ", Returned: " + result);
+        log.info("실행 후 : " + joinPoint.getSignature().toShortString() + ", 결과 : " + result);
     }
 
     @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))", throwing = "error")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
         String errorMessage
-                = "Exception in: " + joinPoint.getSignature().toShortString() +" "+ error;
+                = "예외 : " + getCurrentMethodName(joinPoint) +" "+ error;
         log.error(errorMessage, error);
 
         if (error instanceof MembersCustomException exception) {
@@ -74,9 +72,9 @@ public class MemberAspect {
             }
         }
 
-        String currentMemberName = getCurrentMemberName();
+        String loginMemberName = getLoginMemberName();
         auditLogService.saveLogEvent(
-                AuditLogType.MEMBER_ERROR, currentMemberName, errorMessage);
+                AuditLogType.MEMBER_ERROR, loginMemberName, errorMessage);
     }
 
     // 각 멤버의 로그인이 아니라 Authentication.authenticate()는
@@ -176,13 +174,5 @@ public class MemberAspect {
         auditLogService.saveLogEvent(
                 AuditLogType.UPLOAD_MEMBER_FILE,
                 loginMember.getMemberName(), message);
-    }
-
-    private String getCurrentMemberName(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            return authentication.getName();
-        }
-        return "anonymousUser";
     }
 }
