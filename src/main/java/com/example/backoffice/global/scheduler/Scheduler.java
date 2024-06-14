@@ -1,7 +1,7 @@
 package com.example.backoffice.global.scheduler;
 
 import com.example.backoffice.domain.event.entity.Events;
-import com.example.backoffice.domain.event.service.EventsService;
+import com.example.backoffice.domain.event.facade.EventsServiceFacadeV1;
 import com.example.backoffice.domain.member.facade.MembersServiceFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -18,7 +18,7 @@ import java.util.List;
 public class Scheduler {
 
     private final MembersServiceFacade membersServiceFacade;
-    private final EventsService eventsService;
+    private final EventsServiceFacadeV1 eventsServiceFacade;
 
     // 매일 오전 00시마다 member 휴가 상태 체크
     @Transactional
@@ -31,14 +31,14 @@ public class Scheduler {
 
         // 휴가가 끝난 멤버들의 상태를 false로 설정
         List<Events> endedVacationList
-                = eventsService.findAllByEventTypeAndEndDateBefore(year, month, day);
+                = eventsServiceFacade.findAllByEventTypeAndEndDateBefore(year, month, day);
         for (Events event : endedVacationList) {
             membersServiceFacade.updateOnVacationFalse(event.getMember().getMemberName());
         }
 
         // 휴가가 시작된 멤버들의 상태를 true로 설정
         List<Events> startedVacationList
-                = eventsService.findAllByEventTypeAndStartDateBetween(year, month, day);
+                = eventsServiceFacade.findAllByEventTypeAndStartDateBetween(year, month, day);
         for (Events event : startedVacationList) {
             membersServiceFacade.updateOnVacationTrue(event.getMember().getMemberName());
         }

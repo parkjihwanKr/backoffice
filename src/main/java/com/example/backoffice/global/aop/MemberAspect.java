@@ -24,44 +24,9 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class MemberAspect extends CommonAspect{
+public class MemberAspect extends CommonAspect {
 
     private final AuditLogService auditLogService;
-    private final MembersService membersService;
-    private final NotificationsServiceFacade notificationsServiceFacade;
-
-    // CommonAspect 관리
-    // 장점 1-1) 중복 코드를 줄일 수 있음
-    // 장점 1-2) 유지 보수 용이
-    // 단점 1-1) 필요하지 않은 로직 또한 예외에 민감하게 반응 -> 이로 인해 오버헤드 발생 가능성 높음
-    // 단점 1-2) 설명의 복잡성 -> Enum으로 설명을 간단하게 할 순 있음
-    // 단점 1-3) 불변성을 보장할 수 없음 -> 해당 로직으로 인하여 DomainAspect는 CommonAspect를 상속받는데
-    // 의존성 주입을 받을 때, final이라는 키워드를 빼고 상속받아야함
-    // 이로 인하여 도메인별 예외 처리를 담당
-    @AfterThrowing(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.*(..))", throwing = "error")
-    public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
-        String errorMessage = createErrorMessage(joinPoint, error);
-
-        if (error instanceof MembersCustomException exception) {
-            if (exception.getHttpStatus() == HttpStatus.INTERNAL_SERVER_ERROR) {
-                // 실시간 알림 전송
-                Members ceo = membersService.findByDepartmentAndPosition(
-                        MemberDepartment.HR, MemberPosition.CEO);
-                Members itManager = membersService.findByDepartmentAndPosition(
-                        MemberDepartment.IT, MemberPosition.MANAGER);
-                notificationsServiceFacade.createNotification(
-                        NotificationsConverter.toNotificationData(
-                                itManager, ceo, null, null, null, null,
-                                errorMessage),
-                        NotificationType.URGENT_SERVER_ERROR);
-            }
-        }
-
-        String currentMemberName = getLoginMemberName();
-        auditLogService.saveLogEvent(
-                AuditLogType.MEMBER_ERROR, currentMemberName, errorMessage);
-    }
-
 
     /* @PARAM
     JoinPoint -> 각 메서드들의 파라미터들을 가져옴
@@ -95,28 +60,24 @@ public class MemberAspect extends CommonAspect{
 
     // JoinPoint @Param MembersRequestDto.CreateMembersRequestDto requestDto
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.signup(..))")
-    public void logAfterSignup(JoinPoint joinPoint){
+    public void logAfterSignup(JoinPoint joinPoint) {
         MembersRequestDto.CreateMembersRequestDto requestDto
                 = (MembersRequestDto.CreateMembersRequestDto) joinPoint.getArgs()[0];
-        String message = requestDto.getMemberName()+ "님이 회원가입을 진행하셨습니다.";
+        String message = requestDto.getMemberName() + "님이 회원가입을 진행하셨습니다.";
         log.info(message);
         auditLogService.saveLogEvent(
                 AuditLogType.SIGNUP, requestDto.getMemberName(), message);
     }
 
-    /*
-    JoinPoint @Param
-    Long toMemberId, Members loginMember, MembersRequestDto.UpdateMemberSalaryRequestDto requestDto
-    */
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateSalary(..))")
-    public void logAfterUpdateSalary(JoinPoint joinPoint){
+    public void logAfterUpdateSalary(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         MembersRequestDto.UpdateMemberSalaryRequestDto requestDto =
                 (MembersRequestDto.UpdateMemberSalaryRequestDto) joinPoint.getArgs()[2];
         String message
-                = loginMember.getMemberName()+"님이 "
-                + requestDto.getMemberName()+"님의 급여를 "
-                + requestDto.getSalary()+"로 변경하셨습니다.";
+                = loginMember.getMemberName() + "님이 "
+                + requestDto.getMemberName() + "님의 급여를 "
+                + requestDto.getSalary() + "로 변경하셨습니다.";
 
         auditLogService.saveLogEvent(
                 AuditLogType.CHANGE_MEMBER_SALARY,
@@ -124,7 +85,7 @@ public class MemberAspect extends CommonAspect{
     }
 
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.deleteMember(..))")
-    public void logAfterDeleteMember(JoinPoint joinPoint){
+    public void logAfterDeleteMember(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName() + "님이 회원 탈퇴하셨습니다.";
 
@@ -133,17 +94,13 @@ public class MemberAspect extends CommonAspect{
                 loginMember.getMemberName(), message);
     }
 
-    /*@PARAM
-    Long memberId, Members loginMember,
-            MembersRequestDto.UpdateMemberAttributeRequestDto requestDto*/
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateAttribute(..))")
-    public void logAfterUpdateMemberAttribute(JoinPoint joinPoint){
+    public void logAfterUpdateMemberAttribute(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         MembersRequestDto.UpdateMemberAttributeRequestDto requestDto =
-                (MembersRequestDto.UpdateMemberAttributeRequestDto)
-                        joinPoint.getArgs()[2];
+                (MembersRequestDto.UpdateMemberAttributeRequestDto) joinPoint.getArgs()[2];
 
-        if(requestDto.getSalary() != null
+        if (requestDto.getSalary() != null
                 && requestDto.getPosition() != null && requestDto.getDepartment() != null) {
             String message = loginMember.getMemberName()
                     + "님이 "
@@ -160,11 +117,8 @@ public class MemberAspect extends CommonAspect{
         }
     }
 
-    // 개인이 올린 사진이 회사 방침 내에서 올바른지?, 삭제는 필요 없을 듯?
-    /*@PARAM
-    Long memberId, Members member, MultipartFile image*/
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateProfileImageUrl(..))")
-    public void logAfterUpdateMemberProfileImageUrl(JoinPoint joinPoint){
+    public void logAfterUpdateMemberProfileImageUrl(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName()
                 + "님이 파일을 업로드 하셨습니다.";
