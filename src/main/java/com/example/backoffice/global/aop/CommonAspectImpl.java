@@ -41,11 +41,4 @@ public class CommonAspectImpl implements CommonAspect{
         }
         return "anonymousUser";
     }
-
-    @Override
-    public String createErrorMessage(JoinPoint joinPoint, Throwable error) {
-        String errorMessage = getLoginMemberName() + "가 " + getCurrentMethodName(joinPoint) + "에서 " + error.getMessage() + "를 발생시켰습니다.";
-        log.error(errorMessage, error);
-        return errorMessage;
-    }
 }
