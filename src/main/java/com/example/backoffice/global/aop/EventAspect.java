@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class EventAspect extends CommonAspect{
+public class EventAspect {
 
     private final AuditLogService auditLogService;
 

@@ -1,30 +1,21 @@
 package com.example.backoffice.global.aop;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
-import com.example.backoffice.domain.member.entity.MemberDepartment;
-import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.exception.MembersCustomException;
-import com.example.backoffice.domain.member.service.MembersService;
-import com.example.backoffice.domain.notification.converter.NotificationsConverter;
-import com.example.backoffice.domain.notification.entity.NotificationType;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
 import com.example.backoffice.global.audit.entity.AuditLogType;
 import com.example.backoffice.global.audit.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class MemberAspect extends CommonAspect {
+public class MemberAspect extends CommonAspectImpl {
 
     private final AuditLogService auditLogService;
 
