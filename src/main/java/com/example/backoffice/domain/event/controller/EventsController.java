@@ -2,7 +2,7 @@ package com.example.backoffice.domain.event.controller;
 
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
-import com.example.backoffice.domain.event.service.EventsService;
+import com.example.backoffice.domain.event.facade.EventsServiceFacadeV1;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +18,14 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class EventsController {
 
-    private final EventsService eventsService;
+    private final EventsServiceFacadeV1 eventsServiceFacade;
 
     // 회사 일정 한개 상세 조회
     @GetMapping("/events/{eventId}")
     public ResponseEntity<EventsResponseDto.ReadCompanyEventResponseDto> readCompanyEvent(
             @PathVariable Long eventId){
         EventsResponseDto.ReadCompanyEventResponseDto responseDto
-                = eventsService.readCompanyEvent(eventId);
+                = eventsServiceFacade.readCompanyEvent(eventId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -34,7 +34,7 @@ public class EventsController {
     public ResponseEntity<List<EventsResponseDto.ReadCompanyEventResponseDto>> readCompanyMonthEvent(
             @PathVariable Long year, @PathVariable Long month){
         List<EventsResponseDto.ReadCompanyEventResponseDto> responseDtoList
-                = eventsService.readCompanyMonthEvent(year, month);
+                = eventsServiceFacade.readCompanyMonthEvent(year, month);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
@@ -43,7 +43,7 @@ public class EventsController {
     public ResponseEntity<List<List<EventsResponseDto.ReadCompanyEventResponseDto>>> readCompanyYearEvent(
             @PathVariable Long year){
         List<List<EventsResponseDto.ReadCompanyEventResponseDto>> responseDto
-                = eventsService.readCompanyYearEvent(year);
+                = eventsServiceFacade.readCompanyYearEvent(year);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -54,7 +54,7 @@ public class EventsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EventsRequestDto.UpdateDepartmentEventRequestDto requestDto){
         EventsResponseDto.UpdateDepartmentEventResponseDto responseDto
-                = eventsService.updateDepartmentEvent(eventId, memberDetails.getMembers(), requestDto);
+                = eventsServiceFacade.updateDepartmentEvent(eventId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -64,7 +64,7 @@ public class EventsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @ModelAttribute EventsRequestDto.CreateDepartmentEventsRequestDto requestDto){
         EventsResponseDto.CreateDepartmentEventResponseDto responseDto
-                = eventsService.createDepartmentEvent(memberDetails.getMembers(), requestDto);
+                = eventsServiceFacade.createDepartmentEvent(memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -73,7 +73,7 @@ public class EventsController {
     public ResponseEntity<CommonResponseDto<Void>> deleteDepartmentEvent(
             @PathVariable Long eventId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        eventsService.deleteDepartmentEvent(eventId, memberDetails.getMembers());
+        eventsServiceFacade.deleteDepartmentEvent(eventId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "부서 일정 삭제 성공", 200
@@ -86,7 +86,7 @@ public class EventsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EventsRequestDto.CreateVacationRequestDto requestDto){
         EventsResponseDto.CreateVacationResponseDto responseDto =
-                eventsService.createVacationEvent(memberDetails.getMembers(), requestDto);
+                eventsServiceFacade.createVacationEvent(memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -96,7 +96,7 @@ public class EventsController {
             @PathVariable Long year, @PathVariable Long month,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<EventsResponseDto.ReadVacationResponseDto> responseDtoList =
-                eventsService.readVacationMonthEvent(year, month, memberDetails.getMembers());
+                eventsServiceFacade.readVacationMonthEvent(year, month, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
     // 개인 휴가 일정 부분 수정
@@ -106,7 +106,7 @@ public class EventsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EventsRequestDto.UpdateVacationEventRequestDto requestDto){
         EventsResponseDto.UpdateVacationResponseDto responseDto
-                = eventsService.updateVacationEvent(
+                = eventsServiceFacade.updateVacationEvent(
                         eventId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -116,7 +116,7 @@ public class EventsController {
     public ResponseEntity<CommonResponseDto<Void>> deleteVacationEvent(
             @PathVariable Long eventId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        eventsService.deleteVacationEvent(eventId, memberDetails.getMembers());
+        eventsServiceFacade.deleteVacationEvent(eventId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "휴가 등록 취소 성공", 200
@@ -129,7 +129,7 @@ public class EventsController {
             @PathVariable Long year, @PathVariable Long month, @PathVariable Long day,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<EventsResponseDto.ReadVacationResponseDto> responseDtoList
-                = eventsService.readVacationMemberList(
+                = eventsServiceFacade.readVacationMemberList(
                         year, month, day, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
