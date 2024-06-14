@@ -22,19 +22,21 @@ public class FileAspect {
     public void logAfterAllMethod(JoinPoint joinPoint) {
         String methodName = commonAspect.getCurrentMethodName(joinPoint);
         String message = "";
+        String loginMemberName = commonAspect.getLoginMemberName();
         if (methodName.equals("createFileForMemberRole")
                 || methodName.equals("createFileForBoard") || methodName.equals("createImage")) {
-            message = commonAspect.getLoginMemberName() + "님이 파일을 생성하셨습니다.";
+            message = loginMemberName + "님이 파일을 생성하셨습니다.";
             auditLogService.saveLogEvent(
-                    AuditLogType.CREATE_FILE, commonAspect.getLoginMemberName(), message);
+                    AuditLogType.CREATE_FILE, loginMemberName, message);
         } else if (methodName.equals("deleteFile") || methodName.equals("deleteImage")) {
-            message = commonAspect.getLoginMemberName() + "님이 파일을 삭제하셨습니다.";
+            message = loginMemberName + "님이 파일을 삭제하셨습니다.";
             auditLogService.saveLogEvent(
-                    AuditLogType.DELETE_FILE, commonAspect.getLoginMemberName(), message);
+                    AuditLogType.DELETE_FILE, loginMemberName, message);
         } else {
-            message = commonAspect.getLoginMemberName() + "님이 알 수 없는 메서드를 불렀습니다.";
+            message = loginMemberName + "님이 알 수 없는 메서드를 불렀습니다.";
             auditLogService.saveLogEvent(
-                    AuditLogType.FILE_ERROR, commonAspect.getLoginMemberName(), message);
+                    AuditLogType.FILE_ERROR, loginMemberName, message);
         }
+        commonAspect.getLogMessage(message);
     }
 }

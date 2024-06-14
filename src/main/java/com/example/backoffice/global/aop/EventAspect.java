@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class EventAspect {
 
     private final AuditLogService auditLogService;
-
+    private final CommonAspectImpl commonAspect;
     // 개인 휴가에 대한 이벤트만 고려
     /*@Param
     Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto*/
@@ -32,6 +32,7 @@ public class EventAspect {
         if(requestDto.getUrgent()){
             message = "제목 : 긴급한 휴가 요청 / 이유 : "+ requestDto.getReason();
         }
+        commonAspect.getLogMessage(message);
         auditLogService.saveLogEvent(
                 AuditLogType.CREATE_MEMBER_VACATION, member.getMemberName(), message);
     }
@@ -49,6 +50,7 @@ public class EventAspect {
         if(requestDto.getUrgent()){
             message = "제목 : 긴급한 휴가 요청 / 이유 : "+ requestDto.getReason();
         }
+        commonAspect.getLogMessage(message);
         auditLogService.saveLogEvent(
                 AuditLogType.UPDATE_MEMBER_VACATION, member.getMemberName(), message);
     }

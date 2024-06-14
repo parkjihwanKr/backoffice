@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class MemberAspect extends CommonAspectImpl {
+public class MemberAspect {
 
     private final AuditLogService auditLogService;
-
+    private final CommonAspect commonAspect;
     /* @PARAM
     JoinPoint -> 각 메서드들의 파라미터들을 가져옴
     joinPoint.getArg[0] -> 첫 번째 파라미터 ...
@@ -55,7 +55,9 @@ public class MemberAspect extends CommonAspectImpl {
         MembersRequestDto.CreateMembersRequestDto requestDto
                 = (MembersRequestDto.CreateMembersRequestDto) joinPoint.getArgs()[0];
         String message = requestDto.getMemberName() + "님이 회원가입을 진행하셨습니다.";
-        log.info(message);
+
+        commonAspect.getLogMessage(message);
+
         auditLogService.saveLogEvent(
                 AuditLogType.SIGNUP, requestDto.getMemberName(), message);
     }
@@ -70,6 +72,8 @@ public class MemberAspect extends CommonAspectImpl {
                 + requestDto.getMemberName() + "님의 급여를 "
                 + requestDto.getSalary() + "로 변경하셨습니다.";
 
+        commonAspect.getLogMessage(message);
+
         auditLogService.saveLogEvent(
                 AuditLogType.CHANGE_MEMBER_SALARY,
                 loginMember.getMemberName(), message);
@@ -79,6 +83,8 @@ public class MemberAspect extends CommonAspectImpl {
     public void logAfterDeleteMember(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName() + "님이 회원 탈퇴하셨습니다.";
+
+        commonAspect.getLogMessage(message);
 
         auditLogService.saveLogEvent(
                 AuditLogType.DELETE_MEMBER,
@@ -102,6 +108,8 @@ public class MemberAspect extends CommonAspectImpl {
                     + requestDto.getPosition()
                     + "로 변경하였습니다.";
 
+            commonAspect.getLogMessage(message);
+
             auditLogService.saveLogEvent(
                     AuditLogType.CHANGE_MEMBER_ATTRIBUTE,
                     loginMember.getMemberName(), message);
@@ -113,6 +121,9 @@ public class MemberAspect extends CommonAspectImpl {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName()
                 + "님이 파일을 업로드 하셨습니다.";
+
+        commonAspect.getLogMessage(message);
+
         auditLogService.saveLogEvent(
                 AuditLogType.UPLOAD_MEMBER_FILE,
                 loginMember.getMemberName(), message);
