@@ -11,41 +11,41 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-public interface MembersServiceFacade {
-    MembersResponseDto.CreateMembersResponseDto signup(
-            MembersRequestDto.CreateMembersRequestDto requestDto);
+public interface MembersServiceFacadeV1 {
+    MembersResponseDto.CreateOneDto signup(
+            MembersRequestDto.CreateOneDto requestDto);
 
-    MembersResponseDto.ReadMemberResponseDto readInfo(
+    MembersResponseDto.ReadOneProfileDto readOneProfile(
             Long memberId, Members member);
 
-    MembersResponseDto.UpdateMemberResponseDto updateMember(
+    MembersResponseDto.UpdateOneProfileDto updateOneProfile(
             Long memberId,  Members Member,
-            MembersRequestDto.UpdateMemberRequestDto requestDto);
+            MembersRequestDto.UpdateOneProfileDto requestDto);
 
-    MembersResponseDto.UpdateMemberAttributeResponseDto updateAttribute(
+    MembersResponseDto.UpdateOneAttributeDto updateOneAttribute(
             Long memberId, Members member,
-            MembersRequestDto.UpdateMemberAttributeRequestDto requestDto);
+            MembersRequestDto.UpdateOneAttributeDto requestDto);
 
-    MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateProfileImageUrl(
+    MembersResponseDto.UpdateOneProfileImageDto updateOneProfileImage(
             Long memberId, Members member, MultipartFile image);
 
-    MembersResponseDto.DeleteMemberProfileImageResponseDto deleteProfileImage(
+    MembersResponseDto.DeleteOneProfileImageDto deleteOneProfileImage(
             Long memberId, Members member);
 
-    void deleteMember(Long memberId, Members member);
+    MembersResponseDto.UpdateOneSalaryDto updateOneSalary(
+            Long memberId, Members loginMember,
+            MembersRequestDto.UpdateOneSalaryDto requestDto);
 
-    Members findMember(Members member, Long memberId);
+    void deleteOne(Long memberId, Members member);
 
-    Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
+    Members findOne(Members member, Long memberId);
+
+    Map<String, MemberDepartment> findByMemberNameListExcludingDepartmentListAndIdList(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList);
 
     Members findAdmin(
             Long adminId, MemberRole role, MemberDepartment department);
-
-    MembersResponseDto.UpdateMemberSalaryResponseDto updateSalary(
-            Long memberId, Members loginMember,
-            MembersRequestDto.UpdateMemberSalaryRequestDto requestDto);
 
     void updateOnVacationFalse(String memberName);
 

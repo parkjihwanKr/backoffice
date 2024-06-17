@@ -18,7 +18,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateMembersResponseDto{
+    public static class CreateOneDto{
         // 접속 아이디
         private String memberName;
         // 실제 이름
@@ -33,8 +33,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadMemberResponseDto {
-
+    public static class ReadOneProfileDto {
         private String memberName;
         private String email;
         private String address;
@@ -42,13 +41,16 @@ public class MembersResponseDto {
         private Long loveCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        private Boolean onVacation;
+        private Integer remainingVacationDays;
+        private String profileImageUrl;
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberResponseDto{
+    public static class UpdateOneProfileDto{
         private String name;
         private String memberName;
         private String email;
@@ -64,7 +66,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberAttributeResponseDto{
+    public static class UpdateOneAttributeDto{
         private String memberName;
         private String fileName;
         private MemberRole memberRole;
@@ -76,7 +78,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberSalaryResponseDto {
+    public static class UpdateOneSalaryDto {
         private String memberName;
         private MemberRole memberRole;
         private MemberPosition memberPosition;
@@ -88,7 +90,7 @@ public class MembersResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UpdateMemberVacationDaysResponseDto {
+    public static class UpdateOneVacationDaysDto {
         // 잔여 휴가 일 수
         private Integer vacationDays;
     }
@@ -97,7 +99,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberProfileImageUrlResponseDto{
+    public static class UpdateOneProfileImageDto{
         private String fromMemberName;
         private String profileImageUrl;
     }
@@ -106,7 +108,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeleteMemberProfileImageResponseDto{
+    public static class DeleteOneProfileImageDto{
         private String fromMemberName;
     }
 }
