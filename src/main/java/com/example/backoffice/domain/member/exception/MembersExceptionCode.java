@@ -23,6 +23,8 @@ public enum MembersExceptionCode {
     RESTRICTED_ACCESS_MEMBER(HttpStatus.BAD_REQUEST, "MEMBER-014", "해당 멤버는 접근 권한이 없습니다."),
     INSUFFICIENT_VACATION_DAYS(HttpStatus.BAD_REQUEST, "MEMBER-015","해당 멤버는 충분한 휴가 일수가 없습니다."),
     NOT_FOUND_EXCEPTION_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER-016", "유효하지 않은 예외 처리 방법입니다."),
+    NOT_FOUND_DEPARTMENT(HttpStatus.BAD_REQUEST,"MEMBER-017","해당 부서는 존재하지 않습니다."),
+    NOT_FOUND_POSITION(HttpStatus.BAD_REQUEST,"MEMBER-018","해당 직책은 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;

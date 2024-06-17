@@ -30,24 +30,9 @@ public class MemberAspect {
     @AfterThrowing : 메서드가 예외 처리가 된 후
     */
 
-    // 각 멤버의 로그인이 아니라 Authentication.authenticate()는
-    // 인증된 사용자가 제대로 된 url로 접속해 들어가는지를 확인
-    // 즉, @AuthenticationPrincipal MemberDetails에 해당하는 적절한 값이 들어간 사용자에 대한 로그 기록
-    // AOP는 같은 패키지 내에 protected 메서드에 접근할 수 없음.
-    /*@AfterReturning(pointcut = "execution(* org.springframework.security.web.FilterChainProxy.doFilter(..))")
-    public void logAfterLogin(JoinPoint joinPoint) {
-        String username = (String) joinPoint.getArgs()[0];
-        auditLogService.saveLogEvent(
-                AuditLogType.LOGIN, username, username + "님이 로그인하셨습니다.");
-    }*/
-
-    // 각 멤버의 로그 아웃
-    /*@AfterReturning("execution(* org.springframework.security.web.authentication.logout.LogoutHandler.logout(..))")
-    public void logAfterLogout(JoinPoint joinPoint) {
-        String username = (String) joinPoint.getArgs()[0];
-        auditLogService.saveLogEvent(
-                AuditLogType.LOGOUT, username, username + "님이 로그아웃하셨습니다.");
-    }*/
+    // 로그인, 로그아웃 로직은 직접 로깅 -> private, protected 메서드이기에
+    // 해당 방법이 일관성, 가독성을 떨어트리고 유지 보수까지 엉망으로 한다는 것 앎.
+    // AOP를 지울 지 고민 중.
 
     // JoinPoint @Param MembersRequestDto.CreateMembersRequestDto requestDto
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.signup(..))")
@@ -58,8 +43,7 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogService.saveLogEvent(
-                AuditLogType.SIGNUP, requestDto.getMemberName(), message);
+        auditLogService.save(AuditLogType.SIGNUP, requestDto.getMemberName(), message);
     }
 
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateSalary(..))")
@@ -74,7 +58,7 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogService.saveLogEvent(
+        auditLogService.save(
                 AuditLogType.CHANGE_MEMBER_SALARY,
                 loginMember.getMemberName(), message);
     }
@@ -86,9 +70,8 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogService.saveLogEvent(
-                AuditLogType.DELETE_MEMBER,
-                loginMember.getMemberName(), message);
+        auditLogService.save(
+                AuditLogType.DELETE_MEMBER, loginMember.getMemberName(), message);
     }
 
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateAttribute(..))")
@@ -110,7 +93,7 @@ public class MemberAspect {
 
             commonAspect.getLogMessage(message);
 
-            auditLogService.saveLogEvent(
+            auditLogService.save(
                     AuditLogType.CHANGE_MEMBER_ATTRIBUTE,
                     loginMember.getMemberName(), message);
         }
@@ -124,7 +107,7 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogService.saveLogEvent(
+        auditLogService.save(
                 AuditLogType.UPLOAD_MEMBER_FILE,
                 loginMember.getMemberName(), message);
     }

@@ -26,15 +26,15 @@ public class FileAspect {
         if (methodName.equals("createFileForMemberRole")
                 || methodName.equals("createFileForBoard") || methodName.equals("createImage")) {
             message = loginMemberName + "님이 파일을 생성하셨습니다.";
-            auditLogService.saveLogEvent(
+            auditLogService.save(
                     AuditLogType.CREATE_FILE, loginMemberName, message);
         } else if (methodName.equals("deleteFile") || methodName.equals("deleteImage")) {
             message = loginMemberName + "님이 파일을 삭제하셨습니다.";
-            auditLogService.saveLogEvent(
+            auditLogService.save(
                     AuditLogType.DELETE_FILE, loginMemberName, message);
         } else {
             message = loginMemberName + "님이 알 수 없는 메서드를 불렀습니다.";
-            auditLogService.saveLogEvent(
+            auditLogService.save(
                     AuditLogType.FILE_ERROR, loginMemberName, message);
         }
         commonAspect.getLogMessage(message);
