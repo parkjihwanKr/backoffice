@@ -6,10 +6,10 @@ import com.example.backoffice.global.audit.entity.AuditLogType;
 public class AuditLogConverter {
 
     public static AuditLog toEntity(
-            AuditLogType auditLogType, String username, String details) {
+            AuditLogType auditLogType, String memberName, String details) {
         return AuditLog.builder()
                 .auditLogType(auditLogType)
-                .username(username)
+                .memberName(memberName)
                 .details(details)
                 .build();
     }
