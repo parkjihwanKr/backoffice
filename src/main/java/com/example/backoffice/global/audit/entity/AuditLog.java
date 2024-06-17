@@ -21,6 +21,6 @@ public class AuditLog extends CommonEntity {
     private String id;
     @Enumerated(EnumType.STRING)
     private AuditLogType auditLogType;
-    private String username;
+    private String memberName;
     private String details;
 }

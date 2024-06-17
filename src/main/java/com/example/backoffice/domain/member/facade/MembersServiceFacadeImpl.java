@@ -310,4 +310,18 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
                 throw new SchedulerCustomException(GlobalExceptionCode.NOT_FOUND_SCHEDULER_EVENT_TYPE);
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByDepartment(String department){
+        MemberDepartment memberDepartment = MembersConverter.toDepartment(department);
+        return membersService.findAllByDepartment(memberDepartment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByPosition(String position){
+        MemberPosition memberPosition = MembersConverter.toPosition(position);
+        return membersService.findAllByPosition(memberPosition);
+    }
 }

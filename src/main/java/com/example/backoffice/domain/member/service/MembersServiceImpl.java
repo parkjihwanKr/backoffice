@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.member.service;
 
+import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
@@ -131,5 +132,17 @@ public class MembersServiceImpl implements MembersService{
             MemberDepartment department, MemberPosition position){
         return membersRepository.findByDepartmentAndPosition(department, position).orElseThrow(
                 ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByDepartment(MemberDepartment department){
+        return membersRepository.findAllByDepartment(department);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByPosition(MemberPosition position){
+        return membersRepository.findAllByPosition(position);
     }
 }

@@ -52,4 +52,8 @@ public interface MembersServiceFacade {
     void updateOnVacationTrue(String memberName);
 
     void updateRemainingVacationDays(ScheduledEventType scheduledEventType);
+
+    List<Members> findAllByDepartment(String department);
+
+    List<Members> findAllByPosition(String position);
 }

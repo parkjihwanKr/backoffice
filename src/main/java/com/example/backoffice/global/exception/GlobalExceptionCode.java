@@ -34,6 +34,9 @@ public enum GlobalExceptionCode {
 
     // Scheduler
     NOT_FOUND_SCHEDULER_EVENT_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "SCHEDULER-001","해당 스케줄러에 없는 이벤트 타입입니다."),
+
+    // AuditLog
+    NOT_FOUND_AUDIT_LOG(HttpStatus.BAD_REQUEST, "AUDIT_LOG-001","해당 감사 로그를 찾을 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

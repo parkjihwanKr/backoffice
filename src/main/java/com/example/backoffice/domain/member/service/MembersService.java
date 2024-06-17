@@ -43,4 +43,8 @@ public interface MembersService {
 
     Members findByDepartmentAndPosition(
             MemberDepartment department, MemberPosition position);
+
+    List<Members> findAllByDepartment(MemberDepartment department);
+
+    List<Members> findAllByPosition(MemberPosition position);
 }

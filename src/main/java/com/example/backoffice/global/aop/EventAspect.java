@@ -33,7 +33,7 @@ public class EventAspect {
             message = "제목 : 긴급한 휴가 요청 / 이유 : "+ requestDto.getReason();
         }
         commonAspect.getLogMessage(message);
-        auditLogService.saveLogEvent(
+        auditLogService.save(
                 AuditLogType.CREATE_MEMBER_VACATION, member.getMemberName(), message);
     }
 
@@ -51,7 +51,7 @@ public class EventAspect {
             message = "제목 : 긴급한 휴가 요청 / 이유 : "+ requestDto.getReason();
         }
         commonAspect.getLogMessage(message);
-        auditLogService.saveLogEvent(
+        auditLogService.save(
                 AuditLogType.UPDATE_MEMBER_VACATION, member.getMemberName(), message);
     }
 }
