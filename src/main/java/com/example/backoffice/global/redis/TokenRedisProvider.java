@@ -2,7 +2,6 @@ package com.example.backoffice.global.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.lettuce.core.dynamic.annotation.CommandNaming;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,11 +18,12 @@ public class TokenRedisProvider {
 
     @Qualifier("redisTemplateForToken")
     private final RedisTemplate<String, Object> redisTemplateForToken;
-    public <T> void saveToken(String key, Integer minutes, T value){
+
+    public <T> void saveToken(String key, Integer minutes, T value) {
         String valueString = null;
-        try{
+        try {
             valueString = !(value instanceof String) ? objectMapper.writeValueAsString(value) : (String) value;
-        }catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             throw new RuntimeException();
         }
 
@@ -45,7 +45,7 @@ public class TokenRedisProvider {
         }
     }
 
-    public String getRefreshTokenValue(String key){
+    public String getRefreshTokenValue(String key) {
         // Long isExpiredRefreshToken = redisTemplateForToken.getExpire(key);
         return redisTemplateForToken.opsForValue().get(key).toString();
     }

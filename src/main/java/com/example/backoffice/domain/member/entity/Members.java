@@ -82,7 +82,7 @@ public class Members extends CommonEntity {
 
     public void updateMemberInfo(
             String name, String email, String address,
-            String contact, String introduction, String bCrytPassword){
+            String contact, String introduction, String bCrytPassword) {
         this.name = name;
         this.password = bCrytPassword;
         this.email = email;
@@ -91,39 +91,39 @@ public class Members extends CommonEntity {
         this.introduction = introduction;
     }
 
-    public void updateProfileImage(String profileImageUrl){
+    public void updateProfileImage(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
 
     public void updateAttribute(
-            MemberRole role, MemberDepartment department, MemberPosition position){
+            MemberRole role, MemberDepartment department, MemberPosition position) {
         this.role = role;
         this.department = department;
         this.position = position;
     }
 
-    public void updateSalary(Long salary){
+    public void updateSalary(Long salary) {
         this.salary = salary;
     }
 
-    public void addEmoji(Reactions reaction){
+    public void addEmoji(Reactions reaction) {
         this.reactionList.add(reaction);
         this.loveCount++;
     }
 
-    public void deleteEmoji(){
+    public void deleteEmoji() {
         this.loveCount--;
     }
 
-    public void updateOnVacation(Boolean onVacation){
+    public void updateOnVacation(Boolean onVacation) {
         this.onVacation = onVacation;
     }
 
-    public void updateRemainingVacation(){
+    public void updateRemainingVacation() {
         this.remainingVacationDays++;
     }
 
-    public void updateRemainingVacationYearly(){
+    public void updateRemainingVacationYearly() {
         this.remainingVacationDays += 5;
     }
 }

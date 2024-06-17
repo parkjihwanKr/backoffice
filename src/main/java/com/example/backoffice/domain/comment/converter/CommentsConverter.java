@@ -10,7 +10,7 @@ public class CommentsConverter {
 
     public static Comments toEntity(
             CommentsRequestDto.CreateCommentsRequestDto requestDto,
-            Boards board, Members member){
+            Boards board, Members member) {
         return Comments.builder()
                 .member(member)
                 .board(board)
@@ -21,7 +21,7 @@ public class CommentsConverter {
     }
 
     public static CommentsResponseDto.CreateCommentsResponseDto toCreateDto(
-            Comments comment, Members member){
+            Comments comment, Members member) {
         return CommentsResponseDto.CreateCommentsResponseDto.builder()
                 .writer(member.getMemberName())
                 .content(comment.getContent())
@@ -30,7 +30,7 @@ public class CommentsConverter {
     }
 
     public static CommentsResponseDto.UpdateCommentsResponseDto toUpdateDto(
-            Comments comment, Members member){
+            Comments comment, Members member) {
         return CommentsResponseDto.UpdateCommentsResponseDto.builder()
                 .writer(member.getMemberName())
                 .content(comment.getContent())
@@ -43,7 +43,7 @@ public class CommentsConverter {
 
     public static Comments toChildEntity(
             CommentsRequestDto.CreateReplyRequestDto requestDto,
-            Boards board, Members member){
+            Boards board, Members member) {
         return Comments.builder()
                 .member(member)
                 .board(board)
@@ -54,7 +54,7 @@ public class CommentsConverter {
     }
 
     public static CommentsResponseDto.CreateReplyResponseDto toCreateReplyDto(
-            Comments parentComment, Comments childComment, Members member){
+            Comments parentComment, Comments childComment, Members member) {
         return CommentsResponseDto.CreateReplyResponseDto.builder()
                 .toMemberName(parentComment.getMember().getMemberName())
                 .parentContent(parentComment.getContent())
@@ -66,7 +66,7 @@ public class CommentsConverter {
     }
 
     public static CommentsResponseDto.UpdateReplyResponseDto UpdateReplyDto(
-            Comments parentComment, Comments childComment, Members member){
+            Comments parentComment, Comments childComment, Members member) {
         return CommentsResponseDto.UpdateReplyResponseDto.builder()
                 .toMemberName(parentComment.getMember().getMemberName())
                 .parentContent(parentComment.getContent())

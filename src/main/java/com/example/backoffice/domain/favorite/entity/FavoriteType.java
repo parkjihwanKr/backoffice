@@ -11,11 +11,11 @@ public enum FavoriteType {
 
     private final String domainType;
 
-    FavoriteType(String domainType){
+    FavoriteType(String domainType) {
         this.domainType = domainType;
     }
 
-    public static class DomainLabel{
+    public static class DomainLabel {
         private static final String BOARD = "FAVORITE_BOARD";
         private static final String EVENT = "FAVORITE_EVENT";
         private static final String COMMENT = "FAVORITE_COMMENT";

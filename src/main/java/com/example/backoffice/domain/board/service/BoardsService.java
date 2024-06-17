@@ -13,14 +13,18 @@ import java.util.List;
 public interface BoardsService {
 
     Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable);
+
     BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId);
+
     BoardsResponseDto.CreateBoardResponseDto createBoard(
             Members member, BoardsRequestDto.CreateBoardRequestDto requestDto,
             List<MultipartFile> files);
+
     BoardsResponseDto.UpdateBoardResponseDto updateBoard(
             Long boardId, Members member,
             BoardsRequestDto.UpdateBoardRequestDto requestDto,
-            List <MultipartFile> files);
+            List<MultipartFile> files);
+
     void deleteBoard(Long boardId, Members member);
 
     Boards findById(Long boardId);

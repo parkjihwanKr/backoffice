@@ -20,7 +20,7 @@ public class NotificationsConverter {
 
     public static Notifications toEntity(
             String toMemberName, String fromMemberName, String message,
-            NotificationType notificationType, MemberDepartment memberDepartment){
+            NotificationType notificationType, MemberDepartment memberDepartment) {
         return Notifications.builder()
                 .toMemberName(toMemberName)
                 .fromMemberName(fromMemberName)
@@ -34,7 +34,7 @@ public class NotificationsConverter {
     public static NotificationData toNotificationData(
             Members toMember, Members fromMember,
             Boards board, Comments comment, Comments reply, Events event,
-            String message){
+            String message) {
         return NotificationData.builder()
                 .toMember(toMember)
                 .fromMember(fromMember)
@@ -47,7 +47,7 @@ public class NotificationsConverter {
     }
 
     public static NotificationsResponseDto.ReadNotificationResponseDto toReadOneDto(
-            Notifications notification){
+            Notifications notification) {
 
         return NotificationsResponseDto.ReadNotificationResponseDto.builder()
                 .fromMemberName(notification.getFromMemberName())
@@ -61,7 +61,7 @@ public class NotificationsConverter {
 
     public static NotificationsResponseDto.CreateNotificationListResponseDto toCreateDto(
             Members mainAdmin, Set<MemberDepartment> memberDepartmentSet,
-            List<Notifications> notificationList, String message){
+            List<Notifications> notificationList, String message) {
         List<String> toMemberNameList = new ArrayList<>();
         for (Notifications notification : notificationList) {
             toMemberNameList.add(
@@ -77,7 +77,7 @@ public class NotificationsConverter {
     }
 
     public static Page<NotificationsResponseDto.ReadNotificationListResponseDto> toReadListDto(
-            Page<Notifications> notificationPage){
+            Page<Notifications> notificationPage) {
         return notificationPage.map(
                 notification -> NotificationsResponseDto.ReadNotificationListResponseDto.builder()
                         .toMemberName(notification.getToMemberName())
@@ -88,7 +88,7 @@ public class NotificationsConverter {
     }
 
     public static List<NotificationsResponseDto.ReadNotificationListResponseDto> toReadAllDto(
-            List<Notifications> notificationList){
+            List<Notifications> notificationList) {
         return notificationList.stream()
                 .map(notification -> NotificationsResponseDto.ReadNotificationListResponseDto.builder()
                         .toMemberName(notification.getToMemberName())

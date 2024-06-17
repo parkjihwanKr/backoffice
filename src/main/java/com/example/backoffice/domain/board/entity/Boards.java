@@ -3,8 +3,8 @@ package com.example.backoffice.domain.board.entity;
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.entity.Files;
-import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -61,37 +61,37 @@ public class Boards extends CommonEntity {
     private List<Files> fileList = new ArrayList<>();
 
     // entity method
-    public void incrementViewCount(){
+    public void incrementViewCount() {
         this.viewCount++;
     }
 
-    public void update(BoardsRequestDto.UpdateBoardRequestDto requestDto){
+    public void update(BoardsRequestDto.UpdateBoardRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
     }
 
-    public void addComment(Comments comment){
+    public void addComment(Comments comment) {
         commentList.add(comment);
     }
 
-    public void addReply(Comments reply){
-        commentList.get(commentList.size()-1).getReplyList().add(reply);
+    public void addReply(Comments reply) {
+        commentList.get(commentList.size() - 1).getReplyList().add(reply);
     }
 
-    public void addEmoji(Reactions reaction, String emoji){
+    public void addEmoji(Reactions reaction, String emoji) {
         reactionList.add(reaction);
-        if(emoji.equals("LIKE")){
+        if (emoji.equals("LIKE")) {
             this.likeCount++;
-        }else if(emoji.equals("UNLIKE")){
+        } else if (emoji.equals("UNLIKE")) {
             this.unLikeCount++;
         }
     }
 
-    public void deleteEmoji(String emoji){
-        if(emoji.equals("LIKE")){
+    public void deleteEmoji(String emoji) {
+        if (emoji.equals("LIKE")) {
             this.likeCount--;
         }
-        if(emoji.equals("UNLIKE")){
+        if (emoji.equals("UNLIKE")) {
             this.unLikeCount--;
         }
     }

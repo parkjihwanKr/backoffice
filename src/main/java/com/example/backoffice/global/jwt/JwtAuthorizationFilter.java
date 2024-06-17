@@ -2,7 +2,6 @@ package com.example.backoffice.global.jwt;
 
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
-import com.example.backoffice.global.redis.RedisProvider;
 import com.example.backoffice.global.redis.TokenRedisProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,7 +31,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = jwtProvider.getJwtFromHeader(request);
         log.info("doFilterInternal!!");
-        log.info("accessToken : "+accessToken);
+        log.info("accessToken : " + accessToken);
         if (StringUtils.hasText(accessToken)) {
             JwtStatus jwtStatus = jwtProvider.validateToken(accessToken);
             switch (jwtStatus) {
@@ -48,9 +47,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private void successValidatedToken(String accessToken) {
         Authentication authentication = jwtProvider.getAuthentication(accessToken);
         String authName = authentication.getName();
-        String refreshTokenKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+authName;
+        String refreshTokenKey = JwtProvider.REFRESH_TOKEN_HEADER + " : " + authName;
         // RefreshToken : name
-        if(!tokenRedisProvider.existsByUsername(refreshTokenKey)){
+        if (!tokenRedisProvider.existsByUsername(refreshTokenKey)) {
             return;
         }
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();

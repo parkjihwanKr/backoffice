@@ -48,33 +48,33 @@ public class Comments extends CommonEntity {
     private List<Reactions> reactionList;
 
     // entity method
-    public void update(String content){
+    public void update(String content) {
         this.content = content;
     }
 
-    public void updateParent(Comments comment){
+    public void updateParent(Comments comment) {
         this.parent = comment;
     }
 
-    public void addReply(Comments reply){
+    public void addReply(Comments reply) {
         this.replyList.add(reply);
     }
 
-    public void addEmoji(Reactions reaction, String emoji){
+    public void addEmoji(Reactions reaction, String emoji) {
         reactionList.add(reaction);
-        if(emoji.equals("LIKE")){
+        if (emoji.equals("LIKE")) {
             this.likeCount++;
         }
-        if(emoji.equals("UNLIKE")){
+        if (emoji.equals("UNLIKE")) {
             this.unLikeCount++;
         }
     }
 
-    public void deleteEmoji(String emoji){
-        if(emoji.equals("LIKE")){
+    public void deleteEmoji(String emoji) {
+        if (emoji.equals("LIKE")) {
             this.likeCount--;
         }
-        if(emoji.equals("UNLIKE")){
+        if (emoji.equals("UNLIKE")) {
             this.unLikeCount--;
         }
     }

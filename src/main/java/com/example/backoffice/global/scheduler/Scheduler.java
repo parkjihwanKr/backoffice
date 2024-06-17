@@ -24,7 +24,7 @@ public class Scheduler {
     @Transactional
     // 초 분 시 일 월 요일
     @Scheduled(cron = "0 0 0 * * *")
-    public void updateMemberOnVacation(){
+    public void updateMemberOnVacation() {
         long year = (long) LocalDateTime.now().getYear();
         long month = (long) LocalDateTime.now().getMonthValue();
         long day = (long) LocalDateTime.now().getDayOfMonth();

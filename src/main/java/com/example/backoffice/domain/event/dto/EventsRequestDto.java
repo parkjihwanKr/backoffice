@@ -2,7 +2,6 @@ package com.example.backoffice.domain.event.dto;
 
 import com.example.backoffice.domain.event.exception.annotation.UrgentReasonRequired;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

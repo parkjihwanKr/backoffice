@@ -29,7 +29,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
+public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1 {
 
     private final MembersService membersService;
     private final NotificationsServiceFacade notificationsServiceFacade;
@@ -41,7 +41,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Override
     @Transactional
     public EventsResponseDto.CreateDepartmentEventResponseDto createDepartmentEvent(
-            Members loginMember, EventsRequestDto.CreateDepartmentEventsRequestDto requestDto){
+            Members loginMember, EventsRequestDto.CreateDepartmentEventsRequestDto requestDto) {
         membersService.findById(loginMember.getId());
 
         // 바로 오늘 이전의 날짜가 아니라면 일정을 생성할 수 있게
@@ -60,7 +60,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Override
     @Transactional(readOnly = true)
     public EventsResponseDto.ReadCompanyEventResponseDto readCompanyEvent(
-            Long eventId){
+            Long eventId) {
         Events event = eventsService.findById(eventId);
         return EventsConverter.toReadCompanyDto(event);
     }
@@ -68,7 +68,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Override
     @Transactional(readOnly = true)
     public List<EventsResponseDto.ReadCompanyEventResponseDto> readCompanyMonthEvent(
-            Long year, Long month){
+            Long year, Long month) {
         // 해당 날짜의 정보를 가지고 오는데
         // 만약 2024-05-31~06-02 또는 2024-06-23~07-02까지의 프로젝트라면?
         // 해당 이벤트를 가지고 오는지? 아닌지 확인해야함 -> 가져옴
@@ -80,7 +80,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Override
     @Transactional(readOnly = true)
     public List<List<EventsResponseDto.ReadCompanyEventResponseDto>> readCompanyYearEvent(
-            Long year){
+            Long year) {
         LocalDateTime start
                 = YearMonth.of(year.intValue(), 1).atDay(1).atStartOfDay();
         LocalDateTime end = YearMonth.of(year.intValue(), 12).atEndOfMonth().atTime(23, 59, 59);
@@ -93,7 +93,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Transactional
     public EventsResponseDto.UpdateDepartmentEventResponseDto updateDepartmentEvent(
             Long eventId, Members loginMember,
-            EventsRequestDto.UpdateDepartmentEventRequestDto requestDto){
+            EventsRequestDto.UpdateDepartmentEventRequestDto requestDto) {
         Events event = eventsService.findById(eventId);
 
         // 로그인 멤버의 부서와 요청한 이벤트를 수행할 부서가 같은지?
@@ -113,12 +113,12 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
-    public void deleteDepartmentEvent(Long eventId, Members loginMember){
+    public void deleteDepartmentEvent(Long eventId, Members loginMember) {
         // 검증
         membersService.findById(loginMember.getId());
         Events event = eventsService.findById(eventId);
-        if(!loginMember.getDepartment().equals(event.getDepartment())
-                || loginMember.getPosition().equals(MemberPosition.CEO)){
+        if (!loginMember.getDepartment().equals(event.getDepartment())
+                || loginMember.getPosition().equals(MemberPosition.CEO)) {
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
         }
         eventsService.deleteById(eventId);
@@ -127,7 +127,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Override
     @Transactional
     public EventsResponseDto.CreateVacationResponseDto createVacationEvent(
-            Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto){
+            Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto) {
         membersService.findById(loginMember.getId());
 
         EventDateRangeDto eventDateRangeDto
@@ -135,7 +135,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                 loginMember, requestDto.getStartDate(), requestDto.getEndDate(),
                 requestDto.getUrgent());
 
-        String message = loginMember.getMemberName()+"님의 휴가 요청";
+        String message = loginMember.getMemberName() + "님의 휴가 요청";
 
         Events event = EventsConverter.toEntity(
                 message, requestDto.getReason(),
@@ -150,7 +150,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Override
     @Transactional
     public List<EventsResponseDto.ReadVacationResponseDto> readVacationMonthEvent(
-            Long year, Long month, Members loginMember){
+            Long year, Long month, Members loginMember) {
         membersService.findById(loginMember.getId());
         List<Events> eventList = readMonthEvent(year, month, EventType.MEMBER_VACATION);
         return EventsConverter.toReadVacationMonthDto(eventList);
@@ -160,7 +160,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Transactional
     public EventsResponseDto.UpdateVacationResponseDto updateVacationEvent(
             Long vacationId, Members loginMember,
-            EventsRequestDto.UpdateVacationEventRequestDto requestDto){
+            EventsRequestDto.UpdateVacationEventRequestDto requestDto) {
         membersService.findById(loginMember.getId());
         Events vacation = eventsService.findById(vacationId);
 
@@ -174,7 +174,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
         sendUrgentEventForHRManager(requestDto.getUrgent(), loginMember, vacation);
 
-        String vacationTitle = loginMember.getMemberName()+ "님의 휴가 계획";
+        String vacationTitle = loginMember.getMemberName() + "님의 휴가 계획";
         vacation.update(vacationTitle, requestDto.getReason(), loginMember.getDepartment(),
                 eventDateRangeDto.getStartDate(), eventDateRangeDto.getEndDate(), EventType.MEMBER_VACATION);
 
@@ -183,7 +183,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
-    public void deleteVacationEvent(Long vacationId, Members loginMember){
+    public void deleteVacationEvent(Long vacationId, Members loginMember) {
         // 검증
         membersService.findById(loginMember.getId());
         eventsService.findById(vacationId);
@@ -232,31 +232,31 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     }
 
     private EventDateRangeDto validateVacationDate(
-            Members loginMember, String startDate, String endDate, Boolean urgent){
+            Members loginMember, String startDate, String endDate, Boolean urgent) {
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime startEventDate = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
         LocalDateTime endEventDate = LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
 
         // 1. 시작날이 7일 이전 일때 긴급함 표시가 없을 때
-        if(startEventDate.isBefore(now.plusDays(7)) && !urgent){
+        if (startEventDate.isBefore(now.plusDays(7)) && !urgent) {
             throw new EventsCustomException(
                     EventsExceptionCode.INVALID_START_DATE_OR_PRESS_URGENT_BUTTON);
         }
 
         // 2. 시작날이 7일 또는 7일 후일 때 긴급함 표시가 되어 있을 때
-        if((startEventDate.isEqual(now.plusDays(7))
-                || startEventDate.isAfter(now.plusDays(7))) && urgent){
+        if ((startEventDate.isEqual(now.plusDays(7))
+                || startEventDate.isAfter(now.plusDays(7))) && urgent) {
             throw new EventsCustomException(EventsExceptionCode.INVALID_URGENT);
         }
 
         // 3. 멤버의 잔여 휴가가 총 일수보다 길 때
         long vacationDays = Duration.between(startEventDate, endEventDate).toDays();
-        if(loginMember.getRemainingVacationDays() < (int)vacationDays){
+        if (loginMember.getRemainingVacationDays() < (int) vacationDays) {
             throw new EventsCustomException(EventsExceptionCode.INSUFFICIENT_VACATION_DAYS);
         }
         // 4. 휴가 총 설정이 30일이 넘어갈 때
-        if(vacationDays >= 30){
+        if (vacationDays >= 30) {
             throw new EventsCustomException(EventsExceptionCode.INVALID_VACATION_DAYS);
         }
 
@@ -269,14 +269,14 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         Long memberTotalCount = membersService.findMemberTotalCount();
 
         // startDate ~ endDate까지 해당 휴가 나가있는 이벤트를 list 출력
-        for(long i = 0; i<vacationDays; i++){
+        for (long i = 0; i < vacationDays; i++) {
             LocalDateTime customStartDate = startEventDate.plusDays(i);
             long vacationingMembersCount
                     = eventsService.countVacationingMembers(customStartDate);
 
             double vacationRate = (double) (vacationingMembersCount / memberTotalCount);
             // 긴급함 표시가 없고 전 직원 휴가율이 30%이상일 때
-            if(vacationRate > 0.3 && !urgent){
+            if (vacationRate > 0.3 && !urgent) {
                 throw new EventsCustomException(EventsExceptionCode.EXCEEDS_VACATION_RATE_LIMIT);
             }
         }
@@ -291,7 +291,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         }
     }
 
-    private List<Events> readMonthEvent(Long year, Long month, EventType eventType){
+    private List<Events> readMonthEvent(Long year, Long month, EventType eventType) {
         LocalDateTime start
                 = YearMonth.of(year.intValue(), month.intValue()).atDay(1).atStartOfDay();
         LocalDateTime end = start.plusMonths(1).minusNanos(1);
@@ -300,30 +300,31 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     }
 
     private void validateMemberPermission(
-            Members loginMember, Long vacationMemberId, EventCrudType eventCrudType){
+            Members loginMember, Long vacationMemberId, EventCrudType eventCrudType) {
         switch (eventCrudType) {
-            case UPDATE_VACATION : {
+            case UPDATE_VACATION: {
                 if (loginMember.getId().equals(vacationMemberId)) {
                     throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_UPDATE_EVENT);
                 }
             }
-            case DELETE_VACATION : {
+            case DELETE_VACATION: {
                 if (loginMember.getId().equals(vacationMemberId)) {
                     break;
-                }else if(loginMember.getPosition().equals(MemberPosition.MANAGER)
-                        && loginMember.getDepartment().equals(MemberDepartment.HR)){
+                } else if (loginMember.getPosition().equals(MemberPosition.MANAGER)
+                        && loginMember.getDepartment().equals(MemberDepartment.HR)) {
                     // 인사 부장이면 모든 멤버의 휴가를 삭제할 권한이 존재
                     break;
-                }else{
+                } else {
                     throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
                 }
             }
-            default: throw new EventsCustomException(EventsExceptionCode.INVALID_EVENT_CRUD_TYPE);
+            default:
+                throw new EventsCustomException(EventsExceptionCode.INVALID_EVENT_CRUD_TYPE);
         }
     }
 
-    private void sendUrgentEventForHRManager(Boolean urgent, Members loginMember, Events event){
-        if(urgent){
+    private void sendUrgentEventForHRManager(Boolean urgent, Members loginMember, Events event) {
+        if (urgent) {
             Members hrManager = membersService.findHRManager();
             notificationsServiceFacade.createNotification(
                     NotificationsConverter.toNotificationData(

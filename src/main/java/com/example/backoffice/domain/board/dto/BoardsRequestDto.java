@@ -31,7 +31,7 @@ public class BoardsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateImageBoardRequestDto{
+    public static class UpdateImageBoardRequestDto {
         private MultipartFile file;
     }
 }

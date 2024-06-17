@@ -24,7 +24,7 @@ public class FavoritiesController {
     @PostMapping("/favorities")
     public ResponseEntity<FavoritiesResponseDto.CreateFavoriteResponseDto> createFavorite(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody FavoritiesRequestDto.CreateFavoriteRequestDto requestDto){
+            @RequestBody FavoritiesRequestDto.CreateFavoriteRequestDto requestDto) {
         FavoritiesResponseDto.CreateFavoriteResponseDto responseDto
                 = favoritiesService.createFavorite(memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -34,7 +34,7 @@ public class FavoritiesController {
     @GetMapping("/favorities/{favoriteId}")
     public ResponseEntity<FavoritiesResponseDto.ReadFavoriteResponseDto> readFavorite(
             @PathVariable Long favoriteId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         FavoritiesResponseDto.ReadFavoriteResponseDto responseDto
                 = favoritiesService.readFavorite(favoriteId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -43,7 +43,7 @@ public class FavoritiesController {
     // 즐겨찾기 모두 조회
     @GetMapping("/favorities")
     public ResponseEntity<List<FavoritiesResponseDto.ReadFavoriteResponseDto>> readFavoriteList(
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         List<FavoritiesResponseDto.ReadFavoriteResponseDto> responseDtoList
                 = favoritiesService.readFavoriteList(memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
@@ -53,7 +53,7 @@ public class FavoritiesController {
     @DeleteMapping("/favorities")
     public ResponseEntity<CommonResponseDto<Void>> deleteFavorite(
             @RequestBody FavoritiesRequestDto.DeleteFavoriteIdListRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         favoritiesService.deleteFavorite(requestDto, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(

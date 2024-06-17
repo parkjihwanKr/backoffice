@@ -23,7 +23,7 @@ public class EventsConverter {
 
     public static Events toEntity(
             String title, String description,
-            EventDateRangeDto eventDateRangeDto, Members member, EventType eventType){
+            EventDateRangeDto eventDateRangeDto, Members member, EventType eventType) {
         return Events.builder()
                 .title(title)
                 .description(description)
@@ -34,7 +34,7 @@ public class EventsConverter {
                 .build();
     }
 
-    public static EventsResponseDto.CreateDepartmentEventResponseDto toCreateDepartmentDto(Events event){
+    public static EventsResponseDto.CreateDepartmentEventResponseDto toCreateDepartmentDto(Events event) {
         return EventsResponseDto.CreateDepartmentEventResponseDto.builder()
                 .title(event.getTitle())
                 .description(event.getDescription())
@@ -45,7 +45,7 @@ public class EventsConverter {
     }
 
     public static List<EventsResponseDto.ReadCompanyEventResponseDto> toReadCompanyMonthDto(
-            List<Events> eventList){
+            List<Events> eventList) {
         List<EventsResponseDto.ReadCompanyEventResponseDto> eventResponseDtoList = new ArrayList<>();
         for (Events events : eventList) {
             eventResponseDtoList.add(
@@ -86,7 +86,7 @@ public class EventsConverter {
     }
 
     public static EventsResponseDto.ReadCompanyEventResponseDto toReadCompanyDto(
-            Events event){
+            Events event) {
         return EventsResponseDto.ReadCompanyEventResponseDto.builder()
                 .title(event.getTitle())
                 .description(event.getDescription())
@@ -98,7 +98,7 @@ public class EventsConverter {
     }
 
     public static EventsResponseDto.UpdateDepartmentEventResponseDto toUpdateCompanyDto(
-            Events event){
+            Events event) {
         return EventsResponseDto.UpdateDepartmentEventResponseDto.builder()
                 .title(event.getTitle())
                 .description(event.getDescription())
@@ -111,7 +111,7 @@ public class EventsConverter {
     }
 
     public static EventsResponseDto.CreateVacationResponseDto toCreateVacationDto(
-            Events event, Boolean urgent){
+            Events event, Boolean urgent) {
         return EventsResponseDto.CreateVacationResponseDto.builder()
                 .title(event.getTitle())
                 .description(event.getDescription())
@@ -122,9 +122,9 @@ public class EventsConverter {
     }
 
     public static List<EventsResponseDto.ReadVacationResponseDto> toReadVacationMonthDto(
-            List<Events> eventList){
+            List<Events> eventList) {
         List<EventsResponseDto.ReadVacationResponseDto> responseDtoList = new ArrayList<>();
-        for(Events event : eventList){
+        for (Events event : eventList) {
             responseDtoList.add(
                     EventsResponseDto.ReadVacationResponseDto.builder()
                             .vacationMemberName(event.getMember().getMemberName())
@@ -137,7 +137,7 @@ public class EventsConverter {
     }
 
     public static EventsResponseDto.UpdateVacationResponseDto toUpdateVacationDto(
-            Events vacation, String memberName){
+            Events vacation, String memberName) {
         return EventsResponseDto.UpdateVacationResponseDto.builder()
                 .vacationMemberName(memberName)
                 .startDate(vacation.getStartDate())
@@ -146,9 +146,9 @@ public class EventsConverter {
     }
 
     public static List<EventsResponseDto.ReadVacationResponseDto> toReadVacationMemberListDto(
-            List<Events> eventList){
+            List<Events> eventList) {
         List<EventsResponseDto.ReadVacationResponseDto> responseDtoList = new ArrayList<>();
-        for(Events event : eventList){
+        for (Events event : eventList) {
             responseDtoList.add(
                     EventsResponseDto.ReadVacationResponseDto.builder()
                             .vacationMemberName(event.getMember().getMemberName())

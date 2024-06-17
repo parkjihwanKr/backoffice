@@ -1,9 +1,7 @@
 package com.example.backoffice.global.audit.service;
 
-import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.facade.MembersServiceFacade;
-import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.global.audit.converter.AuditLogConverter;
 import com.example.backoffice.global.audit.entity.AuditLog;
 import com.example.backoffice.global.audit.entity.AuditLogType;
@@ -27,7 +25,7 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Override
     @Transactional
     public void save(
-            AuditLogType auditLogType, String username, String details){
+            AuditLogType auditLogType, String username, String details) {
         AuditLog auditLog
                 = AuditLogConverter.toEntity(auditLogType, username, details);
         auditLogRepository.save(auditLog);
@@ -41,25 +39,25 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     @Override
     @Transactional(readOnly = true)
-    public AuditLog readOne(String auditLogId){
+    public AuditLog readOne(String auditLogId) {
         return auditLogRepository.findById(auditLogId).orElseThrow(
-                ()-> new AuditLogCustomException(GlobalExceptionCode.NOT_FOUND_AUDIT_LOG));
+                () -> new AuditLogCustomException(GlobalExceptionCode.NOT_FOUND_AUDIT_LOG));
     }
 
     // 특정인 조회
     @Override
     @Transactional(readOnly = true)
-    public AuditLog readMemberLog(String memberName){
+    public AuditLog readMemberLog(String memberName) {
         return findByMemberName(memberName);
     }
 
     // 부서에 따른 조회
     @Override
     @Transactional(readOnly = true)
-    public List<AuditLog> readByDepartment(String department){
+    public List<AuditLog> readByDepartment(String department) {
         List<Members> memberList = membersServiceFacade.findAllByDepartment(department);
         List<AuditLog> auditLogList = new ArrayList<>();
-        for(Members member : memberList){
+        for (Members member : memberList) {
             AuditLog auditLog = findByMemberName(member.getMemberName());
             auditLogList.add(auditLog);
         }
@@ -69,10 +67,10 @@ public class AuditLogServiceImpl implements AuditLogService {
     // 직위에 따른 조회
     @Override
     @Transactional
-    public List<AuditLog> readByPosition(String position){
+    public List<AuditLog> readByPosition(String position) {
         List<Members> memberList = membersServiceFacade.findAllByPosition(position);
         List<AuditLog> auditLogList = new ArrayList<>();
-        for(Members member : memberList){
+        for (Members member : memberList) {
             AuditLog auditLog = findByMemberName(member.getMemberName());
             auditLogList.add(auditLog);
         }
@@ -81,13 +79,13 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AuditLog> readAll(){
+    public List<AuditLog> readAll() {
         return auditLogRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public AuditLog findByMemberName(String memberName){
+    public AuditLog findByMemberName(String memberName) {
         return auditLogRepository.findByMemberName(memberName).orElseThrow(
-                ()-> new AuditLogCustomException(GlobalExceptionCode.NOT_FOUND_AUDIT_LOG));
+                () -> new AuditLogCustomException(GlobalExceptionCode.NOT_FOUND_AUDIT_LOG));
     }
 }

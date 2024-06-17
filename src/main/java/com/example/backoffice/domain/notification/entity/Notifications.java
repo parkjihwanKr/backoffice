@@ -34,7 +34,7 @@ public class Notifications extends CommonEntity {
     @Enumerated(EnumType.STRING)
     private MemberDepartment fromMemberDepartment;
 
-    public void isRead(){
+    public void isRead() {
         this.isRead = true;
     }
 }

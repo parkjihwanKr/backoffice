@@ -27,7 +27,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class ReactionsServiceImpl implements ReactionsService{
+public class ReactionsServiceImpl implements ReactionsService {
 
     private final ReactionsRepository reactionsRepository;
     private final MembersService membersService;
@@ -38,7 +38,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Override
     @Transactional
     public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction(
-            Long toMemberId, Members fromMember, ReactionsRequestDto requestDto){
+            Long toMemberId, Members fromMember, ReactionsRequestDto requestDto) {
         Members toMember
                 = membersService.checkMemberId(fromMember.getId(), toMemberId);
 
@@ -63,7 +63,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Override
     @Transactional
     public void deleteMemberReaction(
-            Long toMemberId, Long reactionId, Members fromMember){
+            Long toMemberId, Long reactionId, Members fromMember) {
         Members toMember
                 = membersService.checkMemberId(fromMember.getId(), toMemberId);
         if (!reactionsRepository.existsByIdAndMemberAndReactor(reactionId, toMember, fromMember)) {
@@ -78,14 +78,14 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public ReactionsResponseDto.CreateBoardReactionResponseDto createBoardReaction(
             Long boardId, Members fromMember,
-            ReactionsRequestDto requestDto){
+            ReactionsRequestDto requestDto) {
         Boards board = boardsService.findById(boardId);
         membersService.checkMemberId(
                 fromMember.getId(), board.getMember().getId());
         Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
-        if(reactionsRepository.existsByBoardAndReactor(
-                board, fromMember)){
+        if (reactionsRepository.existsByBoardAndReactor(
+                board, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
@@ -101,12 +101,12 @@ public class ReactionsServiceImpl implements ReactionsService{
 
     @Override
     @Transactional
-    public void deleteBoardReaction(Long boardId, Long reactionId, Members member){
+    public void deleteBoardReaction(Long boardId, Long reactionId, Members member) {
 
         // 1. 예외 검증
         Boards board = boardsService.findById(boardId);
         membersService.checkMemberId(member.getId(), board.getMember().getId());
-        if(!reactionsRepository.existsByIdAndBoardAndReactor(reactionId, board, member)){
+        if (!reactionsRepository.existsByIdAndBoardAndReactor(reactionId, board, member)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
 
@@ -120,7 +120,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public ReactionsResponseDto.CreateCommentReactionResponseDto createCommentReaction(
             Long boardId, Long commentId, Members fromMember,
-            ReactionsRequestDto requestDto){
+            ReactionsRequestDto requestDto) {
 
         // 1. 예외 처리
         Boards board = boardsService.findById(boardId);
@@ -128,8 +128,8 @@ public class ReactionsServiceImpl implements ReactionsService{
 
         Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
-        if(reactionsRepository.existsByCommentAndReactor(
-                comment, fromMember)){
+        if (reactionsRepository.existsByCommentAndReactor(
+                comment, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
@@ -145,12 +145,12 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Override
     @Transactional
     public void deleteCommentReaction(
-            Long commentId, Long reactionId, Members fromMember){
+            Long commentId, Long reactionId, Members fromMember) {
         Comments comment = commentsService.findById(commentId);
         Reactions reaction = findById(reactionId);
 
-        if(!reactionsRepository.existsByIdAndCommentAndReactor(
-                reactionId, comment, fromMember)){
+        if (!reactionsRepository.existsByIdAndCommentAndReactor(
+                reactionId, comment, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
         String commentEmoji = reaction.getEmoji().toString();
@@ -163,14 +163,14 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Transactional
     public ReactionsResponseDto.CreateReplyReactionResponseDto createReplyReaction(
             Long commentId, Long replyId, Members fromMember,
-            ReactionsRequestDto requestDto){
+            ReactionsRequestDto requestDto) {
         Comments comment = commentsService.findById(commentId);
         Comments reply = commentsService.findById(replyId);
 
         Emoji replyEmoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
-        if(reactionsRepository.existsByCommentAndReactor(
-                reply, fromMember)){
+        if (reactionsRepository.existsByCommentAndReactor(
+                reply, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
@@ -189,12 +189,12 @@ public class ReactionsServiceImpl implements ReactionsService{
     @Override
     @Transactional
     public void deleteReplyReaction(
-            Long replyId, Long reactionId, Members fromMember){
+            Long replyId, Long reactionId, Members fromMember) {
         Comments reply = commentsService.findById(replyId);
         Reactions reaction = findById(reactionId);
 
-        if(!reactionsRepository.existsByIdAndCommentAndReactor(
-                reactionId, reply, fromMember)){
+        if (!reactionsRepository.existsByIdAndCommentAndReactor(
+                reactionId, reply, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
 
@@ -217,9 +217,9 @@ public class ReactionsServiceImpl implements ReactionsService{
     }
 
 
-    public Reactions findById(Long reactionId){
+    public Reactions findById(Long reactionId) {
         return reactionsRepository.findById(reactionId).orElseThrow(
-                ()-> new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION)
+                () -> new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION)
         );
     }
 }

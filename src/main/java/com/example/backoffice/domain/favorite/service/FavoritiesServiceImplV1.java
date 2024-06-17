@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,19 +30,17 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
     @Override
     @Transactional
     public FavoritiesResponseDto.CreateFavoriteResponseDto createFavorite(
-            Members loginMembers, FavoritiesRequestDto.CreateFavoriteRequestDto requestDto){
+            Members loginMembers, FavoritiesRequestDto.CreateFavoriteRequestDto requestDto) {
 
         String targetType = requestDto.getTargetType();
         FavoriteType favoriteType = FavoritiesConverter.convertToFavoriteType(targetType);
         String domainTitle;
 
         switch (favoriteType) {
-            case BOARD ->
-                    domainTitle = boardsService.findById(requestDto.getTargetId()).getTitle();
-            case EVENT ->
-                    domainTitle = eventsService.findById(requestDto.getTargetId()).getTitle();
+            case BOARD -> domainTitle = boardsService.findById(requestDto.getTargetId()).getTitle();
+            case EVENT -> domainTitle = eventsService.findById(requestDto.getTargetId()).getTitle();
             case COMMENT, REPLY ->
-                    // 댓글과 대댓글은 제목이 없음으로 content를 가져옴
+                // 댓글과 대댓글은 제목이 없음으로 content를 가져옴
                     domainTitle = commentsService.findById(requestDto.getTargetId()).getContent();
             default -> throw new FavoritiesCustomException(FavoritiesExceptionCode.INVALID_FAVORITE_TYPE);
         }
@@ -57,9 +54,9 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
     @Override
     @Transactional(readOnly = true)
     public FavoritiesResponseDto.ReadFavoriteResponseDto readFavorite(
-            Long favoriteId, Members loginMember){
+            Long favoriteId, Members loginMember) {
         Favorities favorite = favoritiesRepository.findByIdAndMember(favoriteId, loginMember).orElseThrow(
-                ()-> new FavoritiesCustomException(FavoritiesExceptionCode.NO_PERMISSION_TO_READ_FAVORITE)
+                () -> new FavoritiesCustomException(FavoritiesExceptionCode.NO_PERMISSION_TO_READ_FAVORITE)
         );
         return FavoritiesConverter.toReadOneDto(favorite);
     }
@@ -67,7 +64,7 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
     @Override
     @Transactional(readOnly = true)
     public List<FavoritiesResponseDto.ReadFavoriteResponseDto> readFavoriteList(
-            Members loginMember){
+            Members loginMember) {
         List<Favorities> favoritieList = favoritiesRepository.findAllByMember(loginMember);
         return FavoritiesConverter.toReadListDto(favoritieList);
     }
@@ -75,7 +72,7 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
     @Override
     @Transactional
     public void deleteFavorite(
-            FavoritiesRequestDto.DeleteFavoriteIdListRequestDto requestDto, Members loginMember){
+            FavoritiesRequestDto.DeleteFavoriteIdListRequestDto requestDto, Members loginMember) {
         for (Long favoriteId : requestDto.getFavoriteIdList()) {
             try {
                 favoritiesRepository.deleteByIdAndMember(favoriteId, loginMember);
@@ -87,9 +84,9 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
 
     @Override
     @Transactional(readOnly = true)
-    public Favorities findById(Long favoriteId){
+    public Favorities findById(Long favoriteId) {
         return favoritiesRepository.findById(favoriteId).orElseThrow(
-                ()-> new FavoritiesCustomException(FavoritiesExceptionCode.NOT_FOUND_FAVORITIES)
+                () -> new FavoritiesCustomException(FavoritiesExceptionCode.NOT_FOUND_FAVORITIES)
         );
     }
 }

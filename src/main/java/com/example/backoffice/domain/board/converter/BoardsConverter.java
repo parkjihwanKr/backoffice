@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class BoardsConverter {
 
     public static Boards toEntity(
-            BoardsRequestDto.CreateBoardRequestDto requestDto, Members member){
+            BoardsRequestDto.CreateBoardRequestDto requestDto, Members member) {
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
@@ -27,7 +27,7 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static Page<BoardsResponseDto.ReadBoardListResponseDto> toReadDto(Page<Boards> boardPage){
+    public static Page<BoardsResponseDto.ReadBoardListResponseDto> toReadDto(Page<Boards> boardPage) {
         return boardPage.map(board -> {
             return BoardsResponseDto.ReadBoardListResponseDto.builder()
                     .title(board.getTitle())
@@ -104,7 +104,7 @@ public class BoardsConverter {
 
 
     public static BoardsResponseDto.CreateBoardResponseDto toCreateDto(
-            Boards board, List<String> fileUrlList){
+            Boards board, List<String> fileUrlList) {
 
         return BoardsResponseDto.CreateBoardResponseDto.builder()
                 .writer(board.getMember().getMemberName())
@@ -115,11 +115,11 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static BoardsResponseDto.UpdateBoardResponseDto toUpdateDto(Boards board, List<String> fileUrlList){
+    public static BoardsResponseDto.UpdateBoardResponseDto toUpdateDto(Boards board, List<String> fileUrlList) {
 
         List<CommentsResponseDto.UpdateCommentsResponseDto> commentList = new ArrayList<>();
-        if(!board.getCommentList().isEmpty()){
-            for(int i = 0; i<board.getCommentList().size(); i++){
+        if (!board.getCommentList().isEmpty()) {
+            for (int i = 0; i < board.getCommentList().size(); i++) {
                 commentList.add(
                         CommentsResponseDto.UpdateCommentsResponseDto.builder()
                                 .content(board.getCommentList().get(i).getContent())

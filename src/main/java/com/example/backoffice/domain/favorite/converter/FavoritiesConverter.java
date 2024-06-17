@@ -12,16 +12,16 @@ import java.util.List;
 
 public class FavoritiesConverter {
 
-    public static FavoriteType convertToFavoriteType(String targetType){
-        try{
+    public static FavoriteType convertToFavoriteType(String targetType) {
+        try {
             return FavoriteType.valueOf(targetType.toUpperCase());
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new FavoritiesCustomException(FavoritiesExceptionCode.INVALID_FAVORITE_TYPE);
         }
     }
 
     public static Favorities toEntity(
-            Members loginMember, FavoriteType favoriteType, String content){
+            Members loginMember, FavoriteType favoriteType, String content) {
         return Favorities.builder()
                 .favoriteType(favoriteType)
                 .member(loginMember)
@@ -30,7 +30,7 @@ public class FavoritiesConverter {
     }
 
     public static FavoritiesResponseDto.CreateFavoriteResponseDto toCreateDto(
-            Favorities favorite){
+            Favorities favorite) {
         return FavoritiesResponseDto.CreateFavoriteResponseDto.builder()
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
@@ -40,7 +40,7 @@ public class FavoritiesConverter {
     }
 
     public static FavoritiesResponseDto.ReadFavoriteResponseDto toReadOneDto(
-            Favorities favorite){
+            Favorities favorite) {
         return FavoritiesResponseDto.ReadFavoriteResponseDto.builder()
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
@@ -50,9 +50,9 @@ public class FavoritiesConverter {
     }
 
     public static List<FavoritiesResponseDto.ReadFavoriteResponseDto> toReadListDto(
-            List<Favorities> favoriteList){
+            List<Favorities> favoriteList) {
         List<FavoritiesResponseDto.ReadFavoriteResponseDto> responseDtoList = new ArrayList<>();
-        for(Favorities favorite : favoriteList){
+        for (Favorities favorite : favoriteList) {
             responseDtoList.add(
                     FavoritiesResponseDto.ReadFavoriteResponseDto.builder()
                             .favoriteContent(favorite.getContent())

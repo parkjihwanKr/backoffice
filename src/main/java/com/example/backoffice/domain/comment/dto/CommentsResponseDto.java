@@ -14,7 +14,7 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadBoardCommentResponseDto{
+    public static class ReadBoardCommentResponseDto {
         private Long commentId;
         private String commentWriter;
         private String commentContent;
@@ -29,7 +29,7 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateCommentsResponseDto{
+    public static class CreateCommentsResponseDto {
         private String writer;
         private String content;
         private LocalDateTime createdAt;
@@ -39,7 +39,7 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateCommentsResponseDto{
+    public static class UpdateCommentsResponseDto {
         private String writer;
         private String content;
         private Long likeCount;

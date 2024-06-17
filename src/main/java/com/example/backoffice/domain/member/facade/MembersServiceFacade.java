@@ -19,7 +19,7 @@ public interface MembersServiceFacade {
             Long memberId, Members member);
 
     MembersResponseDto.UpdateMemberResponseDto updateMember(
-            Long memberId,  Members Member,
+            Long memberId, Members Member,
             MembersRequestDto.UpdateMemberRequestDto requestDto);
 
     MembersResponseDto.UpdateMemberAttributeResponseDto updateAttribute(

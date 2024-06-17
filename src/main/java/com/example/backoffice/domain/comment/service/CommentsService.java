@@ -1,6 +1,5 @@
 package com.example.backoffice.domain.comment.service;
 
-import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;

@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,7 +21,7 @@ public class CommentsController {
     @PostMapping("/boards/{boardId}/comments")
     public ResponseEntity<CommentsResponseDto.CreateCommentsResponseDto> createComment(
             @RequestBody CommentsRequestDto.CreateCommentsRequestDto requestDto,
-            @PathVariable Long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @PathVariable Long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         CommentsResponseDto.CreateCommentsResponseDto responseDto =
                 commentsService.createComment(requestDto, boardId, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
@@ -32,7 +31,7 @@ public class CommentsController {
     public ResponseEntity<CommentsResponseDto.UpdateCommentsResponseDto> updateComment(
             @RequestBody CommentsRequestDto.UpdateCommentsRequestDto requestDto,
             @PathVariable Long boardId, @PathVariable Long commentId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         CommentsResponseDto.UpdateCommentsResponseDto responseDto =
                 commentsService.updateComment(boardId, commentId,
                         requestDto, memberDetails.getMembers());
@@ -42,7 +41,7 @@ public class CommentsController {
     @DeleteMapping("/boards/{boardId}/comments/{commentId}")
     public ResponseEntity<CommonResponse<Void>> deleteComment(
             @PathVariable Long boardId, @PathVariable Long commentId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         commentsService.deleteComment(boardId, commentId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
                 new CommonResponse<>(
@@ -56,7 +55,7 @@ public class CommentsController {
     public ResponseEntity<CommentsResponseDto.CreateReplyResponseDto> createReply(
             @PathVariable Long boardId, @PathVariable Long commentId,
             @RequestBody CommentsRequestDto.CreateReplyRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         CommentsResponseDto.CreateReplyResponseDto responseDto =
                 commentsService.createReply(boardId, commentId,
                         requestDto, memberDetails.getMembers());
@@ -67,7 +66,7 @@ public class CommentsController {
     public ResponseEntity<CommentsResponseDto.UpdateReplyResponseDto> updateReply(
             @PathVariable Long commentId, @PathVariable Long replyId,
             @RequestBody CommentsRequestDto.UpdateReplyRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         CommentsResponseDto.UpdateReplyResponseDto responseDto =
                 commentsService.updateReply(commentId, replyId,
                         requestDto, memberDetails.getMembers());
@@ -77,7 +76,7 @@ public class CommentsController {
     @DeleteMapping("/comments/{commentId}/replies/{replyId}")
     public ResponseEntity<CommonResponse<Void>> deleteReply(
             @PathVariable Long commentId, @PathVariable Long replyId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         commentsService.deleteReply(
                 commentId, replyId, memberDetails.getMembers());
         return ResponseEntity.ok().body(

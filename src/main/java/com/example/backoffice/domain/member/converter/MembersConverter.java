@@ -11,7 +11,7 @@ import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 
 public class MembersConverter {
 
-    public static Members toAdminEntity(String bcrytPassword){
+    public static Members toAdminEntity(String bcrytPassword) {
         return Members.builder()
                 .memberName("admin")
                 .name("admin")
@@ -27,6 +27,7 @@ public class MembersConverter {
                 .salary(20000000L)
                 .build();
     }
+
     public static Members toEntity(
             MembersRequestDto.CreateMembersRequestDto requestDto, String bcryptPassword) {
         return Members.builder()
@@ -43,7 +44,7 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.CreateMembersResponseDto toCreateDto(Members member){
+    public static MembersResponseDto.CreateMembersResponseDto toCreateDto(Members member) {
         return MembersResponseDto.CreateMembersResponseDto.builder()
                 .email(member.getEmail())
                 .memberName(member.getMemberName())
@@ -54,7 +55,7 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.ReadMemberResponseDto toReadDto(Members member){
+    public static MembersResponseDto.ReadMemberResponseDto toReadDto(Members member) {
         return MembersResponseDto.ReadMemberResponseDto.builder()
                 .email(member.getEmail())
                 .address(member.getAddress())
@@ -66,7 +67,7 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberResponseDto toUpdateDto(Members member){
+    public static MembersResponseDto.UpdateMemberResponseDto toUpdateDto(Members member) {
         return MembersResponseDto.UpdateMemberResponseDto.builder()
                 .memberName(member.getMemberName())
                 .name(member.getName())
@@ -80,7 +81,7 @@ public class MembersConverter {
     }
 
     public static MembersResponseDto.UpdateMemberAttributeResponseDto toUpdateAttributeDto(
-            Members member, String document){
+            Members member, String document) {
         return MembersResponseDto.UpdateMemberAttributeResponseDto.builder()
                 .memberName(member.getMemberName())
                 .fileName(document)
@@ -91,7 +92,7 @@ public class MembersConverter {
     }
 
     public static MembersResponseDto.UpdateMemberSalaryResponseDto toUpdateSalaryDto(
-            Members member){
+            Members member) {
         return MembersResponseDto.UpdateMemberSalaryResponseDto.builder()
                 .memberDepartment(member.getDepartment())
                 .memberName(member.getMemberName())
@@ -101,14 +102,14 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberProfileImageUrlResponseDto toUpdateProfileImageDto(Members member){
+    public static MembersResponseDto.UpdateMemberProfileImageUrlResponseDto toUpdateProfileImageDto(Members member) {
         return MembersResponseDto.UpdateMemberProfileImageUrlResponseDto.builder()
                 .fromMemberName(member.getMemberName())
                 .profileImageUrl(member.getProfileImageUrl())
                 .build();
     }
 
-    public static MembersResponseDto.DeleteMemberProfileImageResponseDto toDeleteProfileImageDto(Members member){
+    public static MembersResponseDto.DeleteMemberProfileImageResponseDto toDeleteProfileImageDto(Members member) {
         return MembersResponseDto.DeleteMemberProfileImageResponseDto.builder()
                 .fromMemberName(member.getMemberName())
                 .build();
@@ -123,9 +124,9 @@ public class MembersConverter {
         throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_DEPARTMENT);
     }
 
-    public static MemberPosition toPosition(String positionName){
-        for(MemberPosition position : MemberPosition.values()){
-            if(position.getPosition().equalsIgnoreCase(positionName)){
+    public static MemberPosition toPosition(String positionName) {
+        for (MemberPosition position : MemberPosition.values()) {
+            if (position.getPosition().equalsIgnoreCase(positionName)) {
                 return position;
             }
         }

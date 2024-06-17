@@ -22,7 +22,7 @@ public class MembersController {
 
     @PostMapping("/signup")
     public ResponseEntity<MembersResponseDto.CreateMembersResponseDto> signup(
-            @Valid @RequestBody MembersRequestDto.CreateMembersRequestDto requestDto){
+            @Valid @RequestBody MembersRequestDto.CreateMembersRequestDto requestDto) {
         MembersResponseDto.CreateMembersResponseDto responseDto
                 = membersServiceFacade.signup(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -31,20 +31,20 @@ public class MembersController {
     @GetMapping("/members/{memberId}/profile")
     public ResponseEntity<MembersResponseDto.ReadMemberResponseDto> readInfo(
             @PathVariable Long memberId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         MembersResponseDto.ReadMemberResponseDto responseDto
                 = membersServiceFacade.readInfo(
-                        memberId, memberDetails.getMembers());
+                memberId, memberDetails.getMembers());
         return ResponseEntity.ok(responseDto);
     }
 
     @PatchMapping("/members/{memberId}/profile")
     public ResponseEntity<MembersResponseDto.UpdateMemberResponseDto> updateMember(
             @PathVariable Long memberId, @RequestBody MembersRequestDto.UpdateMemberRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         MembersResponseDto.UpdateMemberResponseDto responseDto
                 = membersServiceFacade.updateMember(
-                        memberId, memberDetails.getMembers(), requestDto);
+                memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -54,7 +54,7 @@ public class MembersController {
     public ResponseEntity<CommonResponse<MembersResponseDto.UpdateMemberAttributeResponseDto>> updateAttribute(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @ModelAttribute MembersRequestDto.UpdateMemberAttributeRequestDto requestDto){
+            @ModelAttribute MembersRequestDto.UpdateMemberAttributeRequestDto requestDto) {
         MembersResponseDto.UpdateMemberAttributeResponseDto responseDto =
                 membersServiceFacade.updateAttribute(
                         memberId, memberDetails.getMembers(), requestDto);
@@ -70,7 +70,7 @@ public class MembersController {
     public ResponseEntity<MembersResponseDto.UpdateMemberSalaryResponseDto> updateSalary(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody MembersRequestDto.UpdateMemberSalaryRequestDto requestDto){
+            @RequestBody MembersRequestDto.UpdateMemberSalaryRequestDto requestDto) {
         MembersResponseDto.UpdateMemberSalaryResponseDto responseDto =
                 membersServiceFacade.updateSalary(
                         memberId, memberDetails.getMembers(), requestDto);
@@ -80,7 +80,7 @@ public class MembersController {
     @PatchMapping("/members/{memberId}/profileImage")
     public ResponseEntity<MembersResponseDto.UpdateMemberProfileImageUrlResponseDto> updateProfile(
             @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestParam("file")MultipartFile image){
+            @RequestParam("file") MultipartFile image) {
         MembersResponseDto.UpdateMemberProfileImageUrlResponseDto responseDto =
                 membersServiceFacade.updateProfileImageUrl(
                         memberId, memberDetails.getMembers(), image);
@@ -90,7 +90,7 @@ public class MembersController {
     @DeleteMapping("/members/{memberId}/profileImage")
     public ResponseEntity<MembersResponseDto.DeleteMemberProfileImageResponseDto> deleteProfile(
             @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        MembersResponseDto.DeleteMemberProfileImageResponseDto responseDto=
+        MembersResponseDto.DeleteMemberProfileImageResponseDto responseDto =
                 membersServiceFacade.deleteProfileImage(
                         memberId, memberDetails.getMembers());
         return ResponseEntity.ok(responseDto);
@@ -99,7 +99,7 @@ public class MembersController {
     @DeleteMapping("/members/{memberId}")
     public ResponseEntity<CommonResponse<Void>> deleteMember(
             @PathVariable Long memberId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         membersServiceFacade.deleteMember(memberId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "회원 삭제")

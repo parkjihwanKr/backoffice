@@ -10,18 +10,19 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 
 @Repository
-public class EventsRepositoryQueryImpl extends QuerydslRepositorySupport implements EventsRepositoryQuery{
+public class EventsRepositoryQueryImpl extends QuerydslRepositorySupport implements EventsRepositoryQuery {
 
     private final JPAQueryFactory jpaQueryFactory;
 
     QEvents qEvents = QEvents.events;
+
     public EventsRepositoryQueryImpl(JPAQueryFactory jpaQueryFactory) {
         super(Events.class);
         this.jpaQueryFactory = jpaQueryFactory;
     }
 
     @Override
-    public Long countVacationingMembers(LocalDateTime currentDate){
+    public Long countVacationingMembers(LocalDateTime currentDate) {
         // currentDate보다 작거나 같을 때 && currentDate보다 크거나 같을 때 && EventType.MEMBER_VACATION 일 때
         return jpaQueryFactory.selectFrom(qEvents)
                 .where(qEvents.eventType.eq(EventType.MEMBER_VACATION)

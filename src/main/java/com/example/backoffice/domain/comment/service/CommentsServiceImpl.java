@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CommentsServiceImpl implements CommentsService{
+public class CommentsServiceImpl implements CommentsService {
 
     private final CommentsRepository commentsRepository;
     private final BoardsService boardsService;
@@ -42,7 +42,7 @@ public class CommentsServiceImpl implements CommentsService{
     public CommentsResponseDto.UpdateCommentsResponseDto updateComment(
             Long boardId, Long commentId,
             CommentsRequestDto.UpdateCommentsRequestDto requestDto,
-            Members member){
+            Members member) {
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
@@ -56,7 +56,7 @@ public class CommentsServiceImpl implements CommentsService{
 
     @Override
     @Transactional
-    public void deleteComment(Long boardId, Long commentId, Members member){
+    public void deleteComment(Long boardId, Long commentId, Members member) {
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
@@ -71,7 +71,7 @@ public class CommentsServiceImpl implements CommentsService{
     public CommentsResponseDto.CreateReplyResponseDto createReply(
             Long boardId, Long commentId,
             CommentsRequestDto.CreateReplyRequestDto requestDto,
-            Members member){
+            Members member) {
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
@@ -91,7 +91,7 @@ public class CommentsServiceImpl implements CommentsService{
     public CommentsResponseDto.UpdateReplyResponseDto updateReply(
             Long commentId, Long replyId,
             CommentsRequestDto.UpdateReplyRequestDto requestDto,
-            Members member){
+            Members member) {
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
         Boards board = boardsService.findById(comment.getBoard().getId());
@@ -106,7 +106,7 @@ public class CommentsServiceImpl implements CommentsService{
 
     @Override
     @Transactional
-    public void deleteReply(Long commentId, Long replyId, Members member){
+    public void deleteReply(Long commentId, Long replyId, Members member) {
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
         Boards board = boardsService.findById(comment.getBoard().getId());
@@ -123,30 +123,30 @@ public class CommentsServiceImpl implements CommentsService{
 
     @Override
     @Transactional(readOnly = true)
-    public Comments findById(Long commentId){
+    public Comments findById(Long commentId) {
         return commentsRepository.findById(commentId).orElseThrow(
                 () -> new CommentsCustomException(CommentsExceptionCode.NOT_FOUND_COMMENT)
         );
     }
 
-    private void isMatchedBoard(Comments comment, Boards board){
-        if(!comment.getBoard().getId().equals(board.getId())){
+    private void isMatchedBoard(Comments comment, Boards board) {
+        if (!comment.getBoard().getId().equals(board.getId())) {
             throw new CommentsCustomException(
                     CommentsExceptionCode.NOT_MATCHED_BOARD_COMMENT
             );
         }
     }
 
-    private void isMatchedMember(Comments comment, Members member){
-        if(!comment.getMember().getId().equals(member.getId())){
+    private void isMatchedMember(Comments comment, Members member) {
+        if (!comment.getMember().getId().equals(member.getId())) {
             throw new CommentsCustomException(
                     CommentsExceptionCode.NOT_MATCHED_MEMBER_COMMENT
             );
         }
     }
 
-    private void isMatchedComment(Comments comment, Comments reply){
-        if(comment.getId().equals(reply.getId())){
+    private void isMatchedComment(Comments comment, Comments reply) {
+        if (comment.getId().equals(reply.getId())) {
             throw new CommentsCustomException(CommentsExceptionCode.IS_COMMENT);
         }
     }

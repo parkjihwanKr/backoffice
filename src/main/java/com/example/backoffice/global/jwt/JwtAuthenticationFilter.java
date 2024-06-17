@@ -61,13 +61,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = JwtProvider.REFRESH_TOKEN_HEADER;
         response.setHeader(refreshToken, tokenDto.getRefreshToken());
         tokenRedisProvider.saveToken(
-                refreshToken + " : "+username,
+                refreshToken + " : " + username,
                 Math.toIntExact(
                         jwtProvider.getRefreshTokenExpiration() / 1000),
                 tokenDto.getRefreshToken()
         );
-        log.info("AccessToken : "+tokenDto.getAccessToken());
-        log.info("RefreshToken : "+tokenDto.getRefreshToken());
+        log.info("AccessToken : " + tokenDto.getAccessToken());
+        log.info("RefreshToken : " + tokenDto.getRefreshToken());
         // response.setHeader(); 없을 때 넣어주는데, 중복된 토큰이 있으면 업데이트 해준다.
     }
 

@@ -30,7 +30,7 @@ public class BoardsController {
     // 게시글 전체 읽기
     @GetMapping
     public ResponseEntity<Page<BoardsResponseDto.ReadBoardListResponseDto>> readBoard(
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<BoardsResponseDto.ReadBoardListResponseDto> responseDtoList =
                 boardsService.readBoard(pageable);
         return ResponseEntity.ok(responseDtoList);
@@ -38,18 +38,18 @@ public class BoardsController {
 
     // 게시글 하나 읽기
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardsResponseDto.ReadBoardResponseDto> readOne(@PathVariable long boardId){
+    public ResponseEntity<BoardsResponseDto.ReadBoardResponseDto> readOne(@PathVariable long boardId) {
         BoardsResponseDto.ReadBoardResponseDto responseDto = boardsService.readOne(boardId);
         return ResponseEntity.ok(responseDto);
     }
 
     // 게시글 게시
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.MULTIPART_FORM_DATA_VALUE})
+            MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<BoardsResponseDto.CreateBoardResponseDto> createBoard(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") @Valid BoardsRequestDto.CreateBoardRequestDto requestDto,
-            @RequestPart(value = "files") List<MultipartFile> files){
+            @RequestPart(value = "files") List<MultipartFile> files) {
         BoardsResponseDto.CreateBoardResponseDto responseDto =
                 boardsService.createBoard(
                         memberDetails.getMembers(),
@@ -60,14 +60,14 @@ public class BoardsController {
     // 게시글 수정
     @PatchMapping(value = "/{boardId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.MULTIPART_FORM_DATA_VALUE })
+                    MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<BoardsResponseDto.UpdateBoardResponseDto> updateBoard(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") BoardsRequestDto.UpdateBoardRequestDto requestDto,
-            @RequestPart(value = "files") List<MultipartFile> files){
+            @RequestPart(value = "files") List<MultipartFile> files) {
         BoardsResponseDto.UpdateBoardResponseDto responseDto
                 = boardsService.updateBoard(
-                        boardId, memberDetails.getMembers(), requestDto, files);
+                boardId, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.ok(responseDto);
     }
 

@@ -47,6 +47,7 @@ public class BoardsResponseDto {
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
+
     @Getter
     @Builder
     @NoArgsConstructor

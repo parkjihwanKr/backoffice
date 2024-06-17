@@ -25,59 +25,59 @@ public class NotificationsServiceImpl implements NotificationsService {
 
     @Override
     @Transactional
-    public Notifications save(Notifications notification){
+    public Notifications save(Notifications notification) {
         return notificationRepository.save(notification);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Notifications findByIdAndToMemberName(String notificationId, String memberName){
+    public Notifications findByIdAndToMemberName(String notificationId, String memberName) {
         return notificationRepository.findByIdAndToMemberName(notificationId, memberName)
                 .orElseThrow(
-                        ()-> new NotificationsCustomException(NotificationsExceptionCode.NOT_FOUND_NOTIFICATION)
+                        () -> new NotificationsCustomException(NotificationsExceptionCode.NOT_FOUND_NOTIFICATION)
                 );
     }
 
     @Override
     @Transactional
-    public void deleteById(String notificationId){
+    public void deleteById(String notificationId) {
         notificationRepository.deleteById(notificationId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Notifications> findByToMemberName(String memberName, Pageable pageable){
+    public Page<Notifications> findByToMemberName(String memberName, Pageable pageable) {
         return notificationRepository.findByToMemberName(memberName, pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<Notifications> findByToMemberNameAndIsRead(
-            String memberName, Boolean isRead, Pageable pageable){
+            String memberName, Boolean isRead, Pageable pageable) {
         return notificationRepository.findByToMemberNameAndIsRead(memberName, isRead, pageable);
     }
 
     @Override
     @Transactional
-    public List<Notifications> saveAll(List<Notifications> notificationList){
+    public List<Notifications> saveAll(List<Notifications> notificationList) {
         return notificationRepository.saveAll(notificationList);
     }
 
     @Override
     @Transactional
-    public Notifications findById(String notificationId){
+    public Notifications findById(String notificationId) {
         return notificationRepository.findById(notificationId).orElseThrow(
-                ()-> new NotificationsCustomException(NotificationsExceptionCode.NOT_FOUND_NOTIFICATION)
+                () -> new NotificationsCustomException(NotificationsExceptionCode.NOT_FOUND_NOTIFICATION)
         );
     }
 
     @Override
     @Transactional
     public Notifications saveByMemberInfo(
-            String fromMemberName, String toMemberName, MemberDepartment fromMemberDepartment){
+            String fromMemberName, String toMemberName, MemberDepartment fromMemberDepartment) {
         Notifications notifications = NotificationsConverter.toEntity(
                 toMemberName, fromMemberName,
-                toMemberName+"님께서 최근 바뀐 정보가 있습니다.",
+                toMemberName + "님께서 최근 바뀐 정보가 있습니다.",
                 NotificationType.MEMBER, fromMemberDepartment);
         return notificationRepository.save(notifications);
     }

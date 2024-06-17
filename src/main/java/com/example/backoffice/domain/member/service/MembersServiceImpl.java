@@ -1,6 +1,5 @@
 package com.example.backoffice.domain.member.service;
 
-import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
@@ -18,75 +17,75 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MembersServiceImpl implements MembersService{
+public class MembersServiceImpl implements MembersService {
 
     private final MembersRepository membersRepository;
 
     // 타당성 검사 추가
     @Override
     @Transactional
-    public void signup(Members member){
+    public void signup(Members member) {
         membersRepository.save(member);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Members findById(Long memberId){
+    public Members findById(Long memberId) {
         return membersRepository.findById(memberId).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+                () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
         );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Members checkMemberId(Long fromMemberId, Long toMemberId){
-        if(toMemberId.equals(fromMemberId)){
+    public Members checkMemberId(Long fromMemberId, Long toMemberId) {
+        if (toMemberId.equals(fromMemberId)) {
             throw new MembersCustomException(MembersExceptionCode.MATCHED_LOGIN_MEMBER);
         }
         return membersRepository.findById(toMemberId).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+                () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
         );
     }
 
     @Override
     @Transactional(readOnly = true)
     public Members findByIdAndRoleAndDepartment(
-            Long adminId, MemberRole role, MemberDepartment department){
+            Long adminId, MemberRole role, MemberDepartment department) {
         return membersRepository.findByIdAndRoleAndDepartment(adminId, role, department)
                 .orElseThrow(
-                        ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
+                        () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
                 );
     }
 
     @Override
     @Transactional(readOnly = true)
     public Members findByEmailOrMemberNameOrAddressOrContact(
-            String email, String memberName, String address, String contact){
+            String email, String memberName, String address, String contact) {
         return membersRepository.findByEmailOrMemberNameOrAddressOrContact(
                 email, memberName, address, contact).orElse(null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Boolean existsById(Long memberId){
+    public Boolean existsById(Long memberId) {
         return membersRepository.existsById(memberId);
     }
 
     @Override
     @Transactional
-    public Members save(Members member){
+    public Members save(Members member) {
         return membersRepository.save(member);
     }
 
     @Override
     @Transactional
-    public void deleteById(Long memberId){
+    public void deleteById(Long memberId) {
         membersRepository.deleteById(memberId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Members> findAllById(List<Long> memberIdList){
+    public List<Members> findAllById(List<Long> memberIdList) {
         return membersRepository.findAllById(memberIdList);
     }
 
@@ -94,55 +93,55 @@ public class MembersServiceImpl implements MembersService{
     @Transactional(readOnly = true)
     public List<Members> findByDepartmentNotInAndIdNotIn(
             List<MemberDepartment> excludedDepartmentList,
-            List<Long> excludedIdList){
+            List<Long> excludedIdList) {
         return membersRepository.findByDepartmentNotInAndIdNotIn(
                 excludedDepartmentList, excludedIdList);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Members findHRManager(){
+    public Members findHRManager() {
         return membersRepository.findByPositionAndDepartment(
                 MemberPosition.MANAGER, MemberDepartment.HR).orElseThrow(
-                        () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+                () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Long findMemberTotalCount(){
+    public Long findMemberTotalCount() {
         return membersRepository.count();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByMemberName(String memberName){
+    public Members findByMemberName(String memberName) {
         return membersRepository.findByMemberName(memberName).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+                () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Members> findAll(){
+    public List<Members> findAll() {
         return membersRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Members findByDepartmentAndPosition(
-            MemberDepartment department, MemberPosition position){
+            MemberDepartment department, MemberPosition position) {
         return membersRepository.findByDepartmentAndPosition(department, position).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+                () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Members> findAllByDepartment(MemberDepartment department){
+    public List<Members> findAllByDepartment(MemberDepartment department) {
         return membersRepository.findAllByDepartment(department);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Members> findAllByPosition(MemberPosition position){
+    public List<Members> findAllByPosition(MemberPosition position) {
         return membersRepository.findAllByPosition(position);
     }
 }
