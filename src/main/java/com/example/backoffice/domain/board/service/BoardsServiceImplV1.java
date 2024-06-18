@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BoardsServiceImpl implements BoardsService{
+public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     private final BoardsRepository boardsRepository;
     private final FilesService filesService;
@@ -31,14 +31,14 @@ public class BoardsServiceImpl implements BoardsService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable){
+    public Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable){
         Page<Boards> boardList = boardsRepository.findAll(pageable);
-        return BoardsConverter.toReadDto(boardList);
+        return BoardsConverter.toReadAllDto(boardList);
     }
 
     @Override
     @Transactional
-    public BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId){
+    public BoardsResponseDto.ReadOneDto readOne(Long boardId){
         Boards board = findById(boardId);
         incrementViewCount(board);
         return BoardsConverter.toReadOneDto(board);
@@ -46,48 +46,47 @@ public class BoardsServiceImpl implements BoardsService{
 
     @Override
     @Transactional
-    public BoardsResponseDto.CreateBoardResponseDto createBoard(
-            Members member, BoardsRequestDto.CreateBoardRequestDto requestDto,
+    public BoardsResponseDto.CreateOneDto createOne(
+            Members member, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files){
         Boards board = BoardsConverter.toEntity(requestDto, member);
         List<String> fileUrlList = new ArrayList<>();
-        for(int i = 0; i<files.size(); i++) {
-            String fileName = filesService.createFileForBoard(files.get(i), board);
+        for (MultipartFile file : files) {
+            String fileName = filesService.createFileForBoard(file, board);
             fileUrlList.add(fileName);
         }
         boardsRepository.save(board);
-        return BoardsConverter.toCreateDto(board, fileUrlList);
+        return BoardsConverter.toCreateOneDto(board, fileUrlList);
     }
 
     @Override
     @Transactional
-    public BoardsResponseDto.UpdateBoardResponseDto updateBoard(
+    public BoardsResponseDto.UpdateOneDto updateOne(
             Long boardId, Members member,
-            BoardsRequestDto.UpdateBoardRequestDto requestDto,
+            BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files){
         Boards board = findById(boardId);
-        board.update(requestDto);
+        board.update(requestDto.getTitle(), requestDto.getContent());
         // 삭제 전 urlList, 삭제 후 urlList
         List<String> beforeFileUrlList = new ArrayList<>();
         List<String> afterFileUrlList = new ArrayList<>();
 
         for(int i = 0; i<board.getFileList().size(); i++){
             beforeFileUrlList.add(board.getFileList().get(i).getUrl());
-            System.out.println("fileUrlList.get(i) : "+beforeFileUrlList.get(i));
         }
         board.getFileList().clear();
         filesService.deleteFile(board.getId(), beforeFileUrlList);
-        for(int i = 0; i<files.size(); i++) {
+        for (MultipartFile file : files) {
             // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
-            String fileUrl = filesService.createFileForBoard(files.get(i), board);
+            String fileUrl = filesService.createFileForBoard(file, board);
             afterFileUrlList.add(fileUrl);
         }
-        return BoardsConverter.toUpdateDto(board, afterFileUrlList);
+        return BoardsConverter.toUpdateOneDto(board, afterFileUrlList);
     }
 
     @Override
     @Transactional
-    public void deleteBoard(Long boardId, Members member){
+    public void deleteOne(Long boardId, Members member){
         Boards board = findById(boardId);
         if(!member.getId().equals(board.getMember().getId())){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_MEMBER);

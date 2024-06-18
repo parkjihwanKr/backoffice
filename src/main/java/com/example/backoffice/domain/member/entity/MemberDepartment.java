@@ -8,7 +8,8 @@ public enum MemberDepartment {
     FINANCE(Department.FINANCE),
     IT(Department.IT),
     MARKETING(Department.MARKETING),
-    SALES(Department.SALES);
+    SALES(Department.SALES),
+    AUDIT(Department.AUDIT);
 
     private final String department;
 
@@ -17,10 +18,11 @@ public enum MemberDepartment {
     }
 
     public static class Department {
-        public static final String FINANCE = "ROLE_FINANCE";
-        public static final String IT = "ROLE_IT";
-        public static final String SALES = "ROLE_SALES";
-        public static final String MARKETING = "ROLE_MARKETING";
-        public static final String HR = "ROLE_HR";
+        public static final String FINANCE = "FINANCE_DEPARTMENT";
+        public static final String IT = "IT_DEPARTMENT";
+        public static final String SALES = "SALES_DEPARTMENT";
+        public static final String MARKETING = "MARKETING_DEPARTMENT";
+        public static final String HR = "HR_DEPARTMENT";
+        public static final String AUDIT = "AUDIT_DEPARTMENT";
     }
 }

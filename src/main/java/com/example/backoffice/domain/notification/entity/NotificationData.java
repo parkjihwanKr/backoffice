@@ -22,4 +22,5 @@ public class NotificationData {
     private Comments comment;
     private Comments reply;
     private Events event;
+    private String message;
 }

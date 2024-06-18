@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.member.service;
 
+import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
@@ -100,15 +101,6 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByRoleAndPosition(
-            MemberRole role, MemberPosition position) {
-        return membersRepository.findByRoleAndPosition(role, position).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
-        );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Members findHRManager(){
         return membersRepository.findByPositionAndDepartment(
                 MemberPosition.MANAGER, MemberDepartment.HR).orElseThrow(
@@ -123,7 +115,34 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public Long findVacationingMembersCount(){
-        return (long) membersRepository.findAllByOnVacation(true).size();
+    public Members findByMemberName(String memberName){
+        return membersRepository.findByMemberName(memberName).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAll(){
+        return membersRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByDepartmentAndPosition(
+            MemberDepartment department, MemberPosition position){
+        return membersRepository.findByDepartmentAndPosition(department, position).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByDepartment(MemberDepartment department){
+        return membersRepository.findAllByDepartment(department);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByPosition(MemberPosition position){
+        return membersRepository.findAllByPosition(position);
     }
 }

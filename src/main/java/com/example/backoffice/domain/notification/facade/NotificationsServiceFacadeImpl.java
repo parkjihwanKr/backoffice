@@ -2,7 +2,7 @@ package com.example.backoffice.domain.notification.facade;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.fascade.MembersServiceFacade;
+import com.example.backoffice.domain.member.facade.MembersServiceFacade;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.dto.NotificationsRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
@@ -31,7 +31,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
 
     @Override
     @Transactional
-    public NotificationsResponseDto.CreateNotificationResponseDto createNotification(
+    public void createNotification(
             NotificationData notificationData, NotificationType domainType){
 
         // 자기 자신에게 '사랑해요' -> 이미 ReactionException으로 막혀 있음.
@@ -39,15 +39,14 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
         // 알림은 저장하지 않고 자기 자신의 알림에 뜨지 않기에 return null
         if(notificationData.getToMember().getMemberName()
                 .equals(notificationData.getFromMember().getMemberName())){
-            return null;
+            return;
         }
         Notifications notification
                 = generateMessageAndEntity(notificationData, domainType);
         notificationsService.save(notification);
 
-        sendNotificationToUser(
+        sendNotificationForUser(
                 notificationData.getToMember().getMemberName(), notification);
-        return NotificationsConverter.toCreateOneDto(notification);
     }
 
     @Override
@@ -122,7 +121,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 notificationsService.save(notification);
                 memberDepartmentSet.add(memberDepartment);
                 notificationList.add(notification);
-                sendNotificationToUser(memberName, notification);
+                sendNotificationForUser(memberName, notification);
             }
         });
         // 해당 memberRoleList 테스트 후, 설정 예정
@@ -259,12 +258,22 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                         notificationData.getFromMember().getMemberName(),
                         urgentVacationMessage, domainType, notificationData.getFromMember().getDepartment());
             }
+            case URGENT_SERVER_ERROR -> {
+                String urgentServerIssueMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 긴급하게 서버 이슈 메세지를 전달하셨습니다. //"
+                        + notificationData.getMessage();
+                yield NotificationsConverter.toEntity(
+                        notificationData.getToMember().getMemberName(),
+                        notificationData.getFromMember().getMemberName(),
+                        urgentServerIssueMessage, domainType, notificationData.getFromMember().getDepartment());
+            }
 
             default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);
         };
     }
 
-    private void sendNotificationToUser(String toMemberName, Notifications notification){
+    private void sendNotificationForUser(String toMemberName, Notifications notification){
         simpMessagingTemplate.convertAndSendToUser(toMemberName, "/queue/notifications", notification);
     }
 }

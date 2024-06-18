@@ -2,8 +2,7 @@ package com.example.backoffice.domain.member.controller;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
-import com.example.backoffice.domain.member.fascade.MembersServiceFacade;
-import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.member.facade.MembersServiceFacade;
 import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;

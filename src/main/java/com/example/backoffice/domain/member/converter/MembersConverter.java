@@ -6,6 +6,8 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 
 public class MembersConverter {
 
@@ -110,5 +112,23 @@ public class MembersConverter {
         return MembersResponseDto.DeleteMemberProfileImageResponseDto.builder()
                 .fromMemberName(member.getMemberName())
                 .build();
+    }
+
+    public static MemberDepartment toDepartment(String departmentName) {
+        for (MemberDepartment department : MemberDepartment.values()) {
+            if (department.getDepartment().equalsIgnoreCase(departmentName)) {
+                return department;
+            }
+        }
+        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_DEPARTMENT);
+    }
+
+    public static MemberPosition toPosition(String positionName){
+        for(MemberPosition position : MemberPosition.values()){
+            if(position.getPosition().equalsIgnoreCase(positionName)){
+                return position;
+            }
+        }
+        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_POSITION);
     }
 }

@@ -3,7 +3,6 @@ package com.example.backoffice.domain.notification.facade;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.notification.dto.NotificationsRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
-import com.example.backoffice.domain.notification.entity.Notifications;
 import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import org.springframework.data.domain.Page;
@@ -12,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface NotificationsServiceFacade {
-    NotificationsResponseDto.CreateNotificationResponseDto createNotification(
+    void createNotification(
             NotificationData notificationData, NotificationType domainType);
 
     NotificationsResponseDto.ReadNotificationResponseDto readOne(

@@ -1,4 +1,4 @@
-package com.example.backoffice.domain.member.fascade;
+package com.example.backoffice.domain.member.facade;
 
 import com.example.backoffice.domain.file.service.FilesService;
 import com.example.backoffice.domain.member.converter.MembersConverter;
@@ -13,6 +13,9 @@ import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.service.NotificationsService;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.SchedulerCustomException;
+import com.example.backoffice.global.scheduler.ScheduledEventType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +75,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
                 case CONTACT
                         -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
                 case NULL
-                        -> log.info("Not Found Exception!");
+                        -> throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_EXCEPTION_TYPE);
             }
         }
 
@@ -120,13 +123,12 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
 
         if(!loginMember.getPosition().equals(MemberPosition.MANAGER)){
             // 해당 조건을 달성하지 못하면
-            if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
-                    && loginMember.getPosition().equals(MemberPosition.CEO)){
+            if(!loginMember.getPosition().equals(MemberPosition.CEO)){
                 throw new MembersCustomException(
                         MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
-            membersService.findByRoleAndPosition(
-                    loginMember.getRole(), loginMember.getPosition());
+            membersService.findByDepartmentAndPosition(
+                    loginMember.getDepartment(), loginMember.getPosition());
         } else{
             if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
                     && !loginMember.getRole().equals(MemberRole.ADMIN)){
@@ -272,5 +274,54 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
             return MembersExceptionEnum.MEMBER_NAME;
         }
         return MembersExceptionEnum.NULL;
+    }
+
+    @Override
+    @Transactional
+    public void updateOnVacationFalse(String memberName){
+        Members member = membersService.findByMemberName(memberName);
+        member.updateOnVacation(false);
+    }
+
+    @Override
+    @Transactional
+    public void updateOnVacationTrue(String memberName){
+        Members member = membersService.findByMemberName(memberName);
+        member.updateOnVacation(true);
+    }
+
+    @Override
+    @Transactional
+    public void updateRemainingVacationDays(
+            ScheduledEventType scheduledEventType){
+        List<Members> memberList = membersService.findAll();
+        switch (scheduledEventType) {
+            case MONTHLY_UPDATE -> {
+                for(Members member : memberList){
+                    member.updateRemainingVacation();
+                }
+            }
+            case YEARLY_UPDATE -> {
+                for(Members member : memberList){
+                    member.updateRemainingVacationYearly();
+                }
+            }
+            default ->
+                throw new SchedulerCustomException(GlobalExceptionCode.NOT_FOUND_SCHEDULER_EVENT_TYPE);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByDepartment(String department){
+        MemberDepartment memberDepartment = MembersConverter.toDepartment(department);
+        return membersService.findAllByDepartment(memberDepartment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByPosition(String position){
+        MemberPosition memberPosition = MembersConverter.toPosition(position);
+        return membersService.findAllByPosition(memberPosition);
     }
 }
