@@ -1,7 +1,7 @@
 package com.example.backoffice.domain.reaction.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.board.service.BoardsService;
+import com.example.backoffice.domain.board.service.BoardsServiceV1;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.comment.service.CommentsService;
 import com.example.backoffice.domain.member.entity.Members;
@@ -31,7 +31,7 @@ public class ReactionsServiceImpl implements ReactionsService{
 
     private final ReactionsRepository reactionsRepository;
     private final MembersService membersService;
-    private final BoardsService boardsService;
+    private final BoardsServiceV1 boardsService;
     private final CommentsService commentsService;
     private final NotificationsServiceFacade notificationsServiceFacade;
 

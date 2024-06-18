@@ -16,7 +16,7 @@ public class BoardsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadBoardListResponseDto {
+    public static class ReadAllDto {
         private String title;
         private String writer;
         private String content;
@@ -31,7 +31,7 @@ public class BoardsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadBoardResponseDto {
+    public static class ReadOneDto {
 
         // Members.membername
         private String writer;
@@ -51,7 +51,7 @@ public class BoardsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateBoardResponseDto {
+    public static class CreateOneDto {
         private String writer;
         private String title;
         private String content;
@@ -63,7 +63,7 @@ public class BoardsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateBoardResponseDto {
+    public static class UpdateOneDto {
         private String title;
         private String content;
         private String writer;
@@ -74,18 +74,5 @@ public class BoardsResponseDto {
         private Long viewCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateImageBoardResponseDto {
-        private String title;
-        private String content;
-        private String writer;
-        private List<Comments> commentList;
-        private Long likeCount;
-        private LocalDateTime createdAt;
     }
 }

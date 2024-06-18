@@ -1,7 +1,7 @@
 package com.example.backoffice.domain.comment.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.board.service.BoardsService;
+import com.example.backoffice.domain.board.service.BoardsServiceV1;
 import com.example.backoffice.domain.comment.converter.CommentsConverter;
 import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentsServiceImpl implements CommentsService{
 
     private final CommentsRepository commentsRepository;
-    private final BoardsService boardsService;
+    private final BoardsServiceV1 boardsService;
 
     @Override
     @Transactional
