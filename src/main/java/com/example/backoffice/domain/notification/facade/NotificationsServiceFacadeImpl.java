@@ -2,7 +2,7 @@ package com.example.backoffice.domain.notification.facade;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.facade.MembersServiceFacade;
+import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.dto.NotificationsRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
@@ -26,7 +26,7 @@ import java.util.*;
 public class NotificationsServiceFacadeImpl implements NotificationsServiceFacade {
 
     private final NotificationsService notificationsService;
-    private final MembersServiceFacade membersServiceFacade;
+    private final MembersServiceFacadeV1 membersServiceFacade;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
@@ -54,7 +54,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
     public NotificationsResponseDto.ReadNotificationResponseDto readOne(
             Long memberId, String notificationId, Members member){
         // 1. 로그인 사용자와 일치하는지
-        membersServiceFacade.findMember(member, memberId);
+        membersServiceFacade.findOne(member, memberId);
 
         // 2. 해당 알림이 존재하는지
         Notifications notification
@@ -71,7 +71,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
             Long memberId, NotificationsRequestDto.DeleteNotificationRequestDto requestDto,
             Members member){
         // 1. 로그인 사용자와 일치하는지
-        membersServiceFacade.findMember(member, memberId);
+        membersServiceFacade.findOne(member, memberId);
         // 2. 해당 알림이 존재하는지
         for (String id : requestDto.getNotificationIds()) {
             String notificationId
@@ -101,7 +101,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
         // 2. excludedIdList가 null이면 오류가 뜸 -> 빈칸 리스트가 들어갈 수 있게 조정 o
         // 3. Notifcation jpaRepository에 왜 들어가는지 모르겠음. -> test settings 때문
         Map<String, MemberDepartment> memberNamesAndDepartment
-                = membersServiceFacade.findMemberNameListExcludingDepartmentListAndIdList(
+                = membersServiceFacade.findByMemberNameListExcludingDepartmentListAndIdList(
                 requestDto.getExcludedMemberDepartment(), requestDto.getExcludedMemberIdList());
 
         Set<MemberDepartment> memberDepartmentSet = new HashSet<>();
@@ -134,7 +134,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
-                = membersServiceFacade.findMember(member, memberId);
+                = membersServiceFacade.findOne(member, memberId);
 
         Page<Notifications> notificationPage
                 = notificationsService.findByToMemberName(
@@ -150,7 +150,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
-                = membersServiceFacade.findMember(member, memberId);
+                = membersServiceFacade.findOne(member, memberId);
 
         Page<Notifications> notificationPage
                 = notificationsService.findByToMemberNameAndIsRead(
@@ -165,7 +165,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
-                = membersServiceFacade.findMember(member, memberId);
+                = membersServiceFacade.findOne(member, memberId);
 
         Page<Notifications> notificationPage
                 = notificationsService.findByToMemberNameAndIsRead(
@@ -180,7 +180,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
             Long memberId, Members member){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
-                = membersServiceFacade.findMember(member, memberId);
+                = membersServiceFacade.findOne(member, memberId);
 
         List<Notifications> notificationList
                 = notificationsService.findByToMemberNameAndIsRead(

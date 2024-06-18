@@ -1,6 +1,5 @@
 package com.example.backoffice.domain.member.service;
 
-import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
@@ -18,11 +17,10 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MembersServiceImpl implements MembersService{
+public class MembersServiceImplV1 implements MembersServiceV1 {
 
     private final MembersRepository membersRepository;
 
-    // 타당성 검사 추가
     @Override
     @Transactional
     public void signup(Members member){

@@ -35,10 +35,10 @@ public class MemberAspect {
     // AOP를 지울 지 고민 중.
 
     // JoinPoint @Param MembersRequestDto.CreateMembersRequestDto requestDto
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.signup(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.signup(..))")
     public void logAfterSignup(JoinPoint joinPoint) {
-        MembersRequestDto.CreateMembersRequestDto requestDto
-                = (MembersRequestDto.CreateMembersRequestDto) joinPoint.getArgs()[0];
+        MembersRequestDto.CreateOneDto requestDto
+                = (MembersRequestDto.CreateOneDto) joinPoint.getArgs()[0];
         String message = requestDto.getMemberName() + "님이 회원가입을 진행하셨습니다.";
 
         commonAspect.getLogMessage(message);
@@ -46,11 +46,11 @@ public class MemberAspect {
         auditLogService.save(AuditLogType.SIGNUP, requestDto.getMemberName(), message);
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateSalary(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneSalary(..))")
     public void logAfterUpdateSalary(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
-        MembersRequestDto.UpdateMemberSalaryRequestDto requestDto =
-                (MembersRequestDto.UpdateMemberSalaryRequestDto) joinPoint.getArgs()[2];
+        MembersRequestDto.UpdateOneSalaryDto requestDto =
+                (MembersRequestDto.UpdateOneSalaryDto) joinPoint.getArgs()[2];
         String message
                 = loginMember.getMemberName() + "님이 "
                 + requestDto.getMemberName() + "님의 급여를 "
@@ -63,7 +63,7 @@ public class MemberAspect {
                 loginMember.getMemberName(), message);
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.deleteMember(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.deleteOne(..))")
     public void logAfterDeleteMember(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName() + "님이 회원 탈퇴하셨습니다.";
@@ -74,11 +74,11 @@ public class MemberAspect {
                 AuditLogType.DELETE_MEMBER, loginMember.getMemberName(), message);
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateAttribute(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneAttribute(..))")
     public void logAfterUpdateMemberAttribute(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
-        MembersRequestDto.UpdateMemberAttributeRequestDto requestDto =
-                (MembersRequestDto.UpdateMemberAttributeRequestDto) joinPoint.getArgs()[2];
+        MembersRequestDto.UpdateOneAttributeDto requestDto =
+                (MembersRequestDto.UpdateOneAttributeDto) joinPoint.getArgs()[2];
 
         if (requestDto.getSalary() != null
                 && requestDto.getPosition() != null && requestDto.getDepartment() != null) {
@@ -99,7 +99,7 @@ public class MemberAspect {
         }
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateProfileImageUrl(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneProfileImage(..))")
     public void logAfterUpdateMemberProfileImageUrl(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName()

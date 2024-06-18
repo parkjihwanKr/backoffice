@@ -1,37 +1,8 @@
 package com.example.backoffice.domain.member;
 
-import com.example.backoffice.domain.file.service.FilesService;
-import com.example.backoffice.domain.member.converter.MembersConverter;
-import com.example.backoffice.domain.member.dto.MembersRequestDto;
-import com.example.backoffice.domain.member.dto.MembersResponseDto;
-import com.example.backoffice.domain.member.entity.MemberRole;
-import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.exception.MembersCustomException;
-import com.example.backoffice.domain.member.exception.MembersExceptionCode;
-import com.example.backoffice.domain.member.repository.MembersRepository;
-import com.example.backoffice.domain.member.service.MembersServiceImpl;
-import com.example.backoffice.global.security.MemberDetailsImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-test.yml")
