@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FavoritiesServiceImplV1 implements FavoritiesService {
+public class FavoritiesServiceImplV1 implements FavoritiesServiceV1 {
 
     private final BoardsServiceV1 boardsService;
     private final EventsService eventsService;
@@ -29,8 +29,8 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
 
     @Override
     @Transactional
-    public FavoritiesResponseDto.CreateFavoriteResponseDto createFavorite(
-            Members loginMembers, FavoritiesRequestDto.CreateFavoriteRequestDto requestDto){
+    public FavoritiesResponseDto.CreateOneDto createOne(
+            Members loginMembers, FavoritiesRequestDto.CreateOneDto requestDto){
 
         String targetType = requestDto.getTargetType();
         FavoriteType favoriteType = FavoritiesConverter.convertToFavoriteType(targetType);
@@ -50,12 +50,12 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
         Favorities favorities
                 = FavoritiesConverter.toEntity(loginMembers, favoriteType, domainTitle);
         favoritiesRepository.save(favorities);
-        return FavoritiesConverter.toCreateDto(favorities);
+        return FavoritiesConverter.toCreateOneDto(favorities);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public FavoritiesResponseDto.ReadFavoriteResponseDto readFavorite(
+    public FavoritiesResponseDto.ReadOneDto readOne(
             Long favoriteId, Members loginMember){
         Favorities favorite = favoritiesRepository.findByIdAndMember(favoriteId, loginMember).orElseThrow(
                 ()-> new FavoritiesCustomException(FavoritiesExceptionCode.NO_PERMISSION_TO_READ_FAVORITE)
@@ -65,16 +65,16 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FavoritiesResponseDto.ReadFavoriteResponseDto> readFavoriteList(
+    public List<FavoritiesResponseDto.ReadOneDto> readAll(
             Members loginMember){
         List<Favorities> favoritieList = favoritiesRepository.findAllByMember(loginMember);
-        return FavoritiesConverter.toReadListDto(favoritieList);
+        return FavoritiesConverter.toReadAllDto(favoritieList);
     }
 
     @Override
     @Transactional
-    public void deleteFavorite(
-            FavoritiesRequestDto.DeleteFavoriteIdListRequestDto requestDto, Members loginMember){
+    public void delete(
+            FavoritiesRequestDto.DeleteDto requestDto, Members loginMember){
         for (Long favoriteId : requestDto.getFavoriteIdList()) {
             try {
                 favoritiesRepository.deleteByIdAndMember(favoriteId, loginMember);

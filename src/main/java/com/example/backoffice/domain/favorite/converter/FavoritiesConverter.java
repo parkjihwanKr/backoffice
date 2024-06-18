@@ -29,9 +29,9 @@ public class FavoritiesConverter {
                 .build();
     }
 
-    public static FavoritiesResponseDto.CreateFavoriteResponseDto toCreateDto(
+    public static FavoritiesResponseDto.CreateOneDto toCreateOneDto(
             Favorities favorite){
-        return FavoritiesResponseDto.CreateFavoriteResponseDto.builder()
+        return FavoritiesResponseDto.CreateOneDto.builder()
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
                 .createdAt(favorite.getCreatedAt())
@@ -39,9 +39,9 @@ public class FavoritiesConverter {
                 .build();
     }
 
-    public static FavoritiesResponseDto.ReadFavoriteResponseDto toReadOneDto(
+    public static FavoritiesResponseDto.ReadOneDto toReadOneDto(
             Favorities favorite){
-        return FavoritiesResponseDto.ReadFavoriteResponseDto.builder()
+        return FavoritiesResponseDto.ReadOneDto.builder()
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
                 .createdAt(favorite.getCreatedAt())
@@ -49,12 +49,12 @@ public class FavoritiesConverter {
                 .build();
     }
 
-    public static List<FavoritiesResponseDto.ReadFavoriteResponseDto> toReadListDto(
+    public static List<FavoritiesResponseDto.ReadOneDto> toReadAllDto(
             List<Favorities> favoriteList){
-        List<FavoritiesResponseDto.ReadFavoriteResponseDto> responseDtoList = new ArrayList<>();
+        List<FavoritiesResponseDto.ReadOneDto> responseDtoList = new ArrayList<>();
         for(Favorities favorite : favoriteList){
             responseDtoList.add(
-                    FavoritiesResponseDto.ReadFavoriteResponseDto.builder()
+                    FavoritiesResponseDto.ReadOneDto.builder()
                             .favoriteContent(favorite.getContent())
                             .createdAt(favorite.getCreatedAt())
                             .modifiedAt(favorite.getModifiedAt()).build()
