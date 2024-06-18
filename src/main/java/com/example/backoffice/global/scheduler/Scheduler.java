@@ -2,7 +2,7 @@ package com.example.backoffice.global.scheduler;
 
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.facade.EventsServiceFacadeV1;
-import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
+import com.example.backoffice.domain.member.facade.MembersServiceFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Scheduler {
 
-    private final MembersServiceFacadeV1 membersServiceFacade;
+    private final MembersServiceFacade membersServiceFacade;
     private final EventsServiceFacadeV1 eventsServiceFacade;
 
     // 매일 오전 00시마다 member 휴가 상태 체크
