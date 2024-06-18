@@ -1,12 +1,14 @@
 package com.example.backoffice.domain.member.entity;
 
-import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.member.dto.MembersRequestDto;
-import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.domain.event.entity.Events;
+import com.example.backoffice.domain.favorite.entity.Favorities;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -49,22 +51,59 @@ public class Members extends CommonEntity {
 
     private String introduction;
 
+    private Long loveCount;
+
+    // 직책
+    @Column
+    @Enumerated(EnumType.STRING)
+    private MemberPosition position;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private MemberDepartment department;
+
+    // 급여
+    private Long salary;
+
+    // 휴가, 해당 부분은 21억 넘을 이유 없음.
+    private Integer remainingVacationDays;
+
+    // 휴가 상태
+    private Boolean onVacation;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reactions> reactionList;
 
-    private Long loveCount;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Events> eventList;
 
-    public void updateMemberInfo(MembersRequestDto.UpdateMemberRequestDto requestDto, String bCrytPassword){
-        this.name = requestDto.getName();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorities> favoritieList;
+
+    public void updateMemberInfo(
+            String name, String email, String address,
+            String contact, String introduction, String bCrytPassword){
+        this.name = name;
         this.password = bCrytPassword;
-        this.email = requestDto.getEmail();
-        this.address = requestDto.getAddress();
-        this.contact = requestDto.getContact();
-        this.introduction = requestDto.getIntroduction();
+        this.email = email;
+        this.address = address;
+        this.contact = contact;
+        this.introduction = introduction;
     }
 
     public void updateProfileImage(String profileImageUrl){
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateAttribute(
+            MemberRole role, MemberDepartment department, MemberPosition position){
+        this.role = role;
+        this.department = department;
+        this.position = position;
+    }
+
+    public void updateSalary(Long salary){
+        this.salary = salary;
     }
 
     public void addEmoji(Reactions reaction){
@@ -74,5 +113,17 @@ public class Members extends CommonEntity {
 
     public void deleteEmoji(){
         this.loveCount--;
+    }
+
+    public void updateOnVacation(Boolean onVacation){
+        this.onVacation = onVacation;
+    }
+
+    public void updateRemainingVacation(){
+        this.remainingVacationDays++;
+    }
+
+    public void updateRemainingVacationYearly(){
+        this.remainingVacationDays += 5;
     }
 }

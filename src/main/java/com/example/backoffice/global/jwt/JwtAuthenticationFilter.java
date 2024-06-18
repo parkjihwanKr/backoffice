@@ -3,7 +3,7 @@ package com.example.backoffice.global.jwt;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.jwt.dto.TokenDto;
-import com.example.backoffice.global.redis.RedisProvider;
+import com.example.backoffice.global.redis.TokenRedisProvider;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -14,18 +14,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtProvider jwtProvider;
-    private final RedisProvider redisProvider;
+    private final TokenRedisProvider tokenRedisProvider;
 
-    public JwtAuthenticationFilter(JwtProvider jwtProvider, RedisProvider redisProvider) {
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, TokenRedisProvider tokenRedisProvider) {
         this.jwtProvider = jwtProvider;
-        this.redisProvider = redisProvider;
+        this.tokenRedisProvider = tokenRedisProvider;
         setFilterProcessesUrl("/api/v1/login");
     }
 
@@ -61,7 +60,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setHeader(JwtProvider.AUTHORIZATION_HEADER, tokenDto.getAccessToken());
         String refreshToken = JwtProvider.REFRESH_TOKEN_HEADER;
         response.setHeader(refreshToken, tokenDto.getRefreshToken());
-        redisProvider.saveToken(
+        tokenRedisProvider.saveToken(
                 refreshToken + " : "+username,
                 Math.toIntExact(
                         jwtProvider.getRefreshTokenExpiration() / 1000),

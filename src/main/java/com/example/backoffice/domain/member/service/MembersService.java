@@ -1,36 +1,50 @@
 package com.example.backoffice.domain.member.service;
 
-import com.example.backoffice.domain.member.dto.MembersRequestDto;
-import com.example.backoffice.domain.member.dto.MembersResponseDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.global.security.MemberDetailsImpl;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface MembersService {
 
-    MembersResponseDto.CreateMembersResponseDto signup(
-            MembersRequestDto.CreateMembersRequestDto requestDto);
+    void signup(Members member);
 
-    MembersResponseDto.ReadMemberResponseDto readMemberInfo(
-            Long memberId, Members member);
+    Members findById(Long memberId);
 
-    MembersResponseDto.UpdateMemberResponseDto updateMember(
-            Long memberId,  Members Member,
-            MembersRequestDto.UpdateMemberRequestDto requestDto);
+    Members checkMemberId(Long toMemberId, Long fromMemberId);
 
-    MembersResponseDto.UpdateMemberRoleResponseDto updateMemberRole(
-            Long memberId, Members member,
-            MultipartFile file);
+    Members findByEmailOrMemberNameOrAddressOrContact(
+            String email, String memberName, String address, String contact);
 
-    MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateMemberProfileImageUrl(
-            Long memberId, Members member, MultipartFile image);
+    Boolean existsById(Long memberId);
 
-    MembersResponseDto.DeleteMemberProfileImageResponseDto deleteMemberProfileImage(
-            Long memberId, Members member);
+    Members save(Members member);
 
-    void deleteMember(Long memberId, Members member);
+    void deleteById(Long memberId);
 
-    Members findMember(Members member, Long memberId);
+    List<Members> findAllById(List<Long> memberIdList);
 
-    Members validateMember(Long toMemberId, Long fromMemberId);
+    List<Members> findByDepartmentNotInAndIdNotIn(
+            List<MemberDepartment> excludedDepartmentList,
+            List<Long> excludedIdList);
+
+    Members findByIdAndRoleAndDepartment(
+            Long adminId, MemberRole role, MemberDepartment department);
+
+    Members findHRManager();
+
+    Long findMemberTotalCount();
+
+    Members findByMemberName(String memberName);
+
+    List<Members> findAll();
+
+    Members findByDepartmentAndPosition(
+            MemberDepartment department, MemberPosition position);
+
+    List<Members> findAllByDepartment(MemberDepartment department);
+
+    List<Members> findAllByPosition(MemberPosition position);
 }

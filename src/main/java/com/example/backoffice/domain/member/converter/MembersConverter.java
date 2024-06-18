@@ -2,8 +2,12 @@ package com.example.backoffice.domain.member.converter;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 
 public class MembersConverter {
 
@@ -11,12 +15,16 @@ public class MembersConverter {
         return Members.builder()
                 .memberName("admin")
                 .name("admin")
+                .loveCount(0L)
                 .role(MemberRole.ADMIN)
                 .email("admin@test.com")
                 .address("admin시 admin동")
                 .introduction("admin이다")
+                .department(MemberDepartment.HR)
                 .password(bcrytPassword)
                 .contact("010-0000-0000")
+                .position(MemberPosition.CEO)
+                .salary(20000000L)
                 .build();
     }
     public static Members toEntity(
@@ -25,6 +33,8 @@ public class MembersConverter {
                 .memberName(requestDto.getMemberName())
                 .name(requestDto.getName()) // 이름을 name으로 설정하는 것이 맞는지 확인
                 .role(MemberRole.USER) // 역할 설정, MemberRole.USER 또는 직접 설정
+                .department(MemberDepartment.HR)
+                .position(MemberPosition.INTERN)
                 .email(requestDto.getEmail())
                 .address(requestDto.getAddress())
                 .loveCount(0L)
@@ -69,10 +79,25 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberRoleResponseDto toUpdateRoleDto(Members member, String document){
-        return MembersResponseDto.UpdateMemberRoleResponseDto.builder()
-                .fromMemberName(member.getMemberName())
+    public static MembersResponseDto.UpdateMemberAttributeResponseDto toUpdateAttributeDto(
+            Members member, String document){
+        return MembersResponseDto.UpdateMemberAttributeResponseDto.builder()
+                .memberName(member.getMemberName())
                 .fileName(document)
+                .memberPosition(member.getPosition())
+                .memberRole(member.getRole())
+                .memberDepartment(member.getDepartment())
+                .build();
+    }
+
+    public static MembersResponseDto.UpdateMemberSalaryResponseDto toUpdateSalaryDto(
+            Members member){
+        return MembersResponseDto.UpdateMemberSalaryResponseDto.builder()
+                .memberDepartment(member.getDepartment())
+                .memberName(member.getMemberName())
+                .memberRole(member.getRole())
+                .memberPosition(member.getPosition())
+                .changedSalary(member.getSalary())
                 .build();
     }
 
@@ -87,5 +112,23 @@ public class MembersConverter {
         return MembersResponseDto.DeleteMemberProfileImageResponseDto.builder()
                 .fromMemberName(member.getMemberName())
                 .build();
+    }
+
+    public static MemberDepartment toDepartment(String departmentName) {
+        for (MemberDepartment department : MemberDepartment.values()) {
+            if (department.getDepartment().equalsIgnoreCase(departmentName)) {
+                return department;
+            }
+        }
+        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_DEPARTMENT);
+    }
+
+    public static MemberPosition toPosition(String positionName){
+        for(MemberPosition position : MemberPosition.values()){
+            if(position.getPosition().equalsIgnoreCase(positionName)){
+                return position;
+            }
+        }
+        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_POSITION);
     }
 }

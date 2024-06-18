@@ -3,7 +3,7 @@ package com.example.backoffice.global.config;
 import com.example.backoffice.global.jwt.JwtAuthenticationFilter;
 import com.example.backoffice.global.jwt.JwtAuthorizationFilter;
 import com.example.backoffice.global.jwt.JwtProvider;
-import com.example.backoffice.global.redis.RedisProvider;
+import com.example.backoffice.global.redis.TokenRedisProvider;
 import com.example.backoffice.global.security.CustomLogoutHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import java.util.Arrays;
 public class WebSecurityConfig {
 
     private final JwtProvider jwtProvider;
-    private final RedisProvider redisProvider;
+    private final TokenRedisProvider tokenRedisProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomLogoutHandler customLogoutHandler;
     @Bean
@@ -44,14 +44,14 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider, redisProvider);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider, tokenRedisProvider);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtProvider, redisProvider);
+        return new JwtAuthorizationFilter(jwtProvider, tokenRedisProvider);
     }
 
     @Bean
@@ -88,7 +88,10 @@ public class WebSecurityConfig {
 
         ;
         // 필터 순서 조정
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+        /*http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        return http.build();*/
     }
 }

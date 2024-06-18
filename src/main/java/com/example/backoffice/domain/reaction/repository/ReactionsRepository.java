@@ -3,7 +3,6 @@ package com.example.backoffice.domain.reaction.repository;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.reaction.entity.Emoji;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import org.springframework.data.jpa.repository.JpaRepository;
 

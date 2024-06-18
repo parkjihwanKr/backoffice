@@ -1,5 +1,7 @@
 package com.example.backoffice.domain.member.dto;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import lombok.AllArgsConstructor;
@@ -62,9 +64,33 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberRoleResponseDto{
-        private String fromMemberName;
+    public static class UpdateMemberAttributeResponseDto{
+        private String memberName;
         private String fileName;
+        private MemberRole memberRole;
+        private MemberPosition memberPosition;
+        private MemberDepartment memberDepartment;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateMemberSalaryResponseDto {
+        private String memberName;
+        private MemberRole memberRole;
+        private MemberPosition memberPosition;
+        private MemberDepartment memberDepartment;
+        private Long changedSalary;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateMemberVacationDaysResponseDto {
+        // 잔여 휴가 일 수
+        private Integer vacationDays;
     }
 
     @Getter
