@@ -1,7 +1,7 @@
 package com.example.backoffice.domain.favorite.service;
 
 import com.example.backoffice.domain.board.service.BoardsServiceV1;
-import com.example.backoffice.domain.comment.service.CommentsService;
+import com.example.backoffice.domain.comment.service.CommentsServiceV1;
 import com.example.backoffice.domain.event.service.EventsService;
 import com.example.backoffice.domain.favorite.converter.FavoritiesConverter;
 import com.example.backoffice.domain.favorite.dto.FavoritiesRequestDto;
@@ -24,7 +24,7 @@ public class FavoritiesServiceImplV1 implements FavoritiesService {
 
     private final BoardsServiceV1 boardsService;
     private final EventsService eventsService;
-    private final CommentsService commentsService;
+    private final CommentsServiceV1 commentsService;
     private final FavoritiesRepository favoritiesRepository;
 
     @Override

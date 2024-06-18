@@ -3,7 +3,7 @@ package com.example.backoffice.domain.reaction.service;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.service.BoardsServiceV1;
 import com.example.backoffice.domain.comment.entity.Comments;
-import com.example.backoffice.domain.comment.service.CommentsService;
+import com.example.backoffice.domain.comment.service.CommentsServiceV1;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.entity.NotificationData;
@@ -32,7 +32,7 @@ public class ReactionsServiceImpl implements ReactionsService{
     private final ReactionsRepository reactionsRepository;
     private final MembersService membersService;
     private final BoardsServiceV1 boardsService;
-    private final CommentsService commentsService;
+    private final CommentsServiceV1 commentsService;
     private final NotificationsServiceFacade notificationsServiceFacade;
 
     @Override

@@ -42,7 +42,7 @@ public class BoardsResponseDto {
         private Long unLikeCount;
         private Long viewCount;
         // CommentList
-        private List<CommentsResponseDto.ReadBoardCommentResponseDto> commentList;
+        private List<CommentsResponseDto.ReadBoardCommentsDto> commentList;
         private List<String> fileList;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
