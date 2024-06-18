@@ -25,12 +25,10 @@ public class MembersConverter {
                 .contact("010-0000-0000")
                 .position(MemberPosition.CEO)
                 .salary(20000000L)
-                .onVacation(false)
-                .remainingVacationDays(15)
                 .build();
     }
     public static Members toEntity(
-            MembersRequestDto.CreateOneDto requestDto, String bcryptPassword) {
+            MembersRequestDto.CreateMembersRequestDto requestDto, String bcryptPassword) {
         return Members.builder()
                 .memberName(requestDto.getMemberName())
                 .name(requestDto.getName()) // 이름을 name으로 설정하는 것이 맞는지 확인
@@ -42,13 +40,11 @@ public class MembersConverter {
                 .loveCount(0L)
                 .password(bcryptPassword) // 암호화된 비밀번호 사용
                 .contact(requestDto.getContact())
-                .onVacation(false)
-                .remainingVacationDays(1)
                 .build();
     }
 
-    public static MembersResponseDto.CreateOneDto toCreateOneDto(Members member){
-        return MembersResponseDto.CreateOneDto.builder()
+    public static MembersResponseDto.CreateMembersResponseDto toCreateDto(Members member){
+        return MembersResponseDto.CreateMembersResponseDto.builder()
                 .email(member.getEmail())
                 .memberName(member.getMemberName())
                 .name(member.getMemberName())
@@ -58,8 +54,8 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.ReadOneProfileDto toReadOneProfileDto(Members member){
-        return MembersResponseDto.ReadOneProfileDto.builder()
+    public static MembersResponseDto.ReadMemberResponseDto toReadDto(Members member){
+        return MembersResponseDto.ReadMemberResponseDto.builder()
                 .email(member.getEmail())
                 .address(member.getAddress())
                 .memberName(member.getMemberName())
@@ -67,14 +63,11 @@ public class MembersConverter {
                 .loveCount(member.getLoveCount())
                 .createdAt(member.getCreatedAt())
                 .modifiedAt(member.getModifiedAt())
-                .onVacation(member.getOnVacation())
-                .remainingVacationDays(member.getRemainingVacationDays())
-                .profileImageUrl(member.getProfileImageUrl())
                 .build();
     }
 
-    public static MembersResponseDto.UpdateOneProfileDto toUpdateOneDto(Members member){
-        return MembersResponseDto.UpdateOneProfileDto.builder()
+    public static MembersResponseDto.UpdateMemberResponseDto toUpdateDto(Members member){
+        return MembersResponseDto.UpdateMemberResponseDto.builder()
                 .memberName(member.getMemberName())
                 .name(member.getName())
                 .address(member.getAddress())
@@ -86,9 +79,9 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateOneAttributeDto toUpdateOneAttributeDto(
+    public static MembersResponseDto.UpdateMemberAttributeResponseDto toUpdateAttributeDto(
             Members member, String document){
-        return MembersResponseDto.UpdateOneAttributeDto.builder()
+        return MembersResponseDto.UpdateMemberAttributeResponseDto.builder()
                 .memberName(member.getMemberName())
                 .fileName(document)
                 .memberPosition(member.getPosition())
@@ -97,9 +90,9 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateOneSalaryDto toUpdateOneSalaryDto(
+    public static MembersResponseDto.UpdateMemberSalaryResponseDto toUpdateSalaryDto(
             Members member){
-        return MembersResponseDto.UpdateOneSalaryDto.builder()
+        return MembersResponseDto.UpdateMemberSalaryResponseDto.builder()
                 .memberDepartment(member.getDepartment())
                 .memberName(member.getMemberName())
                 .memberRole(member.getRole())
@@ -108,15 +101,15 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateOneProfileImageDto toUpdateOneProfileImageDto(Members member){
-        return MembersResponseDto.UpdateOneProfileImageDto.builder()
+    public static MembersResponseDto.UpdateMemberProfileImageUrlResponseDto toUpdateProfileImageDto(Members member){
+        return MembersResponseDto.UpdateMemberProfileImageUrlResponseDto.builder()
                 .fromMemberName(member.getMemberName())
                 .profileImageUrl(member.getProfileImageUrl())
                 .build();
     }
 
-    public static MembersResponseDto.DeleteOneProfileImageDto toDeleteOneProfileImageDto(Members member){
-        return MembersResponseDto.DeleteOneProfileImageDto.builder()
+    public static MembersResponseDto.DeleteMemberProfileImageResponseDto toDeleteProfileImageDto(Members member){
+        return MembersResponseDto.DeleteMemberProfileImageResponseDto.builder()
                 .fromMemberName(member.getMemberName())
                 .build();
     }
@@ -137,14 +130,5 @@ public class MembersConverter {
             }
         }
         throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_POSITION);
-    }
-
-    public static MemberRole toRole(String roleName){
-        for(MemberRole role : MemberRole.values()){
-            if(role.getAuthority().equalsIgnoreCase(roleName)){
-                return role;
-            }
-        }
-        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_ROLE);
     }
 }

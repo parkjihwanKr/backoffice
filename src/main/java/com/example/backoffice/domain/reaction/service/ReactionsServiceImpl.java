@@ -5,7 +5,7 @@ import com.example.backoffice.domain.board.service.BoardsService;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.comment.service.CommentsService;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.service.MembersServiceV1;
+import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class ReactionsServiceImpl implements ReactionsService{
 
     private final ReactionsRepository reactionsRepository;
-    private final MembersServiceV1 membersService;
+    private final MembersService membersService;
     private final BoardsService boardsService;
     private final CommentsService commentsService;
     private final NotificationsServiceFacade notificationsServiceFacade;

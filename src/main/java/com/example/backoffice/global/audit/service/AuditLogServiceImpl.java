@@ -1,7 +1,9 @@
 package com.example.backoffice.global.audit.service;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
+import com.example.backoffice.domain.member.facade.MembersServiceFacade;
+import com.example.backoffice.domain.member.service.MembersService;
 import com.example.backoffice.global.audit.converter.AuditLogConverter;
 import com.example.backoffice.global.audit.entity.AuditLog;
 import com.example.backoffice.global.audit.entity.AuditLogType;
@@ -20,7 +22,7 @@ import java.util.List;
 public class AuditLogServiceImpl implements AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
-    private final MembersServiceFacadeV1 membersServiceFacade;
+    private final MembersServiceFacade membersServiceFacade;
 
     @Override
     @Transactional
