@@ -14,7 +14,7 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadBoardCommentResponseDto{
+    public static class ReadBoardCommentsDto{
         private Long commentId;
         private String commentWriter;
         private String commentContent;
@@ -22,14 +22,14 @@ public class CommentsResponseDto {
         private Long unLikeCount;
         private LocalDateTime commentCreatedAt;
         private LocalDateTime commentModifiedAt;
-        private List<ReadCommentRepliesResponseDto> replyList;
+        private List<RepliesResponseDto.ReadCommentRepliesDto> replyList;
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateCommentsResponseDto{
+    public static class CreateOneDto{
         private String writer;
         private String content;
         private LocalDateTime createdAt;
@@ -39,58 +39,12 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateCommentsResponseDto{
+    public static class UpdateOneDto{
         private String writer;
         private String content;
         private Long likeCount;
         private Long unLikeCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CreateReplyResponseDto {
-        private String toMemberName;
-        private String parentContent;
-        private LocalDateTime parentCreatedAt;
-        private String fromMemberName;
-        private String childContent;
-        private LocalDateTime childCreatedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ReadCommentRepliesResponseDto {
-        private Long replyId;
-        private String replyWriter;
-        private String replyContent;
-        private Long likeCount;
-        private Long unLikeCount;
-        private LocalDateTime replyCreatedAt;
-        private LocalDateTime replyModifiedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateReplyResponseDto {
-        private String toMemberName;
-        private String parentContent;
-        private LocalDateTime parentCreatedAt;
-        private LocalDateTime parentModifiedAt;
-        private Long parentLikeCount;
-        private Long parentUnLikeCount;
-        private String fromMemberName;
-        private String childContent;
-        private LocalDateTime childCreatedAt;
-        private LocalDateTime childModifiedAt;
-        private Long childLikeCount;
-        private Long childUnLikeCount;
     }
 }
