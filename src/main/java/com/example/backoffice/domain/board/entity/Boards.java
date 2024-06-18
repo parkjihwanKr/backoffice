@@ -65,9 +65,9 @@ public class Boards extends CommonEntity {
         this.viewCount++;
     }
 
-    public void update(BoardsRequestDto.UpdateBoardRequestDto requestDto){
-        this.title = requestDto.getTitle();
-        this.content = requestDto.getContent();
+    public void update(String title, String content){
+        this.title = title;
+        this.content = content;
     }
 
     public void addComment(Comments comment){

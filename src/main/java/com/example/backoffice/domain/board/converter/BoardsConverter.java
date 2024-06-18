@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class BoardsConverter {
 
     public static Boards toEntity(
-            BoardsRequestDto.CreateBoardRequestDto requestDto, Members member){
+            BoardsRequestDto.CreateOneDto requestDto, Members member){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
@@ -27,9 +27,9 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static Page<BoardsResponseDto.ReadBoardListResponseDto> toReadDto(Page<Boards> boardPage){
+    public static Page<BoardsResponseDto.ReadAllDto> toReadAllDto(Page<Boards> boardPage){
         return boardPage.map(board -> {
-            return BoardsResponseDto.ReadBoardListResponseDto.builder()
+            return BoardsResponseDto.ReadAllDto.builder()
                     .title(board.getTitle())
                     .writer(board.getMember().getMemberName())
                     .content(board.getContent())
@@ -42,7 +42,7 @@ public class BoardsConverter {
         });
     }
 
-    public static BoardsResponseDto.ReadBoardResponseDto toReadOneDto(Boards board) {
+    public static BoardsResponseDto.ReadOneDto toReadOneDto(Boards board) {
         List<String> fileUrls = board.getFileList().stream()
                 .map(Files::getUrl)
                 .collect(Collectors.toList());
@@ -88,7 +88,7 @@ public class BoardsConverter {
             }
         }
 
-        return BoardsResponseDto.ReadBoardResponseDto.builder()
+        return BoardsResponseDto.ReadOneDto.builder()
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
                 .content(board.getContent())
@@ -103,10 +103,10 @@ public class BoardsConverter {
     }
 
 
-    public static BoardsResponseDto.CreateBoardResponseDto toCreateDto(
+    public static BoardsResponseDto.CreateOneDto toCreateOneDto(
             Boards board, List<String> fileUrlList){
 
-        return BoardsResponseDto.CreateBoardResponseDto.builder()
+        return BoardsResponseDto.CreateOneDto.builder()
                 .writer(board.getMember().getMemberName())
                 .title(board.getTitle())
                 .content(board.getContent())
@@ -115,7 +115,7 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static BoardsResponseDto.UpdateBoardResponseDto toUpdateDto(Boards board, List<String> fileUrlList){
+    public static BoardsResponseDto.UpdateOneDto toUpdateOneDto(Boards board, List<String> fileUrlList){
 
         List<CommentsResponseDto.UpdateCommentsResponseDto> commentList = new ArrayList<>();
         if(!board.getCommentList().isEmpty()){
@@ -128,7 +128,7 @@ public class BoardsConverter {
             }
         }
 
-        return BoardsResponseDto.UpdateBoardResponseDto.builder()
+        return BoardsResponseDto.UpdateOneDto.builder()
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
                 .content(board.getContent())
