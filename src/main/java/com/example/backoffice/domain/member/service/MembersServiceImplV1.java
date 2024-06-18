@@ -21,7 +21,6 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     private final MembersRepository membersRepository;
 
-    // 타당성 검사 추가
     @Override
     @Transactional
     public void signup(Members member){
