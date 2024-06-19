@@ -16,7 +16,7 @@ public class EventsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateDepartmentEventsRequestDto {
+    public static class CreateOneForDepartmentEventDto {
         private String title;
         private String description;
         // front-end의 캘린더에서 startDate, endDate를 받는다고 가정
@@ -31,7 +31,7 @@ public class EventsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateDepartmentEventRequestDto {
+    public static class UpdateOneForDepartmentEventDto {
         private String title;
         private String description;
         private String startDate;
@@ -45,7 +45,7 @@ public class EventsRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @UrgentReasonRequired
-    public static class CreateVacationRequestDto {
+    public static class CreateOneForVacationEventDto {
         private String title;
         @NotNull
         private String startDate;
@@ -62,7 +62,7 @@ public class EventsRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @UrgentReasonRequired
-    public static class UpdateVacationEventRequestDto {
+    public static class UpdateOneForVacationEventDto {
         @NotNull
         private String startDate;
         @NotNull
