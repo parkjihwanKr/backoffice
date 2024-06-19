@@ -33,9 +33,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 로그아웃 로직일때 인증절차를 밟지 않고 LogoutFilter에서 끝냄
         log.info("attemptAuthentication()");
         try {
-            MembersRequestDto.LoginMemberRequestDto requestDto
+            MembersRequestDto.LoginDto requestDto
                     = new ObjectMapper().readValue(request.getInputStream(),
-                    MembersRequestDto.LoginMemberRequestDto.class);
+                    MembersRequestDto.LoginDto.class);
 
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(

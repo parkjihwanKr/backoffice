@@ -28,7 +28,7 @@ public class MembersConverter {
                 .build();
     }
     public static Members toEntity(
-            MembersRequestDto.CreateMembersRequestDto requestDto, String bcryptPassword) {
+            MembersRequestDto.CreateOneDto requestDto, String bcryptPassword) {
         return Members.builder()
                 .memberName(requestDto.getMemberName())
                 .name(requestDto.getName()) // 이름을 name으로 설정하는 것이 맞는지 확인
@@ -43,8 +43,8 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.CreateMembersResponseDto toCreateDto(Members member){
-        return MembersResponseDto.CreateMembersResponseDto.builder()
+    public static MembersResponseDto.CreateOneDto toCreateOneDto(Members member){
+        return MembersResponseDto.CreateOneDto.builder()
                 .email(member.getEmail())
                 .memberName(member.getMemberName())
                 .name(member.getMemberName())
@@ -54,8 +54,8 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.ReadMemberResponseDto toReadDto(Members member){
-        return MembersResponseDto.ReadMemberResponseDto.builder()
+    public static MembersResponseDto.ReadOneDto toReadOneDto(Members member){
+        return MembersResponseDto.ReadOneDto.builder()
                 .email(member.getEmail())
                 .address(member.getAddress())
                 .memberName(member.getMemberName())
@@ -66,8 +66,8 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberResponseDto toUpdateDto(Members member){
-        return MembersResponseDto.UpdateMemberResponseDto.builder()
+    public static MembersResponseDto.UpdateOneDto toUpdateOneDto(Members member){
+        return MembersResponseDto.UpdateOneDto.builder()
                 .memberName(member.getMemberName())
                 .name(member.getName())
                 .address(member.getAddress())
@@ -79,9 +79,9 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberAttributeResponseDto toUpdateAttributeDto(
+    public static MembersResponseDto.UpdateOneForAttributeDto toUpdateOneForAttributeDto(
             Members member, String document){
-        return MembersResponseDto.UpdateMemberAttributeResponseDto.builder()
+        return MembersResponseDto.UpdateOneForAttributeDto.builder()
                 .memberName(member.getMemberName())
                 .fileName(document)
                 .memberPosition(member.getPosition())
@@ -90,9 +90,9 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberSalaryResponseDto toUpdateSalaryDto(
+    public static MembersResponseDto.UpdateOneForSalaryDto toUpdateOneForSalaryDto(
             Members member){
-        return MembersResponseDto.UpdateMemberSalaryResponseDto.builder()
+        return MembersResponseDto.UpdateOneForSalaryDto.builder()
                 .memberDepartment(member.getDepartment())
                 .memberName(member.getMemberName())
                 .memberRole(member.getRole())
@@ -101,15 +101,15 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.UpdateMemberProfileImageUrlResponseDto toUpdateProfileImageDto(Members member){
-        return MembersResponseDto.UpdateMemberProfileImageUrlResponseDto.builder()
+    public static MembersResponseDto.UpdateOneForProfileImageDto toUpdateOneForProfileImageDto(Members member){
+        return MembersResponseDto.UpdateOneForProfileImageDto.builder()
                 .fromMemberName(member.getMemberName())
                 .profileImageUrl(member.getProfileImageUrl())
                 .build();
     }
 
-    public static MembersResponseDto.DeleteMemberProfileImageResponseDto toDeleteProfileImageDto(Members member){
-        return MembersResponseDto.DeleteMemberProfileImageResponseDto.builder()
+    public static MembersResponseDto.DeleteOneForProfileImageDto toDeleteOneForProfileImageDto(Members member){
+        return MembersResponseDto.DeleteOneForProfileImageDto.builder()
                 .fromMemberName(member.getMemberName())
                 .build();
     }

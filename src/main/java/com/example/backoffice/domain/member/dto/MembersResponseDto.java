@@ -18,7 +18,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateMembersResponseDto{
+    public static class CreateOneDto{
         // 접속 아이디
         private String memberName;
         // 실제 이름
@@ -33,7 +33,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadMemberResponseDto {
+    public static class ReadOneDto {
 
         private String memberName;
         private String email;
@@ -48,7 +48,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberResponseDto{
+    public static class UpdateOneDto{
         private String name;
         private String memberName;
         private String email;
@@ -64,7 +64,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberAttributeResponseDto{
+    public static class UpdateOneForAttributeDto{
         private String memberName;
         private String fileName;
         private MemberRole memberRole;
@@ -76,7 +76,7 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberSalaryResponseDto {
+    public static class UpdateOneForSalaryDto {
         private String memberName;
         private MemberRole memberRole;
         private MemberPosition memberPosition;
@@ -86,18 +86,9 @@ public class MembersResponseDto {
 
     @Getter
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class UpdateMemberVacationDaysResponseDto {
-        // 잔여 휴가 일 수
-        private Integer vacationDays;
-    }
-
-    @Getter
-    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberProfileImageUrlResponseDto{
+    public static class UpdateOneForProfileImageDto{
         private String fromMemberName;
         private String profileImageUrl;
     }
@@ -106,7 +97,16 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeleteMemberProfileImageResponseDto{
+    public static class DeleteOneForProfileImageDto{
         private String fromMemberName;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForVacationDaysDto {
+        // 잔여 휴가 일 수
+        private Integer vacationDays;
     }
 }

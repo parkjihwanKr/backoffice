@@ -12,27 +12,27 @@ import java.util.List;
 import java.util.Map;
 
 public interface MembersServiceFacade {
-    MembersResponseDto.CreateMembersResponseDto signup(
-            MembersRequestDto.CreateMembersRequestDto requestDto);
+    MembersResponseDto.CreateOneDto signup(
+            MembersRequestDto.CreateOneDto requestDto);
 
-    MembersResponseDto.ReadMemberResponseDto readInfo(
+    MembersResponseDto.ReadOneDto readOne(
             Long memberId, Members member);
 
-    MembersResponseDto.UpdateMemberResponseDto updateMember(
+    MembersResponseDto.UpdateOneDto updateOne(
             Long memberId,  Members Member,
-            MembersRequestDto.UpdateMemberRequestDto requestDto);
+            MembersRequestDto.UpdateOneDto requestDto);
 
-    MembersResponseDto.UpdateMemberAttributeResponseDto updateAttribute(
+    MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(
             Long memberId, Members member,
-            MembersRequestDto.UpdateMemberAttributeRequestDto requestDto);
+            MembersRequestDto.UpdateOneForAttributeDto requestDto);
 
-    MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateProfileImageUrl(
+    MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
             Long memberId, Members member, MultipartFile image);
 
-    MembersResponseDto.DeleteMemberProfileImageResponseDto deleteProfileImage(
+    MembersResponseDto.DeleteOneForProfileImageDto deleteOneForProfileImage(
             Long memberId, Members member);
 
-    void deleteMember(Long memberId, Members member);
+    void deleteOne(Long memberId, Members member);
 
     Members findMember(Members member, Long memberId);
 
@@ -43,15 +43,15 @@ public interface MembersServiceFacade {
     Members findAdmin(
             Long adminId, MemberRole role, MemberDepartment department);
 
-    MembersResponseDto.UpdateMemberSalaryResponseDto updateSalary(
+    MembersResponseDto.UpdateOneForSalaryDto updateOneForSalary(
             Long memberId, Members loginMember,
-            MembersRequestDto.UpdateMemberSalaryRequestDto requestDto);
+            MembersRequestDto.UpdateOneForSalaryDto requestDto);
 
-    void updateOnVacationFalse(String memberName);
+    void updateOneForOnVacationFalse(String memberName);
 
-    void updateOnVacationTrue(String memberName);
+    void updateOneForOnVacationTrue(String memberName);
 
-    void updateRemainingVacationDays(ScheduledEventType scheduledEventType);
+    void updateOneForRemainingVacationDays(ScheduledEventType scheduledEventType);
 
     List<Members> findAllByDepartment(String department);
 
