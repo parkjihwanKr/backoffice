@@ -5,11 +5,11 @@ import com.example.backoffice.domain.event.exception.annotation.UrgentReasonRequ
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class UrgentReasonValidator implements ConstraintValidator<UrgentReasonRequired, EventsRequestDto.CreateVacationRequestDto> {
+public class UrgentReasonValidator implements ConstraintValidator<UrgentReasonRequired, EventsRequestDto.CreateOneForVacationEventDto> {
 
     @Override
     public boolean isValid(
-            EventsRequestDto.CreateVacationRequestDto dto, ConstraintValidatorContext context) {
+            EventsRequestDto.CreateOneForVacationEventDto dto, ConstraintValidatorContext context) {
         if (dto.getUrgent() != null && dto.getUrgent() && (dto.getReason() == null || dto.getReason().isEmpty())) {
             return false;
         }

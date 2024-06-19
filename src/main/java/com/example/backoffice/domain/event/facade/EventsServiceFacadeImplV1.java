@@ -39,9 +39,41 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
             = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Override
+    @Transactional(readOnly = true)
+    public EventsResponseDto.ReadOneForCompanyEventDto readOneForCompanyEvent(
+            Long eventId){
+        Events event = eventsService.findById(eventId);
+        return EventsConverter.toReadOneForCompanyEventDto(event);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventsResponseDto.ReadOneForCompanyEventDto> readForCompanyMonthEvent(
+            Long year, Long month){
+        // 해당 날짜의 정보를 가지고 오는데
+        // 만약 2024-05-31~06-02 또는 2024-06-23~07-02까지의 프로젝트라면?
+        // 해당 이벤트를 가지고 오는지? 아닌지 확인해야함 -> 가져옴
+        List<Events> eventList = readMonthEvent(year, month, EventType.DEPARTMENT);
+
+        return EventsConverter.toReadForCompanyMonthEventDto(eventList);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<List<EventsResponseDto.ReadOneForCompanyEventDto>> readForCompanyYearEvent(
+            Long year){
+        LocalDateTime start
+                = YearMonth.of(year.intValue(), 1).atDay(1).atStartOfDay();
+        LocalDateTime end = YearMonth.of(year.intValue(), 12).atEndOfMonth().atTime(23, 59, 59);
+        List<Events> eventList = eventsService.findAllByStartDateBetween(start, end);
+
+        return EventsConverter.toReadForCompanyYearEventDto(eventList);
+    }
+
+    @Override
     @Transactional
-    public EventsResponseDto.CreateDepartmentEventResponseDto createDepartmentEvent(
-            Members loginMember, EventsRequestDto.CreateDepartmentEventsRequestDto requestDto){
+    public EventsResponseDto.CreateOneForDepartmentEventDto createOneForDepartmentEvent(
+            Members loginMember, EventsRequestDto.CreateOneForDepartmentEventDto requestDto){
         membersService.findById(loginMember.getId());
 
         // 바로 오늘 이전의 날짜가 아니라면 일정을 생성할 수 있게
@@ -54,46 +86,14 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                 requestDto.getTitle(), requestDto.getDescription(),
                 eventDateRangeDto, loginMember, EventType.DEPARTMENT);
         eventsService.save(event);
-        return EventsConverter.toCreateDepartmentDto(event);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public EventsResponseDto.ReadCompanyEventResponseDto readCompanyEvent(
-            Long eventId){
-        Events event = eventsService.findById(eventId);
-        return EventsConverter.toReadCompanyDto(event);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<EventsResponseDto.ReadCompanyEventResponseDto> readCompanyMonthEvent(
-            Long year, Long month){
-        // 해당 날짜의 정보를 가지고 오는데
-        // 만약 2024-05-31~06-02 또는 2024-06-23~07-02까지의 프로젝트라면?
-        // 해당 이벤트를 가지고 오는지? 아닌지 확인해야함 -> 가져옴
-        List<Events> eventList = readMonthEvent(year, month, EventType.DEPARTMENT);
-
-        return EventsConverter.toReadCompanyMonthDto(eventList);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<List<EventsResponseDto.ReadCompanyEventResponseDto>> readCompanyYearEvent(
-            Long year){
-        LocalDateTime start
-                = YearMonth.of(year.intValue(), 1).atDay(1).atStartOfDay();
-        LocalDateTime end = YearMonth.of(year.intValue(), 12).atEndOfMonth().atTime(23, 59, 59);
-        List<Events> eventList = eventsService.findAllByStartDateBetween(start, end);
-
-        return EventsConverter.toReadCompanyYearDto(eventList);
+        return EventsConverter.toCreateOneForDepartmentDto(event);
     }
 
     @Override
     @Transactional
-    public EventsResponseDto.UpdateDepartmentEventResponseDto updateDepartmentEvent(
+    public EventsResponseDto.UpdateOneForDepartmentEventDto updateOneForDepartmentEvent(
             Long eventId, Members loginMember,
-            EventsRequestDto.UpdateDepartmentEventRequestDto requestDto){
+            EventsRequestDto.UpdateOneForDepartmentEventDto requestDto){
         Events event = eventsService.findById(eventId);
 
         // 로그인 멤버의 부서와 요청한 이벤트를 수행할 부서가 같은지?
@@ -108,12 +108,12 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                 requestDto.getDepartment(), eventDateRangeDto.getStartDate(),
                 eventDateRangeDto.getEndDate(), EventType.DEPARTMENT);
 
-        return EventsConverter.toUpdateCompanyDto(event);
+        return EventsConverter.toUpdateOneForDepartmentEventDto(event);
     }
 
     @Override
     @Transactional
-    public void deleteDepartmentEvent(Long eventId, Members loginMember){
+    public void deleteOneForDepartmentEvent(Long eventId, Members loginMember){
         // 검증
         membersService.findById(loginMember.getId());
         Events event = eventsService.findById(eventId);
@@ -126,8 +126,8 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
-    public EventsResponseDto.CreateVacationResponseDto createVacationEvent(
-            Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto){
+    public EventsResponseDto.CreateOneForVacationEventDto createOneForVacationEvent(
+            Members loginMember, EventsRequestDto.CreateOneForVacationEventDto requestDto){
         membersService.findById(loginMember.getId());
 
         EventDateRangeDto eventDateRangeDto
@@ -144,23 +144,24 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         sendUrgentEventForHRManager(requestDto.getUrgent(), loginMember, event);
 
         eventsService.save(event);
-        return EventsConverter.toCreateVacationDto(event, requestDto.getUrgent());
+        return EventsConverter.toCreateOneForVacationEventDto(
+                event, requestDto.getUrgent());
     }
 
     @Override
     @Transactional
-    public List<EventsResponseDto.ReadVacationResponseDto> readVacationMonthEvent(
+    public List<EventsResponseDto.ReadOneForVacationEventDto> readForVacationMonthEvent(
             Long year, Long month, Members loginMember){
         membersService.findById(loginMember.getId());
         List<Events> eventList = readMonthEvent(year, month, EventType.MEMBER_VACATION);
-        return EventsConverter.toReadVacationMonthDto(eventList);
+        return EventsConverter.toReadForVacationMonthEventDto(eventList);
     }
 
     @Override
     @Transactional
-    public EventsResponseDto.UpdateVacationResponseDto updateVacationEvent(
+    public EventsResponseDto.UpdateOneForVacationEventDto updateOneForVacationEvent(
             Long vacationId, Members loginMember,
-            EventsRequestDto.UpdateVacationEventRequestDto requestDto){
+            EventsRequestDto.UpdateOneForVacationEventDto requestDto){
         membersService.findById(loginMember.getId());
         Events vacation = eventsService.findById(vacationId);
 
@@ -178,12 +179,12 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         vacation.update(vacationTitle, requestDto.getReason(), loginMember.getDepartment(),
                 eventDateRangeDto.getStartDate(), eventDateRangeDto.getEndDate(), EventType.MEMBER_VACATION);
 
-        return EventsConverter.toUpdateVacationDto(vacation, loginMember.getMemberName());
+        return EventsConverter.toUpdateOneForVacationEventDto(vacation, loginMember.getMemberName());
     }
 
     @Override
     @Transactional
-    public void deleteVacationEvent(Long vacationId, Members loginMember){
+    public void deleteOneForVacationEvent(Long vacationId, Members loginMember){
         // 검증
         membersService.findById(loginMember.getId());
         eventsService.findById(vacationId);
@@ -194,14 +195,14 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventsResponseDto.ReadVacationResponseDto> readVacationMemberList(
+    public List<EventsResponseDto.ReadMemberForVacationEventDto> readMemberListForVacationEvent(
             Long year, Long month, Long day, Members loginMember) {
         membersService.findById(loginMember.getId());
 
         List<Events> eventList
                 = findAllByEventTypeAndStartDateBetween(year, month, day);
 
-        return EventsConverter.toReadVacationMemberListDto(eventList);
+        return EventsConverter.toReadMemberListForVacationEventDto(eventList);
     }
 
     @Override
