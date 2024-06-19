@@ -5,8 +5,6 @@ import com.example.backoffice.domain.board.service.BoardsServiceV1;
 import com.example.backoffice.domain.comment.converter.CommentsConverter;
 import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
-import com.example.backoffice.domain.comment.dto.RepliesRequestDto;
-import com.example.backoffice.domain.comment.dto.RepliesResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.comment.exception.CommentsCustomException;
 import com.example.backoffice.domain.comment.exception.CommentsExceptionCode;
@@ -25,8 +23,8 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
 
     @Override
     @Transactional
-    public CommentsResponseDto.CreateOneDto createOneComment(
-            CommentsRequestDto.CreateOneDto requestDto,
+    public CommentsResponseDto.CreateCommentDto createComment(
+            CommentsRequestDto.CreateCommentDto requestDto,
             Long boardId, Members member) {
         Boards board = boardsService.findById(boardId);
         Comments comment = CommentsConverter.toEntity(requestDto, board, member);
@@ -36,14 +34,14 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
 
         commentsRepository.save(comment);
 
-        return CommentsConverter.toCreateOneCommentDto(comment, member);
+        return CommentsConverter.toCreateCommentDto(comment, member);
     }
 
     @Override
     @Transactional
-    public CommentsResponseDto.UpdateOneDto updateOneComment(
+    public CommentsResponseDto.UpdateCommentDto updateComment(
             Long boardId, Long commentId,
-            CommentsRequestDto.UpdateOneDto requestDto,
+            CommentsRequestDto.UpdateCommentDto requestDto,
             Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
@@ -53,12 +51,12 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
 
         comment.update(requestDto.getContent());
 
-        return CommentsConverter.toUpdateOneCommentDto(comment, member);
+        return CommentsConverter.toUpdateCommentDto(comment, member);
     }
 
     @Override
     @Transactional
-    public void deleteOneComment(Long boardId, Long commentId, Members member){
+    public void deleteComment(Long boardId, Long commentId, Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
@@ -70,10 +68,9 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
 
     @Override
     @Transactional
-    public RepliesResponseDto.CreateOneDto createOneReply(
+    public CommentsResponseDto.CreateReplyDto createReply(
             Long boardId, Long commentId,
-            RepliesRequestDto.CreateOneDto requestDto,
-            Members member){
+            CommentsRequestDto.CreateReplyDto requestDto, Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
@@ -85,15 +82,14 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
         board.addReply(comment);
 
         commentsRepository.save(reply);
-        return CommentsConverter.toCreateOneReplyDto(comment, reply, member);
+        return CommentsConverter.toCreateReplyDto(comment, reply, member);
     }
 
     @Override
     @Transactional
-    public RepliesResponseDto.UpdateOneDto updateOneReply(
+    public CommentsResponseDto.UpdateReplyDto updateReply(
             Long commentId, Long replyId,
-            RepliesRequestDto.UpdateOneDto requestDto,
-            Members member){
+            CommentsRequestDto.UpdateReplyDto requestDto, Members member){
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
         Boards board = boardsService.findById(comment.getBoard().getId());
@@ -103,12 +99,12 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
 
         reply.update(requestDto.getContent());
 
-        return CommentsConverter.UpdateOneReplyDto(comment, reply, member);
+        return CommentsConverter.UpdateReplyDto(comment, reply, member);
     }
 
     @Override
     @Transactional
-    public void deleteOneReply(Long commentId, Long replyId, Members member){
+    public void deleteReply(Long commentId, Long replyId, Members member){
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
         Boards board = boardsService.findById(comment.getBoard().getId());

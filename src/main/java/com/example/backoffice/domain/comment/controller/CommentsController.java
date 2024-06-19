@@ -2,8 +2,6 @@ package com.example.backoffice.domain.comment.controller;
 
 import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
-import com.example.backoffice.domain.comment.dto.RepliesRequestDto;
-import com.example.backoffice.domain.comment.dto.RepliesResponseDto;
 import com.example.backoffice.domain.comment.service.CommentsServiceV1;
 import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
@@ -21,30 +19,30 @@ public class CommentsController {
     private final CommentsServiceV1 commentsService;
 
     @PostMapping("/boards/{boardId}/comments")
-    public ResponseEntity<CommentsResponseDto.CreateOneDto> createOneComment(
-            @RequestBody CommentsRequestDto.CreateOneDto requestDto,
+    public ResponseEntity<CommentsResponseDto.CreateCommentDto> createComment(
+            @RequestBody CommentsRequestDto.CreateCommentDto requestDto,
             @PathVariable Long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        CommentsResponseDto.CreateOneDto responseDto =
-                commentsService.createOneComment(requestDto, boardId, memberDetails.getMembers());
+        CommentsResponseDto.CreateCommentDto responseDto =
+                commentsService.createComment(requestDto, boardId, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
     }
 
     @PatchMapping("/boards/{boardId}/comments/{commentId}")
-    public ResponseEntity<CommentsResponseDto.UpdateOneDto> updateOneComment(
-            @RequestBody CommentsRequestDto.UpdateOneDto requestDto,
+    public ResponseEntity<CommentsResponseDto.UpdateCommentDto> updateComment(
+            @RequestBody CommentsRequestDto.UpdateCommentDto requestDto,
             @PathVariable Long boardId, @PathVariable Long commentId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        CommentsResponseDto.UpdateOneDto responseDto =
-                commentsService.updateOneComment(
+        CommentsResponseDto.UpdateCommentDto responseDto =
+                commentsService.updateComment(
                         boardId, commentId, requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
     }
 
     @DeleteMapping("/boards/{boardId}/comments/{commentId}")
-    public ResponseEntity<CommonResponse<Void>> deleteOneComment(
+    public ResponseEntity<CommonResponse<Void>> deleteComment(
             @PathVariable Long boardId, @PathVariable Long commentId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        commentsService.deleteOneComment(boardId, commentId, memberDetails.getMembers());
+        commentsService.deleteComment(boardId, commentId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
                 new CommonResponse<>(
                         HttpStatus.OK,
@@ -54,32 +52,32 @@ public class CommentsController {
     }
 
     @PostMapping("/boards/{boardId}/comments/{commentId}")
-    public ResponseEntity<RepliesResponseDto.CreateOneDto> createOneReply(
+    public ResponseEntity<CommentsResponseDto.CreateReplyDto> createReply(
             @PathVariable Long boardId, @PathVariable Long commentId,
-            @RequestBody RepliesRequestDto.CreateOneDto requestDto,
+            @RequestBody CommentsRequestDto.CreateReplyDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        RepliesResponseDto.CreateOneDto responseDto =
-                commentsService.createOneReply(
+        CommentsResponseDto.CreateReplyDto responseDto =
+                commentsService.createReply(
                         boardId, commentId, requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
     }
 
     @PatchMapping("/comments/{commentId}/replies/{replyId}")
-    public ResponseEntity<RepliesResponseDto.UpdateOneDto> updateOneReply(
+    public ResponseEntity<CommentsResponseDto.UpdateReplyDto> updateReply(
             @PathVariable Long commentId, @PathVariable Long replyId,
-            @RequestBody RepliesRequestDto.UpdateOneDto requestDto,
+            @RequestBody CommentsRequestDto.UpdateReplyDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        RepliesResponseDto.UpdateOneDto responseDto =
-                commentsService.updateOneReply(commentId, replyId,
+        CommentsResponseDto.UpdateReplyDto responseDto =
+                commentsService.updateReply(commentId, replyId,
                         requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(responseDto);
     }
 
     @DeleteMapping("/comments/{commentId}/replies/{replyId}")
-    public ResponseEntity<CommonResponse<Void>> deleteOneReply(
+    public ResponseEntity<CommonResponse<Void>> deleteReply(
             @PathVariable Long commentId, @PathVariable Long replyId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        commentsService.deleteOneReply(
+        commentsService.deleteReply(
                 commentId, replyId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
                 new CommonResponse<>(

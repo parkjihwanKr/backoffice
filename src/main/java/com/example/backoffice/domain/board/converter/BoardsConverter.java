@@ -4,7 +4,6 @@ import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
-import com.example.backoffice.domain.comment.dto.RepliesResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.Members;
@@ -57,13 +56,13 @@ public class BoardsConverter {
 
             // 최상위 댓글이 맞는지
             if (parentId.equals(commentId)) {
-                List<RepliesResponseDto.ReadCommentRepliesDto> replyList = new ArrayList<>();
+                List<CommentsResponseDto.ReadCommentRepliesDto> replyList = new ArrayList<>();
 
                 // 해당 댓글의 대댓글 찾기
                 for (Comments commentReply : board.getCommentList()) {
                     // 대댓글 리스트에 추가
                     if (commentReply.getParent().getId().equals(commentId) && !commentReply.getId().equals(commentId)) {
-                        replyList.add(RepliesResponseDto.ReadCommentRepliesDto.builder()
+                        replyList.add(CommentsResponseDto.ReadCommentRepliesDto.builder()
                                 .replyId(commentReply.getId())
                                 .replyWriter(commentReply.getMember().getMemberName())
                                 .replyContent(commentReply.getContent())
@@ -118,11 +117,11 @@ public class BoardsConverter {
 
     public static BoardsResponseDto.UpdateOneDto toUpdateOneDto(Boards board, List<String> fileUrlList){
 
-        List<CommentsResponseDto.UpdateOneDto> commentList = new ArrayList<>();
+        List<CommentsResponseDto.UpdateCommentDto> commentList = new ArrayList<>();
         if(!board.getCommentList().isEmpty()){
             for(int i = 0; i<board.getCommentList().size(); i++){
                 commentList.add(
-                        CommentsResponseDto.UpdateOneDto.builder()
+                        CommentsResponseDto.UpdateCommentDto.builder()
                                 .content(board.getCommentList().get(i).getContent())
                                 .build()
                 );
