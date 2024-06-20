@@ -13,18 +13,17 @@ import java.util.Set;
 
 public class NotificationsResponseDto {
 
-    // 멤버, 게시글, 댓글, 대댓글 리액션에 대한 알림 요청
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateNotificationResponseDto {
-        private String message;
+    public static class ReadOneDto {
         private String toMemberName;
         private String fromMemberName;
-        private MemberDepartment memberDepartment;
-        private MemberDepartment adminRole;
+        private MemberDepartment fromMemberDepartment;
         private LocalDateTime createdAt;
+        private Boolean isRead;
+        private String message;
     }
 
     // 어드민의 전체 알림 발송
@@ -32,7 +31,7 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateNotificationListResponseDto {
+    public static class CreateOneForAdminDto {
         private String message;
         private String fromMemberName;
         private List<String> toMemberNameList;
@@ -44,20 +43,7 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadNotificationResponseDto {
-        private String toMemberName;
-        private String fromMemberName;
-        private MemberDepartment fromMemberDepartment;
-        private LocalDateTime createdAt;
-        private Boolean isRead;
-        private String message;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ReadNotificationListResponseDto {
+    public static class ReadAllDto {
         private String toMemberName;
         private String fromMemberName;
         private LocalDateTime createdAt;

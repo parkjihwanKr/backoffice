@@ -31,7 +31,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
 
     @Override
     @Transactional
-    public NotificationsResponseDto.CreateNotificationResponseDto createNotification(
+    public void createOne(
             NotificationData notificationData, NotificationType domainType){
 
         // 자기 자신에게 '사랑해요' -> 이미 ReactionException으로 막혀 있음.
@@ -39,7 +39,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
         // 알림은 저장하지 않고 자기 자신의 알림에 뜨지 않기에 return null
         if(notificationData.getToMember().getMemberName()
                 .equals(notificationData.getFromMember().getMemberName())){
-            return null;
+            return;
         }
         Notifications notification
                 = generateMessageAndEntity(notificationData, domainType);
@@ -47,12 +47,11 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
 
         sendNotificationToUser(
                 notificationData.getToMember().getMemberName(), notification);
-        return NotificationsConverter.toCreateOneDto(notification);
     }
 
     @Override
     @Transactional
-    public NotificationsResponseDto.ReadNotificationResponseDto readOne(
+    public NotificationsResponseDto.ReadOneDto readOne(
             Long memberId, String notificationId, Members member){
         // 1. 로그인 사용자와 일치하는지
         membersServiceFacade.findMember(member, memberId);
@@ -68,8 +67,8 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
 
     @Override
     @Transactional
-    public void deleteNotification(
-            Long memberId, NotificationsRequestDto.DeleteNotificationRequestDto requestDto,
+    public void delete(
+            Long memberId, NotificationsRequestDto.DeleteDto requestDto,
             Members member){
         // 1. 로그인 사용자와 일치하는지
         membersServiceFacade.findMember(member, memberId);
@@ -83,9 +82,9 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
 
     @Override
     @Transactional
-    public NotificationsResponseDto.CreateNotificationListResponseDto createAdminNotification(
+    public NotificationsResponseDto.CreateOneForAdminDto createOneForAdmin(
             Long adminId, Members member,
-            NotificationsRequestDto.CreateNotificationRequestDto requestDto){
+            NotificationsRequestDto.CreateOneForAdminDto requestDto){
         // 1. 해당 어드민 계정이 맞는지 -> 멤버 검증까지 같이 됨
         Members admin = membersServiceFacade.findAdmin(
                 adminId, member.getRole(), member.getMemberDepartment());
@@ -126,12 +125,13 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
             }
         });
         // 해당 memberRoleList 테스트 후, 설정 예정
-        return NotificationsConverter.toCreateDto(admin, memberDepartmentSet, notificationList, message);
+        return NotificationsConverter.toCreateOneForAdminDto(
+                admin, memberDepartmentSet, notificationList, message);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NotificationsResponseDto.ReadNotificationListResponseDto> readList(
+    public Page<NotificationsResponseDto.ReadAllDto> readAll(
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
@@ -141,13 +141,13 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 = notificationsService.findByToMemberName(
                         matchedMember.getMemberName(), pageable);
 
-        return NotificationsConverter.toReadListDto(notificationPage);
+        return NotificationsConverter.toReadPageDto(notificationPage);
     }
 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NotificationsResponseDto.ReadNotificationListResponseDto> readUnreadList(
+    public Page<NotificationsResponseDto.ReadAllDto> readUnread(
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
@@ -157,12 +157,12 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 = notificationsService.findByToMemberNameAndIsRead(
                 matchedMember.getMemberName(), false, pageable);
 
-        return NotificationsConverter.toReadListDto(notificationPage);
+        return NotificationsConverter.toReadPageDto(notificationPage);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NotificationsResponseDto.ReadNotificationListResponseDto> readReadList(
+    public Page<NotificationsResponseDto.ReadAllDto> readRead(
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
@@ -172,12 +172,12 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 = notificationsService.findByToMemberNameAndIsRead(
                 matchedMember.getMemberName(), true, pageable);
 
-        return NotificationsConverter.toReadListDto(notificationPage);
+        return NotificationsConverter.toReadPageDto(notificationPage);
     }
 
     @Override
     @Transactional
-    public List<NotificationsResponseDto.ReadNotificationListResponseDto> readAll(
+    public List<NotificationsResponseDto.ReadAllDto> readAllForUnread(
             Long memberId, Members member){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
@@ -188,8 +188,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                         matchedMember.getMemberName(), false, null)
                 .stream().toList();
 
-        notificationList.forEach(
-                notification -> notification.isRead());
+        notificationList.forEach(Notifications::isRead);
 
         notificationsService.saveAll(notificationList);
 
