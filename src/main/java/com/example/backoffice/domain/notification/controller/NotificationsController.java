@@ -38,6 +38,7 @@ public class NotificationsController {
                 )
         );
     }
+
     // 알림 삭제
     @DeleteMapping("/members/{memberId}/notifications")
     public ResponseEntity<CommonResponseDto<Void>> delete(
@@ -52,6 +53,7 @@ public class NotificationsController {
                 )
         );
     }
+
     // 관리자 전용 단체 메세지 전달
     @PostMapping("/admins/{adminId}/notifications")
     public ResponseEntity<CommonResponseDto<NotificationsResponseDto.CreateOneForAdminDto>> createOneForAdmin(
@@ -78,6 +80,7 @@ public class NotificationsController {
                 = notificationsServiceFacade.readAll(memberId, memberDetails.getMembers(), pageable);
         return ResponseEntity.ok().body(responseDto);
     }
+
     // 읽지 않은 알림 리스트 조회
     @GetMapping("/members/{memberId}/notifications/unread")
     public ResponseEntity<Page<NotificationsResponseDto.ReadAllDto>> readUnread(
