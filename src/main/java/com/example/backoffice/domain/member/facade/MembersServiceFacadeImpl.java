@@ -255,10 +255,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     public Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList){
-        // 해당 리스트에 대한 member가 있는지 확인
         List<Members> memberList = membersService.findAllById(excludedIdList);
-        // 해당 memberList에 저장된 Member와 excludedIdList의 사이즈가 다르면
-        // 특정 아이디에 대한 정보가 없다.
         if(memberList.size() != excludedIdList.size()){
             throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
         }
