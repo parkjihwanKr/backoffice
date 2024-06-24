@@ -21,43 +21,46 @@ public class MembersController {
     private final MembersServiceFacade membersServiceFacade;
 
     @PostMapping("/signup")
-    public ResponseEntity<MembersResponseDto.CreateMembersResponseDto> signup(
-            @Valid @RequestBody MembersRequestDto.CreateMembersRequestDto requestDto){
-        MembersResponseDto.CreateMembersResponseDto responseDto
+    public ResponseEntity<MembersResponseDto.CreateOneDto> signup(
+            @Valid @RequestBody MembersRequestDto.CreateOneDto requestDto){
+        MembersResponseDto.CreateOneDto responseDto
                 = membersServiceFacade.signup(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @GetMapping("/members/{memberId}/profile")
-    public ResponseEntity<MembersResponseDto.ReadMemberResponseDto> readInfo(
+    public ResponseEntity<MembersResponseDto.ReadOneDto> readOne(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        MembersResponseDto.ReadMemberResponseDto responseDto
-                = membersServiceFacade.readInfo(
+        MembersResponseDto.ReadOneDto responseDto
+                = membersServiceFacade.readOne(
                         memberId, memberDetails.getMembers());
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PatchMapping("/members/{memberId}/profile")
-    public ResponseEntity<MembersResponseDto.UpdateMemberResponseDto> updateMember(
-            @PathVariable Long memberId, @RequestBody MembersRequestDto.UpdateMemberRequestDto requestDto,
+    public ResponseEntity<MembersResponseDto.UpdateOneDto> updateOne(
+            @PathVariable Long memberId,
+            @RequestPart(value = "data") MembersRequestDto.UpdateOneDto requestDto,
+            @RequestPart(value = "file") MultipartFile multipartFile,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        MembersResponseDto.UpdateMemberResponseDto responseDto
-                = membersServiceFacade.updateMember(
-                        memberId, memberDetails.getMembers(), requestDto);
-        return ResponseEntity.ok(responseDto);
+        MembersResponseDto.UpdateOneDto responseDto
+                = membersServiceFacade.updateOne(
+                        memberId, memberDetails.getMembers(), multipartFile, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 부서, 권한, 직위를 전부 다 바꿀 수 있게 하는건? -> null이여도 상관없게
     // @ModelAttribute 사용하기
     @PatchMapping("/members/{memberId}/attribute")
-    public ResponseEntity<CommonResponse<MembersResponseDto.UpdateMemberAttributeResponseDto>> updateAttribute(
+    public ResponseEntity<CommonResponse<MembersResponseDto.UpdateOneForAttributeDto>> updateOneForAttribute(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @ModelAttribute MembersRequestDto.UpdateMemberAttributeRequestDto requestDto){
-        MembersResponseDto.UpdateMemberAttributeResponseDto responseDto =
-                membersServiceFacade.updateAttribute(
-                        memberId, memberDetails.getMembers(), requestDto);
+            @RequestPart(value = "data") MembersRequestDto.UpdateOneForAttributeDto requestDto,
+            @RequestPart(value = "file") MultipartFile multipartFile){
+        MembersResponseDto.UpdateOneForAttributeDto responseDto =
+                membersServiceFacade.updateOneForAttribute(
+                        memberId, memberDetails.getMembers(), requestDto, multipartFile);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
                         HttpStatus.OK, "해당 사항이 변경되었습니다.", responseDto
@@ -67,40 +70,40 @@ public class MembersController {
 
     // 급여 변경
     @PatchMapping("/members/{memberId}/attribute/salary")
-    public ResponseEntity<MembersResponseDto.UpdateMemberSalaryResponseDto> updateSalary(
+    public ResponseEntity<MembersResponseDto.UpdateOneForSalaryDto> updateOneForSalary(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody MembersRequestDto.UpdateMemberSalaryRequestDto requestDto){
-        MembersResponseDto.UpdateMemberSalaryResponseDto responseDto =
-                membersServiceFacade.updateSalary(
+            @RequestBody MembersRequestDto.UpdateOneForSalaryDto requestDto){
+        MembersResponseDto.UpdateOneForSalaryDto responseDto =
+                membersServiceFacade.updateOneForSalary(
                         memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PatchMapping("/members/{memberId}/profileImage")
-    public ResponseEntity<MembersResponseDto.UpdateMemberProfileImageUrlResponseDto> updateProfile(
+    public ResponseEntity<MembersResponseDto.UpdateOneForProfileImageDto> updateOneForProfileImage(
             @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestParam("file")MultipartFile image){
-        MembersResponseDto.UpdateMemberProfileImageUrlResponseDto responseDto =
-                membersServiceFacade.updateProfileImageUrl(
+        MembersResponseDto.UpdateOneForProfileImageDto responseDto =
+                membersServiceFacade.updateOneForProfileImage(
                         memberId, memberDetails.getMembers(), image);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @DeleteMapping("/members/{memberId}/profileImage")
-    public ResponseEntity<MembersResponseDto.DeleteMemberProfileImageResponseDto> deleteProfile(
+    public ResponseEntity<MembersResponseDto.DeleteOneForProfileImageDto> deleteOneForProfileImage(
             @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        MembersResponseDto.DeleteMemberProfileImageResponseDto responseDto=
-                membersServiceFacade.deleteProfileImage(
+        MembersResponseDto.DeleteOneForProfileImageDto responseDto=
+                membersServiceFacade.deleteOneForProfileImage(
                         memberId, memberDetails.getMembers());
         return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/members/{memberId}")
-    public ResponseEntity<CommonResponse<Void>> deleteMember(
+    public ResponseEntity<CommonResponse<Void>> deleteOne(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        membersServiceFacade.deleteMember(memberId, memberDetails.getMembers());
+        membersServiceFacade.deleteOne(memberId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "회원 삭제")
         );

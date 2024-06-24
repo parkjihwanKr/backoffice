@@ -52,8 +52,8 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     // 타당성 검사 추가
     @Override
     @Transactional
-    public MembersResponseDto.CreateMembersResponseDto signup(
-            MembersRequestDto.CreateMembersRequestDto requestDto){
+    public MembersResponseDto.CreateOneDto signup(
+            MembersRequestDto.CreateOneDto requestDto){
 
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
@@ -82,22 +82,23 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
         Members member = MembersConverter.toEntity(requestDto, bCrytPassword);
         membersService.signup(member);
-        return MembersConverter.toCreateDto(member);
+        return MembersConverter.toCreateOneDto(member);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MembersResponseDto.ReadMemberResponseDto readInfo(
+    public MembersResponseDto.ReadOneDto readOne(
             Long memberId, Members member){
         Members matchedMember = findMember(member, memberId);
-        return MembersConverter.toReadDto(matchedMember);
+        return MembersConverter.toReadOneDto(matchedMember);
     }
 
 
     @Override
     @Transactional
-    public MembersResponseDto.UpdateMemberResponseDto updateMember(
-            Long memberId, Members member, MembersRequestDto.UpdateMemberRequestDto requestDto){
+    public MembersResponseDto.UpdateOneDto updateOne(
+            Long memberId, Members member, MultipartFile multipartFile,
+            MembersRequestDto.UpdateOneDto requestDto){
         if(!requestDto.getMemberName().equals(member.getMemberName())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER_NAME);
         }
@@ -105,59 +106,73 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
+
+        String profileImageUrl = filesService.createImage(multipartFile);
         member.updateMemberInfo(
                 requestDto.getName(), requestDto.getEmail(), requestDto.getAddress(),
-                requestDto.getContact(), requestDto.getIntroduction(), bCrytPassword);
+                requestDto.getContact(), requestDto.getIntroduction(),
+                bCrytPassword, profileImageUrl);
         Members updateMember = membersService.save(member);
-        return MembersConverter.toUpdateDto(updateMember);
+        return MembersConverter.toUpdateOneDto(updateMember);
     }
 
     // 직원의 부서, 직위, 급여 등등 변경
     @Override
     @Transactional
-    public MembersResponseDto.UpdateMemberAttributeResponseDto updateAttribute(
+    public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(
             Long memberId, Members loginMember,
-            MembersRequestDto.UpdateMemberAttributeRequestDto requestDto){
-        // 1. 로그인 멤버가 해당 부서, 직위, 급여를 바꿀 수 있는 권한인지? -> Role : Admin이면 바꿀 수 있음
-        // 단, 바꾸려는 인물이 직책이 Manager로 승진하는 것이라면 MAIN_ADMIN밖에 권한이 없음
+            MembersRequestDto.UpdateOneForAttributeDto requestDto,
+            MultipartFile multipartFile){
+        Members updateMember
+                = membersService.checkMemberId(loginMember.getId(), memberId);
+        boolean isHRManager = loginMember.getPosition().equals(MemberPosition.MANAGER)
+                && loginMember.getDepartment().equals(MemberDepartment.HR);
+        boolean isMainAdmin = loginMember.getPosition().equals(MemberPosition.CEO);
 
-        if(!loginMember.getPosition().equals(MemberPosition.MANAGER)){
-            // 해당 조건을 달성하지 못하면
-            if(!loginMember.getPosition().equals(MemberPosition.CEO)){
-                throw new MembersCustomException(
-                        MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+        if(isHRManager){
+            // 메인 어드민의 속성을 변경하려는 경우 예외
+            if (requestDto.getPosition().equals(MemberPosition.CEO)
+                    && requestDto.getDepartment().equals(MemberDepartment.HR)) {
+                throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
-            membersService.findByDepartmentAndPosition(
-                    loginMember.getDepartment(), loginMember.getPosition());
-        } else{
-            if(!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
-                    && !loginMember.getRole().equals(MemberRole.ADMIN)){
-                throw new MembersCustomException(
-                        MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+            // 각 부서장(Manager)의 직책을 변경하려는 경우 예외
+            if (updateMember.getPosition().equals(MemberPosition.MANAGER)) {
+                throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+            }
+            // 모든 부서의 차장을 부장으로 승진시키려는 경우 예외
+            if (requestDto.getPosition().equals(MemberPosition.MANAGER)
+                    && updateMember.getPosition().equals(MemberPosition.ASSISTANT_MANAGER)) {
+                throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
         }
-        // 2. 바꾸려는 인물이 존재하는지?
-        Members updateMember = findMember(loginMember, memberId);
+
+        // 로그인 멤버가 메인 어드민이 아닌 경우 예외
+        if (!isMainAdmin && !isHRManager) {
+            throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+        }
+
         String document
-                = filesService.createFileForMemberRole(
-                requestDto.getFile(), updateMember);
+                = filesService.createFileForMemberRole(multipartFile, updateMember);
+
+        MemberRole role = checkedRole(requestDto.getRole());
+        MemberDepartment department = checkedDepartment(requestDto.getDepartment());
+        MemberPosition position = checkedPosition(requestDto.getPosition());
 
         updateMember.updateAttribute(
-                requestDto.getRole(), requestDto.getDepartment(),
-                requestDto.getPosition());
+                role, department, position, requestDto.getSalary());
 
         notificationsService.saveByMemberInfo(
                 loginMember.getMemberName(), updateMember.getMemberName(),
                 updateMember.getDepartment());
 
-        return MembersConverter.toUpdateAttributeDto(updateMember, document);
+        return MembersConverter.toUpdateOneForAttributeDto(updateMember, document);
     }
 
     @Override
     @Transactional
-    public MembersResponseDto.UpdateMemberSalaryResponseDto updateSalary(
+    public MembersResponseDto.UpdateOneForSalaryDto updateOneForSalary(
             Long memberId, Members loginMember,
-            MembersRequestDto.UpdateMemberSalaryRequestDto requestDto){
+            MembersRequestDto.UpdateOneForSalaryDto requestDto){
         // 1. 로그인 멤버가 바꾸려는 인물과 동일 인물이면 안됨
         // 2. 로그인 멤버가 자기 자신의 급여를 바꿀 순 없음
         Members updateMember
@@ -175,7 +190,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
                     loginMember.getMemberName(), updateMember.getMemberName(),
                     updateMember.getDepartment());
 
-            return MembersConverter.toUpdateSalaryDto(updateMember);
+            return MembersConverter.toUpdateOneForSalaryDto(updateMember);
         }else{
             throw new MembersCustomException(
                     MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
@@ -185,20 +200,20 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     // 프로필 이미지 업로드
     @Override
     @Transactional
-    public MembersResponseDto.UpdateMemberProfileImageUrlResponseDto updateProfileImageUrl(
+    public MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
             Long memberId, Members member, MultipartFile image){
         findMember(member, memberId);
 
         String profileImageUrl = filesService.createImage(image);
 
         member.updateProfileImage(profileImageUrl);
-        return MembersConverter.toUpdateProfileImageDto(member);
+        return MembersConverter.toUpdateOneForProfileImageDto(member);
     }
 
     // 프로필 이미지 삭제
     @Override
     @Transactional
-    public MembersResponseDto.DeleteMemberProfileImageResponseDto deleteProfileImage(
+    public MembersResponseDto.DeleteOneForProfileImageDto deleteOneForProfileImage(
             Long memberId, Members member){
         Members existMember = findMember(member, memberId);
         String existMemberProfileImageUrl = existMember.getProfileImageUrl();
@@ -209,12 +224,12 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
         filesService.deleteImage(existMember.getProfileImageUrl());
         existMember.updateProfileImage(null);
 
-        return MembersConverter.toDeleteProfileImageDto(member);
+        return MembersConverter.toDeleteOneForProfileImageDto(member);
     }
 
     @Override
     @Transactional
-    public void deleteMember(Long memberId, Members loginMember){
+    public void deleteOne(Long memberId, Members loginMember){
         findMember(loginMember, memberId);
         membersService.deleteById(memberId);
     }
@@ -240,10 +255,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     public Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList){
-        // 해당 리스트에 대한 member가 있는지 확인
         List<Members> memberList = membersService.findAllById(excludedIdList);
-        // 해당 memberList에 저장된 Member와 excludedIdList의 사이즈가 다르면
-        // 특정 아이디에 대한 정보가 없다.
         if(memberList.size() != excludedIdList.size()){
             throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
         }
@@ -260,7 +272,7 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     }
 
     private MembersExceptionEnum findExceptionType(
-            MembersRequestDto.CreateMembersRequestDto requestDto, Members duplicatedInfoMember){
+            MembersRequestDto.CreateOneDto requestDto, Members duplicatedInfoMember){
         if(requestDto.getContact().equals(duplicatedInfoMember.getContact())){
             return MembersExceptionEnum.CONTACT;
         }
@@ -278,21 +290,21 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
 
     @Override
     @Transactional
-    public void updateOnVacationFalse(String memberName){
+    public void updateOneForOnVacationFalse(String memberName){
         Members member = membersService.findByMemberName(memberName);
         member.updateOnVacation(false);
     }
 
     @Override
     @Transactional
-    public void updateOnVacationTrue(String memberName){
+    public void updateOneForOnVacationTrue(String memberName){
         Members member = membersService.findByMemberName(memberName);
         member.updateOnVacation(true);
     }
 
     @Override
     @Transactional
-    public void updateRemainingVacationDays(
+    public void updateOneForRemainingVacationDays(
             ScheduledEventType scheduledEventType){
         List<Members> memberList = membersService.findAll();
         switch (scheduledEventType) {
@@ -323,5 +335,17 @@ public class MembersServiceFacadeImpl implements MembersServiceFacade{
     public List<Members> findAllByPosition(String position){
         MemberPosition memberPosition = MembersConverter.toPosition(position);
         return membersService.findAllByPosition(memberPosition);
+    }
+
+    public MemberRole checkedRole(String role){
+        return MembersConverter.toRole(role);
+    }
+
+    public MemberDepartment checkedDepartment(String department){
+        return MembersConverter.toDepartment(department);
+    }
+
+    public MemberPosition checkedPosition(String position){
+        return MembersConverter.toPosition(position);
     }
 }

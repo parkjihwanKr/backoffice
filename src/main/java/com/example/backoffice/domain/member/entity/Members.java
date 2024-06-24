@@ -82,13 +82,14 @@ public class Members extends CommonEntity {
 
     public void updateMemberInfo(
             String name, String email, String address,
-            String contact, String introduction, String bCrytPassword){
+            String contact, String introduction, String bCrytPassword, String profileImageUrl){
         this.name = name;
         this.password = bCrytPassword;
         this.email = email;
         this.address = address;
         this.contact = contact;
         this.introduction = introduction;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void updateProfileImage(String profileImageUrl){
@@ -96,10 +97,11 @@ public class Members extends CommonEntity {
     }
 
     public void updateAttribute(
-            MemberRole role, MemberDepartment department, MemberPosition position){
+            MemberRole role, MemberDepartment department, MemberPosition position, Long salary){
         this.role = role;
         this.department = department;
         this.position = position;
+        this.salary = salary;
     }
 
     public void updateSalary(Long salary){

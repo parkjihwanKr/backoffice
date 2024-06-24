@@ -19,7 +19,7 @@ public class MembersRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateMembersRequestDto{
+    public static class CreateOneDto{
         //@Pattern(regexp = "^[a-zA-Z0-9]{4,}$", message = "password는 최소 4자 이상이며 알파벳 대소문자(a~z, A~Z), 숫자(0~9)로 구성되어야 합니다.")
         private String password;
 
@@ -39,7 +39,7 @@ public class MembersRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class LoginMemberRequestDto{
+    public static class LoginDto{
         private String memberName;
         private String password;
     }
@@ -48,39 +48,7 @@ public class MembersRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UpdateMemberAttributeRequestDto {
-        @NotNull
-        private String memberName;
-        private Long salary;
-        private MemberRole role;
-        private MemberDepartment department;
-        private MemberPosition position;
-        private MultipartFile file;
-    }
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class UpdateMemberSalaryRequestDto{
-        private String memberName;
-        private Long salary;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class UpdateMemberVacationDaysRequestDto {
-        // 잔여 휴가 일 수
-        private Integer vacationDays;
-    }
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class UpdateMemberRequestDto{
+    public static class UpdateOneDto{
         private String name;
         private String memberName;
         private String password;
@@ -95,9 +63,40 @@ public class MembersRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UpdateMemberProfileImageUrlRequestDto {
+    public static class UpdateOneForAttributeDto {
+        @NotNull
+        private String memberName;
+        private Long salary;
+        private String role;
+        private String department;
+        private String position;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForSalaryDto{
+        private String memberName;
+        private Long salary;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForProfileImageDto {
         private String password;
         private String passwordConfirm;
         private String profileImageUrl;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForVacationDaysDto {
+        // 잔여 휴가 일 수
+        private Integer vacationDays;
     }
 }

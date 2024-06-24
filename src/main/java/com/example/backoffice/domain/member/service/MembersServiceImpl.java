@@ -128,14 +128,6 @@ public class MembersServiceImpl implements MembersService{
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByDepartmentAndPosition(
-            MemberDepartment department, MemberPosition position){
-        return membersRepository.findByDepartmentAndPosition(department, position).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Members> findAllByDepartment(MemberDepartment department){
         return membersRepository.findAllByDepartment(department);
     }

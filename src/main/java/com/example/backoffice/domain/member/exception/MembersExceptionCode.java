@@ -25,6 +25,7 @@ public enum MembersExceptionCode {
     NOT_FOUND_EXCEPTION_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER-016", "유효하지 않은 예외 처리 방법입니다."),
     NOT_FOUND_DEPARTMENT(HttpStatus.BAD_REQUEST,"MEMBER-017","해당 부서는 존재하지 않습니다."),
     NOT_FOUND_POSITION(HttpStatus.BAD_REQUEST,"MEMBER-018","해당 직책은 존재하지 않습니다."),
+    NOT_FOUND_ROLE(HttpStatus.BAD_REQUEST, "MEMBER-019","해당 역할은 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
