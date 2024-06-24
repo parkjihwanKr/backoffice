@@ -41,9 +41,6 @@ public interface MembersService {
 
     List<Members> findAll();
 
-    Members findByDepartmentAndPosition(
-            MemberDepartment department, MemberPosition position);
-
     List<Members> findAllByDepartment(MemberDepartment department);
 
     List<Members> findAllByPosition(MemberPosition position);

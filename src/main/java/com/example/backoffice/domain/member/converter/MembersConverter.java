@@ -24,6 +24,8 @@ public class MembersConverter {
                 .password(bcrytPassword)
                 .contact("010-0000-0000")
                 .position(MemberPosition.CEO)
+                .remainingVacationDays(4)
+                .onVacation(false)
                 .salary(20000000L)
                 .build();
     }
@@ -40,6 +42,9 @@ public class MembersConverter {
                 .loveCount(0L)
                 .password(bcryptPassword) // 암호화된 비밀번호 사용
                 .contact(requestDto.getContact())
+                .remainingVacationDays(4)
+                .salary(24000000L)
+                .onVacation(false)
                 .build();
     }
 
@@ -60,9 +65,13 @@ public class MembersConverter {
                 .address(member.getAddress())
                 .memberName(member.getMemberName())
                 .role(member.getRole())
+                .position(member.getPosition())
+                .department(member.getDepartment())
                 .loveCount(member.getLoveCount())
                 .createdAt(member.getCreatedAt())
                 .modifiedAt(member.getModifiedAt())
+                .onVacation(member.getOnVacation())
+                .remainingVacationDays(member.getRemainingVacationDays())
                 .build();
     }
 
@@ -74,6 +83,7 @@ public class MembersConverter {
                 .contact(member.getContact())
                 .email(member.getEmail())
                 .introduction(member.getIntroduction())
+                .profileImageUrl(member.getProfileImageUrl())
                 .createdAt(member.getCreatedAt())
                 .modifiedAt(member.getModifiedAt())
                 .build();
@@ -112,6 +122,15 @@ public class MembersConverter {
         return MembersResponseDto.DeleteOneForProfileImageDto.builder()
                 .fromMemberName(member.getMemberName())
                 .build();
+    }
+
+    public static MemberRole toRole(String roleName){
+        for(MemberRole role : MemberRole.values()){
+            if(role.getAuthority().equalsIgnoreCase(roleName)){
+                return role;
+            }
+        }
+        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_ROLE);
     }
 
     public static MemberDepartment toDepartment(String departmentName) {

@@ -3,14 +3,12 @@ package com.example.backoffice.domain.member.dto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
-import com.example.backoffice.domain.member.entity.Members;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class MembersResponseDto {
 
@@ -42,6 +40,10 @@ public class MembersResponseDto {
         private Long loveCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        private Boolean onVacation;
+        private Integer remainingVacationDays;
+        private MemberDepartment department;
+        private MemberPosition position;
     }
 
     @Getter
@@ -56,6 +58,7 @@ public class MembersResponseDto {
         private String address;
         private String introduction;
         private Long loveCount;
+        private String profileImageUrl;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -67,6 +70,7 @@ public class MembersResponseDto {
     public static class UpdateOneForAttributeDto{
         private String memberName;
         private String fileName;
+        private Long salary;
         private MemberRole memberRole;
         private MemberPosition memberPosition;
         private MemberDepartment memberDepartment;

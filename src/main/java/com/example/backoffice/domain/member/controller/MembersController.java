@@ -40,11 +40,13 @@ public class MembersController {
 
     @PatchMapping("/members/{memberId}/profile")
     public ResponseEntity<MembersResponseDto.UpdateOneDto> updateOne(
-            @PathVariable Long memberId, @RequestBody MembersRequestDto.UpdateOneDto requestDto,
+            @PathVariable Long memberId,
+            @RequestPart(value = "data") MembersRequestDto.UpdateOneDto requestDto,
+            @RequestPart(value = "file") MultipartFile multipartFile,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         MembersResponseDto.UpdateOneDto responseDto
                 = membersServiceFacade.updateOne(
-                        memberId, memberDetails.getMembers(), requestDto);
+                        memberId, memberDetails.getMembers(), multipartFile, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -54,10 +56,11 @@ public class MembersController {
     public ResponseEntity<CommonResponse<MembersResponseDto.UpdateOneForAttributeDto>> updateOneForAttribute(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @ModelAttribute MembersRequestDto.UpdateOneForAttributeDto requestDto){
+            @RequestPart(value = "data") MembersRequestDto.UpdateOneForAttributeDto requestDto,
+            @RequestPart(value = "file") MultipartFile multipartFile){
         MembersResponseDto.UpdateOneForAttributeDto responseDto =
                 membersServiceFacade.updateOneForAttribute(
-                        memberId, memberDetails.getMembers(), requestDto);
+                        memberId, memberDetails.getMembers(), requestDto, multipartFile);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
                         HttpStatus.OK, "해당 사항이 변경되었습니다.", responseDto

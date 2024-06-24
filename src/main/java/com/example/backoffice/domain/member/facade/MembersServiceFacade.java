@@ -19,12 +19,13 @@ public interface MembersServiceFacade {
             Long memberId, Members member);
 
     MembersResponseDto.UpdateOneDto updateOne(
-            Long memberId,  Members Member,
+            Long memberId,  Members Member, MultipartFile multipartFile,
             MembersRequestDto.UpdateOneDto requestDto);
 
     MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(
             Long memberId, Members member,
-            MembersRequestDto.UpdateOneForAttributeDto requestDto);
+            MembersRequestDto.UpdateOneForAttributeDto requestDto,
+            MultipartFile multipartFile);
 
     MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
             Long memberId, Members member, MultipartFile image);

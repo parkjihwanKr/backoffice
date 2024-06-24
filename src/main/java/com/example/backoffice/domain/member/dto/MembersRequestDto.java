@@ -67,10 +67,9 @@ public class MembersRequestDto {
         @NotNull
         private String memberName;
         private Long salary;
-        private MemberRole role;
-        private MemberDepartment department;
-        private MemberPosition position;
-        private MultipartFile file;
+        private String role;
+        private String department;
+        private String position;
     }
 
     @Builder
