@@ -2,7 +2,7 @@ package com.example.backoffice.domain.notification.facade;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.facade.MembersServiceFacade;
+import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.dto.NotificationsRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
@@ -26,7 +26,7 @@ import java.util.*;
 public class NotificationsServiceFacadeImpl implements NotificationsServiceFacade {
 
     private final NotificationsService notificationsService;
-    private final MembersServiceFacade membersServiceFacade;
+    private final MembersServiceFacadeV1 membersServiceFacade;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
@@ -267,6 +267,17 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                         notificationData.getToMember().getMemberName(),
                         notificationData.getFromMember().getMemberName(),
                         urgentServerIssueMessage, domainType, notificationData.getFromMember().getDepartment());
+            }
+            case EVALUATION -> {
+                String evaluationMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 "
+                        + notificationData.getMessage()
+                        + " 작성 요청 알림입니다.";
+                yield NotificationsConverter.toEntity(
+                        notificationData.getToMember().getMemberName(),
+                        notificationData.getFromMember().getMemberName(),
+                        evaluationMessage, domainType, notificationData.getFromMember().getDepartment());
             }
 
             default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);

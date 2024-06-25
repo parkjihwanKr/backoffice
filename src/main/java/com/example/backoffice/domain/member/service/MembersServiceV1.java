@@ -7,7 +7,7 @@ import com.example.backoffice.domain.member.entity.Members;
 
 import java.util.List;
 
-public interface MembersService {
+public interface MembersServiceV1 {
 
     void signup(Members member);
 
