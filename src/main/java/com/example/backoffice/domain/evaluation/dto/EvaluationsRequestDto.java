@@ -19,4 +19,14 @@ public class EvaluationsRequestDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CreateOneForCompanyDto {
+        private String description;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
 }

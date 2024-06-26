@@ -17,7 +17,7 @@ public class EvaluationsController {
 
     private final EvaluationsServiceV1 evaluationsService;
 
-    @PostMapping("/evaluations")
+    @PostMapping("/evaluations-department")
     public ResponseEntity<EvaluationsResponseDto.CreateOneForDepartmentDto> createOneForDepartment(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EvaluationsRequestDto.CreateOneForDepartmentDto requestDto){
@@ -26,9 +26,17 @@ public class EvaluationsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @PostMapping("/evaluations-company")
+    public ResponseEntity<EvaluationsResponseDto.CreateOneForCompanyDto> createOneForCompany(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody EvaluationsRequestDto.CreateOneForCompanyDto requestDto){
+        EvaluationsResponseDto.CreateOneForCompanyDto responseDto
+                = evaluationsService.createOneForCompany(memberDetails.getMembers(),requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
     // front 해당 부서에 대한 설문조사를 시행하시겠습니까? -> y/n
     // 시행 기간은 일괄적으로 정해져 있는데?
-    @GetMapping("/evaluations/{evaluationId}/department")
+    @GetMapping("/evaluations-department/{evaluationId}")
     public ResponseEntity<EvaluationsResponseDto.ReadOneForDepartmentDto> readOneForDepartment(
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
@@ -37,7 +45,7 @@ public class EvaluationsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/evaluations/{evaluationId}/company")
+    @GetMapping("/evaluations-company/{evaluationId}")
     public ResponseEntity<EvaluationsResponseDto.ReadOneForCompanyDto> readOneForCompany(
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){

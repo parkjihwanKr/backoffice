@@ -23,8 +23,20 @@ public class EvaluationsConverter {
     }
 
     public static EvaluationsResponseDto.CreateOneForDepartmentDto toCreateOneForDepartmentDto(
-            Evaluations evaluations){
+            String loginMemberName, String title, String description){
         return EvaluationsResponseDto.CreateOneForDepartmentDto.builder()
+                .writerName(loginMemberName)
+                .title(title)
+                .description(description)
+                .build();
+    }
+
+    public static EvaluationsResponseDto.CreateOneForCompanyDto toCreateOneForCompanyDto(
+            String loginMemberName, String title, String description){
+        return EvaluationsResponseDto.CreateOneForCompanyDto.builder()
+                .writerName(loginMemberName)
+                .title(title)
+                .description(description)
                 .build();
     }
 }

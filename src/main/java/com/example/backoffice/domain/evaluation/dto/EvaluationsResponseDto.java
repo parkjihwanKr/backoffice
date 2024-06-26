@@ -13,7 +13,7 @@ public class EvaluationsResponseDto {
     @NoArgsConstructor
     public static class CreateOneForDepartmentDto {
         private String title;
-        private String content;
+        private String description;
         // 만든이
         private String writerName;
     }
@@ -22,9 +22,21 @@ public class EvaluationsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ReadOneForDepartmentDto {
+    public static class CreateOneForCompanyDto {
+        private String title;
+        private String description;
         private String writerName;
-        private String password;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadOneForDepartmentDto {
+        private String title;
+        private Integer year;
+        private Integer quarter;
+        private String writerName;
     }
 
     @Getter

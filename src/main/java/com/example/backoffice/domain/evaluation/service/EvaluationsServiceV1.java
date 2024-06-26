@@ -10,6 +10,9 @@ public interface EvaluationsServiceV1 {
     EvaluationsResponseDto.CreateOneForDepartmentDto createOneForDepartment(
             Members loginMember, EvaluationsRequestDto.CreateOneForDepartmentDto requestDto);
 
+    EvaluationsResponseDto.CreateOneForCompanyDto createOneForCompany(
+            Members loginMember, EvaluationsRequestDto.CreateOneForCompanyDto requestDto);
+
     EvaluationsResponseDto.ReadOneForDepartmentDto readOneForDepartment(
             Long evaluationsId, Members member);
 
