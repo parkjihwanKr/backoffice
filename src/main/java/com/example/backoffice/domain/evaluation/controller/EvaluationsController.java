@@ -34,20 +34,22 @@ public class EvaluationsController {
                 = evaluationsService.createOneForCompany(memberDetails.getMembers(),requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
     // front 해당 부서에 대한 설문조사를 시행하시겠습니까? -> y/n
     // 시행 기간은 일괄적으로 정해져 있는데?
     @GetMapping("/evaluations-department/{evaluationId}")
     public ResponseEntity<EvaluationsResponseDto.ReadOneForDepartmentDto> readOneForDepartment(
+            @RequestParam Integer year, @RequestParam Integer quarter,
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         EvaluationsResponseDto.ReadOneForDepartmentDto responseDto
-                = evaluationsService.readOneForDepartment(evaluationId, memberDetails.getMembers());
+                = evaluationsService.readOneForDepartment(year, quarter, evaluationId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @GetMapping("/evaluations-company/{evaluationId}")
     public ResponseEntity<EvaluationsResponseDto.ReadOneForCompanyDto> readOneForCompany(
-            @PathVariable Long evaluationId,
+            @RequestParam Integer year, @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         return null;
     }

@@ -14,7 +14,7 @@ public interface EvaluationsServiceV1 {
             Members loginMember, EvaluationsRequestDto.CreateOneForCompanyDto requestDto);
 
     EvaluationsResponseDto.ReadOneForDepartmentDto readOneForDepartment(
-            Long evaluationsId, Members member);
+            Integer year, Integer quarter, Long evaluationsId, Members member);
 
     EvaluationsResponseDto.ReadOneForCompanyDto readOneForCompany(
             Long evaluationId, Members loginMember);

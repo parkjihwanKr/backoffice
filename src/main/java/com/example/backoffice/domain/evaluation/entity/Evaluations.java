@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Table
@@ -40,12 +40,16 @@ public class Evaluations extends CommonEntity {
     @Enumerated(EnumType.STRING)
     private MemberDepartment department;
 
+    // 생각해보니 한 평가에 많은 멤버, 한 멤버는 부서 분기별 평가, 회사 1년 종합 평가 등등을 한다고 가정하면
+    // OneToMany관계가 아님 -> ManyToMany 즉, 중간 테이블 필요
     @OneToMany
     private List<Members> memberList;
 
-    private LocalDateTime startDate;
+    /*@OneToMany(mappedBy = "evaluations", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Questions> questionList;*/
+    private LocalDate startDate;
 
-    private LocalDateTime endTime;
+    private LocalDate endTime;
 
     // relation
 

@@ -39,4 +39,14 @@ public class EvaluationsConverter {
                 .description(description)
                 .build();
     }
+
+    public static EvaluationsResponseDto.ReadOneForDepartmentDto toReadOneForDepartmentDto(
+            String title, Integer year, Integer quarter, String writerName){
+        return EvaluationsResponseDto.ReadOneForDepartmentDto.builder()
+                .title(title)
+                .year(year)
+                .quarter(quarter)
+                .writerName(writerName)
+                .build();
+    }
 }

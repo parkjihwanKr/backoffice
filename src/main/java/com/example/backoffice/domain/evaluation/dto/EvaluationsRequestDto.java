@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class EvaluationsRequestDto {
 
@@ -16,8 +16,8 @@ public class EvaluationsRequestDto {
     public static class CreateOneForDepartmentDto{
         private String description;
         private String department;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
+        private LocalDate startDate;
+        private LocalDate endDate;
     }
 
     @Getter
@@ -26,7 +26,7 @@ public class EvaluationsRequestDto {
     @NoArgsConstructor
     public static class CreateOneForCompanyDto {
         private String description;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
+        private LocalDate startDate;
+        private LocalDate endDate;
     }
 }

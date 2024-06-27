@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -100,7 +101,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     @Override
     @Transactional(readOnly = true)
     public EvaluationsResponseDto.ReadOneForDepartmentDto readOneForDepartment(
-            Long evaluationsId, Members loginMember){
+            Integer year, Integer quarter, Long evaluationsId, Members loginMember){
         Evaluations evaluation = findById(evaluationsId);
         membersService.findById(loginMember.getId());
 
@@ -111,7 +112,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
             }
         }
 
-        return null;
+        return EvaluationsConverter.toReadOneForDepartmentDto(
+                evaluation.getTitle(), year, quarter, loginMember.getMemberName());
     }
 
     @Override
@@ -128,7 +130,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
                 ()-> new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS));
     }
 
-    private Integer validateAndDetermineQuarter(LocalDateTime startDate, LocalDateTime endDate) {
+    private Integer validateAndDetermineQuarter(LocalDate startDate, LocalDate endDate) {
         // 1. startDate, endDate 검증
         validateDate(startDate, endDate);
 
@@ -139,25 +141,25 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
             throw new EvaluationsCustomException(EvaluationsExceptionCode.INVALID_QUARTER_REQUEST);
         }
         // 3. 최소 분기별 마지노선 마감 날짜일: 분기별 마지막 달 마지막 일의 14일 전
-        LocalDateTime quarterEndDate = getQuarterEndDate(startQuarter).minusDays(14);
+        LocalDate quarterEndDate = getQuarterEndDate(startQuarter).minusDays(14);
         if (endDate.isAfter(quarterEndDate)) {
             throw new EvaluationsCustomException(EvaluationsExceptionCode.END_DATE_TOO_LATE);
         }
         return startQuarter;
     }
 
-    private LocalDateTime getQuarterEndDate(Integer quarter) {
-        int nowYear = LocalDateTime.now().getYear();
+    private LocalDate getQuarterEndDate(Integer quarter) {
+        int nowYear = LocalDate.now().getYear();
         return switch (quarter) {
-            case 1 -> LocalDateTime.of(nowYear, 3, 31, 23, 59, 59);
-            case 2 -> LocalDateTime.of(nowYear, 6, 30, 23, 59, 59);
-            case 3 -> LocalDateTime.of(nowYear, 9, 30, 23, 59, 59);
-            case 4 -> LocalDateTime.of(nowYear, 12, 31, 23, 59, 59);
+            case 1 -> LocalDate.of(nowYear, 3, 31);
+            case 2 -> LocalDate.of(nowYear, 6, 30);
+            case 3 -> LocalDate.of(nowYear, 9, 30);
+            case 4 -> LocalDate.of(nowYear, 12, 31);
             default -> throw new EvaluationsCustomException(EvaluationsExceptionCode.QUARTER_CALCULATE_ERROR);
         };
     }
 
-    private void validateDate(LocalDateTime startDate, LocalDateTime endDate){
+    private void validateDate(LocalDate startDate, LocalDate endDate){
         // 1. 해당 startDate, endDate의 연도가 같은지?
         int nowYear = LocalDateTime.now().getYear();
         if(startDate.getYear() != nowYear || endDate.getYear() != nowYear){
@@ -165,7 +167,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         }
 
         // 2. 시작 날이 지난 날짜로 설정될 때
-        if(startDate.isBefore(LocalDateTime.now())){
+        if(startDate.isBefore(LocalDate.now())){
             throw new EvaluationsCustomException(EvaluationsExceptionCode.NOW_DATE_BEFORE_START_DATE);
         }
 
