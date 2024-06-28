@@ -2,7 +2,7 @@ package com.example.backoffice.domain.member.controller;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
-import com.example.backoffice.domain.member.facade.MembersServiceFacade;
+import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
 import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;
@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class MembersController {
 
-    private final MembersServiceFacade membersServiceFacade;
+    private final MembersServiceFacadeV1 membersServiceFacade;
 
     @PostMapping("/signup")
     public ResponseEntity<MembersResponseDto.CreateOneDto> signup(

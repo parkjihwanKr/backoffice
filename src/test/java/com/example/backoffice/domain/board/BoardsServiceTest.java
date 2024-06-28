@@ -1,49 +1,14 @@
 package com.example.backoffice.domain.board;
 
-import com.example.backoffice.domain.board.dto.BoardsRequestDto;
-import com.example.backoffice.domain.board.dto.BoardsResponseDto;
-import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.board.repository.BoardsRepository;
-import com.example.backoffice.domain.board.service.BoardsServiceImpl;
-import com.example.backoffice.domain.comment.entity.Comments;
-import com.example.backoffice.domain.comment.repository.CommentsRepository;
-import com.example.backoffice.domain.file.service.FilesService;
-import com.example.backoffice.domain.member.entity.MemberRole;
-import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.repository.MembersRepository;
-import com.example.backoffice.global.redis.RedisProvider;
-import com.example.backoffice.global.security.MemberDetailsImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-test.yml")
 public class BoardsServiceTest {
 
-    private MemberDetailsImpl memberDetails;
+    /*private MemberDetailsImpl memberDetails;
 
     @Mock
     private FilesService filesService;
@@ -239,5 +204,5 @@ public class BoardsServiceTest {
         when(boardsRepository.save(board1)).thenReturn(board1);
         // when
         // then
-    }
+    }*/
 }

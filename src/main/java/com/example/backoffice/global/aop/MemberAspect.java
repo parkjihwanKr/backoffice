@@ -35,7 +35,7 @@ public class MemberAspect {
     // AOP를 지울 지 고민 중.
 
     // JoinPoint @Param MembersRequestDto.CreateMembersRequestDto requestDto
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.signup(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.signup(..))")
     public void logAfterSignup(JoinPoint joinPoint) {
         MembersRequestDto.CreateOneDto requestDto
                 = (MembersRequestDto.CreateOneDto) joinPoint.getArgs()[0];
@@ -46,7 +46,7 @@ public class MemberAspect {
         auditLogService.save(AuditLogType.SIGNUP, requestDto.getMemberName(), message);
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateOneForSalary(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForSalary(..))")
     public void logAfterUpdateSalary(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         MembersRequestDto.UpdateOneForSalaryDto requestDto =
@@ -63,7 +63,7 @@ public class MemberAspect {
                 loginMember.getMemberName(), message);
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.deleteOne(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.deleteOne(..))")
     public void logAfterDeleteMember(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName() + "님이 회원 탈퇴하셨습니다.";
@@ -74,7 +74,7 @@ public class MemberAspect {
                 AuditLogType.DELETE_MEMBER, loginMember.getMemberName(), message);
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateOneForAttribute(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForAttribute(..))")
     public void logAfterUpdateMemberAttribute(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         MembersRequestDto.UpdateOneForAttributeDto requestDto =
@@ -99,7 +99,7 @@ public class MemberAspect {
         }
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImpl.updateOneForProfileImage(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForProfileImage(..))")
     public void logAfterUpdateMemberProfileImageUrl(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName()

@@ -13,7 +13,7 @@ import com.example.backoffice.domain.event.service.EventsService;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
@@ -31,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
-    private final MembersService membersService;
+    private final MembersServiceV1 membersService;
     private final NotificationsServiceFacade notificationsServiceFacade;
     private final EventsService eventsService;
 
@@ -262,7 +262,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         }
 
         // 5. 휴가 시작날이 휴가 끝나는 날보다 느릴 때
-        if (!startEventDate.isBefore(endEventDate)) {
+        if (startEventDate.isBefore(endEventDate)) {
             throw new EventsCustomException(EventsExceptionCode.END_DATE_BEFORE_START_DATE);
         }
 

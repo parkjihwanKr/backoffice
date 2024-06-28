@@ -11,7 +11,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
-import com.example.backoffice.domain.member.service.MembersService;
+import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.service.NotificationsService;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.SchedulerCustomException;
@@ -31,10 +31,10 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MembersServiceFacadeImpl implements MembersServiceFacade{
+public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     private final FilesService filesService;
-    private final MembersService membersService;
+    private final MembersServiceV1 membersService;
     private final NotificationsService notificationsService;
     private final PasswordEncoder passwordEncoder;
     @PostConstruct
