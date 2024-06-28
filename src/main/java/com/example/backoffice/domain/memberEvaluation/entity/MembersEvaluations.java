@@ -25,11 +25,11 @@ public class MembersEvaluations extends CommonEntity {
     private Boolean isCompleted;
 
     // relations
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "members_id")
     private Members member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evaluations_id")
     private Evaluations evaluation;
 
