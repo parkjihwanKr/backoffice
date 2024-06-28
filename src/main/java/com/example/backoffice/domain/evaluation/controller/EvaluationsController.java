@@ -51,6 +51,8 @@ public class EvaluationsController {
     public ResponseEntity<EvaluationsResponseDto.ReadOneForCompanyDto> readOneForCompany(
             @RequestParam Integer year, @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        EvaluationsResponseDto.ReadOneForCompanyDto responseDto
+                = evaluationsService.readOneForCompany(year, evaluationId, memberDetails.getMembers());
         return null;
     }
 }

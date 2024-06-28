@@ -17,7 +17,7 @@ public interface EvaluationsServiceV1 {
             Integer year, Integer quarter, Long evaluationsId, Members member);
 
     EvaluationsResponseDto.ReadOneForCompanyDto readOneForCompany(
-            Long evaluationId, Members loginMember);
+            Integer year, Long evaluationId, Members loginMember);
 
     Evaluations findById(Long evaluationsId);
 }

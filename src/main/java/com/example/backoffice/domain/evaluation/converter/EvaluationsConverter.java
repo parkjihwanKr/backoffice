@@ -11,14 +11,13 @@ public class EvaluationsConverter {
 
     public static Evaluations toEntity(
             String title, Integer year, Integer quarter,
-            String description, MemberDepartment department, List<Members> memberList){
+            String description, MemberDepartment department){
         return Evaluations.builder()
                 .title(title)
                 .year(year)
                 .quarter(quarter)
                 .description(description)
                 .department(department)
-                .memberList(memberList)
                 .build();
     }
 
@@ -47,6 +46,15 @@ public class EvaluationsConverter {
                 .year(year)
                 .quarter(quarter)
                 .writerName(writerName)
+                .build();
+    }
+
+    public static EvaluationsResponseDto.ReadOneForCompanyDto toReadOneForCompanyDto(
+            String title, String description, Integer year){
+        return EvaluationsResponseDto.ReadOneForCompanyDto.builder()
+                .title(title)
+                .description(description)
+                .year(year)
                 .build();
     }
 }

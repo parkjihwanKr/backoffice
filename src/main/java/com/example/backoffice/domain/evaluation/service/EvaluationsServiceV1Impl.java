@@ -12,6 +12,9 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
+import com.example.backoffice.domain.memberEvaluation.converter.MembersEvaluationsConverter;
+import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
+import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluationsServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
@@ -31,6 +34,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     private final MembersServiceV1 membersService;
     private final NotificationsServiceFacade notificationsServiceFacade;
     private final EvaluationsRepository evaluationsRepository;
+    private final MembersEvaluationsServiceV1 membersEvaluationsService;
 
     @Override
     @Transactional
@@ -54,18 +58,20 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         int year = requestDto.getStartDate().getYear();
         String title = year+"년 "+quarter+"분기 부서 설문조사";
 
+        // 한 평가에 여럿 멤버, 한 멤버에 여럿 평가 가능. 다대다인데?
+        // 일단 부서에 대한 평가를 부서원들에게 전달해야하니까 이건 맞음
         List<Members> memberList = membersService.findAllByDepartment(department);
 
-        Evaluations evaluations
+        Evaluations evaluation
                 = EvaluationsConverter.toEntity(
                         title, year, quarter, requestDto.getDescription(),
-                loginMember.getDepartment(), memberList);
-        evaluationsRepository.save(evaluations);
+                loginMember.getDepartment());
+        evaluationsRepository.save(evaluation);
 
-        sendNotificationForMemberList(loginMember, memberList, title);
+        sendNotificationForMemberList(loginMember, memberList, title, evaluation);
 
         return EvaluationsConverter.toCreateOneForDepartmentDto(
-                title, evaluations.getDescription(),loginMember.getMemberName());
+                title, evaluation.getDescription(),loginMember.getMemberName());
     }
 
     @Override
@@ -87,11 +93,11 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         String title = year + "년도 회사 내부 평가";
         List<Members> memberList = membersService.findAll();
         Evaluations evaluation = EvaluationsConverter.toEntity(
-                title, year, 1, requestDto.getDescription(), null, memberList);
+                title, year, 1, requestDto.getDescription(), null);
         evaluationsRepository.save(evaluation);
 
         // 4. 모든 멤버에게 작성 요청
-        sendNotificationForMemberList(loginMember, memberList, title);
+        sendNotificationForMemberList(loginMember, memberList, title, evaluation);
 
         // 5. responseDto 작성
         return EvaluationsConverter.toCreateOneForCompanyDto(
@@ -112,6 +118,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
             }
         }
 
+        membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationsId);
+
         return EvaluationsConverter.toReadOneForDepartmentDto(
                 evaluation.getTitle(), year, quarter, loginMember.getMemberName());
     }
@@ -119,8 +127,14 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     @Override
     @Transactional(readOnly = true)
     public EvaluationsResponseDto.ReadOneForCompanyDto readOneForCompany(
-            Long evaluationId, Members loginMember){
-        return null;
+            Integer year, Long evaluationId, Members loginMember){
+
+        Evaluations evaluation = findById(evaluationId);
+
+        membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationId);
+
+        return EvaluationsConverter.toReadOneForCompanyDto(
+                evaluation.getTitle(), evaluation.getDescription(), evaluation.getYear());
     }
 
     @Override
@@ -183,13 +197,15 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     }
 
     private void sendNotificationForMemberList(
-            Members loginMember, List<Members> memberList, String message){
+            Members loginMember, List<Members> memberList, String message, Evaluations evaluation){
         for(Members member : memberList){
             notificationsServiceFacade.createNotification(
                     NotificationsConverter.toNotificationData(
                             loginMember, member, null, null,
                             null, null, message),
                     NotificationType.EVALUATION);
+
+            membersEvaluationsService.save(MembersEvaluationsConverter.toEntity(member, evaluation));
         }
     }
 }

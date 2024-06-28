@@ -50,7 +50,9 @@ public class EvaluationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ReadOneForCompanyDto {
-        private String memberName;
+        private String writerName;
         private String title;
+        private String description;
+        private Integer year;
     }
 }

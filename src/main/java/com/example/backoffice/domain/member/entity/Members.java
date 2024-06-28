@@ -2,6 +2,7 @@ package com.example.backoffice.domain.member.entity;
 
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.favorite.entity.Favorities;
+import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -20,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Members extends CommonEntity {
 
+    // field
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -71,6 +73,7 @@ public class Members extends CommonEntity {
     // 휴가 상태
     private Boolean onVacation;
 
+    // relations
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reactions> reactionList;
 
@@ -80,6 +83,10 @@ public class Members extends CommonEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorities> favoritieList;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MembersEvaluations> membersEvaluations;
+
+    // entity method
     public void updateMemberInfo(
             String name, String email, String address,
             String contact, String introduction, String bCrytPassword, String profileImageUrl){
