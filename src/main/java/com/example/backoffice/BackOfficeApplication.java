@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableJpaRepositories(
 		basePackages = {
+				"com.example.backoffice.domain.question.repository",
 				"com.example.backoffice.domain.memberEvaluation.repository",
 				"com.example.backoffice.domain.evaluation.repository",
 				"com.example.backoffice.domain.favorite.repository",

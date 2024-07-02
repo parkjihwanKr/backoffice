@@ -31,7 +31,7 @@ public class Favorities extends CommonEntity {
     @Enumerated(EnumType.STRING)
     private FavoriteType favoriteType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Members member;
 
