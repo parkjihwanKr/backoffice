@@ -30,7 +30,7 @@ public class QuestionsRequestDto {
         // 1 선택 시, shortAnswerDto -> null, 2 선택 시, multipleChoiceAnswer -> null
         private List<String> multipleChoiceAnswerList;
         // questionType을 주관식을 선택한 경우에 작성 가능
-        private String shortAnswer;
+        private String shortAnswerDto;
     }
 
     @Getter

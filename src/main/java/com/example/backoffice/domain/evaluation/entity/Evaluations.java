@@ -49,7 +49,7 @@ public class Evaluations extends CommonEntity {
     @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MembersEvaluations> membersEvaluations;
 
-    @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "evaluations", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Questions> questionList;
 
     // entity method

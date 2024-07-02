@@ -15,7 +15,7 @@ public enum QuestionsType {
 
     public static class AnswerType {
         public static final String MULTIPLE_CHOICE_ANSWER = "MULTIPLE_CHOICE_ANSWER";
-        public static final String SHORT_ANSWER = "SHORT_ANSWER";
+        public static final String SHORT_ANSWER = "MULTIPLE_CHOICE_ANSWER";
 
     }
 }

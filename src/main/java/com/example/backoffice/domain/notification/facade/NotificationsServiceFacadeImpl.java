@@ -33,6 +33,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
     @Transactional
     public void createNotification(
             NotificationData notificationData, NotificationType domainType){
+
         // 자기 자신에게 '사랑해요' -> 이미 ReactionException으로 막혀 있음.
         // 자기 자신의 게시글, 댓글, 대댓글의 '좋아요'는 할 수 있되
         // 알림은 저장하지 않고 자기 자신의 알림에 뜨지 않기에 return null
