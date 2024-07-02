@@ -51,7 +51,7 @@ public class AnswersServiceImplV1 implements AnswersServiceV1{
                 return answerList;
             }
             default -> {
-                return null;
+                throw new AnswersCustomException(AnswersExceptionCode.NOT_FOUND_QUESTIONS_TYPE);
             }
         }
     }
