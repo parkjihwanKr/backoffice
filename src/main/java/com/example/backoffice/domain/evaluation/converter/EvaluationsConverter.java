@@ -22,7 +22,7 @@ public class EvaluationsConverter {
     }
 
     public static EvaluationsResponseDto.CreateOneForDepartmentDto toCreateOneForDepartmentDto(
-            String loginMemberName, String title, String description){
+            String title, String description, String loginMemberName){
         return EvaluationsResponseDto.CreateOneForDepartmentDto.builder()
                 .writerName(loginMemberName)
                 .title(title)

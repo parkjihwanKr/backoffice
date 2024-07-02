@@ -186,7 +186,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         }
 
         // 3. 시작 날이 마감 날보다 느릴 때
-        if (startDate.isBefore(endDate)) {
+        if (!startDate.isBefore(endDate)) {
             throw new EvaluationsCustomException(EvaluationsExceptionCode.END_DATE_BEFORE_START_DATE);
         }
 
@@ -205,7 +205,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
                             null, null, message),
                     NotificationType.EVALUATION);
 
-            membersEvaluationsService.save(MembersEvaluationsConverter.toEntity(member, evaluation));
+            membersEvaluationsService.save(
+                    MembersEvaluationsConverter.toEntity(member, evaluation));
         }
     }
 }
