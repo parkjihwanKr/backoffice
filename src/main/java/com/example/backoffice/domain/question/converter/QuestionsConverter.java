@@ -12,11 +12,13 @@ import java.util.List;
 public class QuestionsConverter {
 
     public static Questions toEntity(
-            Evaluations evaluation, QuestionsType questionsType, String questionText){
+            Evaluations evaluation, QuestionsType questionsType,
+            String questionText/*, List<Answer> multipleChoiceAnswerList*/){
         return Questions.builder()
                 .evaluation(evaluation)
                 .questionsType(questionsType)
                 .questionText(questionText)
+                /*.multipleChoiceAnswerList(multipleChoiceAnswerList)*/
                 .build();
     }
 
@@ -29,13 +31,13 @@ public class QuestionsConverter {
     }
 
     public static QuestionsResponseDto.CreateOneDto toCreateOneDto(
-            String questionText, QuestionsType questionsType, Integer questionsNumber,
-            List<String> multipleChoiceAnswerList){
+            String questionText, QuestionsType questionsType, Integer questionsNumber
+            /*List<String> multipleChoiceAnswerList*/){
         return QuestionsResponseDto.CreateOneDto.builder()
                 .questionNumber(questionsNumber)
                 .questionText(questionText)
                 .questionType(questionsType)
-                .multipleChoiceAnswerList(multipleChoiceAnswerList)
+                /*.multipleChoiceAnswerList(multipleChoiceAnswerList)*/
                 .build();
     }
 

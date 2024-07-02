@@ -49,39 +49,45 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
                     QuestionsExceptionCode.NOT_PERMISSION_DEPARTMENT_OR_POSITION);
         }
 
-        // 3. requestDto.getQuestionType()이 signleAnswer로 체크 되어 있는데 객관식 문제를 만들 수 있으면 안됨
+        // 3. requestDto.getQuestionType()이 shortAnswer로 체크 되어 있는데 객관식 문제를 만들 수 있으면 안됨
         // 프론트에서 드롭다운 형태로 값을 받아올 것이기에 이상한 형태의 값을 받는 것만 방지
         // 4. Question Entity 생성
         // 5. 부모인 Evaluations에 추가
         List<QuestionsResponseDto.CreateOneDto> responseDtoList = new ArrayList<>();
         Integer questionsNumber = 1;
+
         for(QuestionsRequestDto.CreateOneDto requestQuestion : requestDto.getQuestionList()){
             QuestionsType questionsType
                     = QuestionsConverter.toQuestionsType(requestQuestion.getQuestionType());
-            for(String multipleChoiceAnswer : requestQuestion.getMultipleChoiceAnswerList()){
-                // 3-1. 객관식 질문에 대한 답을 적지 않았을 때
-                if(multipleChoiceAnswer.isEmpty()
-                        && questionsType.equals(QuestionsType.MULTIPLE_CHOICE_ANSWER)){
-                    throw new QuestionsCustomException(QuestionsExceptionCode.NOT_EMPTY_ANSWER);
+            Questions question;
+            switch (questionsType){
+                case MULTIPLE_CHOICE_ANSWER -> {
+                    if(requestQuestion.getShortAnswerDto() != null
+                            || requestQuestion.getMultipleChoiceAnswerList() == null){
+                        throw new QuestionsCustomException(QuestionsExceptionCode.NEED_MULTIPLE_CHOICE_ANSWER);
+                    }
+                    // 객관식 질문에 대한 답을 객체로 가지고 있을 예정,
+                    question = QuestionsConverter.toEntity(
+                                    evaluation, questionsType, requestQuestion.getQuestionText());
                 }
-                // 3-2. 주관식 질문에 대한 객관식 답을 적었을 때
-                // 객관식이 체크되면 주관식 질문을 적을 수 없게 할 것이지만 잘못된 요청이 있을 수 있기에
-                if(!multipleChoiceAnswer.isEmpty()
-                        && questionsType.equals(QuestionsType.SHORT_ANSWER)){
-                    throw new QuestionsCustomException(QuestionsExceptionCode.NOT_NEED_ANSWER);
+                case SHORT_ANSWER -> {
+                    if(requestQuestion.getMultipleChoiceAnswerList() != null
+                            || requestQuestion.getShortAnswerDto() == null){
+                        throw new QuestionsCustomException(QuestionsExceptionCode.NEED_SHORT_ANSWER);
+                    }
+                    // 현재는 객관식과 주관식의 답을 만드는 엔티티 코드가 중복되지만 Answer 도메인을 만들면 변경될 예정
+                    question = QuestionsConverter.toEntity(
+                                    evaluation, questionsType, requestQuestion.getQuestionText());
                 }
+                default -> throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION_TYPE);
             }
-
-            Questions question
-                    = QuestionsConverter.toEntity(
-                            evaluation, questionsType, requestQuestion.getQuestionText());
 
             questionsRepository.save(question);
             evaluation.addQuestion(question);
             responseDtoList.add(
                     QuestionsConverter.toCreateOneDto(
                             question.getQuestionText(), question.getQuestionsType(),
-                            questionsNumber, requestQuestion.getMultipleChoiceAnswerList()));
+                            questionsNumber));
             questionsNumber++;
         }
 

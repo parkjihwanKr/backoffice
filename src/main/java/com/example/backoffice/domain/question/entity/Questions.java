@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,6 +31,10 @@ public class Questions {
     private String questionText;
 
     // 객관식 답은 Answer로 1~5까지
+    @Column(length = 500)
+    private String shortAnswer;
+
+    /*private List<String> multipleChoiceAnswerList;*/
 
     // relations
     // 한 평가에 여럿 질문, 질문 하나에 한 평가

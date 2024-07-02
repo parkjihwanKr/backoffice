@@ -29,4 +29,12 @@ public class QuestionsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @PatchMapping("/evaluations-department/{evaluationId}/questions/{questionId}")
+    public ResponseEntity<QuestionsResponseDto.UpdateOneDto> updateOneForDepartment(
+            @PathVariable Long evaluationId, @PathVariable Long questionId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody QuestionsRequestDto.UpdateOneDto requestDt){
+
+        return null;
+    }
 }

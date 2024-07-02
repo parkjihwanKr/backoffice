@@ -10,6 +10,8 @@ import java.util.List;
 
 public class QuestionsResponseDto {
 
+    // ForCompany, ForDepartment를 안 쓰는 이유 :
+    // 응답 형식이 변경될 거 같지 않음
     @Getter
     @Builder
     @AllArgsConstructor
@@ -34,6 +36,19 @@ public class QuestionsResponseDto {
         // 확장성을 위해 Enum으로 만듦 -> 실제로 구현한 것은 QuestionsType은 2개임.
         private QuestionsType questionType;
         // 1. 매우 만족 ~ 5. 매우 불만족
+        private List<String> multipleChoiceAnswerList;
+    }
+
+    // 해당 부분은 카드의 순서를 바꾸듯 질문의 번호가 바뀌는 형태가 될 수 있음
+    // 즉, Question Entity의 고유 아이디가 빨라도 질문의 앞 순서가 되는게 아니라 인덱스 순서대로 밀려나야됨
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneDto{
+        private String questionNumber;
+        private String questionText;
+        private QuestionsType questionsType;
         private List<String> multipleChoiceAnswerList;
     }
 }
