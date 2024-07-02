@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.question.entity;
 
+import com.example.backoffice.domain.answer.entity.Answers;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -28,13 +29,16 @@ public class Questions {
     @Enumerated(EnumType.STRING)
     private QuestionsType questionsType;
 
+    @Column(unique = true)
     private String questionText;
 
     // 객관식 답은 Answer로 1~5까지
     @Column(length = 500)
     private String shortAnswer;
 
-    /*private List<String> multipleChoiceAnswerList;*/
+    @Builder.Default
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Answers> multipleChoiceAnswerList = new ArrayList<>();
 
     // relations
     // 한 평가에 여럿 질문, 질문 하나에 한 평가
@@ -43,4 +47,7 @@ public class Questions {
     private Evaluations evaluation;
 
     // entity methods
+    public void addAnswer(Answers answer){
+        this.multipleChoiceAnswerList.add(answer);
+    }
 }
