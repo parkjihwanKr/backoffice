@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.question.converter;
 
+import com.example.backoffice.domain.answer.entity.Answers;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
 import com.example.backoffice.domain.question.entity.Questions;
@@ -58,6 +59,18 @@ public class QuestionsConverter {
                 .questionText(question.getQuestionText())
                 .questionsType(question.getQuestionsType())
                 .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
+                .build();
+    }
+
+    public static QuestionsResponseDto.UpdateOneForOrderDto toUpdateOneForChangedOrderDto(
+            Long beforeOrder, Long updateOrder, String questionText,
+            QuestionsType questionsType, List<Answers> multipleChoiceAnswerList){
+        return QuestionsResponseDto.UpdateOneForOrderDto.builder()
+                .beforeUpdatedOrder(beforeOrder)
+                .updatedOrder(updateOrder)
+                .questionText(questionText)
+                .questionsType(questionsType)
+                .multipleChoiceAnswerList(multipleChoiceAnswerList)
                 .build();
     }
 }

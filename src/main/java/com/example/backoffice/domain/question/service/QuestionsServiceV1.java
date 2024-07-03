@@ -15,5 +15,9 @@ public interface QuestionsServiceV1 {
             Long evaluationId, Long questionId,
             Members loginMember, QuestionsRequestDto.UpdateOneDto requestDto);
 
+    QuestionsResponseDto.UpdateOneForOrderDto updateOneForChangedOrder(
+            Long evaluationId, Long questionId,
+            Members loginMember, QuestionsRequestDto.UpdateOneForOrderDto requestDto);
+
     Questions findById(Long questionId);
 }

@@ -37,4 +37,15 @@ public class QuestionsController {
                         evaluationId, questionId, memberDetails.getMembers(), requestDto);
         return null;
     }
+
+    @PatchMapping("/evaluations-department/{evaluationId}/questions/{questionId}/change-order")
+    public ResponseEntity<QuestionsResponseDto.UpdateOneForOrderDto> updateOneForChangedOrder(
+            @PathVariable Long evaluationId, @PathVariable Long questionId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody QuestionsRequestDto.UpdateOneForOrderDto requestDto){
+        QuestionsResponseDto.UpdateOneForOrderDto responseDto
+                =  questionsService.updateOneForChangedOrder(
+                        evaluationId, questionId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

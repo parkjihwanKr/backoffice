@@ -7,7 +7,6 @@ import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.question.converter.QuestionsConverter;
 import com.example.backoffice.domain.question.dto.QuestionsRequestDto;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
@@ -27,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
-    private final MembersServiceV1 membersService;
     private final EvaluationsServiceV1 evaluationsService;
     private final AnswersServiceV1 answersService;
     private final QuestionsRepository questionsRepository;
@@ -118,25 +116,36 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
     @Override
     @Transactional
+    public QuestionsResponseDto.UpdateOneForOrderDto updateOneForChangedOrder(
+            Long evaluationId, Long questionId,
+            Members loginMember, QuestionsRequestDto.UpdateOneForOrderDto requestDto){
+        Evaluations evaluation = evaluationsService.findById(evaluationId);
+        Questions question = findById(questionId);
+
+        List<Questions> evaluationQuestionList = evaluation.getQuestionList();
+        Long maxOrderSize = (long) evaluationQuestionList.size();
+        if(requestDto.getUpdatedOrder() > maxOrderSize){
+            throw new QuestionsCustomException(QuestionsExceptionCode. ORDER_EXCEEDS_MAX_SIZE);
+        }
+
+        Long beforeUpdatedOrder = question.getOrder();
+        if(beforeUpdatedOrder.equals(requestDto.getUpdatedOrder())){
+            throw new QuestionsCustomException(QuestionsExceptionCode.MATCHED_BEFORE_AND_AFTER_ORDER);
+        }
+
+        question.updateForChangedOrder(requestDto.getUpdatedOrder());
+        evaluation.updateQuestionList(evaluationQuestionList);
+
+        return QuestionsConverter.toUpdateOneForChangedOrderDto(
+                beforeUpdatedOrder, requestDto.getUpdatedOrder(),
+                question.getQuestionText(), question.getQuestionsType(),
+                question.getMultipleChoiceAnswerList());
+    }
+
+    @Override
+    @Transactional
     public Questions findById(Long questionId){
         return questionsRepository.findById(questionId).orElseThrow(
                 ()-> new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION));
-    }
-
-    @Transactional(readOnly = true)
-    public Long findOrder(Long evaluationId, Long questionOrder){
-        List<Questions> evaluationQuestionList = findEvaluationQuestionList(evaluationId);
-        for(Questions question : evaluationQuestionList){
-            Long order = question.getOrder();
-            if(order.equals(questionOrder)){
-                return order;
-            }
-        }
-        throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Questions> findEvaluationQuestionList(Long evaluationId){
-        return questionsRepository.findAllByEvaluationId(evaluationId);
     }
 }

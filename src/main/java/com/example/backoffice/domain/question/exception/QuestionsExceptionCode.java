@@ -16,6 +16,8 @@ public enum QuestionsExceptionCode {
     NOT_EXCEED_TWENTY_OR_BELOW_ZERO(HttpStatus.BAD_REQUEST, "QUESTIONS-006", "요청하는 순서는 0이상 20이하여야합니다."),
     NOT_FOUND_QUESTIONS_ORDER(HttpStatus.BAD_REQUEST,"QUESTIONS-007", "해당 질문의 순서를 잘못 입력하셨습니다."),
     NEED_EXCEED_ONE_ANSWER_OR_NULL(HttpStatus.BAD_REQUEST, "QUESTIONS-009", "해당 질문에 대한 답은 1개 초과거나 없어야합니다."),
+    MATCHED_BEFORE_AND_AFTER_ORDER(HttpStatus.BAD_REQUEST, "QUESTIONS-010", "질문의 바꾸려는 순서가 전과 후가 같으면 바뀌지 않습니다."),
+    ORDER_EXCEEDS_MAX_SIZE(HttpStatus.BAD_REQUEST, "QUESTIONS-011","질문 리스트의 순서가 최대 크기를 초과했습니다."),
     ;
 
     private final HttpStatus httpStatus;

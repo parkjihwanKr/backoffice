@@ -41,4 +41,12 @@ public class QuestionsRequestDto {
         private String changeQuestionType;
         private List<String> multipleChoiceAnswerList;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForOrderDto {
+        private Long updatedOrder;
+    }
 }

@@ -68,4 +68,8 @@ public class Questions {
         this.questionsType = questionsType;
         this.multipleChoiceAnswerList.clear();
     }
+
+    public void updateForChangedOrder(Long changedOrder){
+        this.order = changedOrder;
+    }
 }
