@@ -31,8 +31,10 @@ public class QuestionsController {
     public ResponseEntity<QuestionsResponseDto.UpdateOneDto> updateOneForDepartment(
             @PathVariable Long evaluationId, @PathVariable Long questionId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody QuestionsRequestDto.UpdateOneDto requestDt){
-
+            @RequestBody QuestionsRequestDto.UpdateOneDto requestDto){
+        QuestionsResponseDto.UpdateOneDto responseDto
+                = questionsService.updateOneForDepartment(
+                        evaluationId, questionId, memberDetails.getMembers(), requestDto);
         return null;
     }
 }

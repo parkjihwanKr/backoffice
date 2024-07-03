@@ -65,7 +65,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
                     = QuestionsConverter.toQuestionsType(requestQuestion.getQuestionType());
             Questions question
                     = QuestionsConverter.toEntity(
-                            evaluation, questionsType, requestQuestion.getQuestionText());
+                            evaluation, questionsType, requestQuestion.getQuestionText(), (long) questionsNumber);
 
             List<Answers> answersList = answersService.createAll(question, requestQuestion);
 
@@ -81,5 +81,62 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         return QuestionsConverter.toCreateAllDto(
                 evaluation.getTitle(), evaluation.getYear(),
                 evaluation.getQuarter(), responseDtoList);
+    }
+
+    @Override
+    @Transactional
+    public QuestionsResponseDto.UpdateOneDto updateOneForDepartment(
+            Long evaluationId, Long questionId,
+            Members loginMember, QuestionsRequestDto.UpdateOneDto requestDto){
+        // 1. 존재하는 평가인지?
+        Evaluations evaluation = evaluationsService.findById(evaluationId);
+        Questions question = findById(questionId);
+
+        if(!loginMember.getDepartment().equals(evaluation.getDepartment())
+                && loginMember.getPosition().equals(MemberPosition.MANAGER)){
+            throw new QuestionsCustomException(QuestionsExceptionCode.NOT_PERMISSION_DEPARTMENT_OR_POSITION);
+        }
+
+        QuestionsType questionsType
+                = QuestionsConverter.toQuestionsType(requestDto.getChangeQuestionType());
+        if(requestDto.getMultipleChoiceAnswerList().size() > 1){
+            List<Answers> updateMultipleChoiceAnswerList
+                    = answersService.updateAllForMultipleChoiceAnswer(question, requestDto.getMultipleChoiceAnswerList());
+            question.updateForMultipleChoiceAnswerList(
+                    requestDto.getChangeQuestionText(), questionsType, updateMultipleChoiceAnswerList);
+        }else if(requestDto.getMultipleChoiceAnswerList().isEmpty()){
+            answersService.updateAllForShortAnswer(questionId);
+            question.updateForShortAnswer(
+                    requestDto.getChangeQuestionText(), questionsType);
+        }else{
+            // 질문 1개에 대한 응답 번호가 한 개 일 때
+            throw new QuestionsCustomException(QuestionsExceptionCode.NEED_EXCEED_ONE_ANSWER_OR_NULL);
+        }
+
+        return QuestionsConverter.toUpdateOneDto(question);
+    }
+
+    @Override
+    @Transactional
+    public Questions findById(Long questionId){
+        return questionsRepository.findById(questionId).orElseThrow(
+                ()-> new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION));
+    }
+
+    @Transactional(readOnly = true)
+    public Long findOrder(Long evaluationId, Long questionOrder){
+        List<Questions> evaluationQuestionList = findEvaluationQuestionList(evaluationId);
+        for(Questions question : evaluationQuestionList){
+            Long order = question.getOrder();
+            if(order.equals(questionOrder)){
+                return order;
+            }
+        }
+        throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Questions> findEvaluationQuestionList(Long evaluationId){
+        return questionsRepository.findAllByEvaluationId(evaluationId);
     }
 }

@@ -13,12 +13,12 @@ public class QuestionsConverter {
 
     public static Questions toEntity(
             Evaluations evaluation, QuestionsType questionsType,
-            String questionText/*, List<Answer> multipleChoiceAnswerList*/){
+            String questionText, Long order){
         return Questions.builder()
                 .evaluation(evaluation)
                 .questionsType(questionsType)
                 .questionText(questionText)
-                /*.multipleChoiceAnswerList(multipleChoiceAnswerList)*/
+                .order(order)
                 .build();
     }
 
@@ -49,6 +49,15 @@ public class QuestionsConverter {
                 .year(evaluationYear)
                 .quarter(evaluationQuarter)
                 .questionList(questionList)
+                .build();
+    }
+
+    public static QuestionsResponseDto.UpdateOneDto toUpdateOneDto(Questions question){
+        return QuestionsResponseDto.UpdateOneDto.builder()
+                .questionNumber(question.getOrder())
+                .questionText(question.getQuestionText())
+                .questionsType(question.getQuestionsType())
+                .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
                 .build();
     }
 }

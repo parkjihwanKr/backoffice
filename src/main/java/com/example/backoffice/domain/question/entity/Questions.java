@@ -36,11 +36,14 @@ public class Questions {
     @Column(length = 500)
     private String shortAnswer;
 
+    @Column(length = 20)
+    private Long order;
+
+    // relations
     @Builder.Default
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answers> multipleChoiceAnswerList = new ArrayList<>();
 
-    // relations
     // 한 평가에 여럿 질문, 질문 하나에 한 평가
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evalutions_id")
@@ -49,5 +52,20 @@ public class Questions {
     // entity methods
     public void addAnswer(Answers answer){
         this.multipleChoiceAnswerList.add(answer);
+    }
+
+    public void updateForMultipleChoiceAnswerList(
+            String questionText, QuestionsType questionsType, List<Answers> newMultipleChoiceAnswerList){
+        this.questionText = questionText;
+        this.questionsType = questionsType;
+
+        this.multipleChoiceAnswerList.clear();
+        this.multipleChoiceAnswerList.addAll(newMultipleChoiceAnswerList);
+    }
+
+    public void updateForShortAnswer(String questionText, QuestionsType questionsType){
+        this.questionText = questionText;
+        this.questionsType = questionsType;
+        this.multipleChoiceAnswerList.clear();
     }
 }

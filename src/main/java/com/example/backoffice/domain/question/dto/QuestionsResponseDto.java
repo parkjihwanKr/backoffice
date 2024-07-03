@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.question.dto;
 
+import com.example.backoffice.domain.answer.entity.Answers;
 import com.example.backoffice.domain.question.entity.QuestionsType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,9 +47,9 @@ public class QuestionsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneDto{
-        private String questionNumber;
+        private Long questionNumber;
         private String questionText;
         private QuestionsType questionsType;
-        private List<String> multipleChoiceAnswerList;
+        private List<Answers> multipleChoiceAnswerList;
     }
 }
