@@ -49,4 +49,12 @@ public class QuestionsRequestDto {
     public static class UpdateOneForOrderDto {
         private Long updatedOrder;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DeleteDto{
+        private List<Long> questionOrderList;
+    }
 }

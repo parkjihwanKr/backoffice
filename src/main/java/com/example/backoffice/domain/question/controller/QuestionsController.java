@@ -3,6 +3,7 @@ package com.example.backoffice.domain.question.controller;
 import com.example.backoffice.domain.question.dto.QuestionsRequestDto;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
 import com.example.backoffice.domain.question.service.QuestionsServiceV1;
+import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,5 +48,20 @@ public class QuestionsController {
                 =  questionsService.updateOneForChangedOrder(
                         evaluationId, questionId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    // 1개에서 ~ 여럿
+    @DeleteMapping("/evaluations-department/{evaluationId}/questions")
+    public ResponseEntity<CommonResponse<Void>> delete(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody QuestionsRequestDto.DeleteDto requestDto){
+        questionsService.delete(
+                evaluationId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        HttpStatus.OK, "성공적으로 삭제되었습니다.", null
+                )
+        );
     }
 }

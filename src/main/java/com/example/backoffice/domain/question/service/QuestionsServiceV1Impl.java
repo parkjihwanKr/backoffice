@@ -133,8 +133,16 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
             throw new QuestionsCustomException(QuestionsExceptionCode.MATCHED_BEFORE_AND_AFTER_ORDER);
         }
 
+        // 순서 변경
+        List<Questions> changedEvaluationQuestionList
+                = swapOrder(evaluationQuestionList, beforeUpdatedOrder, requestDto.getUpdatedOrder());
+        // 상위 도메인에도 바뀐 내용 전달
+        evaluation.updateQuestionList(changedEvaluationQuestionList);
+        // 변경되어질 question 도메인 찾기
+        Questions updatedQuestion = findByOrder(beforeUpdatedOrder);
+        // question 2개 변경
         question.updateForChangedOrder(requestDto.getUpdatedOrder());
-        evaluation.updateQuestionList(evaluationQuestionList);
+        updatedQuestion.updateForChangedOrder(beforeUpdatedOrder);
 
         return QuestionsConverter.toUpdateOneForChangedOrderDto(
                 beforeUpdatedOrder, requestDto.getUpdatedOrder(),
@@ -144,8 +152,92 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
     @Override
     @Transactional
+    public void delete(
+            Long evaluationId, Members loginMember,
+            QuestionsRequestDto.DeleteDto requestDto){
+        // 1. 삭제할 권한 체크
+        Evaluations evaluation = evaluationsService.findById(evaluationId);
+        // 2. 삭제할 아이디 없으면 오류
+        if(requestDto.getQuestionOrderList().isEmpty()){
+            throw new QuestionsCustomException(QuestionsExceptionCode.NOT_INPUT_DELETED_QUESTION);
+        }
+        // 3. 삭제된다면 해당 평가의 질문 리스트의 순서를 변경해야함
+        List<Long> deletedQuestionOrderList = requestDto.getQuestionOrderList();
+        for(int i = 0; i < deletedQuestionOrderList.size(); i++){
+            // 질문 10개 삭제될 질문이 2-5이라고 가정
+            // 삭제할 질문이 존재하는지 확인
+            questionsRepository.findByEvaluationIdAndOrder(
+                    evaluationId, deletedQuestionOrderList.get(i))
+                    .orElseThrow(()-> new QuestionsCustomException(
+                            QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER));
+        }
+        // 해당 부분에 삭제된 질문들의 순서 공백을 채워넣어야함
+        // 상위 도메인 변경 사항
+        List<Questions> notDeletedEvaluationQuestionList
+                = questionsRepository.findAllByOrderNotInAndEvaluationId(
+                        requestDto.getQuestionOrderList(), evaluationId);
+        List<Questions> changedQuestionList = updateOrder(notDeletedEvaluationQuestionList);
+        evaluation.updateQuestionList(changedQuestionList);
+
+        // 하위 도메인 변경 사항
+        int index = 0;
+        for(Questions question : changedQuestionList){
+            question.updateForChangedOrder(changedQuestionList.get(index).getOrder());
+            index++;
+        }
+
+        // 요청한 질문 삭제
+        for(Long deletedOrder : requestDto.getQuestionOrderList()){
+            questionsRepository.deleteByEvaluationIdAndOrder(evaluationId,deletedOrder);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Questions findById(Long questionId){
         return questionsRepository.findById(questionId).orElseThrow(
                 ()-> new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION));
+    }
+
+    @Transactional(readOnly = true)
+    public Questions findByOrder(Long order){
+        return questionsRepository.findByOrder(order).orElseThrow(
+                ()-> new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER)
+        );
+    }
+
+    private List<Questions> swapOrder(List<Questions> evaluationQuestionList, Long beforeChangedOrder, Long updatedOrder) {
+        int beforeIndex = beforeChangedOrder.intValue() - 1;
+        int afterIndex = updatedOrder.intValue() - 1;
+
+        Questions questionToMove = evaluationQuestionList.get(beforeIndex);
+        evaluationQuestionList.remove(beforeIndex);
+
+        if (beforeIndex < afterIndex) {
+            evaluationQuestionList.add(afterIndex, questionToMove);
+        } else {
+            evaluationQuestionList.add(afterIndex, questionToMove);
+        }
+        return evaluationQuestionList;
+    }
+
+    private List<Questions> updateOrder(List<Questions> notDeletedEvaluationQuestionList){
+        // notDeletedEvaluationQuestionList -> 질문을 가지게 됨 -> 1,6,7,8,9,10
+        // 해당하는 리스트의 순서를 땡겨와야함
+        List<Questions> changedEvaluationQuestionList = new ArrayList<>();
+        for(int index = 0; index<notDeletedEvaluationQuestionList.size(); index++){
+            Long changedOrder = index + 1L;
+            if(!notDeletedEvaluationQuestionList.get(index).getOrder().equals(changedOrder)){
+                // 다르면
+                Questions changedQuestion
+                        = QuestionsConverter.toUpdateOneForChangedOrder(
+                                changedEvaluationQuestionList.get(index), changedOrder);
+                changedEvaluationQuestionList.add(changedQuestion);
+            }else{
+                // 같으면
+                changedEvaluationQuestionList.add(notDeletedEvaluationQuestionList.get(index));
+            }
+        }
+        return changedEvaluationQuestionList;
     }
 }

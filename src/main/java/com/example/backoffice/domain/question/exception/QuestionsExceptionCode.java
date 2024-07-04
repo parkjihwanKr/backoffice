@@ -18,6 +18,7 @@ public enum QuestionsExceptionCode {
     NEED_EXCEED_ONE_ANSWER_OR_NULL(HttpStatus.BAD_REQUEST, "QUESTIONS-009", "해당 질문에 대한 답은 1개 초과거나 없어야합니다."),
     MATCHED_BEFORE_AND_AFTER_ORDER(HttpStatus.BAD_REQUEST, "QUESTIONS-010", "질문의 바꾸려는 순서가 전과 후가 같으면 바뀌지 않습니다."),
     ORDER_EXCEEDS_MAX_SIZE(HttpStatus.BAD_REQUEST, "QUESTIONS-011","질문 리스트의 순서가 최대 크기를 초과했습니다."),
+    NOT_INPUT_DELETED_QUESTION(HttpStatus.BAD_REQUEST, "QUESTION-012", "삭제할 질문을 입력하지 않았습니다."),
     ;
 
     private final HttpStatus httpStatus;

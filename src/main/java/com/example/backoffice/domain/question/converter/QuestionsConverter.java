@@ -73,4 +73,15 @@ public class QuestionsConverter {
                 .multipleChoiceAnswerList(multipleChoiceAnswerList)
                 .build();
     }
+
+    public static Questions toUpdateOneForChangedOrder(Questions question, Long changedOrder){
+        return Questions.builder()
+                .questionText(question.getQuestionText())
+                .order(changedOrder)
+                .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
+                .shortAnswer(question.getShortAnswer())
+                .evaluation(question.getEvaluation())
+                .questionsType(question.getQuestionsType())
+                .build();
+    }
 }
