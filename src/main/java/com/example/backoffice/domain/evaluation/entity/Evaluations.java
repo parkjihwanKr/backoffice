@@ -56,4 +56,8 @@ public class Evaluations extends CommonEntity {
     public void addQuestion(Questions question){
         questionList.add(question);
     }
+
+    public void updateQuestionList(List<Questions> changedQuestionList){
+        this.questionList = changedQuestionList;
+    }
 }

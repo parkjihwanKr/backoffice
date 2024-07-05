@@ -11,4 +11,11 @@ public interface AnswersServiceV1 {
 
     List<Answers> createAll(
             Questions question, QuestionsRequestDto.CreateOneDto questionsRequestDto);
+
+    List<Answers> findAllByQuestionId(Long questionId);
+
+    List<Answers> updateAllForMultipleChoiceAnswer(
+            Questions question, List<String> changeQuestionTextList);
+
+    void updateAllForShortAnswer(Long questionId);
 }

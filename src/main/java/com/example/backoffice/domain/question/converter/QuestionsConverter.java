@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.question.converter;
 
+import com.example.backoffice.domain.answer.entity.Answers;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
 import com.example.backoffice.domain.question.entity.Questions;
@@ -13,12 +14,12 @@ public class QuestionsConverter {
 
     public static Questions toEntity(
             Evaluations evaluation, QuestionsType questionsType,
-            String questionText/*, List<Answer> multipleChoiceAnswerList*/){
+            String questionText, Long order){
         return Questions.builder()
                 .evaluation(evaluation)
                 .questionsType(questionsType)
                 .questionText(questionText)
-                /*.multipleChoiceAnswerList(multipleChoiceAnswerList)*/
+                .order(order)
                 .build();
     }
 
@@ -49,6 +50,38 @@ public class QuestionsConverter {
                 .year(evaluationYear)
                 .quarter(evaluationQuarter)
                 .questionList(questionList)
+                .build();
+    }
+
+    public static QuestionsResponseDto.UpdateOneDto toUpdateOneDto(Questions question){
+        return QuestionsResponseDto.UpdateOneDto.builder()
+                .questionNumber(question.getOrder())
+                .questionText(question.getQuestionText())
+                .questionsType(question.getQuestionsType())
+                .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
+                .build();
+    }
+
+    public static QuestionsResponseDto.UpdateOneForOrderDto toUpdateOneForChangedOrderDto(
+            Long beforeOrder, Long updateOrder, String questionText,
+            QuestionsType questionsType, List<Answers> multipleChoiceAnswerList){
+        return QuestionsResponseDto.UpdateOneForOrderDto.builder()
+                .beforeUpdatedOrder(beforeOrder)
+                .updatedOrder(updateOrder)
+                .questionText(questionText)
+                .questionsType(questionsType)
+                .multipleChoiceAnswerList(multipleChoiceAnswerList)
+                .build();
+    }
+
+    public static Questions toUpdateOneForChangedOrder(Questions question, Long changedOrder){
+        return Questions.builder()
+                .questionText(question.getQuestionText())
+                .order(changedOrder)
+                .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
+                .shortAnswer(question.getShortAnswer())
+                .evaluation(question.getEvaluation())
+                .questionsType(question.getQuestionsType())
                 .build();
     }
 }

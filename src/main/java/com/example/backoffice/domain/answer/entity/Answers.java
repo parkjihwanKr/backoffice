@@ -25,11 +25,14 @@ public class Answers {
     @JoinColumn(name = "question_id")
     private Questions question;
 
-    // 예시 1. 회사 생활에 만족하십니까?
-    // 1. 매우 만족 ~ 5. 매우 불만족
     // 예시 2. 회사 생활에 불만족하시다면 그 이유를 설명해주세요
     // 이러한 이유로 회사가 불만족스럽습니다.
-    private String answerText;
+    private String text;
+
+    private Long number;
 
     // entity methods
+    public void update(String text){
+        this.text = text;
+    }
 }
