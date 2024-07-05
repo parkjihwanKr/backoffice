@@ -1,6 +1,5 @@
 package com.example.backoffice.domain.question.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,7 +46,7 @@ public class QuestionsRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneForOrderDto {
-        private Long updatedOrder;
+        private Long updatedNumber;
     }
 
     @Getter
@@ -55,6 +54,6 @@ public class QuestionsRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class DeleteDto{
-        private List<Long> questionOrderList;
+        private List<Long> questionNumberList;
     }
 }

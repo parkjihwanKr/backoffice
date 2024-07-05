@@ -25,19 +25,18 @@ public class Questions {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    //@NotNull
     @Enumerated(EnumType.STRING)
     private QuestionsType questionsType;
 
-    @Column(unique = true)
+    @Column
     private String questionText;
 
     // 객관식 답은 Answer로 1~5까지
     @Column(length = 500)
     private String shortAnswer;
 
-    @Column(length = 20)
-    private Long order;
+    private Long number;
 
     // relations
     @Builder.Default
@@ -69,7 +68,7 @@ public class Questions {
         this.multipleChoiceAnswerList.clear();
     }
 
-    public void updateForChangedOrder(Long changedOrder){
-        this.order = changedOrder;
+    public void updateForChangedOrder(Long changedNumber){
+        this.number = changedNumber;
     }
 }

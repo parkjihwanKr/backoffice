@@ -82,7 +82,7 @@ public class AnswersServiceImplV1 implements AnswersServiceV1{
                     answer.update(changeQuestionTextList.get(i));
                     i++;
                 }else{
-                    answersRepository.deleteByAnswerText(
+                    answersRepository.deleteByText(
                             existingAnswerList.get(i).getText());
                 }
                 updateAnswerList.add(answer);

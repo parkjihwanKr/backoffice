@@ -18,6 +18,7 @@ import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluations
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
+import com.example.backoffice.domain.question.entity.Questions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,16 +42,14 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     public EvaluationsResponseDto.CreateOneForDepartmentDto createOneForDepartment(
             Members loginMember, EvaluationsRequestDto.CreateOneForDepartmentDto requestDto){
 
-        // 1. 멤버 확인
-        membersService.findById(loginMember.getId());
-        // 2. 적절한 부서에서 설문 조사를 만들었는지?
+        // 1. 적절한 부서에서 설문 조사를 만들었는지?
         MemberDepartment department = MembersConverter.toDepartment(requestDto.getDepartment());
         if(!loginMember.getDepartment().equals(department)
                 && (loginMember.getPosition().equals(MemberPosition.MANAGER)
                 || loginMember.getPosition().equals(MemberPosition.CEO))){
             throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_DEPARTMENT_ACCESS);
         }
-        // 3. 요청한 날짜가 시작, 마감 날짜가 분기에 따라 잘 나뉘었는지?
+        // 2. 요청한 날짜가 시작, 마감 날짜가 분기에 따라 잘 나뉘었는지?
         Integer quarter
                 = validateAndDetermineQuarter(
                         requestDto.getStartDate(), requestDto.getEndDate());
@@ -109,7 +108,6 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     public EvaluationsResponseDto.ReadOneForDepartmentDto readOneForDepartment(
             Integer year, Integer quarter, Long evaluationsId, Members loginMember){
         Evaluations evaluation = findById(evaluationsId);
-        membersService.findById(loginMember.getId());
 
         // 부서 설문 조사에 부서원들, 사장만 접근 가능
         if(!evaluation.getDepartment().equals(loginMember.getDepartment())){
@@ -121,7 +119,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationsId);
 
         return EvaluationsConverter.toReadOneForDepartmentDto(
-                evaluation.getTitle(), year, quarter, loginMember.getMemberName());
+                evaluation.getTitle(), year, quarter, loginMember.getMemberName(),
+                evaluation.getQuestionList());
     }
 
     @Override

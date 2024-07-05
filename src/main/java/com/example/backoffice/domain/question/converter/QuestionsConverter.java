@@ -14,12 +14,12 @@ public class QuestionsConverter {
 
     public static Questions toEntity(
             Evaluations evaluation, QuestionsType questionsType,
-            String questionText, Long order){
+            String questionText, Long number){
         return Questions.builder()
                 .evaluation(evaluation)
                 .questionsType(questionsType)
                 .questionText(questionText)
-                .order(order)
+                .number(number)
                 .build();
     }
 
@@ -55,7 +55,7 @@ public class QuestionsConverter {
 
     public static QuestionsResponseDto.UpdateOneDto toUpdateOneDto(Questions question){
         return QuestionsResponseDto.UpdateOneDto.builder()
-                .questionNumber(question.getOrder())
+                .questionNumber(question.getNumber())
                 .questionText(question.getQuestionText())
                 .questionsType(question.getQuestionsType())
                 .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
@@ -63,21 +63,21 @@ public class QuestionsConverter {
     }
 
     public static QuestionsResponseDto.UpdateOneForOrderDto toUpdateOneForChangedOrderDto(
-            Long beforeOrder, Long updateOrder, String questionText,
+            Long previousNumber, Long updatedNumber, String questionText,
             QuestionsType questionsType, List<Answers> multipleChoiceAnswerList){
         return QuestionsResponseDto.UpdateOneForOrderDto.builder()
-                .beforeUpdatedOrder(beforeOrder)
-                .updatedOrder(updateOrder)
+                .previousNumber(previousNumber)
+                .updatedNumber(updatedNumber)
                 .questionText(questionText)
                 .questionsType(questionsType)
                 .multipleChoiceAnswerList(multipleChoiceAnswerList)
                 .build();
     }
 
-    public static Questions toUpdateOneForChangedOrder(Questions question, Long changedOrder){
+    public static Questions toUpdateOneForChangedOrder(Questions question, Long changedNumber){
         return Questions.builder()
                 .questionText(question.getQuestionText())
-                .order(changedOrder)
+                .number(changedNumber)
                 .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
                 .shortAnswer(question.getShortAnswer())
                 .evaluation(question.getEvaluation())

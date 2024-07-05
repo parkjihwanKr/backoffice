@@ -4,6 +4,7 @@ import com.example.backoffice.domain.evaluation.dto.EvaluationsResponseDto;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.question.entity.Questions;
 
 import java.util.List;
 
@@ -40,12 +41,14 @@ public class EvaluationsConverter {
     }
 
     public static EvaluationsResponseDto.ReadOneForDepartmentDto toReadOneForDepartmentDto(
-            String title, Integer year, Integer quarter, String writerName){
+            String title, Integer year, Integer quarter, String writerName,
+            List<Questions> questionList){
         return EvaluationsResponseDto.ReadOneForDepartmentDto.builder()
                 .title(title)
                 .year(year)
                 .quarter(quarter)
                 .writerName(writerName)
+                .evaluationQuestionList(questionList)
                 .build();
     }
 

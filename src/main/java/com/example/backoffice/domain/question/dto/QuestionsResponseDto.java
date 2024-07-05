@@ -58,8 +58,8 @@ public class QuestionsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneForOrderDto {
-        private Long beforeUpdatedOrder;
-        private Long updatedOrder;
+        private Long previousNumber;
+        private Long updatedNumber;
         private String questionText;
         private QuestionsType questionsType;
         private List<Answers> multipleChoiceAnswerList;
