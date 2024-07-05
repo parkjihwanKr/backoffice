@@ -7,7 +7,7 @@ import com.example.backoffice.domain.question.entity.Questions;
 
 public interface QuestionsServiceV1 {
 
-    QuestionsResponseDto.CreateAllDto createAllForDepartment(
+    QuestionsResponseDto.CreateAllDto createAll(
             Long evaluationId, Members loginMember,
             QuestionsRequestDto.CreateAllDto requestDto);
 

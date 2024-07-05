@@ -18,13 +18,13 @@ public class QuestionsController {
 
     private final QuestionsServiceV1 questionsService;
 
-    @PostMapping("/evaluations-department/{evaluationId}/questions")
-    public ResponseEntity<QuestionsResponseDto.CreateAllDto> createAllForDepartment(
+    @PostMapping("/evaluations/{evaluationId}/questions")
+    public ResponseEntity<QuestionsResponseDto.CreateAllDto> createAll(
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody QuestionsRequestDto.CreateAllDto requestDto){
         QuestionsResponseDto.CreateAllDto responseDto =
-                questionsService.createAllForDepartment(evaluationId, memberDetails.getMembers(), requestDto);
+                questionsService.createAll(evaluationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -36,7 +36,7 @@ public class QuestionsController {
         QuestionsResponseDto.UpdateOneDto responseDto
                 = questionsService.updateOneForDepartment(
                         evaluationId, questionId, memberDetails.getMembers(), requestDto);
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PatchMapping("/evaluations-department/{evaluationId}/questions/{questionId}/change-order")
@@ -60,8 +60,6 @@ public class QuestionsController {
                 evaluationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
-                        HttpStatus.OK, "성공적으로 삭제되었습니다.", null
-                )
-        );
+                        HttpStatus.OK, "성공적으로 삭제되었습니다.", null));
     }
 }
