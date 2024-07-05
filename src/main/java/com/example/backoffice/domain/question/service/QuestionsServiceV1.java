@@ -11,7 +11,7 @@ public interface QuestionsServiceV1 {
             Long evaluationId, Members loginMember,
             QuestionsRequestDto.CreateAllDto requestDto);
 
-    QuestionsResponseDto.UpdateOneDto updateOneForDepartment(
+    QuestionsResponseDto.UpdateOneDto updateOne(
             Long evaluationId, Long questionId,
             Members loginMember, QuestionsRequestDto.UpdateOneDto requestDto);
 

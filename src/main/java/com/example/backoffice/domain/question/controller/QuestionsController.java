@@ -28,18 +28,18 @@ public class QuestionsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PatchMapping("/evaluations-department/{evaluationId}/questions/{questionId}")
-    public ResponseEntity<QuestionsResponseDto.UpdateOneDto> updateOneForDepartment(
+    @PatchMapping("/evaluations/{evaluationId}/questions/{questionId}")
+    public ResponseEntity<QuestionsResponseDto.UpdateOneDto> updateOne(
             @PathVariable Long evaluationId, @PathVariable Long questionId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody QuestionsRequestDto.UpdateOneDto requestDto){
         QuestionsResponseDto.UpdateOneDto responseDto
-                = questionsService.updateOneForDepartment(
+                = questionsService.updateOne(
                         evaluationId, questionId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PatchMapping("/evaluations-department/{evaluationId}/questions/{questionId}/change-order")
+    @PatchMapping("/evaluations/{evaluationId}/questions/{questionId}/change-order")
     public ResponseEntity<QuestionsResponseDto.UpdateOneForOrderDto> updateOneForChangedOrder(
             @PathVariable Long evaluationId, @PathVariable Long questionId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -51,7 +51,7 @@ public class QuestionsController {
     }
 
     // 1개에서 ~ 여럿
-    @DeleteMapping("/evaluations-department/{evaluationId}/questions")
+    @DeleteMapping("/evaluations/{evaluationId}/questions")
     public ResponseEntity<CommonResponse<Void>> delete(
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,

@@ -76,7 +76,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
     @Override
     @Transactional
-    public QuestionsResponseDto.UpdateOneDto updateOneForDepartment(
+    public QuestionsResponseDto.UpdateOneDto updateOne(
             Long evaluationId, Long questionId,
             Members loginMember, QuestionsRequestDto.UpdateOneDto requestDto){
         // 1. 존재하는 평가인지?
