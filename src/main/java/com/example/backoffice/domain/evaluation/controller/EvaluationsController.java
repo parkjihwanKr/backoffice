@@ -53,6 +53,6 @@ public class EvaluationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         EvaluationsResponseDto.ReadOneForCompanyDto responseDto
                 = evaluationsService.readOneForCompany(year, evaluationId, memberDetails.getMembers());
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }

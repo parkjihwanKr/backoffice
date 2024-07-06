@@ -64,13 +64,14 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         Evaluations evaluation
                 = EvaluationsConverter.toEntity(
                         title, year, quarter, requestDto.getDescription(),
-                loginMember.getDepartment());
+                loginMember.getDepartment(), requestDto.getStartDate(), requestDto.getEndDate());
         evaluationsRepository.save(evaluation);
 
         sendNotificationForMemberList(loginMember, memberList, title, evaluation);
 
         return EvaluationsConverter.toCreateOneForDepartmentDto(
-                title, evaluation.getDescription(),loginMember.getMemberName());
+                title, evaluation.getDescription(),loginMember.getMemberName(),
+                evaluation.getStartDate(), evaluation.getEndDate());
     }
 
     @Override
@@ -78,9 +79,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     public EvaluationsResponseDto.CreateOneForCompanyDto createOneForCompany(
             Members loginMember, EvaluationsRequestDto.CreateOneForCompanyDto requestDto){
         // 1. 인사부장과 일치하는 인물인지? 또는 ceo인지?
-        Members hrManager = membersService.findHRManager();
-        if(!(loginMember.getId().equals(hrManager.getId())
-                && loginMember.getPosition().equals(MemberPosition.CEO))){
+        if((!loginMember.getDepartment().equals(MemberDepartment.HR) && loginMember.getPosition().equals(MemberPosition.MANAGER))
+                || !loginMember.getPosition().equals(MemberPosition.CEO)){
             throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
         }
 
@@ -91,8 +91,11 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         int year = requestDto.getStartDate().getYear();
         String title = year + "년도 회사 내부 평가";
         List<Members> memberList = membersService.findAll();
-        Evaluations evaluation = EvaluationsConverter.toEntity(
-                title, year, 1, requestDto.getDescription(), null);
+        Evaluations evaluation
+                = EvaluationsConverter.toEntity(
+                title, year, 1, requestDto.getDescription(),
+                loginMember.getDepartment(), requestDto.getStartDate(),
+                requestDto.getEndDate());
         evaluationsRepository.save(evaluation);
 
         // 4. 모든 멤버에게 작성 요청
@@ -100,7 +103,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
 
         // 5. responseDto 작성
         return EvaluationsConverter.toCreateOneForCompanyDto(
-                loginMember.getMemberName(), title, requestDto.getDescription());
+                loginMember.getMemberName(), title, evaluation.getDescription(),
+                evaluation.getStartDate(), evaluation.getEndDate());
     }
 
     @Override
@@ -143,6 +147,9 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
                 ()-> new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS));
     }
 
+    // 1. 시작 날짜가 다음년도 1분기일 때, 이번 년도 4분기에만 가능하게 변경
+    // 2. 시작 날짜가 다음년도 2~4분기일 때, 이번 년도의 1~3분기에만 가능하게
+    // 즉, 설문 조사를 시작하는 분기의 전 분기에만 만들 수 있게 하고자 함.
     private Integer validateAndDetermineQuarter(LocalDate startDate, LocalDate endDate) {
         // 1. startDate, endDate 검증
         validateDate(startDate, endDate);

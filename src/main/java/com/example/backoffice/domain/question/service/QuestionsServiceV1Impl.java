@@ -37,6 +37,10 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
             QuestionsRequestDto.CreateAllDto requestDto){
         // 1. 만들 수 있는 직위인지 검증
         Evaluations evaluation = evaluationsService.findById(evaluationId);
+        // 2. 처음 만들게 되면 가능하지만 한 설문 조사에 질문을 또 만드는 것은 수정에서만 가능하게
+        if(!evaluation.getQuestionList().isEmpty()){
+            throw new QuestionsCustomException(QuestionsExceptionCode.EXIST_EVALUATION_QUESTION_LIST);
+        }
         MemberDepartment department = evaluation.getDepartment();
 
         if(!(department.equals(loginMember.getDepartment())
@@ -49,7 +53,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         List<QuestionsResponseDto.CreateOneDto> responseDtoList = new ArrayList<>();
         Integer questionsNumber = 1;
 
-        // 2. 질문을 만드는데 알맞는 형태인지?
+        // 3. 질문을 만드는데 알맞는 형태인지?
         for(QuestionsRequestDto.CreateOneDto requestQuestion : requestDto.getQuestionList()){
             // 평가 -> 질문 -> 답
             QuestionsType questionsType
@@ -58,14 +62,14 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
                     = QuestionsConverter.toEntity(
                     evaluation, questionsType, requestQuestion.getQuestionText(), (long) questionsNumber);
 
-            answersService.createAll(question, requestQuestion);
-
             questionsRepository.save(question);
-            evaluation.addQuestion(question);
+
+            List<Answers> answerList = answersService.createAll(question, requestQuestion);
+
             responseDtoList.add(
                     QuestionsConverter.toCreateOneDto(
                             question.getQuestionText(), question.getQuestionsType(),
-                            questionsNumber));
+                            questionsNumber, answerList));
             questionsNumber++;
         }
 

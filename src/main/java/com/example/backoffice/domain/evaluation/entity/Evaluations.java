@@ -43,7 +43,7 @@ public class Evaluations extends CommonEntity {
 
     private LocalDate startDate;
 
-    private LocalDate endTime;
+    private LocalDate endDate;
 
     // relation
     @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)

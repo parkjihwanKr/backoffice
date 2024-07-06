@@ -8,6 +8,7 @@ import com.example.backoffice.domain.question.entity.QuestionsType;
 import com.example.backoffice.domain.question.exception.QuestionsCustomException;
 import com.example.backoffice.domain.question.exception.QuestionsExceptionCode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionsConverter {
@@ -32,13 +33,17 @@ public class QuestionsConverter {
     }
 
     public static QuestionsResponseDto.CreateOneDto toCreateOneDto(
-            String questionText, QuestionsType questionsType, Integer questionsNumber
-            /*List<String> multipleChoiceAnswerList*/){
+            String questionText, QuestionsType questionsType, Integer questionsNumber,
+            List<Answers> multipleChoiceAnswerList){
+        List<String> changeAnswerList = new ArrayList<>();
+        for(Answers answer : multipleChoiceAnswerList){
+            changeAnswerList.add(answer.getText());
+        }
         return QuestionsResponseDto.CreateOneDto.builder()
                 .questionNumber(questionsNumber)
                 .questionText(questionText)
                 .questionType(questionsType)
-                /*.multipleChoiceAnswerList(multipleChoiceAnswerList)*/
+                .multipleChoiceAnswerList(changeAnswerList)
                 .build();
     }
 

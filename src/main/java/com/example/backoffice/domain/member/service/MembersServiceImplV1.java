@@ -103,7 +103,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     public Members findHRManager(){
         return membersRepository.findByPositionAndDepartment(
                 MemberPosition.MANAGER, MemberDepartment.HR).orElseThrow(
-                        () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+                        () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_HR_MANAGER));
     }
 
     @Override

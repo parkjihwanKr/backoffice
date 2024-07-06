@@ -64,4 +64,15 @@ public class QuestionsResponseDto {
         private QuestionsType questionsType;
         private List<Answers> multipleChoiceAnswerList;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadOneDto{
+        private Long questionNumber;
+        private String questionText;
+        private QuestionsType questionsType;
+        private List<String> multipleAnswerList;
+    }
 }

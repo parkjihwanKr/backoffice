@@ -36,6 +36,8 @@ public class Questions {
     @Column(length = 500)
     private String shortAnswer;
 
+    // 해당 질문에 대한 number가 중복되면 안됨
+    // evaluations_id = 1 -> number 1,2,3,4,5,1(x)
     private Long number;
 
     // relations

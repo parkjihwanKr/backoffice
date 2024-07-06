@@ -127,7 +127,7 @@ public class AnswersServiceImplV1 implements AnswersServiceV1{
                             AnswersExceptionCode.NOT_FOUND_QUESTIONS_TYPE);
         }
         answersRepository.save(answer);
-        question.addAnswer(answer);
+        // question.addAnswer(answer);
         return answer;
     }
 }
