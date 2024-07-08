@@ -29,4 +29,15 @@ public class EvaluationsRequestDto {
         private LocalDate startDate;
         private LocalDate endDate;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForDepartmentDto {
+        private String title;
+        private String description;
+        private LocalDate startDate;
+        private LocalDate endDate;
+    }
 }

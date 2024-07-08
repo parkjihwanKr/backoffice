@@ -19,5 +19,8 @@ public interface EvaluationsServiceV1 {
     EvaluationsResponseDto.ReadOneForCompanyDto readOneForCompany(
             Integer year, Long evaluationId, Members loginMember);
 
+    EvaluationsResponseDto.UpdateOneForDepartmentDto updateOneForDepartment(
+            Long evaluationId, Members loginMember,
+            EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto);
     Evaluations findById(Long evaluationsId);
 }

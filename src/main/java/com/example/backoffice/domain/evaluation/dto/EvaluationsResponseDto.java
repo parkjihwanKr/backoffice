@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.evaluation.dto;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
 import com.example.backoffice.domain.question.entity.Questions;
 import lombok.AllArgsConstructor;
@@ -59,5 +60,20 @@ public class EvaluationsResponseDto {
         private String description;
         private Integer year;
         private List<Questions> evaluationQuestionList;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForDepartmentDto {
+        private MemberDepartment department;
+        private String writerName;
+        private String title;
+        private String description;
+        private Integer year;
+        private Integer quarter;
+        private LocalDate startDate;
+        private LocalDate endDate;
     }
 }

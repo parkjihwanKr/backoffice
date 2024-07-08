@@ -89,4 +89,20 @@ public class EvaluationsConverter {
                 .year(year)
                 .build();
     }
+
+    public static EvaluationsResponseDto.UpdateOneForDepartmentDto toUpdateOneForDepartmentDto(
+            MemberDepartment department, String title, String description,
+            Integer year, Integer quarter, String writerName,
+            LocalDate startDate, LocalDate endDate){
+        return EvaluationsResponseDto.UpdateOneForDepartmentDto.builder()
+                .department(department)
+                .title(title)
+                .description(description)
+                .year(year)
+                .quarter(quarter)
+                .writerName(writerName)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
+    }
 }

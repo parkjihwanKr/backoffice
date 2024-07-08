@@ -141,6 +141,42 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     }
 
     @Override
+    @Transactional
+    public EvaluationsResponseDto.UpdateOneForDepartmentDto updateOneForDepartment(
+            Long evaluationId, Members loginMember,
+            EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto){
+        Evaluations evaluation = findById(evaluationId);
+        // 1. 해당 설문 조사를 변경할 권한 검증
+        if(!loginMember.getDepartment().equals(evaluation.getDepartment())
+                || !loginMember.getPosition().equals(MemberPosition.MANAGER)){
+            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
+        }
+
+        // 2. requestDto의 startDate와 endDate 검증
+        Integer quarter
+                = validateAndDetermineQuarter(
+                        requestDto.getStartDate(), requestDto.getEndDate());
+
+        // 3. 해당 부서의 멤버에게 알림 발송
+        List<Members> memberList
+                = membersService.findAllByDepartment(loginMember.getDepartment());
+        String message = requestDto.getTitle();
+        sendNotificationForMemberList(loginMember, memberList, message, evaluation);
+
+        // 4. 요청 사항에 따른 엔티티 변경
+        evaluation.update(
+                requestDto.getTitle(), requestDto.getDescription(),
+                requestDto.getStartDate(), requestDto.getEndDate(),
+                requestDto.getStartDate().getYear());
+
+        // 5. 응답 DTO
+        return EvaluationsConverter.toUpdateOneForDepartmentDto(
+                evaluation.getDepartment(), evaluation.getTitle(), evaluation.getDescription(),
+                evaluation.getYear(), evaluation.getQuarter(), loginMember.getMemberName(),
+                evaluation.getStartDate(), evaluation.getEndDate());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Evaluations findById(Long evaluationId){
         return evaluationsRepository.findById(evaluationId).orElseThrow(

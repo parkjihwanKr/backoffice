@@ -53,8 +53,14 @@ public class Evaluations extends CommonEntity {
     private List<Questions> questionList;
 
     // entity method
-    public void addQuestion(Questions question){
-        questionList.add(question);
+    public void update(
+            String title, String description,
+            LocalDate startDate, LocalDate endDate, Integer year){
+        this.title = title;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.year = year;
     }
 
     public void updateQuestionList(List<Questions> changedQuestionList){
