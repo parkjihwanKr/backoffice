@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Entity
 @Builder
@@ -23,6 +25,8 @@ public class MembersEvaluations extends CommonEntity {
     private Long id;
 
     private Boolean isCompleted;
+
+    private LocalDateTime completedDate;
 
     // relations
     @ManyToOne(fetch = FetchType.LAZY)
