@@ -3,6 +3,7 @@ package com.example.backoffice.domain.evaluation.service;
 import com.example.backoffice.domain.evaluation.converter.EvaluationsConverter;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsRequestDto;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsResponseDto;
+import com.example.backoffice.domain.evaluation.entity.EvaluationType;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
@@ -44,11 +45,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
 
         // 1. 적절한 부서에서 설문 조사를 만들었는지?
         MemberDepartment department = MembersConverter.toDepartment(requestDto.getDepartment());
-        if(!loginMember.getDepartment().equals(department)
-                && (loginMember.getPosition().equals(MemberPosition.MANAGER)
-                || loginMember.getPosition().equals(MemberPosition.CEO))){
-            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_DEPARTMENT_ACCESS);
-        }
+        matchDepartmentManager(department, loginMember.getDepartment(), loginMember.getPosition());
+
         // 2. 요청한 날짜가 시작, 마감 날짜가 분기에 따라 잘 나뉘었는지?
         Integer quarter
                 = validateAndDetermineQuarter(
@@ -64,7 +62,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         Evaluations evaluation
                 = EvaluationsConverter.toEntity(
                         title, year, quarter, requestDto.getDescription(),
-                loginMember.getDepartment(), requestDto.getStartDate(), requestDto.getEndDate());
+                loginMember.getDepartment(), requestDto.getStartDate(),
+                requestDto.getEndDate(), EvaluationType.DEPARTMENT);
         evaluationsRepository.save(evaluation);
 
         sendNotificationForMemberList(loginMember, memberList, title, evaluation);
@@ -79,10 +78,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     public EvaluationsResponseDto.CreateOneForCompanyDto createOneForCompany(
             Members loginMember, EvaluationsRequestDto.CreateOneForCompanyDto requestDto){
         // 1. 인사부장과 일치하는 인물인지? 또는 ceo인지?
-        if((!loginMember.getDepartment().equals(MemberDepartment.HR) && loginMember.getPosition().equals(MemberPosition.MANAGER))
-                || !loginMember.getPosition().equals(MemberPosition.CEO)){
-            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
-        }
+        matchHRManagerOrCEO(loginMember.getDepartment(), loginMember.getPosition());
 
         // 2. startDate, endDate 검증
         validateDate(requestDto.getStartDate(), requestDto.getEndDate());
@@ -95,7 +91,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
                 = EvaluationsConverter.toEntity(
                 title, year, 1, requestDto.getDescription(),
                 loginMember.getDepartment(), requestDto.getStartDate(),
-                requestDto.getEndDate());
+                requestDto.getEndDate(), EvaluationType.COMPANY);
         evaluationsRepository.save(evaluation);
 
         // 4. 모든 멤버에게 작성 요청
@@ -147,10 +143,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
             EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto){
         Evaluations evaluation = findById(evaluationId);
         // 1. 해당 설문 조사를 변경할 권한 검증
-        if(!loginMember.getDepartment().equals(evaluation.getDepartment())
-                || !loginMember.getPosition().equals(MemberPosition.MANAGER)){
-            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
-        }
+        matchDepartmentManager(
+                evaluation.getDepartment(), loginMember.getDepartment(), loginMember.getPosition());
 
         // 2. requestDto의 startDate와 endDate 검증
         Integer quarter
@@ -167,7 +161,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         evaluation.update(
                 requestDto.getTitle(), requestDto.getDescription(),
                 requestDto.getStartDate(), requestDto.getEndDate(),
-                requestDto.getStartDate().getYear());
+                requestDto.getStartDate().getYear(), quarter);
 
         // 5. 응답 DTO
         return EvaluationsConverter.toUpdateOneForDepartmentDto(
@@ -201,7 +195,7 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         evaluation.update(
                 requestDto.getTitle(), requestDto.getDescription(),
                 requestDto.getStartDate(), requestDto.getEndDate(),
-                requestDto.getStartDate().getYear());
+                requestDto.getStartDate().getYear(), 1);
 
         // 6. 응답 DTO 생성
         return EvaluationsConverter.toUpdateOneForCompanyDto(
@@ -211,12 +205,49 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     }
 
     @Override
+    @Transactional
+    public void deleteOne(Long evaluationId, Members loginMember){
+        // 1. 평가가 존재하는지?
+        Evaluations evaluation = findById(evaluationId);
+        EvaluationType evaluationType = evaluation.getEvaluationType();
+        switch (evaluationType) {
+            case DEPARTMENT -> {
+                matchDepartmentManager(
+                        evaluation.getDepartment(), loginMember.getDepartment(),
+                        loginMember.getPosition());
+                evaluationsRepository.deleteById(evaluationId);
+            }
+            case COMPANY -> {
+                matchHRManagerOrCEO(loginMember.getDepartment(), loginMember.getPosition());
+                evaluationsRepository.deleteById(evaluationId);
+            }
+            default -> throw new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATION_TYPE);
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Evaluations findById(Long evaluationId){
         return evaluationsRepository.findById(evaluationId).orElseThrow(
                 ()-> new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS));
     }
 
+    private void matchDepartmentManager(
+            MemberDepartment department, MemberDepartment loginMemberDepartment,
+            MemberPosition loginMemberPosition){
+        if(!loginMemberDepartment.equals(department)
+                && (loginMemberPosition.equals(MemberPosition.MANAGER)
+                || loginMemberPosition.equals(MemberPosition.CEO))){
+            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_DEPARTMENT_ACCESS);
+        }
+    }
+
+    private void matchHRManagerOrCEO(MemberDepartment department, MemberPosition position){
+        if((!department.equals(MemberDepartment.HR) && position.equals(MemberPosition.MANAGER))
+                || !position.equals(MemberPosition.CEO)){
+            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
+        }
+    }
     // 1. 시작 날짜가 다음년도 1분기일 때, 이번 년도 4분기에만 가능하게 변경
     // 2. 시작 날짜가 다음년도 2~4분기일 때, 이번 년도의 1~3분기에만 가능하게
     // 즉, 설문 조사를 시작하는 분기의 전 분기에만 만들 수 있게 하고자 함.

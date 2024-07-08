@@ -2,6 +2,7 @@ package com.example.backoffice.domain.evaluation.converter;
 
 import com.example.backoffice.domain.answer.entity.Answers;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsResponseDto;
+import com.example.backoffice.domain.evaluation.entity.EvaluationType;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
@@ -17,7 +18,7 @@ public class EvaluationsConverter {
     public static Evaluations toEntity(
             String title, Integer year, Integer quarter,
             String description, MemberDepartment department,
-            LocalDate startDate, LocalDate endDate){
+            LocalDate startDate, LocalDate endDate, EvaluationType evaluationType){
         return Evaluations.builder()
                 .title(title)
                 .year(year)
@@ -26,6 +27,7 @@ public class EvaluationsConverter {
                 .department(department)
                 .startDate(startDate)
                 .endDate(endDate)
+                .evaluationType(evaluationType)
                 .build();
     }
 

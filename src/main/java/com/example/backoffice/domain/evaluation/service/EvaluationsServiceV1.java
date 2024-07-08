@@ -27,5 +27,7 @@ public interface EvaluationsServiceV1 {
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.UpdateOneForCompanyDto requestDto);
 
+    void deleteOne(Long evaluationId, Members loginMember);
+
     Evaluations findById(Long evaluationsId);
 }
