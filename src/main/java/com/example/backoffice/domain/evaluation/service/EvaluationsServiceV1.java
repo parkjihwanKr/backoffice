@@ -22,5 +22,10 @@ public interface EvaluationsServiceV1 {
     EvaluationsResponseDto.UpdateOneForDepartmentDto updateOneForDepartment(
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto);
+
+    EvaluationsResponseDto.UpdateOneForCompanyDto updateOneForCompany(
+            Long evaluationId, Members loginMember,
+            EvaluationsRequestDto.UpdateOneForCompanyDto requestDto);
+
     Evaluations findById(Long evaluationsId);
 }

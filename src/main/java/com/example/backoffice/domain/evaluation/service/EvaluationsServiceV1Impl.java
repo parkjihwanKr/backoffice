@@ -160,8 +160,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         // 3. 해당 부서의 멤버에게 알림 발송
         List<Members> memberList
                 = membersService.findAllByDepartment(loginMember.getDepartment());
-        String message = requestDto.getTitle();
-        sendNotificationForMemberList(loginMember, memberList, message, evaluation);
+        sendNotificationForMemberList(
+                loginMember, memberList, requestDto.getTitle(), evaluation);
 
         // 4. 요청 사항에 따른 엔티티 변경
         evaluation.update(
@@ -174,6 +174,40 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
                 evaluation.getDepartment(), evaluation.getTitle(), evaluation.getDescription(),
                 evaluation.getYear(), evaluation.getQuarter(), loginMember.getMemberName(),
                 evaluation.getStartDate(), evaluation.getEndDate());
+    }
+
+    @Override
+    @Transactional
+    public EvaluationsResponseDto.UpdateOneForCompanyDto updateOneForCompany(
+            Long evaluationId, Members loginMember,
+            EvaluationsRequestDto.UpdateOneForCompanyDto requestDto){
+        // 1. 존재하는 평가인지?
+        Evaluations evaluation = findById(evaluationId);
+
+        // 2. 평가를 수정할 수 있는 권한인지?
+        if(!(loginMember.getPosition().equals(MemberPosition.MANAGER)
+                && loginMember.getDepartment().equals(MemberDepartment.HR))){
+            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
+        }
+
+        // 3. 시작일과 마감일을 적절하게 요청했는지?
+        validateDate(requestDto.getStartDate(), requestDto.getEndDate());
+
+        // 4. 알림 전송
+        sendNotificationForMemberList(
+                loginMember, membersService.findAll(), requestDto.getTitle(), evaluation);
+
+        // 5. 평가 엔티티 수정
+        evaluation.update(
+                requestDto.getTitle(), requestDto.getDescription(),
+                requestDto.getStartDate(), requestDto.getEndDate(),
+                requestDto.getStartDate().getYear());
+
+        // 6. 응답 DTO 생성
+        return EvaluationsConverter.toUpdateOneForCompanyDto(
+                evaluation.getTitle(), evaluation.getDescription(),
+                evaluation.getStartDate(), evaluation.getEndDate(),
+                loginMember.getMemberName());
     }
 
     @Override

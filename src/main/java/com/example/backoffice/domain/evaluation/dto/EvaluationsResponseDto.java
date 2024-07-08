@@ -76,4 +76,17 @@ public class EvaluationsResponseDto {
         private LocalDate startDate;
         private LocalDate endDate;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForCompanyDto {
+        private String writerName;
+        private String title;
+        private String description;
+        private Integer year;
+        private LocalDate startDate;
+        private LocalDate endDate;
+    }
 }

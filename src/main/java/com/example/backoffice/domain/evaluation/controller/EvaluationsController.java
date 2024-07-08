@@ -66,4 +66,15 @@ public class EvaluationsController {
                         evaluationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    @PatchMapping("evaluations-company/{evaluationId}")
+    public ResponseEntity<EvaluationsResponseDto.UpdateOneForCompanyDto> updateOneForCompany(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody EvaluationsRequestDto.UpdateOneForCompanyDto requestDto){
+        EvaluationsResponseDto.UpdateOneForCompanyDto responseDto
+                = evaluationsService.updateOneForCompany(
+                        evaluationId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

@@ -105,4 +105,16 @@ public class EvaluationsConverter {
                 .endDate(endDate)
                 .build();
     }
+
+    public static EvaluationsResponseDto.UpdateOneForCompanyDto toUpdateOneForCompanyDto(
+            String title, String description,
+            LocalDate startDate, LocalDate endDate, String writerName){
+        return EvaluationsResponseDto.UpdateOneForCompanyDto.builder()
+                .title(title)
+                .description(description)
+                .startDate(startDate)
+                .endDate(endDate)
+                .writerName(writerName)
+                .build();
+    }
 }
