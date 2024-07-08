@@ -9,7 +9,5 @@ public interface AnswersRepository extends JpaRepository<Answers, Long> {
 
     List<Answers> findAllByQuestionId(Long questionId);
 
-    void deleteByAnswerText(String answerText);
-
-    void deleteAllByQuestionId(Long questionId);
+    void deleteByText(String answerText);
 }

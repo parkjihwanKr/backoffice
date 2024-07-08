@@ -14,6 +14,7 @@ public class EvaluationsRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateOneForDepartmentDto{
+        private String title;
         private String description;
         private String department;
         private LocalDate startDate;
@@ -25,6 +26,29 @@ public class EvaluationsRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateOneForCompanyDto {
+        private String title;
+        private String description;
+        private LocalDate startDate;
+        private LocalDate endDate;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForDepartmentDto {
+        private String title;
+        private String description;
+        private LocalDate startDate;
+        private LocalDate endDate;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForCompanyDto {
+        private String title;
         private String description;
         private LocalDate startDate;
         private LocalDate endDate;

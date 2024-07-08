@@ -43,7 +43,10 @@ public class Evaluations extends CommonEntity {
 
     private LocalDate startDate;
 
-    private LocalDate endTime;
+    private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    private EvaluationType evaluationType;
 
     // relation
     @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -53,8 +56,15 @@ public class Evaluations extends CommonEntity {
     private List<Questions> questionList;
 
     // entity method
-    public void addQuestion(Questions question){
-        questionList.add(question);
+    public void update(
+            String title, String description,
+            LocalDate startDate, LocalDate endDate, Integer year, Integer quarter){
+        this.title = title;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.year = year;
+        this.quarter = quarter;
     }
 
     public void updateQuestionList(List<Questions> changedQuestionList){

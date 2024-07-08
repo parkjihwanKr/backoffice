@@ -18,6 +18,7 @@ public enum EvaluationsExceptionCode {
     UNAUTHORIZED_ACCESS(HttpStatus.BAD_REQUEST,"EVALUATIONS-009","연간 설문 조사를 작성할 권한이 없습니다."),
     INVALID_DAY_REQUEST(HttpStatus.BAD_REQUEST, "EVALUATIONS-010", "요청하신 날짜가 잘못되었습니다."),
     NOT_SAME_NOW_YEAR(HttpStatus.BAD_REQUEST, "EVALUATIONS-011", "시작 연도 또는 마감 연도는 현재 년도와 같아야합니다."),
+    NOT_FOUND_EVALUATION_TYPE(HttpStatus.BAD_REQUEST, "EVALUATIONS-012", "존재하지 않은 평가 타입입니다."),
     ;
 
     private final HttpStatus httpStatus;

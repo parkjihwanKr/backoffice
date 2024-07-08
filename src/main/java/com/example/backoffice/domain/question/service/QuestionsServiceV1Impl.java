@@ -37,6 +37,10 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
             QuestionsRequestDto.CreateAllDto requestDto){
         // 1. 만들 수 있는 직위인지 검증
         Evaluations evaluation = evaluationsService.findById(evaluationId);
+        // 2. 처음 만들게 되면 가능하지만 한 설문 조사에 질문을 또 만드는 것은 수정에서만 가능하게
+        if(!evaluation.getQuestionList().isEmpty()){
+            throw new QuestionsCustomException(QuestionsExceptionCode.EXIST_EVALUATION_QUESTION_LIST);
+        }
         MemberDepartment department = evaluation.getDepartment();
 
         if(!(department.equals(loginMember.getDepartment())
@@ -49,7 +53,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         List<QuestionsResponseDto.CreateOneDto> responseDtoList = new ArrayList<>();
         Integer questionsNumber = 1;
 
-        // 2. 질문을 만드는데 알맞는 형태인지?
+        // 3. 질문을 만드는데 알맞는 형태인지?
         for(QuestionsRequestDto.CreateOneDto requestQuestion : requestDto.getQuestionList()){
             // 평가 -> 질문 -> 답
             QuestionsType questionsType
@@ -58,14 +62,14 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
                     = QuestionsConverter.toEntity(
                     evaluation, questionsType, requestQuestion.getQuestionText(), (long) questionsNumber);
 
-            answersService.createAll(question, requestQuestion);
-
             questionsRepository.save(question);
-            evaluation.addQuestion(question);
+
+            List<Answers> answerList = answersService.createAll(question, requestQuestion);
+
             responseDtoList.add(
                     QuestionsConverter.toCreateOneDto(
                             question.getQuestionText(), question.getQuestionsType(),
-                            questionsNumber));
+                            questionsNumber, answerList));
             questionsNumber++;
         }
 
@@ -117,28 +121,28 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
         List<Questions> evaluationQuestionList = evaluation.getQuestionList();
         Long maxOrderSize = (long) evaluationQuestionList.size();
-        if(requestDto.getUpdatedOrder() > maxOrderSize){
+        if(requestDto.getUpdatedNumber() > maxOrderSize){
             throw new QuestionsCustomException(QuestionsExceptionCode. ORDER_EXCEEDS_MAX_SIZE);
         }
 
-        Long beforeUpdatedOrder = question.getOrder();
-        if(beforeUpdatedOrder.equals(requestDto.getUpdatedOrder())){
+        Long beforeUpdatedNumber = question.getNumber();
+        if(beforeUpdatedNumber.equals(requestDto.getUpdatedNumber())){
             throw new QuestionsCustomException(QuestionsExceptionCode.MATCHED_BEFORE_AND_AFTER_ORDER);
         }
 
         // 순서 변경
         List<Questions> changedEvaluationQuestionList
-                = swapOrder(evaluationQuestionList, beforeUpdatedOrder, requestDto.getUpdatedOrder());
+                = swapOrder(evaluationQuestionList, beforeUpdatedNumber, requestDto.getUpdatedNumber());
         // 상위 도메인에도 바뀐 내용 전달
         evaluation.updateQuestionList(changedEvaluationQuestionList);
         // 변경되어질 question 도메인 찾기
-        Questions updatedQuestion = findByOrder(beforeUpdatedOrder);
+        Questions updatedQuestion = findByOrder(beforeUpdatedNumber);
         // question 2개 변경
-        question.updateForChangedOrder(requestDto.getUpdatedOrder());
-        updatedQuestion.updateForChangedOrder(beforeUpdatedOrder);
+        question.updateForChangedOrder(requestDto.getUpdatedNumber());
+        updatedQuestion.updateForChangedOrder(beforeUpdatedNumber);
 
         return QuestionsConverter.toUpdateOneForChangedOrderDto(
-                beforeUpdatedOrder, requestDto.getUpdatedOrder(),
+                beforeUpdatedNumber, requestDto.getUpdatedNumber(),
                 question.getQuestionText(), question.getQuestionsType(),
                 question.getMultipleChoiceAnswerList());
     }
@@ -151,37 +155,37 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         // 1. 삭제할 권한 체크
         Evaluations evaluation = evaluationsService.findById(evaluationId);
         // 2. 삭제할 아이디 없으면 오류
-        if(requestDto.getQuestionOrderList().isEmpty()){
+        if(requestDto.getQuestionNumberList().isEmpty()){
             throw new QuestionsCustomException(QuestionsExceptionCode.NOT_INPUT_DELETED_QUESTION);
         }
         // 3. 삭제된다면 해당 평가의 질문 리스트의 순서를 변경해야함
-        List<Long> deletedQuestionOrderList = requestDto.getQuestionOrderList();
-        for(int i = 0; i < deletedQuestionOrderList.size(); i++){
+        List<Long> deletedQuestionNumberList = requestDto.getQuestionNumberList();
+        for(int i = 0; i < deletedQuestionNumberList.size(); i++){
             // 질문 10개 삭제될 질문이 2-5이라고 가정
             // 삭제할 질문이 존재하는지 확인
-            questionsRepository.findByEvaluationIdAndOrder(
-                    evaluationId, deletedQuestionOrderList.get(i))
+            questionsRepository.findByEvaluationIdAndNumber(
+                    evaluationId, deletedQuestionNumberList.get(i))
                     .orElseThrow(()-> new QuestionsCustomException(
                             QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER));
         }
         // 해당 부분에 삭제된 질문들의 순서 공백을 채워넣어야함
         // 상위 도메인 변경 사항
         List<Questions> notDeletedEvaluationQuestionList
-                = questionsRepository.findAllByOrderNotInAndEvaluationId(
-                        requestDto.getQuestionOrderList(), evaluationId);
+                = questionsRepository.findAllByNumberNotInAndEvaluationId(
+                        requestDto.getQuestionNumberList(), evaluationId);
         List<Questions> changedQuestionList = updateOrder(notDeletedEvaluationQuestionList);
         evaluation.updateQuestionList(changedQuestionList);
 
         // 하위 도메인 변경 사항
         int index = 0;
         for(Questions question : changedQuestionList){
-            question.updateForChangedOrder(changedQuestionList.get(index).getOrder());
+            question.updateForChangedOrder(changedQuestionList.get(index).getNumber());
             index++;
         }
 
         // 요청한 질문 삭제
-        for(Long deletedOrder : requestDto.getQuestionOrderList()){
-            questionsRepository.deleteByEvaluationIdAndOrder(evaluationId,deletedOrder);
+        for(Long deletedNumber : requestDto.getQuestionNumberList()){
+            questionsRepository.deleteByEvaluationIdAndNumber(evaluationId,deletedNumber);
         }
     }
 
@@ -193,15 +197,15 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
     }
 
     @Transactional(readOnly = true)
-    public Questions findByOrder(Long order){
-        return questionsRepository.findByOrder(order).orElseThrow(
+    public Questions findByOrder(Long number){
+        return questionsRepository.findByNumber(number).orElseThrow(
                 ()-> new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER)
         );
     }
 
-    private List<Questions> swapOrder(List<Questions> evaluationQuestionList, Long beforeChangedOrder, Long updatedOrder) {
-        int beforeIndex = beforeChangedOrder.intValue() - 1;
-        int afterIndex = updatedOrder.intValue() - 1;
+    private List<Questions> swapOrder(List<Questions> evaluationQuestionList, Long beforeChangedNumber, Long updatedNumber) {
+        int beforeIndex = beforeChangedNumber.intValue() - 1;
+        int afterIndex = updatedNumber.intValue() - 1;
 
         Questions questionToMove = evaluationQuestionList.get(beforeIndex);
         evaluationQuestionList.remove(beforeIndex);
@@ -219,12 +223,12 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         // 해당하는 리스트의 순서를 땡겨와야함
         List<Questions> changedEvaluationQuestionList = new ArrayList<>();
         for(int index = 0; index<notDeletedEvaluationQuestionList.size(); index++){
-            Long changedOrder = index + 1L;
-            if(!notDeletedEvaluationQuestionList.get(index).getOrder().equals(changedOrder)){
+            Long changedNumber = index + 1L;
+            if(!notDeletedEvaluationQuestionList.get(index).getNumber().equals(changedNumber)){
                 // 다르면
                 Questions changedQuestion
                         = QuestionsConverter.toUpdateOneForChangedOrder(
-                                changedEvaluationQuestionList.get(index), changedOrder);
+                                changedEvaluationQuestionList.get(index), changedNumber);
                 changedEvaluationQuestionList.add(changedQuestion);
             }else{
                 // 같으면

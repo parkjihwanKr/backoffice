@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuestionsRepository extends JpaRepository<Questions, Long> {
-    Optional<Questions> findByOrder(Long order);
-    Optional<Questions> findByEvaluationIdAndOrder(Long evaluationId, Long order);
-    List<Questions> findAllByOrderNotInAndEvaluationId(List<Long> deletedOrderList, Long evaluationId);
-    void deleteByEvaluationIdAndOrder(Long evaluationId, Long deletedOrder);
+    Optional<Questions> findByNumber(Long number);
+    Optional<Questions> findByEvaluationIdAndNumber(Long evaluationId, Long number);
+    List<Questions> findAllByNumberNotInAndEvaluationId(List<Long> deletedNumberList, Long evaluationId);
+    void deleteByEvaluationIdAndNumber(Long evaluationId, Long deletedNumber);
 }

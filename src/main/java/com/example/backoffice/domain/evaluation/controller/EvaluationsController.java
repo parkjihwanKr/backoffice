@@ -3,6 +3,7 @@ package com.example.backoffice.domain.evaluation.controller;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsRequestDto;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsResponseDto;
 import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
+import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,37 @@ public class EvaluationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         EvaluationsResponseDto.ReadOneForCompanyDto responseDto
                 = evaluationsService.readOneForCompany(year, evaluationId, memberDetails.getMembers());
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @PatchMapping("/evaluations-department/{evaluationId}")
+    public ResponseEntity<EvaluationsResponseDto.UpdateOneForDepartmentDto> updateOneForDepartment(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto){
+        EvaluationsResponseDto.UpdateOneForDepartmentDto responseDto
+                = evaluationsService.updateOneForDepartment(
+                        evaluationId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @PatchMapping("/evaluations-company/{evaluationId}")
+    public ResponseEntity<EvaluationsResponseDto.UpdateOneForCompanyDto> updateOneForCompany(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody EvaluationsRequestDto.UpdateOneForCompanyDto requestDto){
+        EvaluationsResponseDto.UpdateOneForCompanyDto responseDto
+                = evaluationsService.updateOneForCompany(
+                        evaluationId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @DeleteMapping("/evaluations/{evaluationId}")
+    public ResponseEntity<CommonResponse<Void>> deleteOne(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        evaluationsService.deleteOne(evaluationId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(HttpStatus.OK, "해당 설문 조사는 삭제되었습니다.", null));
     }
 }
