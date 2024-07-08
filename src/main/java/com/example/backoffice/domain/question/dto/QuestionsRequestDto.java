@@ -56,4 +56,20 @@ public class QuestionsRequestDto {
     public static class DeleteDto{
         private List<Long> questionNumberList;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ConductOneForMultipleAnswerDto{
+        private Long answerNumber;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ConductOneForShortAnswerDto {
+        private String shortAnswer;
+    }
 }

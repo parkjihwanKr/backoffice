@@ -14,12 +14,10 @@ import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.memberEvaluation.converter.MembersEvaluationsConverter;
-import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluationsServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
-import com.example.backoffice.domain.question.entity.Questions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,7 +68,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
                 requestDto.getEndDate(), EvaluationType.DEPARTMENT);
         evaluationsRepository.save(evaluation);
 
-        sendNotificationForMemberList(loginMember, memberList, title, evaluation);
+        sendNotificationForMemberList(
+                loginMember, memberList, title, evaluation, NotificationType.EVALUATION);
 
         return EvaluationsConverter.toCreateOneForDepartmentDto(
                 title, evaluation.getDescription(),loginMember.getMemberName(),
@@ -103,7 +102,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         evaluationsRepository.save(evaluation);
 
         // 4. 모든 멤버에게 작성 요청
-        sendNotificationForMemberList(loginMember, memberList, title, evaluation);
+        sendNotificationForMemberList(
+                loginMember, memberList, title, evaluation, NotificationType.EVALUATION);
 
         // 5. responseDto 작성
         return EvaluationsConverter.toCreateOneForCompanyDto(
@@ -117,12 +117,9 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
             Integer year, Integer quarter, Long evaluationsId, Members loginMember){
         Evaluations evaluation = findById(evaluationsId);
 
-        // 부서 설문 조사에 부서원들, 사장만 접근 가능
-        if(!evaluation.getDepartment().equals(loginMember.getDepartment())){
-            if(!loginMember.getPosition().equals(MemberPosition.CEO)){
-                throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
-            }
-        }
+        matchDepartmentOrCEO(
+                evaluation.getDepartment(), loginMember.getDepartment(),
+                loginMember.getPosition());
 
         membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationsId);
 
@@ -163,7 +160,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         List<Members> memberList
                 = membersService.findAllByDepartment(loginMember.getDepartment());
         sendNotificationForMemberList(
-                loginMember, memberList, requestDto.getTitle(), evaluation);
+                loginMember, memberList, requestDto.getTitle(),
+                evaluation, NotificationType.UPDATE_EVALUATION);
 
         // 4. 요청 사항에 따른 엔티티 변경
         evaluation.update(
@@ -197,7 +195,8 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
 
         // 4. 알림 전송
         sendNotificationForMemberList(
-                loginMember, membersService.findAll(), requestDto.getTitle(), evaluation);
+                loginMember, membersService.findAll(), requestDto.getTitle(),
+                evaluation, NotificationType.UPDATE_EVALUATION);
 
         // 5. 평가 엔티티 수정
         evaluation.update(
@@ -253,6 +252,23 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     private void matchHRManagerOrCEO(MemberDepartment department, MemberPosition position){
         if((!department.equals(MemberDepartment.HR) && position.equals(MemberPosition.MANAGER))
                 || !position.equals(MemberPosition.CEO)){
+            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
+        }
+    }
+
+    private void matchDepartmentOrCEO(
+            MemberDepartment evaluationDepartment, MemberDepartment loginMemberDepartment,
+            MemberPosition loginMemberPosition){
+        // 부서 설문 조사에 부서원들, 사장만 접근 가능
+        if(!evaluationDepartment.equals(loginMemberDepartment)){
+            if(!loginMemberPosition.equals(MemberPosition.CEO)){
+                throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
+            }
+        }
+    }
+
+    private void matchDepartment(MemberDepartment evaluationDepartment, MemberDepartment loginMemberDepartment){
+        if(!evaluationDepartment.equals(loginMemberDepartment)){
             throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
         }
     }
@@ -312,16 +328,22 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     }
 
     private void sendNotificationForMemberList(
-            Members loginMember, List<Members> memberList, String message, Evaluations evaluation){
-        for(Members member : memberList){
-            notificationsServiceFacade.createNotification(
-                    NotificationsConverter.toNotificationData(
-                            loginMember, member, null, null,
-                            null, null, message),
-                    NotificationType.EVALUATION);
+            Members loginMember, List<Members> memberList, String message,
+            Evaluations evaluation, NotificationType notificationType){
+        switch (notificationType) {
+            case EVALUATION, UPDATE_EVALUATION -> {
+                for(Members member : memberList){
+                    notificationsServiceFacade.createNotification(
+                            NotificationsConverter.toNotificationData(
+                                    loginMember, member, null, null,
+                                    null, null, message),
+                            notificationType);
 
-            membersEvaluationsService.save(
-                    MembersEvaluationsConverter.toEntity(member, evaluation));
+                    membersEvaluationsService.save(
+                            MembersEvaluationsConverter.toEntity(member, evaluation));
+                }
+            }
+            default -> throw new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATION_TYPE);
         }
     }
 }
