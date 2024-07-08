@@ -53,7 +53,11 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
                         requestDto.getStartDate(), requestDto.getEndDate());
 
         int year = requestDto.getStartDate().getYear();
-        String title = year+"년 "+quarter+"분기 부서 설문조사";
+
+        String title = requestDto.getTitle();
+        if(title.isBlank()){
+            title = year+"년 "+quarter+"분기 부서 설문조사";
+        }
 
         // 한 평가에 여럿 멤버, 한 멤버에 여럿 평가 가능. 다대다인데?
         // 일단 부서에 대한 평가를 부서원들에게 전달해야하니까 이건 맞음
@@ -85,7 +89,11 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
 
         // 3. toEntity
         int year = requestDto.getStartDate().getYear();
-        String title = year + "년도 회사 내부 평가";
+        String title = requestDto.getTitle();
+        if(title.isBlank()){
+            title = year + "년도 회사 내부 평가";
+        }
+
         List<Members> memberList = membersService.findAll();
         Evaluations evaluation
                 = EvaluationsConverter.toEntity(
