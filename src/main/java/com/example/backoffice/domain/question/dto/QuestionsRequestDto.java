@@ -61,15 +61,21 @@ public class QuestionsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ConductOneForMultipleAnswerDto{
-        private Long answerNumber;
+    public static class SubmitAllDto {
+        private String memberName;
+        // 설문조사를 응했음을 동의하십니까?
+        private Boolean checked;
+        private List<QuestionsResponseDto.SubmitOneDto> submitOneDtoList;
     }
 
     @Getter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ConductOneForShortAnswerDto {
+    public static class SubmitOneDto {
+        private Long questionNumber;
+        private String questionType;
         private String shortAnswer;
+        private Long multipleChoiceAnswerNumber;
     }
 }

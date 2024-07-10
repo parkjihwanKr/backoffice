@@ -3,6 +3,7 @@ package com.example.backoffice.domain.evaluation.service;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsRequestDto;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsResponseDto;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 
 public interface EvaluationsServiceV1 {
@@ -30,4 +31,5 @@ public interface EvaluationsServiceV1 {
     void deleteOne(Long evaluationId, Members loginMember);
 
     Evaluations findById(Long evaluationsId);
+
 }

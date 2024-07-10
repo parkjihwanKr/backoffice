@@ -267,11 +267,6 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         }
     }
 
-    private void matchDepartment(MemberDepartment evaluationDepartment, MemberDepartment loginMemberDepartment){
-        if(!evaluationDepartment.equals(loginMemberDepartment)){
-            throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
-        }
-    }
     // 1. 시작 날짜가 다음년도 1분기일 때, 이번 년도 4분기에만 가능하게 변경
     // 2. 시작 날짜가 다음년도 2~4분기일 때, 이번 년도의 1~3분기에만 가능하게
     // 즉, 설문 조사를 시작하는 분기의 전 분기에만 만들 수 있게 하고자 함.
