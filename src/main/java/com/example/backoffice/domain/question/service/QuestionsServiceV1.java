@@ -19,8 +19,13 @@ public interface QuestionsServiceV1 {
             Long evaluationId, Long questionId,
             Members loginMember, QuestionsRequestDto.UpdateOneForOrderDto requestDto);
 
-    void delete(Long evaluationId, Members loginMember,
-                QuestionsRequestDto.DeleteDto requestDto);
+    void delete(
+            Long evaluationId, Members loginMember,
+            QuestionsRequestDto.DeleteDto requestDto);
+
+    QuestionsResponseDto.SubmitAllDto submitAll(
+            Long evaluationId, Members loginMember,
+            QuestionsRequestDto.SubmitAllDto requestDto);
 
     Questions findById(Long questionId);
 }

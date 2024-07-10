@@ -32,12 +32,7 @@ public class Questions {
     @Column
     private String questionText;
 
-    // 객관식 답은 Answer로 1~5까지
-    @Column(length = 500)
-    private String shortAnswer;
-
-    // 해당 질문에 대한 number가 중복되면 안됨
-    // evaluations_id = 1 -> number 1,2,3,4,5,1(x)
+    // order가 mysql 예약어라서 number로 수정
     private Long number;
 
     // relations
@@ -51,10 +46,6 @@ public class Questions {
     private Evaluations evaluation;
 
     // entity methods
-    public void addAnswer(Answers answer){
-        this.multipleChoiceAnswerList.add(answer);
-    }
-
     public void updateForMultipleChoiceAnswerList(
             String questionText, QuestionsType questionsType, List<Answers> newMultipleChoiceAnswerList){
         this.questionText = questionText;

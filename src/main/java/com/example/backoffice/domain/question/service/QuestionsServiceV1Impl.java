@@ -7,6 +7,8 @@ import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
+import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluationsServiceV1;
 import com.example.backoffice.domain.question.converter.QuestionsConverter;
 import com.example.backoffice.domain.question.dto.QuestionsRequestDto;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
@@ -28,6 +30,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
     private final EvaluationsServiceV1 evaluationsService;
     private final AnswersServiceV1 answersService;
+    private final MembersEvaluationsServiceV1 membersEvaluationsService;
     private final QuestionsRepository questionsRepository;
 
     @Override
@@ -187,6 +190,62 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         for(Long deletedNumber : requestDto.getQuestionNumberList()){
             questionsRepository.deleteByEvaluationIdAndNumber(evaluationId,deletedNumber);
         }
+    }
+
+    @Override
+    @Transactional
+    public QuestionsResponseDto.SubmitAllDto submitAll(
+            Long evaluationId, Members loginMember, QuestionsRequestDto.SubmitAllDto requestDto){
+        // 1. 멤버가 수행해야하는 설문조사인지?
+        MembersEvaluations membersEvaluation
+                = membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationId);
+        Evaluations evaluation = membersEvaluation.getEvaluation();
+
+        // 2. 평가에 알맞는 답을 제출하는지?
+        int index = 0;
+        for(Questions question : evaluation.getQuestionList()){
+            if(evaluation.getQuestionList().get(index).getId().equals(question.getId())){
+                throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION);
+            }
+            QuestionsType questionsType
+                    = QuestionsConverter.toQuestionsType(
+                            requestDto.getSubmitOneDtoList().get(index).getQuestionType());
+            switch(questionsType) {
+                // 2-1 주관식 제출
+                case SHORT_ANSWER -> {
+                    if(!question.getQuestionsType().equals(questionsType)){
+                        throw new QuestionsCustomException(
+                                QuestionsExceptionCode.INPUT_SHORT_ANSWER);
+                    }
+                    if(requestDto.getSubmitOneDtoList().get(index).getMultipleChoiceAnswerNumber() != null
+                            || requestDto.getSubmitOneDtoList().get(index).getShortAnswer().isEmpty()){
+                        throw new QuestionsCustomException(
+                                QuestionsExceptionCode.INPUT_SHORT_ANSWER);
+                    }
+                }
+                // 2-2 객관식 제출
+                case MULTIPLE_CHOICE_ANSWER -> {
+                    if(!question.getQuestionsType().equals(questionsType)){
+                        throw new QuestionsCustomException(
+                                QuestionsExceptionCode.INPUT_MULTIPLE_CHOICE_ANSWER);
+                    }
+                    if(requestDto.getSubmitOneDtoList().get(index).getMultipleChoiceAnswerNumber() == null
+                            || !requestDto.getSubmitOneDtoList().get(index).getShortAnswer().isEmpty()){
+                        throw new QuestionsCustomException(
+                                QuestionsExceptionCode.INPUT_MULTIPLE_CHOICE_ANSWER);
+                    }
+                }
+                // 2-3 주관식, 객관식 제출이 아닌 다른 형태
+                default -> throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION_TYPE);
+            }
+            index++;
+        }
+        if(!requestDto.getChecked()){
+            throw new QuestionsCustomException(QuestionsExceptionCode.CHECKED_IS_FALSE);
+        }
+
+        membersEvaluation.isCompleted(true);
+        return null;
     }
 
     @Override

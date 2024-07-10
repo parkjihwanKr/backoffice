@@ -75,4 +75,26 @@ public class QuestionsResponseDto {
         private QuestionsType questionsType;
         private List<String> multipleAnswerList;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SubmitAllDto {
+        private String memberName;
+        // 설문조사를 응했음을 동의하십니까?
+        private Boolean checked;
+        private List<SubmitOneDto> submitOneDtoList;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SubmitOneDto {
+        private Long questionNumber;
+        private String questionType;
+        private String shortAnswer;
+        private Long multipleChoiceAnswerNumber;
+    }
 }

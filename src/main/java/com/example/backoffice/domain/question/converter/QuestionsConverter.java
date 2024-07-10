@@ -84,7 +84,6 @@ public class QuestionsConverter {
                 .questionText(question.getQuestionText())
                 .number(changedNumber)
                 .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
-                .shortAnswer(question.getShortAnswer())
                 .evaluation(question.getEvaluation())
                 .questionsType(question.getQuestionsType())
                 .build();
