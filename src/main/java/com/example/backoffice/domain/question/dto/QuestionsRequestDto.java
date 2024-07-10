@@ -72,8 +72,7 @@ public class QuestionsRequestDto {
     @NoArgsConstructor
     public static class SubmitOneDto {
         private Long questionNumber;
-        private String questionType;
         private String shortAnswer;
-        private Long multipleChoiceAnswerNumber;
+        private List<Long> multipleChoiceAnswerNumber;
     }
 }

@@ -114,6 +114,13 @@ public class AnswersServiceImplV1 implements AnswersServiceV1{
         answersRepository.deleteAll(existingAnswerList);
     }
 
+    @Override
+    @Transactional
+    public Answers findByQuestionIdAndNumber(Long questionId, Long number){
+        return answersRepository.findByQuestionIdAndNumber(questionId, number).orElseThrow(
+                ()-> new AnswersCustomException(AnswersExceptionCode.NOT_FOUND_ANSWER));
+    }
+
     private Answers createRelations(Questions question, String answerText, Long number){
         // 질문 1. 회사 생활에 만족하십니까? -> 1. 매우 만족
         // 질문 1. 회사 생활에 만족하십니까? -> 2. 보통
@@ -129,5 +136,12 @@ public class AnswersServiceImplV1 implements AnswersServiceV1{
         answersRepository.save(answer);
         // question.addAnswer(answer);
         return answer;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Answers findByQuestionId(Long questionId){
+        return answersRepository.findByQuestionId(questionId).orElseThrow(
+                ()-> new AnswersCustomException(AnswersExceptionCode.NOT_FOUND_ANSWER));
     }
 }

@@ -57,8 +57,8 @@ public class EvaluationsConverter {
     }
 
     public static EvaluationsResponseDto.ReadOneForDepartmentDto toReadOneForDepartmentDto(
-            String title, Integer year, Integer quarter, String writerName,
-            List<Questions> questionList){
+            String title, String description, Integer year,
+            Integer quarter, String writerName, List<Questions> questionList){
         List<QuestionsResponseDto.ReadOneDto> questionResponseDtoList = new ArrayList<>();
         for(Questions question : questionList){
             List<String> answerList = new ArrayList<>();
@@ -77,6 +77,7 @@ public class EvaluationsConverter {
 
         return EvaluationsResponseDto.ReadOneForDepartmentDto.builder()
                 .title(title)
+                .description(description)
                 .year(year)
                 .quarter(quarter)
                 .writerName(writerName)
@@ -85,11 +86,29 @@ public class EvaluationsConverter {
     }
 
     public static EvaluationsResponseDto.ReadOneForCompanyDto toReadOneForCompanyDto(
-            String title, String description, Integer year){
+            String title, String description,
+            Integer year, String writerName, List<Questions> questionList){
+        List<QuestionsResponseDto.ReadOneDto> questionResponseDtoList = new ArrayList<>();
+        for(Questions question : questionList){
+            List<String> answerList = new ArrayList<>();
+            for(Answers answer : question.getMultipleChoiceAnswerList()){
+                answerList.add(answer.getText());
+            }
+            questionResponseDtoList.add(
+                    QuestionsResponseDto.ReadOneDto.builder()
+                            .questionNumber(question.getNumber())
+                            .questionText(question.getQuestionText())
+                            .questionsType(question.getQuestionsType())
+                            .multipleAnswerList(answerList)
+                            .build()
+            );
+        }
         return EvaluationsResponseDto.ReadOneForCompanyDto.builder()
                 .title(title)
                 .description(description)
                 .year(year)
+                .writerName(writerName)
+                .questionList(questionResponseDtoList)
                 .build();
     }
 
@@ -110,11 +129,12 @@ public class EvaluationsConverter {
     }
 
     public static EvaluationsResponseDto.UpdateOneForCompanyDto toUpdateOneForCompanyDto(
-            String title, String description,
+            String title, String description, Integer year,
             LocalDate startDate, LocalDate endDate, String writerName){
         return EvaluationsResponseDto.UpdateOneForCompanyDto.builder()
                 .title(title)
                 .description(description)
+                .year(year)
                 .startDate(startDate)
                 .endDate(endDate)
                 .writerName(writerName)

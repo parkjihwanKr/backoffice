@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.evaluation.service;
 
+import com.example.backoffice.domain.evaluation.entity.EvaluationType;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
@@ -31,5 +32,14 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     @Transactional
     public void deleteById(Long evaluationId){
         evaluationsRepository.deleteById(evaluationId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Evaluations findByIdAndEvaluationType(
+            Long evaluationId, EvaluationType evaluationType){
+        return evaluationsRepository.findByIdAndEvaluationType(evaluationId, evaluationType).orElseThrow(
+                ()-> new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS)
+        );
     }
 }
