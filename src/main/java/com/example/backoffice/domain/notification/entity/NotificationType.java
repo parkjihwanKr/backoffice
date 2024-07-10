@@ -11,6 +11,8 @@ public enum NotificationType {
     EVENT(Domain.EVENT),
     URGENT_VACATION_EVENT(Domain.URGENT_VACATION_EVENT),
     URGENT_SERVER_ERROR(Domain.URGENT_SERVER_ERROR),
+    EVALUATION(Domain.EVALUATION),
+    UPDATE_EVALUATION(Domain.UPDATE_EVALUATION)
     ;
 
     private final String domain;
@@ -28,5 +30,7 @@ public enum NotificationType {
         public static final String EVENT = "EVENT";
         public static final String URGENT_VACATION_EVENT = "VACATION EVENT";
         public static final String URGENT_SERVER_ERROR = "URGENT_SERVER_ERROR";
+        public static final String EVALUATION = "EVALUATION";
+        public static final String UPDATE_EVALUATION = "UPDATE_EVALUATION";
     }
 }

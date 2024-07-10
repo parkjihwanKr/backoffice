@@ -5,27 +5,26 @@ import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.member.entity.Members;
 
-public interface CommentsService {
+public interface CommentsServiceV1 {
 
-    CommentsResponseDto.CreateCommentsResponseDto createComment(
-            CommentsRequestDto.CreateCommentsRequestDto requestDto,
+    CommentsResponseDto.CreateCommentDto createComment(
+            CommentsRequestDto.CreateCommentDto requestDto,
             Long boardId, Members member);
 
-    CommentsResponseDto.UpdateCommentsResponseDto updateComment(
+    CommentsResponseDto.UpdateCommentDto updateComment(
             Long boardId, Long commentId,
-            CommentsRequestDto.UpdateCommentsRequestDto requestDto,
+            CommentsRequestDto.UpdateCommentDto requestDto,
             Members member);
 
     void deleteComment(Long boardId, Long commentId, Members member);
 
-    CommentsResponseDto.CreateReplyResponseDto createReply(
+    CommentsResponseDto.CreateReplyDto createReply(
             Long boardId, Long commentId,
-            CommentsRequestDto.CreateReplyRequestDto requestDto,
-            Members member);
+            CommentsRequestDto.CreateReplyDto requestDto, Members member);
 
-    CommentsResponseDto.UpdateReplyResponseDto updateReply(
+    CommentsResponseDto.UpdateReplyDto updateReply(
             Long commentId, Long replyId,
-            CommentsRequestDto.UpdateReplyRequestDto requestDto,
+            CommentsRequestDto.UpdateReplyDto requestDto,
             Members member);
 
     void deleteReply(Long commentId, Long replyId, Members member);

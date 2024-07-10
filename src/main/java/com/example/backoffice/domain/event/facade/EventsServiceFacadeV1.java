@@ -8,37 +8,36 @@ import com.example.backoffice.domain.member.entity.Members;
 import java.util.List;
 
 public interface EventsServiceFacadeV1 {
-    EventsResponseDto.CreateDepartmentEventResponseDto createDepartmentEvent(
-            Members loginMember, EventsRequestDto.CreateDepartmentEventsRequestDto requestDto);
+    EventsResponseDto.ReadOneForCompanyEventDto readOneForCompanyEvent(Long eventId);
 
-    EventsResponseDto.ReadCompanyEventResponseDto readCompanyEvent(
-            Long eventId);
-
-    List<EventsResponseDto.ReadCompanyEventResponseDto> readCompanyMonthEvent(
+    List<EventsResponseDto.ReadOneForCompanyEventDto> readForCompanyMonthEvent(
             Long year, Long month);
 
-    List<List<EventsResponseDto.ReadCompanyEventResponseDto>> readCompanyYearEvent(
+    List<List<EventsResponseDto.ReadOneForCompanyEventDto>> readForCompanyYearEvent(
             Long year);
 
-    EventsResponseDto.UpdateDepartmentEventResponseDto updateDepartmentEvent(
+    EventsResponseDto.CreateOneForDepartmentEventDto createOneForDepartmentEvent(
+            Members loginMember, EventsRequestDto.CreateOneForDepartmentEventDto requestDto);
+
+    EventsResponseDto.UpdateOneForDepartmentEventDto updateOneForDepartmentEvent(
             Long eventId, Members loginMember,
-            EventsRequestDto.UpdateDepartmentEventRequestDto requestDto);
+            EventsRequestDto.UpdateOneForDepartmentEventDto requestDto);
 
-    void deleteDepartmentEvent(Long eventId, Members loginMember);
+    void deleteOneForDepartmentEvent(Long eventId, Members loginMember);
 
-    EventsResponseDto.CreateVacationResponseDto createVacationEvent(
-            Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto);
+    EventsResponseDto.CreateOneForVacationEventDto createOneForVacationEvent(
+            Members loginMember, EventsRequestDto.CreateOneForVacationEventDto requestDto);
 
-    List<EventsResponseDto.ReadVacationResponseDto> readVacationMonthEvent(
+    List<EventsResponseDto.ReadOneForVacationEventDto> readForVacationMonthEvent(
             Long year, Long month, Members loginMember);
 
-    EventsResponseDto.UpdateVacationResponseDto updateVacationEvent(
+    EventsResponseDto.UpdateOneForVacationEventDto updateOneForVacationEvent(
             Long vacationId, Members loginMember,
-            EventsRequestDto.UpdateVacationEventRequestDto requestDto);
+            EventsRequestDto.UpdateOneForVacationEventDto requestDto);
 
-    void deleteVacationEvent(Long vacationId, Members loginMember);
+    void deleteOneForVacationEvent(Long vacationId, Members loginMember);
 
-    List<EventsResponseDto.ReadVacationResponseDto> readVacationMemberList(
+    List<EventsResponseDto.ReadMemberForVacationEventDto> readMemberListForVacationEvent(
             Long year, Long month, Long day, Members loginMember);
 
     List<Events> findAllByEventTypeAndEndDateBefore(Long year, Long month, Long day);

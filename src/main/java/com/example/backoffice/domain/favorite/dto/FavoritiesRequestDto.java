@@ -13,7 +13,7 @@ public class FavoritiesRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateFavoriteRequestDto {
+    public static class CreateOneDto {
         private String targetType;
         private Long targetId;
     }
@@ -22,7 +22,7 @@ public class FavoritiesRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeleteFavoriteIdListRequestDto {
+    public static class DeleteDto {
         private List<Long> favoriteIdList;
     }
 }

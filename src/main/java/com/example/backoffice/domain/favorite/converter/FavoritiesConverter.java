@@ -12,16 +12,16 @@ import java.util.List;
 
 public class FavoritiesConverter {
 
-    public static FavoriteType convertToFavoriteType(String targetType) {
-        try {
+    public static FavoriteType convertToFavoriteType(String targetType){
+        try{
             return FavoriteType.valueOf(targetType.toUpperCase());
-        } catch (IllegalArgumentException e) {
+        }catch (IllegalArgumentException e){
             throw new FavoritiesCustomException(FavoritiesExceptionCode.INVALID_FAVORITE_TYPE);
         }
     }
 
     public static Favorities toEntity(
-            Members loginMember, FavoriteType favoriteType, String content) {
+            Members loginMember, FavoriteType favoriteType, String content){
         return Favorities.builder()
                 .favoriteType(favoriteType)
                 .member(loginMember)
@@ -29,9 +29,9 @@ public class FavoritiesConverter {
                 .build();
     }
 
-    public static FavoritiesResponseDto.CreateFavoriteResponseDto toCreateDto(
-            Favorities favorite) {
-        return FavoritiesResponseDto.CreateFavoriteResponseDto.builder()
+    public static FavoritiesResponseDto.CreateOneDto toCreateOneDto(
+            Favorities favorite){
+        return FavoritiesResponseDto.CreateOneDto.builder()
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
                 .createdAt(favorite.getCreatedAt())
@@ -39,9 +39,9 @@ public class FavoritiesConverter {
                 .build();
     }
 
-    public static FavoritiesResponseDto.ReadFavoriteResponseDto toReadOneDto(
-            Favorities favorite) {
-        return FavoritiesResponseDto.ReadFavoriteResponseDto.builder()
+    public static FavoritiesResponseDto.ReadOneDto toReadOneDto(
+            Favorities favorite){
+        return FavoritiesResponseDto.ReadOneDto.builder()
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
                 .createdAt(favorite.getCreatedAt())
@@ -49,12 +49,12 @@ public class FavoritiesConverter {
                 .build();
     }
 
-    public static List<FavoritiesResponseDto.ReadFavoriteResponseDto> toReadListDto(
-            List<Favorities> favoriteList) {
-        List<FavoritiesResponseDto.ReadFavoriteResponseDto> responseDtoList = new ArrayList<>();
-        for (Favorities favorite : favoriteList) {
+    public static List<FavoritiesResponseDto.ReadOneDto> toReadAllDto(
+            List<Favorities> favoriteList){
+        List<FavoritiesResponseDto.ReadOneDto> responseDtoList = new ArrayList<>();
+        for(Favorities favorite : favoriteList){
             responseDtoList.add(
-                    FavoritiesResponseDto.ReadFavoriteResponseDto.builder()
+                    FavoritiesResponseDto.ReadOneDto.builder()
                             .favoriteContent(favorite.getContent())
                             .createdAt(favorite.getCreatedAt())
                             .modifiedAt(favorite.getModifiedAt()).build()

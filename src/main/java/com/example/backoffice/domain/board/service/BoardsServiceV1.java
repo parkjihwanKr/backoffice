@@ -10,22 +10,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface BoardsService {
+public interface BoardsServiceV1 {
 
-    Page<BoardsResponseDto.ReadBoardListResponseDto> readBoard(Pageable pageable);
-
-    BoardsResponseDto.ReadBoardResponseDto readOne(Long boardId);
-
-    BoardsResponseDto.CreateBoardResponseDto createBoard(
-            Members member, BoardsRequestDto.CreateBoardRequestDto requestDto,
+    Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable);
+    BoardsResponseDto.ReadOneDto readOne(Long boardId);
+    BoardsResponseDto.CreateOneDto createOne(
+            Members member, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files);
-
-    BoardsResponseDto.UpdateBoardResponseDto updateBoard(
+    BoardsResponseDto.UpdateOneDto updateOne(
             Long boardId, Members member,
-            BoardsRequestDto.UpdateBoardRequestDto requestDto,
-            List<MultipartFile> files);
-
-    void deleteBoard(Long boardId, Members member);
-
+            BoardsRequestDto.UpdateOneDto requestDto,
+            List <MultipartFile> files);
+    void deleteOne(Long boardId, Members member);
     Boards findById(Long boardId);
 }

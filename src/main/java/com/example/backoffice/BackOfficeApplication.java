@@ -10,19 +10,24 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @SpringBootApplication
 @EnableJpaRepositories(
-        basePackages = {
-                "com.example.backoffice.domain.favorite.repository",
-                "com.example.backoffice.domain.event.repository",
-                "com.example.backoffice.domain.board.repository",
-                "com.example.backoffice.domain.comment.repository",
-                "com.example.backoffice.domain.file.repository",
-                "com.example.backoffice.domain.member.repository",
-                "com.example.backoffice.domain.reaction.repository"
-        })
+		basePackages = {
+				"com.example.backoffice.domain.memberAnswer.repository",
+				"com.example.backoffice.domain.answer.repository",
+				"com.example.backoffice.domain.question.repository",
+				"com.example.backoffice.domain.memberEvaluation.repository",
+				"com.example.backoffice.domain.evaluation.repository",
+				"com.example.backoffice.domain.favorite.repository",
+				"com.example.backoffice.domain.event.repository",
+				"com.example.backoffice.domain.board.repository",
+				"com.example.backoffice.domain.comment.repository",
+				"com.example.backoffice.domain.file.repository",
+				"com.example.backoffice.domain.member.repository",
+				"com.example.backoffice.domain.reaction.repository"
+		})
 public class BackOfficeApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(BackOfficeApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(BackOfficeApplication.class, args);
+	}
 
 }

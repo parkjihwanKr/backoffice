@@ -14,7 +14,7 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateCompanyEventResponseDto {
+    public static class CreateOneForCompanyEventDto {
         private String title;
         private String description;
         private LocalDateTime startDate;
@@ -26,19 +26,7 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadCompanyMonthEventResponseDto {
-        private String title;
-        private MemberDepartment department;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
-        private LocalDateTime createdAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ReadCompanyEventResponseDto {
+    public static class ReadOneForCompanyEventDto {
         private String title;
         private String description;
         private MemberDepartment department;
@@ -52,7 +40,7 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateDepartmentEventResponseDto {
+    public static class CreateOneForDepartmentEventDto {
         private String title;
         private String description;
         private MemberDepartment department;
@@ -66,7 +54,7 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateDepartmentEventResponseDto {
+    public static class UpdateOneForDepartmentEventDto {
         private String title;
         private String description;
         private MemberDepartment department;
@@ -80,7 +68,7 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateVacationResponseDto {
+    public static class CreateOneForVacationEventDto {
         private String title;
         private String description;
         private Boolean urgent;
@@ -92,7 +80,7 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadVacationResponseDto {
+    public static class ReadOneForVacationEventDto {
         private String vacationMemberName;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
@@ -102,7 +90,17 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateVacationResponseDto {
+    public static class ReadMemberForVacationEventDto {
+        private String vacationMemberName;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateOneForVacationEventDto {
         private String vacationMemberName;
         private LocalDateTime startDate;
         private LocalDateTime endDate;

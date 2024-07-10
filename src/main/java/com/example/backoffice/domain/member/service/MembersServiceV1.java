@@ -7,7 +7,7 @@ import com.example.backoffice.domain.member.entity.Members;
 
 import java.util.List;
 
-public interface MembersService {
+public interface MembersServiceV1 {
 
     void signup(Members member);
 
@@ -40,9 +40,6 @@ public interface MembersService {
     Members findByMemberName(String memberName);
 
     List<Members> findAll();
-
-    Members findByDepartmentAndPosition(
-            MemberDepartment department, MemberPosition position);
 
     List<Members> findAllByDepartment(MemberDepartment department);
 

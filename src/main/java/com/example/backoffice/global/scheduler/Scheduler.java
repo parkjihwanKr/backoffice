@@ -2,7 +2,7 @@ package com.example.backoffice.global.scheduler;
 
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.facade.EventsServiceFacadeV1;
-import com.example.backoffice.domain.member.facade.MembersServiceFacade;
+import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Scheduler {
 
-    private final MembersServiceFacade membersServiceFacade;
+    private final MembersServiceFacadeV1 membersServiceFacade;
     private final EventsServiceFacadeV1 eventsServiceFacade;
 
     // 매일 오전 00시마다 member 휴가 상태 체크
@@ -33,14 +33,14 @@ public class Scheduler {
         List<Events> endedVacationList
                 = eventsServiceFacade.findAllByEventTypeAndEndDateBefore(year, month, day);
         for (Events event : endedVacationList) {
-            membersServiceFacade.updateOnVacationFalse(event.getMember().getMemberName());
+            membersServiceFacade.updateOneForOnVacationFalse(event.getMember().getMemberName());
         }
 
         // 휴가가 시작된 멤버들의 상태를 true로 설정
         List<Events> startedVacationList
                 = eventsServiceFacade.findAllByEventTypeAndStartDateBetween(year, month, day);
         for (Events event : startedVacationList) {
-            membersServiceFacade.updateOnVacationTrue(event.getMember().getMemberName());
+            membersServiceFacade.updateOneForOnVacationTrue(event.getMember().getMemberName());
         }
     }
 
@@ -48,13 +48,13 @@ public class Scheduler {
     @Transactional
     @Scheduled(cron = "0 10 0 1 * *")
     public void updateRemainingVacationDaysMonthly() {
-        membersServiceFacade.updateRemainingVacationDays(ScheduledEventType.MONTHLY_UPDATE);
+        membersServiceFacade.updateOneForRemainingVacationDays(ScheduledEventType.MONTHLY_UPDATE);
     }
 
     // 매년 1월 1일 00시 10분
     @Transactional
     @Scheduled(cron = "0 20 0 1 1 *")
     public void updateRemainingVacationDaysYearly() {
-        membersServiceFacade.updateRemainingVacationDays(ScheduledEventType.YEARLY_UPDATE);
+        membersServiceFacade.updateOneForRemainingVacationDays(ScheduledEventType.YEARLY_UPDATE);
     }
 }

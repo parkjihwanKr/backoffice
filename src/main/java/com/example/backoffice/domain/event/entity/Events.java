@@ -36,7 +36,7 @@ public class Events extends CommonEntity {
     private EventType eventType;
 
     // relations
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Members member;
 

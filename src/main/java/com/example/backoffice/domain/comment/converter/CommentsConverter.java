@@ -9,8 +9,8 @@ import com.example.backoffice.domain.member.entity.Members;
 public class CommentsConverter {
 
     public static Comments toEntity(
-            CommentsRequestDto.CreateCommentsRequestDto requestDto,
-            Boards board, Members member) {
+            CommentsRequestDto.CreateCommentDto requestDto,
+            Boards board, Members member){
         return Comments.builder()
                 .member(member)
                 .board(board)
@@ -20,18 +20,18 @@ public class CommentsConverter {
                 .build();
     }
 
-    public static CommentsResponseDto.CreateCommentsResponseDto toCreateDto(
-            Comments comment, Members member) {
-        return CommentsResponseDto.CreateCommentsResponseDto.builder()
+    public static CommentsResponseDto.CreateCommentDto toCreateCommentDto(
+            Comments comment, Members member){
+        return CommentsResponseDto.CreateCommentDto.builder()
                 .writer(member.getMemberName())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();
     }
 
-    public static CommentsResponseDto.UpdateCommentsResponseDto toUpdateDto(
-            Comments comment, Members member) {
-        return CommentsResponseDto.UpdateCommentsResponseDto.builder()
+    public static CommentsResponseDto.UpdateCommentDto toUpdateCommentDto(
+            Comments comment, Members member){
+        return CommentsResponseDto.UpdateCommentDto.builder()
                 .writer(member.getMemberName())
                 .content(comment.getContent())
                 .likeCount(comment.getLikeCount())
@@ -41,9 +41,9 @@ public class CommentsConverter {
                 .build();
     }
 
-    public static Comments toChildEntity(
-            CommentsRequestDto.CreateReplyRequestDto requestDto,
-            Boards board, Members member) {
+    public static Comments toReplyEntity(
+            CommentsRequestDto.CreateReplyDto requestDto,
+            Boards board, Members member){
         return Comments.builder()
                 .member(member)
                 .board(board)
@@ -53,9 +53,9 @@ public class CommentsConverter {
                 .build();
     }
 
-    public static CommentsResponseDto.CreateReplyResponseDto toCreateReplyDto(
-            Comments parentComment, Comments childComment, Members member) {
-        return CommentsResponseDto.CreateReplyResponseDto.builder()
+    public static CommentsResponseDto.CreateReplyDto toCreateReplyDto(
+            Comments parentComment, Comments childComment, Members member){
+        return CommentsResponseDto.CreateReplyDto.builder()
                 .toMemberName(parentComment.getMember().getMemberName())
                 .parentContent(parentComment.getContent())
                 .parentCreatedAt(parentComment.getCreatedAt())
@@ -65,9 +65,9 @@ public class CommentsConverter {
                 .build();
     }
 
-    public static CommentsResponseDto.UpdateReplyResponseDto UpdateReplyDto(
-            Comments parentComment, Comments childComment, Members member) {
-        return CommentsResponseDto.UpdateReplyResponseDto.builder()
+    public static CommentsResponseDto.UpdateReplyDto UpdateReplyDto(
+            Comments parentComment, Comments childComment, Members member){
+        return CommentsResponseDto.UpdateReplyDto.builder()
                 .toMemberName(parentComment.getMember().getMemberName())
                 .parentContent(parentComment.getContent())
                 .parentCreatedAt(parentComment.getCreatedAt())

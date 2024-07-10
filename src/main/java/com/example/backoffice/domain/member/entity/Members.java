@@ -2,6 +2,7 @@ package com.example.backoffice.domain.member.entity;
 
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.favorite.entity.Favorities;
+import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -20,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Members extends CommonEntity {
 
+    // field
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -71,6 +73,7 @@ public class Members extends CommonEntity {
     // 휴가 상태
     private Boolean onVacation;
 
+    // relations
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reactions> reactionList;
 
@@ -80,50 +83,56 @@ public class Members extends CommonEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorities> favoritieList;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MembersEvaluations> membersEvaluations;
+
+    // entity method
     public void updateMemberInfo(
             String name, String email, String address,
-            String contact, String introduction, String bCrytPassword) {
+            String contact, String introduction, String bCrytPassword, String profileImageUrl){
         this.name = name;
         this.password = bCrytPassword;
         this.email = email;
         this.address = address;
         this.contact = contact;
         this.introduction = introduction;
+        this.profileImageUrl = profileImageUrl;
     }
 
-    public void updateProfileImage(String profileImageUrl) {
+    public void updateProfileImage(String profileImageUrl){
         this.profileImageUrl = profileImageUrl;
     }
 
     public void updateAttribute(
-            MemberRole role, MemberDepartment department, MemberPosition position) {
+            MemberRole role, MemberDepartment department, MemberPosition position, Long salary){
         this.role = role;
         this.department = department;
         this.position = position;
-    }
-
-    public void updateSalary(Long salary) {
         this.salary = salary;
     }
 
-    public void addEmoji(Reactions reaction) {
+    public void updateSalary(Long salary){
+        this.salary = salary;
+    }
+
+    public void addEmoji(Reactions reaction){
         this.reactionList.add(reaction);
         this.loveCount++;
     }
 
-    public void deleteEmoji() {
+    public void deleteEmoji(){
         this.loveCount--;
     }
 
-    public void updateOnVacation(Boolean onVacation) {
+    public void updateOnVacation(Boolean onVacation){
         this.onVacation = onVacation;
     }
 
-    public void updateRemainingVacation() {
+    public void updateRemainingVacation(){
         this.remainingVacationDays++;
     }
 
-    public void updateRemainingVacationYearly() {
+    public void updateRemainingVacationYearly(){
         this.remainingVacationDays += 5;
     }
 }

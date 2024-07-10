@@ -1,7 +1,7 @@
 package com.example.backoffice.domain.comment.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.board.service.BoardsService;
+import com.example.backoffice.domain.board.service.BoardsServiceV1;
 import com.example.backoffice.domain.comment.converter.CommentsConverter;
 import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
@@ -16,15 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CommentsServiceImpl implements CommentsService {
+public class CommentsServiceImplV1 implements CommentsServiceV1 {
 
     private final CommentsRepository commentsRepository;
-    private final BoardsService boardsService;
+    private final BoardsServiceV1 boardsService;
 
     @Override
     @Transactional
-    public CommentsResponseDto.CreateCommentsResponseDto createComment(
-            CommentsRequestDto.CreateCommentsRequestDto requestDto,
+    public CommentsResponseDto.CreateCommentDto createComment(
+            CommentsRequestDto.CreateCommentDto requestDto,
             Long boardId, Members member) {
         Boards board = boardsService.findById(boardId);
         Comments comment = CommentsConverter.toEntity(requestDto, board, member);
@@ -34,15 +34,15 @@ public class CommentsServiceImpl implements CommentsService {
 
         commentsRepository.save(comment);
 
-        return CommentsConverter.toCreateDto(comment, member);
+        return CommentsConverter.toCreateCommentDto(comment, member);
     }
 
     @Override
     @Transactional
-    public CommentsResponseDto.UpdateCommentsResponseDto updateComment(
+    public CommentsResponseDto.UpdateCommentDto updateComment(
             Long boardId, Long commentId,
-            CommentsRequestDto.UpdateCommentsRequestDto requestDto,
-            Members member) {
+            CommentsRequestDto.UpdateCommentDto requestDto,
+            Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
@@ -51,12 +51,12 @@ public class CommentsServiceImpl implements CommentsService {
 
         comment.update(requestDto.getContent());
 
-        return CommentsConverter.toUpdateDto(comment, member);
+        return CommentsConverter.toUpdateCommentDto(comment, member);
     }
 
     @Override
     @Transactional
-    public void deleteComment(Long boardId, Long commentId, Members member) {
+    public void deleteComment(Long boardId, Long commentId, Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
@@ -68,14 +68,13 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     @Transactional
-    public CommentsResponseDto.CreateReplyResponseDto createReply(
+    public CommentsResponseDto.CreateReplyDto createReply(
             Long boardId, Long commentId,
-            CommentsRequestDto.CreateReplyRequestDto requestDto,
-            Members member) {
+            CommentsRequestDto.CreateReplyDto requestDto, Members member){
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
-        Comments reply = CommentsConverter.toChildEntity(requestDto, board, member);
+        Comments reply = CommentsConverter.toReplyEntity(requestDto, board, member);
 
         isMatchedBoard(comment, board);
         reply.updateParent(comment);
@@ -88,10 +87,9 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     @Transactional
-    public CommentsResponseDto.UpdateReplyResponseDto updateReply(
+    public CommentsResponseDto.UpdateReplyDto updateReply(
             Long commentId, Long replyId,
-            CommentsRequestDto.UpdateReplyRequestDto requestDto,
-            Members member) {
+            CommentsRequestDto.UpdateReplyDto requestDto, Members member){
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
         Boards board = boardsService.findById(comment.getBoard().getId());
@@ -106,7 +104,7 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     @Transactional
-    public void deleteReply(Long commentId, Long replyId, Members member) {
+    public void deleteReply(Long commentId, Long replyId, Members member){
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
         Boards board = boardsService.findById(comment.getBoard().getId());
@@ -123,30 +121,30 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     @Transactional(readOnly = true)
-    public Comments findById(Long commentId) {
+    public Comments findById(Long commentId){
         return commentsRepository.findById(commentId).orElseThrow(
                 () -> new CommentsCustomException(CommentsExceptionCode.NOT_FOUND_COMMENT)
         );
     }
 
-    private void isMatchedBoard(Comments comment, Boards board) {
-        if (!comment.getBoard().getId().equals(board.getId())) {
+    private void isMatchedBoard(Comments comment, Boards board){
+        if(!comment.getBoard().getId().equals(board.getId())){
             throw new CommentsCustomException(
                     CommentsExceptionCode.NOT_MATCHED_BOARD_COMMENT
             );
         }
     }
 
-    private void isMatchedMember(Comments comment, Members member) {
-        if (!comment.getMember().getId().equals(member.getId())) {
+    private void isMatchedMember(Comments comment, Members member){
+        if(!comment.getMember().getId().equals(member.getId())){
             throw new CommentsCustomException(
                     CommentsExceptionCode.NOT_MATCHED_MEMBER_COMMENT
             );
         }
     }
 
-    private void isMatchedComment(Comments comment, Comments reply) {
-        if (comment.getId().equals(reply.getId())) {
+    private void isMatchedComment(Comments comment, Comments reply){
+        if(comment.getId().equals(reply.getId())){
             throw new CommentsCustomException(CommentsExceptionCode.IS_COMMENT);
         }
     }
