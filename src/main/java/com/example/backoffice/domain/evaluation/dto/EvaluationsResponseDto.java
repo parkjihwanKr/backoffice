@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class EvaluationsResponseDto {
@@ -88,5 +89,15 @@ public class EvaluationsResponseDto {
         private Integer year;
         private LocalDate startDate;
         private LocalDate endDate;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SubmitOneDto {
+        private String submitterName;
+        // 제출 시간
+        private LocalDateTime createdAt;
     }
 }

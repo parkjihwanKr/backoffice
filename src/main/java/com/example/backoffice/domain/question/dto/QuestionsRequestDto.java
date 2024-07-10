@@ -57,17 +57,15 @@ public class QuestionsRequestDto {
         private List<Long> questionNumberList;
     }
 
-    @Getter
+    /*@Getter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     public static class SubmitAllDto {
-        private String memberName;
-        // 설문조사를 응했음을 동의하십니까?
-        private Boolean checked;
+
         private List<QuestionsResponseDto.SubmitOneDto> submitOneDtoList;
     }
-
+*/
     @Getter
     @Builder
     @AllArgsConstructor

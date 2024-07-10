@@ -62,14 +62,4 @@ public class QuestionsController {
                 new CommonResponse<>(
                         HttpStatus.OK, "성공적으로 삭제되었습니다.", null));
     }
-
-    @PostMapping("/evaluations/{evaluationId}/questions/submit")
-    public ResponseEntity<QuestionsResponseDto.SubmitAllDto> submitAll(
-            @PathVariable Long evaluationId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody QuestionsRequestDto.SubmitAllDto requestDto){
-        QuestionsResponseDto.SubmitAllDto responseDto
-                = questionsService.submitAll(evaluationId, memberDetails.getMembers(), requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
 }
