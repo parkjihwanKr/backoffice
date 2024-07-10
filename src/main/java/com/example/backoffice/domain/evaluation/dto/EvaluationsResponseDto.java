@@ -46,6 +46,7 @@ public class EvaluationsResponseDto {
     public static class ReadOneForDepartmentDto {
         private String writerName;
         private String title;
+        private String description;
         private Integer year;
         private Integer quarter;
         private List<QuestionsResponseDto.ReadOneDto> questionList;
@@ -60,7 +61,7 @@ public class EvaluationsResponseDto {
         private String title;
         private String description;
         private Integer year;
-        private List<Questions> evaluationQuestionList;
+        private List<QuestionsResponseDto.ReadOneDto> questionList;
     }
 
     @Getter

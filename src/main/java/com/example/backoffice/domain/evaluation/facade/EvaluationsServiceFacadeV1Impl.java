@@ -7,7 +7,6 @@ import com.example.backoffice.domain.evaluation.entity.EvaluationType;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
-import com.example.backoffice.domain.evaluation.repository.EvaluationsRepository;
 import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
@@ -119,17 +118,18 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
     @Override
     @Transactional(readOnly = true)
     public EvaluationsResponseDto.ReadOneForDepartmentDto readOneForDepartment(
-            Integer year, Integer quarter, Long evaluationsId, Members loginMember){
-        Evaluations evaluation = evaluationsService.findById(evaluationsId);
+            Integer year, Integer quarter, Long evaluationId, Members loginMember){
+        Evaluations evaluation
+                = evaluationsService.findByIdAndEvaluationType(
+                        evaluationId, EvaluationType.DEPARTMENT);
 
         matchDepartmentOrCEO(
                 evaluation.getDepartment(), loginMember.getDepartment(),
                 loginMember.getPosition());
 
-        membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationsId);
-
         return EvaluationsConverter.toReadOneForDepartmentDto(
-                evaluation.getTitle(), year, quarter, loginMember.getMemberName(),
+                evaluation.getTitle(), evaluation.getDescription(),
+                year, quarter, loginMember.getMemberName(),
                 evaluation.getQuestionList());
     }
 
@@ -138,12 +138,15 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
     public EvaluationsResponseDto.ReadOneForCompanyDto readOneForCompany(
             Integer year, Long evaluationId, Members loginMember){
 
-        Evaluations evaluation = evaluationsService.findById(evaluationId);
+        Evaluations evaluation
+                = evaluationsService.findByIdAndEvaluationType(
+                evaluationId, EvaluationType.COMPANY);
 
-        membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationId);
+        // membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationId);
 
         return EvaluationsConverter.toReadOneForCompanyDto(
-                evaluation.getTitle(), evaluation.getDescription(), evaluation.getYear());
+                evaluation.getTitle(), evaluation.getDescription(), evaluation.getYear(),
+                loginMember.getMemberName(), evaluation.getQuestionList());
     }
 
     @Override
@@ -151,7 +154,9 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
     public EvaluationsResponseDto.UpdateOneForDepartmentDto updateOneForDepartment(
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto){
-        Evaluations evaluation = evaluationsService.findById(evaluationId);
+        Evaluations evaluation
+                = evaluationsService.findByIdAndEvaluationType(
+                evaluationId, EvaluationType.DEPARTMENT);
         // 1. 해당 설문 조사를 변경할 권한 검증
         matchDepartmentManager(
                 evaluation.getDepartment(), loginMember.getDepartment(), loginMember.getPosition());
@@ -187,11 +192,14 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.UpdateOneForCompanyDto requestDto){
         // 1. 존재하는 평가인지?
-        Evaluations evaluation = evaluationsService.findById(evaluationId);
+        Evaluations evaluation
+                = evaluationsService.findByIdAndEvaluationType(
+                        evaluationId, EvaluationType.COMPANY);
 
         // 2. 평가를 수정할 수 있는 권한인지?
         if(!(loginMember.getPosition().equals(MemberPosition.MANAGER)
-                && loginMember.getDepartment().equals(MemberDepartment.HR))){
+                && loginMember.getDepartment().equals(MemberDepartment.HR))
+                && !loginMember.getPosition().equals(MemberPosition.CEO)){
             throw new EvaluationsCustomException(EvaluationsExceptionCode.UNAUTHORIZED_ACCESS);
         }
 
@@ -212,8 +220,8 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         // 6. 응답 DTO 생성
         return EvaluationsConverter.toUpdateOneForCompanyDto(
                 evaluation.getTitle(), evaluation.getDescription(),
-                evaluation.getStartDate(), evaluation.getEndDate(),
-                loginMember.getMemberName());
+                evaluation.getYear(), evaluation.getStartDate(),
+                evaluation.getEndDate(), loginMember.getMemberName());
     }
 
     @Override
@@ -249,9 +257,9 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
         for(QuestionsRequestDto.SubmitOneDto questionRequestDto : requestDto.getQuestionSubmitAllDto()){
             // 해당 Question이 evaluation에 포함되어있는지?
-            questionsService.findByEvaluationIdAndNumber(
-                    evaluationId, questionRequestDto.getQuestionNumber());
-            questionsService.submitOne(questionRequestDto, loginMember);
+            questionsService.submitOne(
+                    evaluationId, questionRequestDto.getQuestionNumber(),
+                    questionRequestDto, loginMember);
         }
         if(!requestDto.getChecked()){
             throw new EvaluationsCustomException(EvaluationsExceptionCode.NOT_INPUT_EVALUATION_CHECKED);
@@ -296,12 +304,13 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         validateDate(startDate, endDate);
 
         // 2. 시작 분기와 마감 분기가 일치하는지?
-        int startQuarter = (startDate.getMonthValue() - 1) / 3 + 1;
-        int endQuarter = (endDate.getMonthValue() - 1) / 3 + 1;
+        // int startQuarter = (startDate.getMonthValue() - 1) / 3 + 1;
+        /*int endQuarter = (endDate.getMonthValue() - 1) / 3 + 1;
         if (endQuarter > startQuarter) {
             throw new EvaluationsCustomException(EvaluationsExceptionCode.INVALID_QUARTER_REQUEST);
-        }
-        // 3. 최소 분기별 마지노선 마감 날짜일: 분기별 마지막 달 마지막 일의 14일 전
+        }*/
+        // 2. 최소 분기별 마지노선 마감 날짜일: 분기별 마지막 달 마지막 일의 14일 전
+        int startQuarter = (startDate.getMonthValue() - 1) / 3 + 1;
         LocalDate quarterEndDate = getQuarterEndDate(startQuarter).minusDays(14);
         if (endDate.isAfter(quarterEndDate)) {
             throw new EvaluationsCustomException(EvaluationsExceptionCode.END_DATE_TOO_LATE);
@@ -340,6 +349,13 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         // 4. 최소 기간 보장 7일
         if (ChronoUnit.DAYS.between(startDate, endDate) < 7) {
             throw new EvaluationsCustomException(EvaluationsExceptionCode.MINIMUM_DURATION_TOO_SHORT);
+        }
+
+        // 5. 시작 분기와 마감 분기가 일치하는지?
+        int startQuarter = (startDate.getMonthValue() - 1) / 3 + 1;
+        int endQuarter = (endDate.getMonthValue() - 1) / 3 + 1;
+        if (endQuarter > startQuarter) {
+            throw new EvaluationsCustomException(EvaluationsExceptionCode.INCORRECT_DATE_QUARTER_REQUEST);
         }
     }
 

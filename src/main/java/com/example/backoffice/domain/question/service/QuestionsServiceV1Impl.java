@@ -7,6 +7,7 @@ import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.memberAnswer.service.MembersAnswersServiceV1;
 import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluationsServiceV1;
 import com.example.backoffice.domain.question.converter.QuestionsConverter;
@@ -22,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
     private final EvaluationsServiceV1 evaluationsService;
     private final AnswersServiceV1 answersService;
-    private final MembersEvaluationsServiceV1 membersEvaluationsService;
+    private final MembersAnswersServiceV1 membersAnswersService;
     private final QuestionsRepository questionsRepository;
 
     @Override
@@ -191,24 +194,44 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
     @Override
     @Transactional
-    public void submitOne(QuestionsRequestDto.SubmitOneDto requestDto, Members loginMember){
-        QuestionsType questionsType = QuestionsConverter.toQuestionsType(requestDto.getQuestionType());
-        switch(questionsType) {
-            case SHORT_ANSWER -> {
-                if(requestDto.getShortAnswer().isEmpty()
-                        || requestDto.getMultipleChoiceAnswerNumber() != null){
+    public void submitOne(Long evaluationId, Long number,
+                          QuestionsRequestDto.SubmitOneDto requestDto, Members loginMember){
+        Questions question = findByEvaluationIdAndNumber(evaluationId, number);
+        String shortAnswer
+                = Optional.ofNullable(requestDto.getShortAnswer()).orElse("");
+        List<Long> multipleChoiceAnswers
+                = Optional.ofNullable(
+                        requestDto.getMultipleChoiceAnswerNumber()).orElse(
+                                Collections.emptyList());
+
+        QuestionsType questionsType = question.getQuestionsType();
+        switch (questionsType) {
+            case SHORT_ANSWER ->{
+                if(shortAnswer.isEmpty() && !multipleChoiceAnswers.isEmpty()) {
                     throw new QuestionsCustomException(QuestionsExceptionCode.INPUT_SHORT_ANSWER);
                 }
+                saveMemberAnswer(question, loginMember, requestDto.getQuestionNumber(), questionsType);
             }
             case MULTIPLE_CHOICE_ANSWER -> {
-                if(!requestDto.getShortAnswer().isEmpty()
-                        || requestDto.getMultipleChoiceAnswerNumber() == null){
+                if(!shortAnswer.isEmpty() && multipleChoiceAnswers.isEmpty()) {
                     throw new QuestionsCustomException(QuestionsExceptionCode.INPUT_MULTIPLE_CHOICE_ANSWER);
+                }
+                if(multipleChoiceAnswers.size() > 1) {
+                    int maxAnswerNumber = answersService.findAllByQuestionId(question.getId()).size();
+                    for(Long answerNumber : multipleChoiceAnswers) {
+                        if(answerNumber > maxAnswerNumber) {
+                            throw new QuestionsCustomException(QuestionsExceptionCode.ORDER_EXCEEDS_MAX_SIZE);
+                        }
+                        saveMemberAnswer(question, loginMember, requestDto.getQuestionNumber(), questionsType);
+                    }
+                } else if(multipleChoiceAnswers.size() == 1) {
+                    saveMemberAnswer(question, loginMember, requestDto.getQuestionNumber(), questionsType);
                 }
             }
             default -> throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION_TYPE);
         }
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -261,8 +284,25 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
     @Override
     @Transactional(readOnly = true)
-    public void findByEvaluationIdAndNumber(Long evaluationId, Long number){
-        questionsRepository.findByEvaluationIdAndNumber(evaluationId, number).orElseThrow(
+    public Questions findByEvaluationIdAndNumber(Long evaluationId, Long number){
+        return questionsRepository.findByEvaluationIdAndNumber(evaluationId, number).orElseThrow(
                 ()-> new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER));
+    }
+
+    public void saveMemberAnswer(
+            Questions question, Members loginMember, Long questionNumber, QuestionsType questionsType){
+        switch (questionsType) {
+            case SHORT_ANSWER -> {
+                Answers answer = answersService.findByQuestionId(question.getId());
+                membersAnswersService.saveOne(question, loginMember, answer);
+            }
+            case MULTIPLE_CHOICE_ANSWER -> {
+                Answers answer
+                        = answersService.findByQuestionIdAndNumber(
+                        question.getId(), questionNumber);
+                membersAnswersService.saveOne(question, loginMember, answer);
+            }
+            default -> throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION_TYPE);
+        }
     }
 }

@@ -23,9 +23,11 @@ public interface QuestionsServiceV1 {
             Long evaluationId, Members loginMember,
             QuestionsRequestDto.DeleteDto requestDto);
 
-    void submitOne(QuestionsRequestDto.SubmitOneDto requestDto, Members loginMember);
+    void submitOne(
+            Long evaluationId, Long number,
+            QuestionsRequestDto.SubmitOneDto requestDto, Members loginMember);
 
-    void findByEvaluationIdAndNumber(Long evaluationId, Long number);
+    Questions findByEvaluationIdAndNumber(Long evaluationId, Long number);
 
     Questions findById(Long questionId);
 }

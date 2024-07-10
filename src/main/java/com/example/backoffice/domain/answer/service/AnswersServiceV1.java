@@ -18,4 +18,8 @@ public interface AnswersServiceV1 {
             Questions question, List<String> changeQuestionTextList);
 
     void updateAllForShortAnswer(Long questionId);
+
+    Answers findByQuestionIdAndNumber(Long questionId, Long number);
+
+    Answers findByQuestionId(Long questionId);
 }
