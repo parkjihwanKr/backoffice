@@ -166,10 +166,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         for(int i = 0; i < deletedQuestionNumberList.size(); i++){
             // 질문 10개 삭제될 질문이 2-5이라고 가정
             // 삭제할 질문이 존재하는지 확인
-            questionsRepository.findByEvaluationIdAndNumber(
-                    evaluationId, deletedQuestionNumberList.get(i))
-                    .orElseThrow(()-> new QuestionsCustomException(
-                            QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER));
+            findByEvaluationIdAndNumber(evaluationId, deletedQuestionNumberList.get(i));
         }
         // 해당 부분에 삭제된 질문들의 순서 공백을 채워넣어야함
         // 상위 도메인 변경 사항
@@ -194,58 +191,23 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
     @Override
     @Transactional
-    public QuestionsResponseDto.SubmitAllDto submitAll(
-            Long evaluationId, Members loginMember, QuestionsRequestDto.SubmitAllDto requestDto){
-        // 1. 멤버가 수행해야하는 설문조사인지?
-        MembersEvaluations membersEvaluation
-                = membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationId);
-        Evaluations evaluation = membersEvaluation.getEvaluation();
-
-        // 2. 평가에 알맞는 답을 제출하는지?
-        int index = 0;
-        for(Questions question : evaluation.getQuestionList()){
-            if(evaluation.getQuestionList().get(index).getId().equals(question.getId())){
-                throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION);
-            }
-            QuestionsType questionsType
-                    = QuestionsConverter.toQuestionsType(
-                            requestDto.getSubmitOneDtoList().get(index).getQuestionType());
-            switch(questionsType) {
-                // 2-1 주관식 제출
-                case SHORT_ANSWER -> {
-                    if(!question.getQuestionsType().equals(questionsType)){
-                        throw new QuestionsCustomException(
-                                QuestionsExceptionCode.INPUT_SHORT_ANSWER);
-                    }
-                    if(requestDto.getSubmitOneDtoList().get(index).getMultipleChoiceAnswerNumber() != null
-                            || requestDto.getSubmitOneDtoList().get(index).getShortAnswer().isEmpty()){
-                        throw new QuestionsCustomException(
-                                QuestionsExceptionCode.INPUT_SHORT_ANSWER);
-                    }
+    public void submitOne(QuestionsRequestDto.SubmitOneDto requestDto, Members loginMember){
+        QuestionsType questionsType = QuestionsConverter.toQuestionsType(requestDto.getQuestionType());
+        switch(questionsType) {
+            case SHORT_ANSWER -> {
+                if(requestDto.getShortAnswer().isEmpty()
+                        || requestDto.getMultipleChoiceAnswerNumber() != null){
+                    throw new QuestionsCustomException(QuestionsExceptionCode.INPUT_SHORT_ANSWER);
                 }
-                // 2-2 객관식 제출
-                case MULTIPLE_CHOICE_ANSWER -> {
-                    if(!question.getQuestionsType().equals(questionsType)){
-                        throw new QuestionsCustomException(
-                                QuestionsExceptionCode.INPUT_MULTIPLE_CHOICE_ANSWER);
-                    }
-                    if(requestDto.getSubmitOneDtoList().get(index).getMultipleChoiceAnswerNumber() == null
-                            || !requestDto.getSubmitOneDtoList().get(index).getShortAnswer().isEmpty()){
-                        throw new QuestionsCustomException(
-                                QuestionsExceptionCode.INPUT_MULTIPLE_CHOICE_ANSWER);
-                    }
-                }
-                // 2-3 주관식, 객관식 제출이 아닌 다른 형태
-                default -> throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION_TYPE);
             }
-            index++;
+            case MULTIPLE_CHOICE_ANSWER -> {
+                if(!requestDto.getShortAnswer().isEmpty()
+                        || requestDto.getMultipleChoiceAnswerNumber() == null){
+                    throw new QuestionsCustomException(QuestionsExceptionCode.INPUT_MULTIPLE_CHOICE_ANSWER);
+                }
+            }
+            default -> throw new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTION_TYPE);
         }
-        if(!requestDto.getChecked()){
-            throw new QuestionsCustomException(QuestionsExceptionCode.CHECKED_IS_FALSE);
-        }
-
-        membersEvaluation.isCompleted(true);
-        return null;
     }
 
     @Override
@@ -295,5 +257,12 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
             }
         }
         return changedEvaluationQuestionList;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void findByEvaluationIdAndNumber(Long evaluationId, Long number){
+        questionsRepository.findByEvaluationIdAndNumber(evaluationId, number).orElseThrow(
+                ()-> new QuestionsCustomException(QuestionsExceptionCode.NOT_FOUND_QUESTIONS_ORDER));
     }
 }

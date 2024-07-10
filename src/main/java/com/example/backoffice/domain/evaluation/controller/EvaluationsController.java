@@ -2,7 +2,10 @@ package com.example.backoffice.domain.evaluation.controller;
 
 import com.example.backoffice.domain.evaluation.dto.EvaluationsRequestDto;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsResponseDto;
+import com.example.backoffice.domain.evaluation.facade.EvaluationsServiceFacadeV1;
 import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
+import com.example.backoffice.domain.question.dto.QuestionsRequestDto;
+import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
 import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +19,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 public class EvaluationsController {
 
-    private final EvaluationsServiceV1 evaluationsService;
+    private final EvaluationsServiceFacadeV1 evaluationsServiceFacade;
 
     @PostMapping("/evaluations-department")
     public ResponseEntity<EvaluationsResponseDto.CreateOneForDepartmentDto> createOneForDepartment(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EvaluationsRequestDto.CreateOneForDepartmentDto requestDto){
         EvaluationsResponseDto.CreateOneForDepartmentDto responseDto
-                = evaluationsService.createOneForDepartment(memberDetails.getMembers(), requestDto);
+                = evaluationsServiceFacade.createOneForDepartment(memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -32,7 +35,8 @@ public class EvaluationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EvaluationsRequestDto.CreateOneForCompanyDto requestDto){
         EvaluationsResponseDto.CreateOneForCompanyDto responseDto
-                = evaluationsService.createOneForCompany(memberDetails.getMembers(),requestDto);
+                = evaluationsServiceFacade.createOneForCompany(
+                        memberDetails.getMembers(),requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -44,7 +48,8 @@ public class EvaluationsController {
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         EvaluationsResponseDto.ReadOneForDepartmentDto responseDto
-                = evaluationsService.readOneForDepartment(year, quarter, evaluationId, memberDetails.getMembers());
+                = evaluationsServiceFacade.readOneForDepartment(
+                        year, quarter, evaluationId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -53,7 +58,8 @@ public class EvaluationsController {
             @RequestParam Integer year, @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         EvaluationsResponseDto.ReadOneForCompanyDto responseDto
-                = evaluationsService.readOneForCompany(year, evaluationId, memberDetails.getMembers());
+                = evaluationsServiceFacade.readOneForCompany(
+                        year, evaluationId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -63,7 +69,7 @@ public class EvaluationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto){
         EvaluationsResponseDto.UpdateOneForDepartmentDto responseDto
-                = evaluationsService.updateOneForDepartment(
+                = evaluationsServiceFacade.updateOneForDepartment(
                         evaluationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -74,7 +80,7 @@ public class EvaluationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EvaluationsRequestDto.UpdateOneForCompanyDto requestDto){
         EvaluationsResponseDto.UpdateOneForCompanyDto responseDto
-                = evaluationsService.updateOneForCompany(
+                = evaluationsServiceFacade.updateOneForCompany(
                         evaluationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -83,8 +89,19 @@ public class EvaluationsController {
     public ResponseEntity<CommonResponse<Void>> deleteOne(
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        evaluationsService.deleteOne(evaluationId, memberDetails.getMembers());
+        evaluationsServiceFacade.deleteOne(evaluationId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "해당 설문 조사는 삭제되었습니다.", null));
+    }
+
+    @PostMapping("/evaluations/{evaluationId}/submit")
+    public ResponseEntity<EvaluationsResponseDto.SubmitOneDto> submitOne(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody EvaluationsRequestDto.SubmitOneDto requestDto){
+        EvaluationsResponseDto.SubmitOneDto responseDto
+                = evaluationsServiceFacade.submitOne(
+                        evaluationId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }

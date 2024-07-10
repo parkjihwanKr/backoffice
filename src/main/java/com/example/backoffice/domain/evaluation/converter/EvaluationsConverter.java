@@ -10,6 +10,7 @@ import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
 import com.example.backoffice.domain.question.entity.Questions;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,6 +118,13 @@ public class EvaluationsConverter {
                 .startDate(startDate)
                 .endDate(endDate)
                 .writerName(writerName)
+                .build();
+    }
+
+    public static EvaluationsResponseDto.SubmitOneDto toSubmitOneDto(String submitterName){
+        return EvaluationsResponseDto.SubmitOneDto.builder()
+                .createdAt(LocalDateTime.now())
+                .submitterName(submitterName)
                 .build();
     }
 }
