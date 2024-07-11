@@ -35,7 +35,7 @@ public class MemberAspect {
     // AOP를 지울 지 고민 중.
 
     // JoinPoint @Param MembersRequestDto.CreateMembersRequestDto requestDto
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.signup(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.createOneForSignup(..))")
     public void logAfterSignup(JoinPoint joinPoint) {
         MembersRequestDto.CreateOneDto requestDto
                 = (MembersRequestDto.CreateOneDto) joinPoint.getArgs()[0];

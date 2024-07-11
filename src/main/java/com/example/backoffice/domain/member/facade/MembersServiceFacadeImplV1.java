@@ -38,7 +38,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     private final NotificationsServiceV1 notificationsService;
     private final PasswordEncoder passwordEncoder;
     @PostConstruct
-    public void createAdminAccount(){
+    public void createOneForAdmin(){
         if(membersService.existsById(1L)){
             return;
         }
@@ -52,7 +52,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     // 타당성 검사 추가
     @Override
     @Transactional
-    public MembersResponseDto.CreateOneDto signup(
+    public MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto){
 
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){

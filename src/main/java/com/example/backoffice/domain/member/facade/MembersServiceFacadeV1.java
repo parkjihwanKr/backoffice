@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface MembersServiceFacadeV1 {
-    MembersResponseDto.CreateOneDto signup(
+    MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto);
 
     MembersResponseDto.ReadOneDto readOne(
