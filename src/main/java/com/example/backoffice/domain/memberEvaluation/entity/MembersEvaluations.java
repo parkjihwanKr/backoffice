@@ -38,7 +38,12 @@ public class MembersEvaluations extends CommonEntity {
     private Evaluations evaluation;
 
     // entity method
-    public void isCompleted(boolean isCompleted){
+    public void isCompleted(Boolean isCompleted){
         this.isCompleted = isCompleted;
+    }
+
+    public void unCompleted(Boolean isCompleted, LocalDateTime completedDate){
+        this.isCompleted = isCompleted;
+        this.completedDate = completedDate;
     }
 }

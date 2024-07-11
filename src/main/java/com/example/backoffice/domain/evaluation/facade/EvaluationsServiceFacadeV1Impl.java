@@ -268,6 +268,13 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         return EvaluationsConverter.toSubmitOneDto(loginMember.getMemberName());
     }
 
+    @Override
+    @Transactional
+    public void deleteSubmittedOneForCancellation(Long evaluationId, Members loginMember){
+        // 해당 멤버에게 할당된 설문조사가 있는지?
+        membersEvaluationsService.deleteSubmittedOneForCancellation(evaluationId, loginMember.getId());
+    }
+
     private void matchDepartmentManager(
             MemberDepartment department, MemberDepartment loginMemberDepartment,
             MemberPosition loginMemberPosition){

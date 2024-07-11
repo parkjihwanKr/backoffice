@@ -104,4 +104,15 @@ public class EvaluationsController {
                         evaluationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    @DeleteMapping("/evaluations/{evaluationId}/submit")
+    public ResponseEntity<CommonResponse<Void>> deleteSubmittedOneForCancellation(
+            @PathVariable Long evaluationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        evaluationsServiceFacade.deleteSubmittedOneForCancellation(
+                evaluationId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        HttpStatus.OK, "해당 설문조사가 취소 되었습니다.", null));
+    }
 }

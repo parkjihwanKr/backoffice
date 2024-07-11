@@ -11,4 +11,6 @@ public interface MembersEvaluationsServiceV1 {
     void save(MembersEvaluations membersEvaluations);
 
     List<MembersEvaluations> findAllByIsCompleted(Boolean isCompleted);
+
+    void deleteSubmittedOneForCancellation(Long evaluationId, Long loginMemberId);
 }
