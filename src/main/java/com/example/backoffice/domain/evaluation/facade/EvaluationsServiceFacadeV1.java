@@ -33,4 +33,5 @@ public interface EvaluationsServiceFacadeV1 {
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.SubmitOneDto requestDto);
 
+    void deleteSubmittedOneForCancellation(Long evaluationId, Members loginMember);
 }
