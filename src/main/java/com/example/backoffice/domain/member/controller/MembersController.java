@@ -21,10 +21,10 @@ public class MembersController {
     private final MembersServiceFacadeV1 membersServiceFacade;
 
     @PostMapping("/signup")
-    public ResponseEntity<MembersResponseDto.CreateOneDto> signup(
+    public ResponseEntity<MembersResponseDto.CreateOneDto> createOneForSignup(
             @Valid @RequestBody MembersRequestDto.CreateOneDto requestDto){
         MembersResponseDto.CreateOneDto responseDto
-                = membersServiceFacade.signup(requestDto);
+                = membersServiceFacade.createOneForSignup(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
