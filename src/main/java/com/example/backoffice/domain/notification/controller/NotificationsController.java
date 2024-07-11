@@ -2,7 +2,7 @@ package com.example.backoffice.domain.notification.controller;
 
 import com.example.backoffice.domain.notification.dto.NotificationsRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
+import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class NotificationsController {
 
-    private final NotificationsServiceFacade notificationsServiceFacade;
+    private final NotificationsServiceFacadeV1 notificationsServiceFacade;
 
     // 알림 단건 조회
     @GetMapping("/members/{memberId}/notifications/{notificationId}")

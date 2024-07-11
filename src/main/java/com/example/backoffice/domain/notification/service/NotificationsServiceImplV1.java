@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationsServiceImpl implements NotificationsService {
+public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
 
     private final NotificationsRepository notificationRepository;
 

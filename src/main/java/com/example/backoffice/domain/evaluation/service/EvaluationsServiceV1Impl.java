@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
@@ -41,5 +44,11 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
         return evaluationsRepository.findByIdAndEvaluationType(evaluationId, evaluationType).orElseThrow(
                 ()-> new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS)
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Evaluations> findAllByEndDatePlusSevenDays(LocalDate endDatePlusSevenDays){
+        return evaluationsRepository.findAllByEndDate(endDatePlusSevenDays);
     }
 }

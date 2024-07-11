@@ -18,7 +18,7 @@ import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluationsServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
+import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import com.example.backoffice.domain.question.dto.QuestionsRequestDto;
 import com.example.backoffice.domain.question.service.QuestionsServiceV1;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ import java.util.List;
 public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV1{
 
     private final MembersServiceV1 membersService;
-    private final NotificationsServiceFacade notificationsServiceFacade;
+    private final NotificationsServiceFacadeV1 notificationsServiceFacade;
     private final MembersEvaluationsServiceV1 membersEvaluationsService;
     private final QuestionsServiceV1 questionsService;
     private final EvaluationsServiceV1 evaluationsService;

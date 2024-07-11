@@ -8,7 +8,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
+import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import com.example.backoffice.domain.reaction.converter.ReactionsConverter;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
@@ -33,7 +33,7 @@ public class ReactionsServiceImpl implements ReactionsService {
     private final MembersServiceV1 membersService;
     private final BoardsServiceV1 boardsService;
     private final CommentsServiceV1 commentsService;
-    private final NotificationsServiceFacade notificationsServiceFacade;
+    private final NotificationsServiceFacadeV1 notificationsServiceFacade;
 
     @Override
     @Transactional

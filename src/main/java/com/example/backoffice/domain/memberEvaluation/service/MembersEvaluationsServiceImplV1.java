@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MembersEvaluationsServiceImplV1 implements MembersEvaluationsServiceV1{
@@ -26,5 +28,11 @@ public class MembersEvaluationsServiceImplV1 implements MembersEvaluationsServic
     @Transactional
     public void save(MembersEvaluations membersEvaluations){
         membersEvaluationsRepository.save(membersEvaluations);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MembersEvaluations> findAllByIsCompleted(Boolean isCompleted){
+        return membersEvaluationsRepository.findAllByIsCompleted(isCompleted);
     }
 }

@@ -12,7 +12,7 @@ import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
-import com.example.backoffice.domain.notification.service.NotificationsService;
+import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.SchedulerCustomException;
 import com.example.backoffice.global.scheduler.ScheduledEventType;
@@ -35,7 +35,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     private final FilesService filesService;
     private final MembersServiceV1 membersService;
-    private final NotificationsService notificationsService;
+    private final NotificationsServiceV1 notificationsService;
     private final PasswordEncoder passwordEncoder;
     @PostConstruct
     public void createAdminAccount(){
@@ -235,6 +235,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Members findMember(Members member, Long memberId){
         if(!member.getId().equals(memberId)){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
@@ -271,21 +272,10 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         return memberNameMap;
     }
 
-    private MembersExceptionEnum findExceptionType(
-            MembersRequestDto.CreateOneDto requestDto, Members duplicatedInfoMember){
-        if(requestDto.getContact().equals(duplicatedInfoMember.getContact())){
-            return MembersExceptionEnum.CONTACT;
-        }
-        if(requestDto.getEmail().equals(duplicatedInfoMember.getEmail())){
-            return MembersExceptionEnum.EMAIL;
-        }
-        if(requestDto.getAddress().equals(duplicatedInfoMember.getAddress())){
-            return MembersExceptionEnum.ADDRESS;
-        }
-        if(requestDto.getMemberName().equals(duplicatedInfoMember.getMemberName())){
-            return MembersExceptionEnum.MEMBER_NAME;
-        }
-        return MembersExceptionEnum.NULL;
+    @Override
+    @Transactional(readOnly = true)
+    public Members findHRManager(){
+        return membersService.findHRManager();
     }
 
     @Override
@@ -319,7 +309,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
                 }
             }
             default ->
-                throw new SchedulerCustomException(GlobalExceptionCode.NOT_FOUND_SCHEDULER_EVENT_TYPE);
+                    throw new SchedulerCustomException(GlobalExceptionCode.NOT_FOUND_SCHEDULER_EVENT_TYPE);
         }
     }
 
@@ -335,6 +325,23 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     public List<Members> findAllByPosition(String position){
         MemberPosition memberPosition = MembersConverter.toPosition(position);
         return membersService.findAllByPosition(memberPosition);
+    }
+
+    private MembersExceptionEnum findExceptionType(
+            MembersRequestDto.CreateOneDto requestDto, Members duplicatedInfoMember){
+        if(requestDto.getContact().equals(duplicatedInfoMember.getContact())){
+            return MembersExceptionEnum.CONTACT;
+        }
+        if(requestDto.getEmail().equals(duplicatedInfoMember.getEmail())){
+            return MembersExceptionEnum.EMAIL;
+        }
+        if(requestDto.getAddress().equals(duplicatedInfoMember.getAddress())){
+            return MembersExceptionEnum.ADDRESS;
+        }
+        if(requestDto.getMemberName().equals(duplicatedInfoMember.getMemberName())){
+            return MembersExceptionEnum.MEMBER_NAME;
+        }
+        return MembersExceptionEnum.NULL;
     }
 
     public MemberRole checkedRole(String role){

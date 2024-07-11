@@ -3,6 +3,7 @@ package com.example.backoffice.domain.member.facade;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.scheduler.ScheduledEventType;
@@ -57,4 +58,6 @@ public interface MembersServiceFacadeV1 {
     List<Members> findAllByDepartment(String department);
 
     List<Members> findAllByPosition(String position);
+
+    Members findHRManager();
 }
