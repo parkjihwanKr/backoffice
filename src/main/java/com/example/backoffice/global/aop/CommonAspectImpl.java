@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Aspect
 @Component
-public class CommonAspectImpl implements CommonAspect{
+public class CommonAspectImpl implements CommonAspect {
 
     @Override
     public String getCurrentMethodName(JoinPoint joinPoint) {
@@ -25,8 +25,9 @@ public class CommonAspectImpl implements CommonAspect{
         }
         return "anonymousUser";
     }
+
     @Override
-    public void getLogMessage(String message){
+    public void getLogMessage(String message) {
         log.info(message);
     }
 }

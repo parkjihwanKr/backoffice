@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,11 +31,11 @@ public class S3Util {
     @Value("${YOUR_BUCKET_NAME}")
     private String bucket;
 
-    public String uploadImage(MultipartFile image){
+    public String uploadImage(MultipartFile image) {
         return uploadFileOrImage(image);
     }
 
-    public String uploadFile(MultipartFile file){
+    public String uploadFile(MultipartFile file) {
         return uploadFileOrImage(file);
     }
 
@@ -56,19 +55,19 @@ public class S3Util {
         }
     }
 
-    public void removeImage(String imageUrl){
+    public void removeImage(String imageUrl) {
         String imageName = URLDecoder.decode(imageUrl, StandardCharsets.UTF_8)
                 .substring(imageUrl.indexOf("_"));
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, imageName));
     }
 
-    private String uploadFileOrImage(MultipartFile file){
-        try{
+    private String uploadFileOrImage(MultipartFile file) {
+        try {
             if (Objects.requireNonNull(file.getOriginalFilename()).isBlank()) {
                 throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_NAME_IS_BLANK);
             }
             String uuid = UUID.randomUUID().toString();
-            String filename = uuid+"_"+file.getOriginalFilename();
+            String filename = uuid + "_" + file.getOriginalFilename();
             ObjectMetadata metadata = new ObjectMetadata();
 
             metadata.setContentType(file.getContentType());
@@ -76,7 +75,7 @@ public class S3Util {
             amazonS3Client.putObject(bucket, filename, file.getInputStream(), metadata);
 
             return amazonS3Client.getUrl(bucket, filename).toString();
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_UPLOAD_FAIL);
         }
     }

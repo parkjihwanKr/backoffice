@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface NotificationsService {
+public interface NotificationsServiceV1 {
 
     Notifications save(Notifications notification);
 

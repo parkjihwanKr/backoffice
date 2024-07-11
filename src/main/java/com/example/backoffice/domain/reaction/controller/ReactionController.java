@@ -22,7 +22,7 @@ public class ReactionController {
     public ResponseEntity<ReactionsResponseDto.CreateMemberReactionResponseDto> createMemberReaction(
             @PathVariable Long memberId,
             @RequestBody ReactionsRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         ReactionsResponseDto.CreateMemberReactionResponseDto responseDto =
                 reactionsService.createMemberReaction(
                         memberId, memberDetails.getMembers(), requestDto);
@@ -32,7 +32,7 @@ public class ReactionController {
     @DeleteMapping("/member/{memberId}/reactions/{reactionId}")
     public ResponseEntity<CommonResponse<Void>> deleteMemberReaction(
             @PathVariable Long memberId, @PathVariable Long reactionId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         reactionsService.deleteMemberReaction(
                 memberId, reactionId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
@@ -45,9 +45,9 @@ public class ReactionController {
 
     @PostMapping("/boards/{boardId}/reactions")
     public ResponseEntity<ReactionsResponseDto.CreateBoardReactionResponseDto> createBoardReaction(
-                    @PathVariable Long boardId,
-                    @RequestBody ReactionsRequestDto requestDto,
-                    @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @PathVariable Long boardId,
+            @RequestBody ReactionsRequestDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         ReactionsResponseDto.CreateBoardReactionResponseDto responseDto =
                 reactionsService.createBoardReaction(
                         boardId, memberDetails.getMembers(), requestDto);
@@ -57,7 +57,7 @@ public class ReactionController {
     @DeleteMapping("/boards/{boardId}/reactions/{reactionId}")
     public ResponseEntity<CommonResponse<Void>> deleteBoardReaction(
             @PathVariable Long boardId, @PathVariable Long reactionId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         reactionsService.deleteBoardReaction(
                 boardId, reactionId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
@@ -72,7 +72,7 @@ public class ReactionController {
     public ResponseEntity<ReactionsResponseDto.CreateCommentReactionResponseDto> createCommentReaction(
             @PathVariable Long boardId, @PathVariable Long commentId,
             @RequestBody ReactionsRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         ReactionsResponseDto.CreateCommentReactionResponseDto responseDto =
                 reactionsService.createCommentReaction(
                         boardId, commentId, memberDetails.getMembers(), requestDto);
@@ -82,7 +82,7 @@ public class ReactionController {
     @DeleteMapping("/comments/{commentId}/reactions/{reactionId}")
     public ResponseEntity<CommonResponse<Void>> deleteCommentReaction(
             @PathVariable Long commentId, @PathVariable Long reactionId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         reactionsService.deleteCommentReaction(
                 commentId, reactionId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
@@ -97,7 +97,7 @@ public class ReactionController {
     public ResponseEntity<ReactionsResponseDto.CreateReplyReactionResponseDto> createReplyReaction(
             @PathVariable Long commentId, @PathVariable Long replyId,
             @RequestBody ReactionsRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         ReactionsResponseDto.CreateReplyReactionResponseDto responseDto =
                 reactionsService.createReplyReaction(
                         commentId, replyId, memberDetails.getMembers(), requestDto);
@@ -108,7 +108,7 @@ public class ReactionController {
     @DeleteMapping("/replies/{replyId}/reactions/{reactionId}")
     public ResponseEntity<CommonResponse<Void>> deleteReplyReaction(
             @PathVariable Long replyId, @PathVariable Long reactionId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         reactionsService.deleteReplyReaction(
                 replyId, reactionId, memberDetails.getMembers());
         return ResponseEntity.ok().body(

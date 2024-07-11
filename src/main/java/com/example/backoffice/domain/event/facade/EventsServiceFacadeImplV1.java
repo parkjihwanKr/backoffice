@@ -16,7 +16,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
+import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +32,7 @@ import java.util.List;
 public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     private final MembersServiceV1 membersService;
-    private final NotificationsServiceFacade notificationsServiceFacade;
+    private final NotificationsServiceFacadeV1 notificationsServiceFacade;
     private final EventsService eventsService;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER

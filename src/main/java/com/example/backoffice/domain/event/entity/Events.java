@@ -44,7 +44,7 @@ public class Events extends CommonEntity {
     public void update(
             String title, String description,
             MemberDepartment department, LocalDateTime startDate,
-            LocalDateTime endDate, EventType eventType){
+            LocalDateTime endDate, EventType eventType) {
         this.title = title;
         this.description = description;
         this.department = department;

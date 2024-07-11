@@ -13,11 +13,11 @@ public enum EventCrudType {
 
     private final String label;
 
-    EventCrudType(String label){
+    EventCrudType(String label) {
         this.label = label;
     }
 
-    public static class eventLabelTypes{
+    public static class eventLabelTypes {
         public static final String CREATE_DEPARTMENT = "부서 이벤트 생성";
         public static final String UPDATE_DEPARTMENT = "부서 이벤트 수정";
         public static final String CREATE_VACATION = "휴가 이벤트 생성";

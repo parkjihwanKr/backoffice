@@ -4,7 +4,7 @@ import com.example.backoffice.global.exception.CustomException;
 
 public class FilesCustomException extends CustomException {
 
-    public FilesCustomException(FilesExceptionCode e){
+    public FilesCustomException(FilesExceptionCode e) {
         super(e.getHttpStatus(), e.getErrorCode(), e.getMessage());
     }
 }

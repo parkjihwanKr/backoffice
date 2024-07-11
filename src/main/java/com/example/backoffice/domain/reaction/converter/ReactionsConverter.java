@@ -23,7 +23,7 @@ public class ReactionsConverter {
 
     public static ReactionsResponseDto
             .CreateMemberReactionResponseDto toCreateMemberReactionDto(
-                    Reactions reaction, String emoji){
+            Reactions reaction, String emoji) {
         return ReactionsResponseDto.CreateMemberReactionResponseDto.builder()
                 .fromMemberName(reaction.getReactor().getMemberName())
                 .toMemberName(reaction.getMember().getMemberName())
@@ -34,7 +34,7 @@ public class ReactionsConverter {
 
     public static ReactionsResponseDto
             .CreateBoardReactionResponseDto toCreateBoardReactionDto(
-                    Members fromMember, Boards board, String emoji){
+            Members fromMember, Boards board, String emoji) {
         return ReactionsResponseDto.CreateBoardReactionResponseDto.builder()
                 .boardTitle(board.getTitle())
                 .boardContent(board.getContent())
@@ -48,7 +48,7 @@ public class ReactionsConverter {
 
     public static ReactionsResponseDto
             .CreateCommentReactionResponseDto toCreateCommentReactionDto(
-                    Comments comment, Members fromMember, String emoji){
+            Comments comment, Members fromMember, String emoji) {
         return ReactionsResponseDto.CreateCommentReactionResponseDto.builder()
                 .commentContent(comment.getContent())
                 .likeCount(comment.getLikeCount())
@@ -60,7 +60,7 @@ public class ReactionsConverter {
 
     public static ReactionsResponseDto
             .CreateReplyReactionResponseDto toCreateReplyReactionDto(
-                    Comments reply, Members fromMember, String emoji){
+            Comments reply, Members fromMember, String emoji) {
         return ReactionsResponseDto.CreateReplyReactionResponseDto.builder()
                 .replyContent(reply.getContent())
                 .likeCount(reply.getLikeCount())

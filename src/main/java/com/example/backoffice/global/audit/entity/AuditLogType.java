@@ -21,16 +21,15 @@ public enum AuditLogType {
     UPDATE_MEMBER_VACATION(eventLabel.UPDATE_MEMBER_VACATION),
     CHANGE_BOARD_FILE(eventLabel.CHANGE_BOARD_FILE),
     CHANGE_EVENT(eventLabel.CHANGE_EVENT),
-    CHANGE_SECURITY_SETTINGS(eventLabel.CHANGE_SECURITY_SETTINGS)
-    ;
+    CHANGE_SECURITY_SETTINGS(eventLabel.CHANGE_SECURITY_SETTINGS);
 
     private final String label;
 
-    AuditLogType(String label){
+    AuditLogType(String label) {
         this.label = label;
     }
 
-    public static class eventLabel{
+    public static class eventLabel {
         public static final String LOGIN = "LOGIN";
         public static final String LOGOUT = "LOGOUT";
         public static final String SIGNUP = "SIGNUP";

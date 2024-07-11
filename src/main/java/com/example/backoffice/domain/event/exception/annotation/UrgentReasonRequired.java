@@ -15,6 +15,8 @@ import java.lang.annotation.Target;
 public @interface UrgentReasonRequired {
 
     String message() default "Reason must be provided if urgent is true";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

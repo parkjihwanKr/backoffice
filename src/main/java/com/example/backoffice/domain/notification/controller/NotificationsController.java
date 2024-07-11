@@ -2,8 +2,7 @@ package com.example.backoffice.domain.notification.controller;
 
 import com.example.backoffice.domain.notification.dto.NotificationsRequestDto;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacade;
-import com.example.backoffice.domain.notification.service.NotificationsService;
+import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +23,13 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class NotificationsController {
 
-    private final NotificationsServiceFacade notificationsServiceFacade;
+    private final NotificationsServiceFacadeV1 notificationsServiceFacade;
 
     // 알림 단건 조회
     @GetMapping("/members/{memberId}/notifications/{notificationId}")
     public ResponseEntity<CommonResponseDto<NotificationsResponseDto.ReadNotificationResponseDto>> readOne(
             @PathVariable Long memberId, @PathVariable String notificationId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         NotificationsResponseDto.ReadNotificationResponseDto responseDto
                 = notificationsServiceFacade.readOne(memberId, notificationId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
@@ -39,12 +38,13 @@ public class NotificationsController {
                 )
         );
     }
+
     // 알림 삭제
     @DeleteMapping("/members/{memberId}/notifications")
     public ResponseEntity<CommonResponseDto<Void>> deleteNotifications(
             @PathVariable Long memberId,
             @RequestBody NotificationsRequestDto.DeleteNotificationRequestDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         notificationsServiceFacade.deleteNotification(
                 memberId, requestDto, memberDetails.getMembers());
         return ResponseEntity.ok().body(
@@ -53,15 +53,16 @@ public class NotificationsController {
                 )
         );
     }
+
     // 관리자 전용 단체 메세지 전달
     @PostMapping("/admins/{adminId}/notifications")
     public ResponseEntity<CommonResponseDto<NotificationsResponseDto.CreateNotificationListResponseDto>> createAdminNotification(
             @PathVariable Long adminId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody NotificationsRequestDto.CreateNotificationRequestDto requestDto){
+            @RequestBody NotificationsRequestDto.CreateNotificationRequestDto requestDto) {
         NotificationsResponseDto.CreateNotificationListResponseDto responseDto
                 = notificationsServiceFacade.createAdminNotification(
-                        adminId, memberDetails.getMembers(), requestDto);
+                adminId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.ok().body(
                 new CommonResponseDto<>(
                         responseDto, "전체 알림 전송 성공", 200
@@ -74,20 +75,21 @@ public class NotificationsController {
     public ResponseEntity<Page<NotificationsResponseDto.ReadNotificationListResponseDto>> readNotificationList(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<NotificationsResponseDto.ReadNotificationListResponseDto> responseDto
                 = notificationsServiceFacade.readList(memberId, memberDetails.getMembers(), pageable);
         return ResponseEntity.ok().body(responseDto);
     }
+
     // 읽지 않은 알림 리스트 조회
     @GetMapping("/members/{memberId}/notifications/unread")
     public ResponseEntity<Page<NotificationsResponseDto.ReadNotificationListResponseDto>> readUnReadNotificationList(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 10) Pageable pageable){
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
         Page<NotificationsResponseDto.ReadNotificationListResponseDto> responseDto
                 = notificationsServiceFacade.readUnreadList(
-                        memberId, memberDetails.getMembers(), pageable);
+                memberId, memberDetails.getMembers(), pageable);
         return ResponseEntity.ok().body(responseDto);
     }
 
@@ -106,7 +108,7 @@ public class NotificationsController {
     @PostMapping("/members/{memberId}/notifications/unread")
     public ResponseEntity<CommonResponseDto<List<NotificationsResponseDto.ReadNotificationListResponseDto>>> readAll(
             @PathVariable Long memberId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         List<NotificationsResponseDto.ReadNotificationListResponseDto> responseDtoList
                 = notificationsServiceFacade.readAll(memberId, memberDetails.getMembers());
         return ResponseEntity.ok().body(

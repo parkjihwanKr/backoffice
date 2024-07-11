@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface NotificationsServiceFacade {
+public interface NotificationsServiceFacadeV1 {
     void createNotification(
             NotificationData notificationData, NotificationType domainType);
 
@@ -29,6 +29,7 @@ public interface NotificationsServiceFacade {
 
     Page<NotificationsResponseDto.ReadNotificationListResponseDto> readReadList(
             Long memberId, Members member, Pageable pageable);
+
     void deleteNotification(
             Long memberId, NotificationsRequestDto.DeleteNotificationRequestDto requestDto,
             Members member);

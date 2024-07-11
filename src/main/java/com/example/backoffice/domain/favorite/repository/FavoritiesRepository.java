@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface FavoritiesRepository extends JpaRepository<Favorities,Long> {
+public interface FavoritiesRepository extends JpaRepository<Favorities, Long> {
 
     List<Favorities> findAllByMember(Members loginMember);
 

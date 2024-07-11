@@ -20,24 +20,25 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     private final JwtProvider jwtProvider;
     private final TokenRedisProvider tokenRedisProvider;
+
     // 3. accessToken, refreshToken 삭제
     // 4. logout 진행
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication){
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         log.info("logout 진행중...");
-        try{
+        try {
             // 1. accessToken, refreshToken 타당성 확인
             String tokenValue = jwtProvider.getJwtFromHeader(request);
             String authMemberName = jwtProvider.getUsernameFromToken(tokenValue);
             String redisTokenKey
-                    = JwtProvider.REFRESH_TOKEN_HEADER+" : " +authMemberName;
-            if(jwtProvider.validateToken(tokenValue).equals(JwtStatus.ACCESS) &&
-                    tokenRedisProvider.getRefreshTokenValue(redisTokenKey).equals(null)){
+                    = JwtProvider.REFRESH_TOKEN_HEADER + " : " + authMemberName;
+            if (jwtProvider.validateToken(tokenValue).equals(JwtStatus.ACCESS) &&
+                    tokenRedisProvider.getRefreshTokenValue(redisTokenKey).equals(null)) {
                 // 3. 보안을 위해 로그아웃하면 refreshToken 삭제
                 tokenRedisProvider.deleteToken(redisTokenKey);
                 log.info("logout success!");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new AuthenticationCustomException(
                     GlobalExceptionCode.NOT_MATCHED_AUTHENTICATION
             );

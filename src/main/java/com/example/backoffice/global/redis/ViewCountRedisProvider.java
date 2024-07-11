@@ -15,29 +15,30 @@ public class ViewCountRedisProvider {
     @Qualifier("redisTemplateForViewCount")
     private final RedisTemplate<String, Object> redisTemplateForViewCount;
 
-    public <T> void saveViewCount(String key, T value){
+    public <T> void saveViewCount(String key, T value) {
         String valueString = null;
-        try{
+        try {
             valueString =
                     !(value instanceof String) ? objectMapper.writeValueAsString(value) : (String) value;
-        }catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             throw new RuntimeException();
         }
 
         redisTemplateForViewCount.opsForValue().set(key, valueString);
     }
+
     // 조회수 증가
     public Long incrementViewCount(String key) {
         return redisTemplateForViewCount.opsForValue().increment(key, 1);
     }
 
     // 조회수 감소
-    public Long decreaseViewCount(String key){
+    public Long decreaseViewCount(String key) {
         return redisTemplateForViewCount.opsForValue().decrement(key);
     }
 
     // 조회수 가져오기
-    public Long getViewCount(String key){
+    public Long getViewCount(String key) {
         Object value = redisTemplateForViewCount.opsForValue().get(key);
         String serializeToJsonValue = serializeToJson(value);
         return value != null ? Long.parseLong(serializeToJsonValue) : null;

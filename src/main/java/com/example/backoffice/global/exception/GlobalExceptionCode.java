@@ -21,8 +21,8 @@ public enum GlobalExceptionCode {
     // Validate JWT Token
     INVALID_TOKEN_VALUE(HttpStatus.BAD_REQUEST, "JWT-001", "JWT 토큰 값이 유효하지 않습니다."),
     UNAUTHORIZED_REFRESH_TOKEN_VALUE(HttpStatus.UNAUTHORIZED, "JWT-002", "JWT Refresh 토큰값이 유효하지 않습니다."),
-    INVALID_SIGNATURE(HttpStatus.BAD_REQUEST, "JWT-003","Invalid JWT signature, 유효하지 않는 JWT 서명 입니다."),
-    EXPIRED_JWT_TOKEN(HttpStatus.BAD_REQUEST,"JWT-004","Expired JWT token, 만료된 JWT token 입니다."),
+    INVALID_SIGNATURE(HttpStatus.BAD_REQUEST, "JWT-003", "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다."),
+    EXPIRED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "JWT-004", "Expired JWT token, 만료된 JWT token 입니다."),
     UNSUPPORTED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "JWT-005", "Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다."),
 
     // Authentcation
@@ -33,10 +33,10 @@ public enum GlobalExceptionCode {
     NOT_DESERIALIZED_JSON(HttpStatus.BAD_REQUEST, "JSON-002", "역직렬화가 되지 않습니다."),
 
     // Scheduler
-    NOT_FOUND_SCHEDULER_EVENT_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "SCHEDULER-001","해당 스케줄러에 없는 이벤트 타입입니다."),
+    NOT_FOUND_SCHEDULER_EVENT_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "SCHEDULER-001", "해당 스케줄러에 없는 이벤트 타입입니다."),
 
     // AuditLog
-    NOT_FOUND_AUDIT_LOG(HttpStatus.BAD_REQUEST, "AUDIT_LOG-001","해당 감사 로그를 찾을 수 없습니다."),
+    NOT_FOUND_AUDIT_LOG(HttpStatus.BAD_REQUEST, "AUDIT_LOG-001", "해당 감사 로그를 찾을 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

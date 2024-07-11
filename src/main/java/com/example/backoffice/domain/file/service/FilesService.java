@@ -8,8 +8,12 @@ import java.util.List;
 
 public interface FilesService {
     String createFileForMemberRole(MultipartFile file, Members member);
+
     String createFileForBoard(MultipartFile file, Boards board);
+
     String createImage(MultipartFile image);
+
     void deleteFile(Long boardId, List<String> fileList);
+
     void deleteImage(String imageUrl);
 }

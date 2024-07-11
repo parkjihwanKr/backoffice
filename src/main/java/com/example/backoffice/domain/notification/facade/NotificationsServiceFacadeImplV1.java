@@ -11,7 +11,7 @@ import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.entity.Notifications;
 import com.example.backoffice.domain.notification.exception.NotificationsCustomException;
 import com.example.backoffice.domain.notification.exception.NotificationsExceptionCode;
-import com.example.backoffice.domain.notification.service.NotificationsService;
+import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,9 +23,9 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class NotificationsServiceFacadeImpl implements NotificationsServiceFacade {
+public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFacadeV1 {
 
-    private final NotificationsService notificationsService;
+    private final NotificationsServiceV1 notificationsService;
     private final MembersServiceFacadeV1 membersServiceFacade;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
@@ -201,20 +201,14 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                 String memberMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 '사랑해요' 이모티콘을 사용하셨습니다.";
-                yield NotificationsConverter.toEntity(
-                        notificationData.getToMember().getMemberName(),
-                        notificationData.getFromMember().getMemberName(),
-                        memberMessage, domainType, notificationData.getFromMember().getDepartment());
+                yield toEntity(notificationData, memberMessage, domainType);
             }
             case BOARD -> {
                 String boardMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 게시글 " + notificationData.getBoard().getTitle()
                         + "에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield NotificationsConverter.toEntity(
-                        notificationData.getToMember().getMemberName(),
-                        notificationData.getFromMember().getMemberName(),
-                        boardMessage, domainType, notificationData.getFromMember().getDepartment());
+                yield toEntity(notificationData, boardMessage, domainType);
             }
             case COMMENT -> {
                 String commentMessage
@@ -222,10 +216,7 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                         + "님께서 게시글 " + notificationData.getBoard().getTitle()
                         + "의 댓글 '" + notificationData.getComment().getContent()
                         + "'에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield NotificationsConverter.toEntity(
-                        notificationData.getToMember().getMemberName(),
-                        notificationData.getFromMember().getMemberName(),
-                        commentMessage, domainType, notificationData.getFromMember().getDepartment());
+                yield toEntity(notificationData, commentMessage, domainType);
             }
             case REPLY -> {
                 String replyMessage
@@ -233,39 +224,27 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                         + "님께서 게시글 " + notificationData.getComment().getBoard().getTitle()
                         + "의 댓글 '" + notificationData.getReply().getContent()
                         + "'에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield NotificationsConverter.toEntity(
-                        notificationData.getToMember().getMemberName(),
-                        notificationData.getFromMember().getMemberName(),
-                        replyMessage, domainType, notificationData.getFromMember().getDepartment());
+                yield toEntity(notificationData, replyMessage, domainType);
             }
             case EVENT -> {
                 String eventMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 "+ notificationData.getEvent().getTitle()
                         + "에 대한 일정을 등록하셨습니다.";
-                yield NotificationsConverter.toEntity(
-                        notificationData.getToMember().getMemberName(),
-                        notificationData.getFromMember().getMemberName(),
-                        eventMessage, domainType, notificationData.getFromMember().getDepartment());
+                yield toEntity(notificationData, eventMessage, domainType);
             }
             case URGENT_VACATION_EVENT -> {
                 String urgentVacationMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 긴급하게 휴가를 요청하셨습니다.";
-                yield NotificationsConverter.toEntity(
-                        notificationData.getToMember().getMemberName(),
-                        notificationData.getFromMember().getMemberName(),
-                        urgentVacationMessage, domainType, notificationData.getFromMember().getDepartment());
+                yield toEntity(notificationData, urgentVacationMessage, domainType);
             }
             case URGENT_SERVER_ERROR -> {
                 String urgentServerIssueMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 긴급하게 서버 이슈 메세지를 전달하셨습니다. //"
                         + notificationData.getMessage();
-                yield NotificationsConverter.toEntity(
-                        notificationData.getToMember().getMemberName(),
-                        notificationData.getFromMember().getMemberName(),
-                        urgentServerIssueMessage, domainType, notificationData.getFromMember().getDepartment());
+                yield toEntity(notificationData, urgentServerIssueMessage, domainType);
             }
             case EVALUATION -> {
                 String evaluationMessage
@@ -273,10 +252,15 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
                         + "님께서 "
                         + notificationData.getMessage()
                         + " 작성 요청 알림입니다.";
-                yield NotificationsConverter.toEntity(
-                        notificationData.getToMember().getMemberName(),
-                        notificationData.getFromMember().getMemberName(),
-                        evaluationMessage, domainType, notificationData.getFromMember().getDepartment());
+                yield toEntity(notificationData, evaluationMessage, domainType);
+            }
+            case UPDATE_EVALUATION -> {
+                // "설문 조사 마감 7일 전입니다. 신속히 마무리 해주시길 바랍니다."
+                String evaluationMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 "
+                        + notificationData.getMessage();
+                yield toEntity(notificationData, evaluationMessage, domainType);
             }
 
             default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);
@@ -285,5 +269,12 @@ public class NotificationsServiceFacadeImpl implements NotificationsServiceFacad
 
     private void sendNotificationForUser(String toMemberName, Notifications notification){
         simpMessagingTemplate.convertAndSendToUser(toMemberName, "/queue/notifications", notification);
+    }
+
+    private Notifications toEntity(NotificationData notificationData, String message, NotificationType domainType){
+        return NotificationsConverter.toEntity(
+                notificationData.getFromMember().getMemberName(),
+                notificationData.getToMember().getMemberName(),
+                message, domainType, notificationData.getFromMember().getDepartment());
     }
 }
