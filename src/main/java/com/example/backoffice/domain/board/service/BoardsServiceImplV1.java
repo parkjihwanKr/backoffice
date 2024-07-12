@@ -51,11 +51,11 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             List<MultipartFile> files){
         Boards board = BoardsConverter.toEntity(requestDto, member);
         List<String> fileUrlList = new ArrayList<>();
+        boardsRepository.save(board);
         for (MultipartFile file : files) {
             String fileName = filesService.createFileForBoard(file, board);
             fileUrlList.add(fileName);
         }
-        boardsRepository.save(board);
         return BoardsConverter.toCreateOneDto(board, fileUrlList);
     }
 
