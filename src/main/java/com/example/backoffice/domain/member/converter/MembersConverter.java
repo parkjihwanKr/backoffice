@@ -97,6 +97,7 @@ public class MembersConverter {
                 .memberPosition(member.getPosition())
                 .memberRole(member.getRole())
                 .memberDepartment(member.getDepartment())
+                .salary(member.getSalary())
                 .build();
     }
 

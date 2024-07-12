@@ -57,7 +57,6 @@ public class MembersResponseDto {
         private String contact;
         private String address;
         private String introduction;
-        private Long loveCount;
         private String profileImageUrl;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;

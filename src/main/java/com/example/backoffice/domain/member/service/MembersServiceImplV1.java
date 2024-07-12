@@ -38,7 +38,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members checkMemberId(Long fromMemberId, Long toMemberId){
+    public Members readOneForDifferentMemberCheck(Long fromMemberId, Long toMemberId){
         if(toMemberId.equals(fromMemberId)){
             throw new MembersCustomException(MembersExceptionCode.MATCHED_LOGIN_MEMBER);
         }
