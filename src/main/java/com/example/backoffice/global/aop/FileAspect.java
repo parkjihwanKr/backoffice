@@ -18,7 +18,7 @@ public class FileAspect {
     private final AuditLogService auditLogService;
     private final CommonAspect commonAspect;
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesService.*(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesServiceV1.*(..))")
     public void logAfterAllMethod(JoinPoint joinPoint) {
         String methodName = commonAspect.getCurrentMethodName(joinPoint);
         String message = "";

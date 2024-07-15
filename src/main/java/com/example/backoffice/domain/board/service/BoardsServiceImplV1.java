@@ -7,7 +7,7 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
-import com.example.backoffice.domain.file.service.FilesService;
+import com.example.backoffice.domain.file.service.FilesServiceV1;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.redis.ViewCountRedisProvider;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.List;
 public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     private final BoardsRepository boardsRepository;
-    private final FilesService filesService;
+    private final FilesServiceV1 filesService;
     private final ViewCountRedisProvider viewCountRedisProvider;
 
     @Override
@@ -53,7 +53,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         List<String> fileUrlList = new ArrayList<>();
         boardsRepository.save(board);
         for (MultipartFile file : files) {
-            String fileName = filesService.createFileForBoard(file, board);
+            String fileName = filesService.createOneForBoard(file, board);
             fileUrlList.add(fileName);
         }
         return BoardsConverter.toCreateOneDto(board, fileUrlList);
@@ -75,10 +75,10 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             beforeFileUrlList.add(board.getFileList().get(i).getUrl());
         }
         board.getFileList().clear();
-        filesService.deleteFile(board.getId(), beforeFileUrlList);
+        filesService.delete(board.getId(), beforeFileUrlList);
         for (MultipartFile file : files) {
             // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
-            String fileUrl = filesService.createFileForBoard(file, board);
+            String fileUrl = filesService.createOneForBoard(file, board);
             afterFileUrlList.add(fileUrl);
         }
         return BoardsConverter.toUpdateOneDto(board, afterFileUrlList);

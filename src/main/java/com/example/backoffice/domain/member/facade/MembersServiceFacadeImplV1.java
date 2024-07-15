@@ -1,6 +1,6 @@
 package com.example.backoffice.domain.member.facade;
 
-import com.example.backoffice.domain.file.service.FilesService;
+import com.example.backoffice.domain.file.service.FilesServiceV1;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
@@ -33,7 +33,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
-    private final FilesService filesService;
+    private final FilesServiceV1 filesService;
     private final MembersServiceV1 membersService;
     private final NotificationsServiceV1 notificationsService;
     private final PasswordEncoder passwordEncoder;
@@ -149,7 +149,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         }
 
         String document
-                = filesService.createFileForMemberRole(multipartFile, updateMember);
+                = filesService.createOneForMemberRole(multipartFile, updateMember);
 
         MemberRole role = checkedRole(requestDto.getRole());
         MemberDepartment department = checkedDepartment(requestDto.getDepartment());
