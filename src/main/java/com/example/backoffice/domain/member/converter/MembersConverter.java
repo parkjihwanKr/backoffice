@@ -118,7 +118,7 @@ public class MembersConverter {
     }
 
     public static MembersResponseDto.UpdateOneForProfileImageDto toUpdateOneForProfileImageDto(Members member){
-        return MembersResponseDto.UpdateOneForProfileImageDto.builder(
+        return MembersResponseDto.UpdateOneForProfileImageDto.builder()
                 .memberId(member.getId())
                 .fromMemberName(member.getMemberName())
                 .profileImageUrl(member.getProfileImageUrl())
