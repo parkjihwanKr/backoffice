@@ -74,8 +74,8 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
             responseDtoList.add(
                     QuestionsConverter.toCreateOneDto(
-                            question.getQuestionText(), question.getQuestionsType(),
-                            questionsNumber, answerList));
+                            question.getId(), question.getQuestionText(),
+                            question.getQuestionsType(), questionsNumber, answerList));
             questionsNumber++;
         }
 
@@ -148,7 +148,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         updatedQuestion.updateForChangedOrder(beforeUpdatedNumber);
 
         return QuestionsConverter.toUpdateOneForChangedOrderDto(
-                beforeUpdatedNumber, requestDto.getUpdatedNumber(),
+                questionId, beforeUpdatedNumber, requestDto.getUpdatedNumber(),
                 question.getQuestionText(), question.getQuestionsType(),
                 question.getMultipleChoiceAnswerList());
     }

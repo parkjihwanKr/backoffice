@@ -19,6 +19,7 @@ public class EvaluationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateOneForDepartmentDto {
+        private Long evaluationId;
         private String title;
         private String description;
         // 만든이
@@ -32,6 +33,7 @@ public class EvaluationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateOneForCompanyDto {
+        private Long evaluationId;
         private String title;
         private String description;
         private String writerName;
@@ -44,6 +46,7 @@ public class EvaluationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ReadOneForDepartmentDto {
+        private Long evaluationId;
         private String writerName;
         private String title;
         private String description;
@@ -57,6 +60,7 @@ public class EvaluationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ReadOneForCompanyDto {
+        private Long evaluationId;
         private String writerName;
         private String title;
         private String description;
@@ -69,6 +73,7 @@ public class EvaluationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneForDepartmentDto {
+        private Long evaluationId;
         private MemberDepartment department;
         private String writerName;
         private String title;
@@ -84,6 +89,7 @@ public class EvaluationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneForCompanyDto {
+        private Long evaluationId;
         private String writerName;
         private String title;
         private String description;
@@ -97,6 +103,7 @@ public class EvaluationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class SubmitOneDto {
+        private Long evaluationId;
         private String submitterName;
         // 제출 시간
         private LocalDateTime createdAt;

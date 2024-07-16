@@ -100,7 +100,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
                 new NotificationData(board.getMember(), fromMember, board, null, null, null, null);
         notificationsServiceFacade.createNotification(boardsNotification, NotificationType.BOARD);
         return ReactionsConverter.toCreateBoardReactionDto(
-                fromMember, board, emoji.toString());
+                reaction.getId(), fromMember, board, emoji.toString());
     }
 
     @Override
@@ -143,7 +143,8 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
                 new NotificationData(
                         comment.getMember(), fromMember, board, comment, null, null, null);
         notificationsServiceFacade.createNotification(commentsNotification, NotificationType.COMMENT);
-        return ReactionsConverter.toCreateCommentReactionDto(comment, fromMember, emoji.toString());
+        return ReactionsConverter.toCreateCommentReactionDto(
+                reaction.getId(), comment, fromMember, emoji.toString());
     }
 
     @Override
@@ -187,7 +188,8 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
                         reply.getMember(), fromMember,
                         reply.getParent().getBoard(), comment, reply, null, null);
         notificationsServiceFacade.createNotification(replyNotification, NotificationType.REPLY);
-        return ReactionsConverter.toCreateReplyReactionDto(reply, fromMember, replyEmoji.toString());
+        return ReactionsConverter.toCreateReplyReactionDto(
+                reaction.getId(), reply, fromMember, replyEmoji.toString());
     }
 
     @Override

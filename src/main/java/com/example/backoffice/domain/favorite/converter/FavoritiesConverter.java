@@ -32,6 +32,7 @@ public class FavoritiesConverter {
     public static FavoritiesResponseDto.CreateOneDto toCreateOneDto(
             Favorities favorite){
         return FavoritiesResponseDto.CreateOneDto.builder()
+                .favoriteId(favorite.getId())
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
                 .createdAt(favorite.getCreatedAt())
@@ -42,6 +43,7 @@ public class FavoritiesConverter {
     public static FavoritiesResponseDto.ReadOneDto toReadOneDto(
             Favorities favorite){
         return FavoritiesResponseDto.ReadOneDto.builder()
+                .favoriteId(favorite.getId())
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
                 .createdAt(favorite.getCreatedAt())
@@ -55,6 +57,7 @@ public class FavoritiesConverter {
         for(Favorities favorite : favoriteList){
             responseDtoList.add(
                     FavoritiesResponseDto.ReadOneDto.builder()
+                            .favoriteId(favorite.getId())
                             .favoriteContent(favorite.getContent())
                             .createdAt(favorite.getCreatedAt())
                             .modifiedAt(favorite.getModifiedAt()).build()

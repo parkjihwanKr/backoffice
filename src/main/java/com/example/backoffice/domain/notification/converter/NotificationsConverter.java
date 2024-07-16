@@ -50,6 +50,7 @@ public class NotificationsConverter {
             Notifications notification) {
 
         return NotificationsResponseDto.ReadNotificationResponseDto.builder()
+                .notificationId(notification.getId())
                 .fromMemberName(notification.getFromMemberName())
                 .toMemberName(notification.getToMemberName())
                 .fromMemberDepartment(notification.getFromMemberDepartment())
@@ -63,11 +64,14 @@ public class NotificationsConverter {
             Members mainAdmin, Set<MemberDepartment> memberDepartmentSet,
             List<Notifications> notificationList, String message) {
         List<String> toMemberNameList = new ArrayList<>();
+        List<String> notificationIdList = new ArrayList<>();
         for (Notifications notification : notificationList) {
             toMemberNameList.add(
                     notification.getToMemberName());
+            notificationIdList.add(notification.getId());
         }
         return NotificationsResponseDto.CreateNotificationListResponseDto.builder()
+                .notificationIdList(notificationIdList)
                 .message(message)
                 .fromAdminRole(mainAdmin.getRole())
                 .fromMemberName(mainAdmin.getMemberName())
@@ -80,6 +84,7 @@ public class NotificationsConverter {
             Page<Notifications> notificationPage) {
         return notificationPage.map(
                 notification -> NotificationsResponseDto.ReadNotificationListResponseDto.builder()
+                        .notificationId(notification.getId())
                         .toMemberName(notification.getToMemberName())
                         .fromMemberName(notification.getFromMemberName())
                         .createdAt(notification.getCreatedAt())
@@ -91,6 +96,7 @@ public class NotificationsConverter {
             List<Notifications> notificationList) {
         return notificationList.stream()
                 .map(notification -> NotificationsResponseDto.ReadNotificationListResponseDto.builder()
+                        .notificationId(notification.getId())
                         .toMemberName(notification.getToMemberName())
                         .fromMemberName(notification.getFromMemberName())
                         .createdAt(notification.getCreatedAt())

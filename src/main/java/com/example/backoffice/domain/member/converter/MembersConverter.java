@@ -50,6 +50,7 @@ public class MembersConverter {
 
     public static MembersResponseDto.CreateOneDto toCreateOneDto(Members member){
         return MembersResponseDto.CreateOneDto.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .memberName(member.getMemberName())
                 .name(member.getMemberName())
@@ -61,6 +62,7 @@ public class MembersConverter {
 
     public static MembersResponseDto.ReadOneDto toReadOneDto(Members member){
         return MembersResponseDto.ReadOneDto.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .address(member.getAddress())
                 .memberName(member.getMemberName())
@@ -77,6 +79,7 @@ public class MembersConverter {
 
     public static MembersResponseDto.UpdateOneDto toUpdateOneDto(Members member){
         return MembersResponseDto.UpdateOneDto.builder()
+                .memberId(member.getId())
                 .memberName(member.getMemberName())
                 .name(member.getName())
                 .address(member.getAddress())
@@ -92,6 +95,7 @@ public class MembersConverter {
     public static MembersResponseDto.UpdateOneForAttributeDto toUpdateOneForAttributeDto(
             Members member, String document){
         return MembersResponseDto.UpdateOneForAttributeDto.builder()
+                .memberId(member.getId())
                 .memberName(member.getMemberName())
                 .fileName(document)
                 .memberPosition(member.getPosition())
@@ -104,6 +108,7 @@ public class MembersConverter {
     public static MembersResponseDto.UpdateOneForSalaryDto toUpdateOneForSalaryDto(
             Members member){
         return MembersResponseDto.UpdateOneForSalaryDto.builder()
+                .memberId(member.getId())
                 .memberDepartment(member.getDepartment())
                 .memberName(member.getMemberName())
                 .memberRole(member.getRole())
@@ -113,7 +118,8 @@ public class MembersConverter {
     }
 
     public static MembersResponseDto.UpdateOneForProfileImageDto toUpdateOneForProfileImageDto(Members member){
-        return MembersResponseDto.UpdateOneForProfileImageDto.builder()
+        return MembersResponseDto.UpdateOneForProfileImageDto.builder(
+                .memberId(member.getId())
                 .fromMemberName(member.getMemberName())
                 .profileImageUrl(member.getProfileImageUrl())
                 .build();
@@ -121,6 +127,7 @@ public class MembersConverter {
 
     public static MembersResponseDto.DeleteOneForProfileImageDto toDeleteOneForProfileImageDto(Members member){
         return MembersResponseDto.DeleteOneForProfileImageDto.builder()
+                .memberId(member.getId())
                 .fromMemberName(member.getMemberName())
                 .build();
     }

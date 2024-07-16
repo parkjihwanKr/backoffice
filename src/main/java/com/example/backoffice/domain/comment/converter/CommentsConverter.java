@@ -23,6 +23,7 @@ public class CommentsConverter {
     public static CommentsResponseDto.CreateCommentDto toCreateCommentDto(
             Comments comment, Members member){
         return CommentsResponseDto.CreateCommentDto.builder()
+                .commentId(comment.getId())
                 .writer(member.getMemberName())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
@@ -32,6 +33,7 @@ public class CommentsConverter {
     public static CommentsResponseDto.UpdateCommentDto toUpdateCommentDto(
             Comments comment, Members member){
         return CommentsResponseDto.UpdateCommentDto.builder()
+                .commentId(comment.getId())
                 .writer(member.getMemberName())
                 .content(comment.getContent())
                 .likeCount(comment.getLikeCount())
@@ -57,6 +59,8 @@ public class CommentsConverter {
     public static CommentsResponseDto.CreateReplyDto toCreateReplyDto(
             Comments parentComment, Comments childComment, Members member){
         return CommentsResponseDto.CreateReplyDto.builder()
+                .commentId(parentComment.getId())
+                .replyId(childComment.getId())
                 .toMemberName(parentComment.getMember().getMemberName())
                 .parentContent(parentComment.getContent())
                 .parentCreatedAt(parentComment.getCreatedAt())
@@ -72,6 +76,7 @@ public class CommentsConverter {
         // 일관성의 문제로 쿼리가 한 번 더 날라가게 만듦
         // 해당 부분은 성능이 중요하다면 필드 writerName을 만드는게 좋음
         return CommentsResponseDto.UpdateReplyDto.builder()
+                .commentId(parentComment.getId())
                 .toMemberName(parentComment.getMember().getMemberName())
                 .parentContent(parentComment.getContent())
                 .parentCreatedAt(parentComment.getCreatedAt())
@@ -79,6 +84,7 @@ public class CommentsConverter {
                 .parentLikeCount(parentComment.getLikeCount())
                 .parentUnLikeCount(parentComment.getUnLikeCount())
                 .fromMemberName(member.getMemberName())
+                .replyId(childComment.getId())
                 .childContent(childComment.getContent())
                 .childCreatedAt(childComment.getCreatedAt())
                 .childModifiedAt(childComment.getModifiedAt())

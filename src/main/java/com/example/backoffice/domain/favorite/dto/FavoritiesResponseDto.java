@@ -16,6 +16,7 @@ public class FavoritiesResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneDto{
+        private Long favoriteId;
         private String favoriteType;
         private String favoriteContent;
         private LocalDateTime createdAt;
@@ -27,6 +28,7 @@ public class FavoritiesResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadOneDto{
+        private Long favoriteId;
         private String favoriteType;
         private String favoriteContent;
         private LocalDateTime createdAt;

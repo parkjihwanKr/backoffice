@@ -33,13 +33,14 @@ public class QuestionsConverter {
     }
 
     public static QuestionsResponseDto.CreateOneDto toCreateOneDto(
-            String questionText, QuestionsType questionsType, Integer questionsNumber,
+            Long questionId, String questionText, QuestionsType questionsType, Integer questionsNumber,
             List<Answers> multipleChoiceAnswerList){
         List<String> changeAnswerList = new ArrayList<>();
         for(Answers answer : multipleChoiceAnswerList){
             changeAnswerList.add(answer.getText());
         }
         return QuestionsResponseDto.CreateOneDto.builder()
+                .questionId(questionId)
                 .questionNumber(questionsNumber)
                 .questionText(questionText)
                 .questionType(questionsType)
@@ -60,6 +61,7 @@ public class QuestionsConverter {
 
     public static QuestionsResponseDto.UpdateOneDto toUpdateOneDto(Questions question){
         return QuestionsResponseDto.UpdateOneDto.builder()
+                .questionId(question.getId())
                 .questionNumber(question.getNumber())
                 .questionText(question.getQuestionText())
                 .questionsType(question.getQuestionsType())
@@ -68,9 +70,10 @@ public class QuestionsConverter {
     }
 
     public static QuestionsResponseDto.UpdateOneForOrderDto toUpdateOneForChangedOrderDto(
-            Long previousNumber, Long updatedNumber, String questionText,
+            Long questionId, Long previousNumber, Long updatedNumber, String questionText,
             QuestionsType questionsType, List<Answers> multipleChoiceAnswerList){
         return QuestionsResponseDto.UpdateOneForOrderDto.builder()
+                .questionId(questionId)
                 .previousNumber(previousNumber)
                 .updatedNumber(updatedNumber)
                 .questionText(questionText)

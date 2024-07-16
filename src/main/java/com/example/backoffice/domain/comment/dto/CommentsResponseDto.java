@@ -15,6 +15,7 @@ public class CommentsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadBoardCommentsDto{
+        private Long boardId;
         private Long commentId;
         private String commentWriter;
         private String commentContent;
@@ -30,6 +31,7 @@ public class CommentsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateCommentDto{
+        private Long commentId;
         private String writer;
         private String content;
         private LocalDateTime createdAt;
@@ -40,6 +42,7 @@ public class CommentsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateCommentDto{
+        private Long commentId;
         private String writer;
         private String content;
         private Long likeCount;
@@ -53,6 +56,7 @@ public class CommentsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadCommentRepliesDto {
+        private Long commentId;
         private Long replyId;
         private String replyWriter;
         private String replyContent;
@@ -67,6 +71,8 @@ public class CommentsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateReplyDto {
+        private Long commentId;
+        private Long replyId;
         private String toMemberName;
         private String parentContent;
         private LocalDateTime parentCreatedAt;
@@ -80,6 +86,8 @@ public class CommentsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateReplyDto {
+        private Long commentId;
+        private Long replyId;
         private String toMemberName;
         private String parentContent;
         private LocalDateTime parentCreatedAt;

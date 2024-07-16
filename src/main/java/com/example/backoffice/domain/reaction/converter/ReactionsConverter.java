@@ -24,6 +24,7 @@ public class ReactionsConverter {
     public static ReactionsResponseDto.CreateOneForMemberDto toCreateMemberReactionDto(
             Reactions reaction, String emoji) {
         return ReactionsResponseDto.CreateOneForMemberDto.builder()
+                .reactionId(reaction.getId())
                 .fromMemberName(reaction.getReactor().getMemberName())
                 .toMemberName(reaction.getMember().getMemberName())
                 .emoji(emoji)
@@ -32,8 +33,9 @@ public class ReactionsConverter {
     }
 
     public static ReactionsResponseDto.CreateOneForBoardDto toCreateBoardReactionDto(
-            Members fromMember, Boards board, String emoji) {
+            Long reactionId, Members fromMember, Boards board, String emoji) {
         return ReactionsResponseDto.CreateOneForBoardDto.builder()
+                .reactionId(reactionId)
                 .boardTitle(board.getTitle())
                 .boardContent(board.getContent())
                 .likeCount(board.getLikeCount())
@@ -45,8 +47,9 @@ public class ReactionsConverter {
     }
 
     public static ReactionsResponseDto.CreateOneForCommentDto toCreateCommentReactionDto(
-            Comments comment, Members fromMember, String emoji) {
+            Long reactionId, Comments comment, Members fromMember, String emoji) {
         return ReactionsResponseDto.CreateOneForCommentDto.builder()
+                .reactionId(reactionId)
                 .commentContent(comment.getContent())
                 .likeCount(comment.getLikeCount())
                 .unLikeCount(comment.getUnLikeCount())
@@ -56,8 +59,9 @@ public class ReactionsConverter {
     }
 
     public static ReactionsResponseDto.CreateOneForReplyDto toCreateReplyReactionDto(
-            Comments reply, Members fromMember, String emoji) {
+            Long reactionId, Comments reply, Members fromMember, String emoji) {
         return ReactionsResponseDto.CreateOneForReplyDto.builder()
+                .reactionId(reactionId)
                 .replyContent(reply.getContent())
                 .likeCount(reply.getLikeCount())
                 .unLikeCount(reply.getUnLikeCount())
