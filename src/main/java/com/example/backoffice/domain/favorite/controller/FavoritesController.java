@@ -1,8 +1,8 @@
 package com.example.backoffice.domain.favorite.controller;
 
-import com.example.backoffice.domain.favorite.dto.FavoritiesRequestDto;
-import com.example.backoffice.domain.favorite.dto.FavoritiesResponseDto;
-import com.example.backoffice.domain.favorite.service.FavoritiesServiceV1;
+import com.example.backoffice.domain.favorite.dto.FavoritesRequestDto;
+import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
+import com.example.backoffice.domain.favorite.service.FavoritesServiceV1;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -16,45 +16,45 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-public class FavoritiesController {
+public class FavoritesController {
 
-    private final FavoritiesServiceV1 favoritiesService;
+    private final FavoritesServiceV1 favoritesService;
 
     // 즐겨찾기 생성
-    @PostMapping("/favorities")
-    public ResponseEntity<FavoritiesResponseDto.CreateOneDto> createOne(
+    @PostMapping("/favorites")
+    public ResponseEntity<FavoritesResponseDto.CreateOneDto> createOne(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody FavoritiesRequestDto.CreateOneDto requestDto){
-        FavoritiesResponseDto.CreateOneDto responseDto
-                = favoritiesService.createOne(memberDetails.getMembers(), requestDto);
+            @RequestBody FavoritesRequestDto.CreateOneDto requestDto){
+        FavoritesResponseDto.CreateOneDto responseDto
+                = favoritesService.createOne(memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 즐겨찾기 1개 조회
-    @GetMapping("/favorities/{favoriteId}")
-    public ResponseEntity<FavoritiesResponseDto.ReadOneDto> readOne(
+    @GetMapping("/favorites/{favoriteId}")
+    public ResponseEntity<FavoritesResponseDto.ReadOneDto> readOne(
             @PathVariable Long favoriteId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        FavoritiesResponseDto.ReadOneDto responseDto
-                = favoritiesService.readOne(favoriteId, memberDetails.getMembers());
+        FavoritesResponseDto.ReadOneDto responseDto
+                = favoritesService.readOne(favoriteId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 즐겨찾기 모두 조회
-    @GetMapping("/favorities")
-    public ResponseEntity<List<FavoritiesResponseDto.ReadOneDto>> readAll(
+    @GetMapping("/favorites")
+    public ResponseEntity<List<FavoritesResponseDto.ReadOneDto>> readAll(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        List<FavoritiesResponseDto.ReadOneDto> responseDtoList
-                = favoritiesService.readAll(memberDetails.getMembers());
+        List<FavoritesResponseDto.ReadOneDto> responseDtoList
+                = favoritesService.readAll(memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     // 즐겨찾기 삭제
-    @DeleteMapping("/favorities")
+    @DeleteMapping("/favorites")
     public ResponseEntity<CommonResponseDto<Void>> delete(
-            @RequestBody FavoritiesRequestDto.DeleteDto requestDto,
+            @RequestBody FavoritesRequestDto.DeleteDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        favoritiesService.delete(requestDto, memberDetails.getMembers());
+        favoritesService.delete(requestDto, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "즐겨찾기 삭제 성공", 200

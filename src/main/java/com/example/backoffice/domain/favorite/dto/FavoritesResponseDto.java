@@ -1,15 +1,14 @@
 package com.example.backoffice.domain.favorite.dto;
 
-import com.example.backoffice.domain.event.entity.Events;
+import com.example.backoffice.domain.favorite.entity.FavoriteType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-public class FavoritiesResponseDto {
+public class FavoritesResponseDto {
 
     @Getter
     @Builder
@@ -29,7 +28,7 @@ public class FavoritiesResponseDto {
     @AllArgsConstructor
     public static class ReadOneDto{
         private Long favoriteId;
-        private String favoriteType;
+        private FavoriteType favoriteType;
         private String favoriteContent;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;

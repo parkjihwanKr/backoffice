@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-public class FavoritiesRequestDto {
+public class FavoritesRequestDto {
 
     @Getter
     @Builder

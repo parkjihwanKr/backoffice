@@ -1,37 +1,37 @@
 package com.example.backoffice.domain.favorite.converter;
 
-import com.example.backoffice.domain.favorite.dto.FavoritiesResponseDto;
+import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
 import com.example.backoffice.domain.favorite.entity.FavoriteType;
-import com.example.backoffice.domain.favorite.entity.Favorities;
-import com.example.backoffice.domain.favorite.exception.FavoritiesCustomException;
-import com.example.backoffice.domain.favorite.exception.FavoritiesExceptionCode;
+import com.example.backoffice.domain.favorite.entity.Favorites;
+import com.example.backoffice.domain.favorite.exception.FavoritesCustomException;
+import com.example.backoffice.domain.favorite.exception.FavoritesExceptionCode;
 import com.example.backoffice.domain.member.entity.Members;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FavoritiesConverter {
+public class FavoritesConverter {
 
-    public static FavoriteType convertToFavoriteType(String targetType){
+    public static FavoriteType toFavoriteType(String targetType){
         try{
             return FavoriteType.valueOf(targetType.toUpperCase());
         }catch (IllegalArgumentException e){
-            throw new FavoritiesCustomException(FavoritiesExceptionCode.INVALID_FAVORITE_TYPE);
+            throw new FavoritesCustomException(FavoritesExceptionCode.INVALID_FAVORITE_TYPE);
         }
     }
 
-    public static Favorities toEntity(
+    public static Favorites toEntity(
             Members loginMember, FavoriteType favoriteType, String content){
-        return Favorities.builder()
+        return Favorites.builder()
                 .favoriteType(favoriteType)
                 .member(loginMember)
                 .content(content)
                 .build();
     }
 
-    public static FavoritiesResponseDto.CreateOneDto toCreateOneDto(
-            Favorities favorite){
-        return FavoritiesResponseDto.CreateOneDto.builder()
+    public static FavoritesResponseDto.CreateOneDto toCreateOneDto(
+            Favorites favorite){
+        return FavoritesResponseDto.CreateOneDto.builder()
                 .favoriteId(favorite.getId())
                 .favoriteType(favorite.getFavoriteType().getDomainType())
                 .favoriteContent(favorite.getContent())
@@ -40,24 +40,25 @@ public class FavoritiesConverter {
                 .build();
     }
 
-    public static FavoritiesResponseDto.ReadOneDto toReadOneDto(
-            Favorities favorite){
-        return FavoritiesResponseDto.ReadOneDto.builder()
+    public static FavoritesResponseDto.ReadOneDto toReadOneDto(
+            Favorites favorite){
+        return FavoritesResponseDto.ReadOneDto.builder()
                 .favoriteId(favorite.getId())
-                .favoriteType(favorite.getFavoriteType().getDomainType())
+                .favoriteType(favorite.getFavoriteType())
                 .favoriteContent(favorite.getContent())
                 .createdAt(favorite.getCreatedAt())
                 .modifiedAt(favorite.getModifiedAt())
                 .build();
     }
 
-    public static List<FavoritiesResponseDto.ReadOneDto> toReadAllDto(
-            List<Favorities> favoriteList){
-        List<FavoritiesResponseDto.ReadOneDto> responseDtoList = new ArrayList<>();
-        for(Favorities favorite : favoriteList){
+    public static List<FavoritesResponseDto.ReadOneDto> toReadAllDto(
+            List<Favorites> favoriteList){
+        List<FavoritesResponseDto.ReadOneDto> responseDtoList = new ArrayList<>();
+        for(Favorites favorite : favoriteList){
             responseDtoList.add(
-                    FavoritiesResponseDto.ReadOneDto.builder()
+                    FavoritesResponseDto.ReadOneDto.builder()
                             .favoriteId(favorite.getId())
+                            .favoriteType(favorite.getFavoriteType())
                             .favoriteContent(favorite.getContent())
                             .createdAt(favorite.getCreatedAt())
                             .modifiedAt(favorite.getModifiedAt()).build()
