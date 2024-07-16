@@ -27,7 +27,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class ReactionsServiceImpl implements ReactionsService {
+public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
 
     private final ReactionsRepository reactionsRepository;
     private final MembersServiceV1 membersService;
@@ -37,22 +37,26 @@ public class ReactionsServiceImpl implements ReactionsService {
 
     @Override
     @Transactional
-    public ReactionsResponseDto.CreateMemberReactionResponseDto createMemberReaction(
+    public ReactionsResponseDto.CreateOneForMemberDto createOneForMember(
             Long toMemberId, Members fromMember, ReactionsRequestDto requestDto) {
+        // 1. 자기 자신이 아닌 다른 사람에게 리액션을 하는지?
         Members toMember
                 = membersService.readOneForDifferentMemberCheck(fromMember.getId(), toMemberId);
 
+        // 2. 이미 준 사람에게 리액션을 중복해서 주는 것 방지
         if (reactionsRepository.existsByMemberAndReactor(toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
+        // 3. Emoji에 없는 리액션을 하는 것을 방지
         Emoji emoji = validateEmoji(requestDto.getEmoji(), Collections.singleton(Emoji.LOVE));
 
         Reactions reaction
                 = ReactionsConverter.toEntity(toMember, fromMember, emoji, null, null);
+
+        toMember.addLoveCount();
         reactionsRepository.save(reaction);
 
-        toMember.addEmoji(reaction);
         // toMember, fromMember 정보가 notification으로 다 넘어가기에 Member Domain은 null 가능
         NotificationData membersNotification =
                 new NotificationData(toMember, fromMember, null, null, null, null, null);
@@ -62,21 +66,21 @@ public class ReactionsServiceImpl implements ReactionsService {
 
     @Override
     @Transactional
-    public void deleteMemberReaction(
+    public void deleteOneForMember(
             Long toMemberId, Long reactionId, Members fromMember) {
         Members toMember
                 = membersService.readOneForDifferentMemberCheck(fromMember.getId(), toMemberId);
         if (!reactionsRepository.existsByIdAndMemberAndReactor(reactionId, toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
-        toMember.deleteEmoji();
+        toMember.deleteLoveCount();
 
         reactionsRepository.deleteById(reactionId);
     }
 
     @Override
     @Transactional
-    public ReactionsResponseDto.CreateBoardReactionResponseDto createBoardReaction(
+    public ReactionsResponseDto.CreateOneForBoardDto createOneForBoard(
             Long boardId, Members fromMember,
             ReactionsRequestDto requestDto) {
         Boards board = boardsService.findById(boardId);
@@ -101,7 +105,7 @@ public class ReactionsServiceImpl implements ReactionsService {
 
     @Override
     @Transactional
-    public void deleteBoardReaction(Long boardId, Long reactionId, Members member) {
+    public void deleteOneForBoard(Long boardId, Long reactionId, Members member) {
 
         // 1. 예외 검증
         Boards board = boardsService.findById(boardId);
@@ -118,7 +122,7 @@ public class ReactionsServiceImpl implements ReactionsService {
 
     @Override
     @Transactional
-    public ReactionsResponseDto.CreateCommentReactionResponseDto createCommentReaction(
+    public ReactionsResponseDto.CreateOneForCommentDto createOneForComment(
             Long boardId, Long commentId, Members fromMember,
             ReactionsRequestDto requestDto) {
 
@@ -144,7 +148,7 @@ public class ReactionsServiceImpl implements ReactionsService {
 
     @Override
     @Transactional
-    public void deleteCommentReaction(
+    public void deleteOneForComment(
             Long commentId, Long reactionId, Members fromMember) {
         Comments comment = commentsService.findById(commentId);
         Reactions reaction = findById(reactionId);
@@ -161,7 +165,7 @@ public class ReactionsServiceImpl implements ReactionsService {
 
     @Override
     @Transactional
-    public ReactionsResponseDto.CreateReplyReactionResponseDto createReplyReaction(
+    public ReactionsResponseDto.CreateOneForReplyDto createOneForReply(
             Long commentId, Long replyId, Members fromMember,
             ReactionsRequestDto requestDto) {
         Comments comment = commentsService.findById(commentId);
@@ -188,7 +192,7 @@ public class ReactionsServiceImpl implements ReactionsService {
 
     @Override
     @Transactional
-    public void deleteReplyReaction(
+    public void deleteOneForReply(
             Long replyId, Long reactionId, Members fromMember) {
         Comments reply = commentsService.findById(replyId);
         Reactions reaction = findById(reactionId);

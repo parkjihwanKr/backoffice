@@ -74,8 +74,8 @@ public class Members extends CommonEntity {
     private Boolean onVacation;
 
     // relations
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reactions> reactionList;
+    /*@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reactions> reactionList;*/
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Events> eventList;
@@ -115,12 +115,11 @@ public class Members extends CommonEntity {
         this.salary = salary;
     }
 
-    public void addEmoji(Reactions reaction){
-        this.reactionList.add(reaction);
+    public void addLoveCount(){
         this.loveCount++;
     }
 
-    public void deleteEmoji(){
+    public void deleteLoveCount(){
         this.loveCount--;
     }
 

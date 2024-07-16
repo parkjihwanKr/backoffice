@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FilesServiceV1Impl implements FilesServiceV1 {
+public class FilesServiceImplV1 implements FilesServiceV1 {
 
     private final S3Util s3Util;
     private final FilesRepository filesRepository;

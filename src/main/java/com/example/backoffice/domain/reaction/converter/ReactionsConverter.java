@@ -21,10 +21,9 @@ public class ReactionsConverter {
                 .build();
     }
 
-    public static ReactionsResponseDto
-            .CreateMemberReactionResponseDto toCreateMemberReactionDto(
+    public static ReactionsResponseDto.CreateOneForMemberDto toCreateMemberReactionDto(
             Reactions reaction, String emoji) {
-        return ReactionsResponseDto.CreateMemberReactionResponseDto.builder()
+        return ReactionsResponseDto.CreateOneForMemberDto.builder()
                 .fromMemberName(reaction.getReactor().getMemberName())
                 .toMemberName(reaction.getMember().getMemberName())
                 .emoji(emoji)
@@ -32,10 +31,9 @@ public class ReactionsConverter {
                 .build();
     }
 
-    public static ReactionsResponseDto
-            .CreateBoardReactionResponseDto toCreateBoardReactionDto(
+    public static ReactionsResponseDto.CreateOneForBoardDto toCreateBoardReactionDto(
             Members fromMember, Boards board, String emoji) {
-        return ReactionsResponseDto.CreateBoardReactionResponseDto.builder()
+        return ReactionsResponseDto.CreateOneForBoardDto.builder()
                 .boardTitle(board.getTitle())
                 .boardContent(board.getContent())
                 .likeCount(board.getLikeCount())
@@ -46,10 +44,9 @@ public class ReactionsConverter {
                 .build();
     }
 
-    public static ReactionsResponseDto
-            .CreateCommentReactionResponseDto toCreateCommentReactionDto(
+    public static ReactionsResponseDto.CreateOneForCommentDto toCreateCommentReactionDto(
             Comments comment, Members fromMember, String emoji) {
-        return ReactionsResponseDto.CreateCommentReactionResponseDto.builder()
+        return ReactionsResponseDto.CreateOneForCommentDto.builder()
                 .commentContent(comment.getContent())
                 .likeCount(comment.getLikeCount())
                 .unLikeCount(comment.getUnLikeCount())
@@ -58,10 +55,9 @@ public class ReactionsConverter {
                 .build();
     }
 
-    public static ReactionsResponseDto
-            .CreateReplyReactionResponseDto toCreateReplyReactionDto(
+    public static ReactionsResponseDto.CreateOneForReplyDto toCreateReplyReactionDto(
             Comments reply, Members fromMember, String emoji) {
-        return ReactionsResponseDto.CreateReplyReactionResponseDto.builder()
+        return ReactionsResponseDto.CreateOneForReplyDto.builder()
                 .replyContent(reply.getContent())
                 .likeCount(reply.getLikeCount())
                 .unLikeCount(reply.getUnLikeCount())

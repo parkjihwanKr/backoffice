@@ -13,7 +13,7 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateMemberReactionResponseDto {
+    public static class CreateOneForMemberDto {
         private String fromMemberName;
         private String toMemberName;
         private String emoji;
@@ -24,7 +24,7 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateBoardReactionResponseDto {
+    public static class CreateOneForBoardDto {
         private String boardTitle;
         private String boardContent;
         private Long likeCount;
@@ -38,7 +38,7 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateCommentReactionResponseDto {
+    public static class CreateOneForCommentDto {
         private String commentContent;
         private Long likeCount;
         private Long unLikeCount;
@@ -50,7 +50,7 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateReplyReactionResponseDto {
+    public static class CreateOneForReplyDto {
         private String replyContent;
         private Long likeCount;
         private Long unLikeCount;

@@ -70,14 +70,6 @@ public class Boards extends CommonEntity {
         this.content = content;
     }
 
-    public void addComment(Comments comment){
-        commentList.add(comment);
-    }
-
-    public void addReply(Comments reply){
-        commentList.get(commentList.size()-1).getReplyList().add(reply);
-    }
-
     public void addEmoji(Reactions reaction, String emoji){
         reactionList.add(reaction);
         if(emoji.equals("LIKE")){
