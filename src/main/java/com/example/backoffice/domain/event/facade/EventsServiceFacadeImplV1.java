@@ -326,7 +326,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     private void sendUrgentEventForHRManager(Boolean urgent, Members loginMember, Events event){
         if(urgent){
             Members hrManager = membersService.findHRManager();
-            notificationsServiceFacade.createNotification(
+            notificationsServiceFacade.createOne(
                     NotificationsConverter.toNotificationData(
                             hrManager, loginMember, null, null, null, event, null),
                     NotificationType.URGENT_VACATION_EVENT);

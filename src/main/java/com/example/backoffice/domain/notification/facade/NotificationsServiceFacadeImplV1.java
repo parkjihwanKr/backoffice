@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.notification.facade;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
@@ -31,7 +32,7 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
 
     @Override
     @Transactional
-    public void createNotification(
+    public void createOne(
             NotificationData notificationData, NotificationType domainType){
         // 자기 자신에게 '사랑해요' -> 이미 ReactionException으로 막혀 있음.
         // 자기 자신의 게시글, 댓글, 대댓글의 '좋아요'는 할 수 있되
@@ -50,10 +51,10 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
 
     @Override
     @Transactional
-    public NotificationsResponseDto.ReadNotificationResponseDto readOne(
+    public NotificationsResponseDto.ReadOneDto readOne(
             Long memberId, String notificationId, Members member){
         // 1. 로그인 사용자와 일치하는지
-        membersServiceFacade.findMember(member, memberId);
+        membersServiceFacade.matchLoginMember(member, memberId);
 
         // 2. 해당 알림이 존재하는지
         Notifications notification
@@ -66,34 +67,38 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
 
     @Override
     @Transactional
-    public void deleteNotification(
-            Long memberId, NotificationsRequestDto.DeleteNotificationRequestDto requestDto,
+    public List<String> delete(
+            Long memberId, NotificationsRequestDto.DeleteDto requestDto,
             Members member){
         // 1. 로그인 사용자와 일치하는지
-        membersServiceFacade.findMember(member, memberId);
+        membersServiceFacade.matchLoginMember(member, memberId);
         // 2. 해당 알림이 존재하는지
+        List<String> deleteList = new ArrayList<>();
         for (String id : requestDto.getNotificationIds()) {
             String notificationId
                     = notificationsService.findById(id).getId();
+            deleteList.add(notificationId);
             notificationsService.deleteById(notificationId);
         }
+        return deleteList;
     }
 
     @Override
     @Transactional
-    public NotificationsResponseDto.CreateNotificationListResponseDto createAdminNotification(
-            Long adminId, Members member,
-            NotificationsRequestDto.CreateNotificationRequestDto requestDto){
+    public NotificationsResponseDto.CreateForAdminDto createForAdmin(
+            Long adminId, Members admin,
+            NotificationsRequestDto.CreateForAdminDto requestDto){
         // 1. 해당 어드민 계정이 맞는지 -> 멤버 검증까지 같이 됨
-        Members admin = membersServiceFacade.findAdmin(
-                adminId, member.getRole(), member.getDepartment());
+        if(!admin.getPosition().equals(MemberPosition.CEO)){
+            throw new NotificationsCustomException(NotificationsExceptionCode.NOT_ACCESS_POSITION);
+        }
 
         // 2. excludeMemberRole에 따라 해당 Role은 제외한 멤버 정보를 가져옴
         // 해당 부분은 제외한 역할의 MemberName과 해당 Member의 역할만 가져온 Map
 
         // 어차피 자기 자신에게는 알림이 안가게 해야하기에 빈 공간에 넣어주는 걸로
         if(requestDto.getExcludedMemberIdList().isEmpty()){
-            requestDto.getExcludedMemberIdList().add(member.getId());
+            requestDto.getExcludedMemberIdList().add(admin.getId());
         }
         // 문제 상황 :
         // 1. ADMIN(자기 자신) 또한 알림 메세지에 들어감 -> 자기 자신은 알림에 넣지 않는 식으로 변경 o
@@ -109,10 +114,10 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
 
         memberNamesAndDepartment.forEach((memberName, memberDepartment) -> {
             // 메세지를 만든 본인은 알림에 등록되지 않음
-            if(!member.getMemberName().equals(memberName)){
+            if(!admin.getMemberName().equals(memberName)){
                 Notifications notification = NotificationsConverter.toEntity(
                         memberName, // Map의 key
-                        member.getMemberName(), // From Member
+                        admin.getMemberName(), // From Member
                         message, // 메시지 내용
                         NotificationType.MEMBER, // 알림 타입
                         memberDepartment // Map의 value
@@ -124,62 +129,62 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
             }
         });
         // 해당 memberRoleList 테스트 후, 설정 예정
-        return NotificationsConverter.toCreateDto(admin, memberDepartmentSet, notificationList, message);
+        return NotificationsConverter.toCreateForAdminDto(admin, memberDepartmentSet, notificationList, message);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NotificationsResponseDto.ReadNotificationListResponseDto> readList(
+    public Page<NotificationsResponseDto.ReadDto> read(
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
-                = membersServiceFacade.findMember(member, memberId);
+                = membersServiceFacade.matchLoginMember(member, memberId);
 
         Page<Notifications> notificationPage
                 = notificationsService.findByToMemberName(
                         matchedMember.getMemberName(), pageable);
 
-        return NotificationsConverter.toReadListDto(notificationPage);
+        return NotificationsConverter.toReadDto(notificationPage);
     }
 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NotificationsResponseDto.ReadNotificationListResponseDto> readUnreadList(
+    public Page<NotificationsResponseDto.ReadDto> readUnread(
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
-                = membersServiceFacade.findMember(member, memberId);
+                = membersServiceFacade.matchLoginMember(member, memberId);
 
         Page<Notifications> notificationPage
                 = notificationsService.findByToMemberNameAndIsRead(
                 matchedMember.getMemberName(), false, pageable);
 
-        return NotificationsConverter.toReadListDto(notificationPage);
+        return NotificationsConverter.toReadDto(notificationPage);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NotificationsResponseDto.ReadNotificationListResponseDto> readReadList(
+    public Page<NotificationsResponseDto.ReadDto> readRead(
             Long memberId, Members member, Pageable pageable){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
-                = membersServiceFacade.findMember(member, memberId);
+                = membersServiceFacade.matchLoginMember(member, memberId);
 
         Page<Notifications> notificationPage
                 = notificationsService.findByToMemberNameAndIsRead(
                 matchedMember.getMemberName(), true, pageable);
 
-        return NotificationsConverter.toReadListDto(notificationPage);
+        return NotificationsConverter.toReadDto(notificationPage);
     }
 
     @Override
     @Transactional
-    public List<NotificationsResponseDto.ReadNotificationListResponseDto> readAll(
+    public List<NotificationsResponseDto.ReadAllDto> readAll(
             Long memberId, Members member){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
-                = membersServiceFacade.findMember(member, memberId);
+                = membersServiceFacade.matchLoginMember(member, memberId);
 
         List<Notifications> notificationList
                 = notificationsService.findByToMemberNameAndIsRead(
@@ -187,7 +192,7 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                 .stream().toList();
 
         notificationList.forEach(
-                notification -> notification.isRead());
+                notifications -> notifications.isRead());
 
         notificationsService.saveAll(notificationList);
 

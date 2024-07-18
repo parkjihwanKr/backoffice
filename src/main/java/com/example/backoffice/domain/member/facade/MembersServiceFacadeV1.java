@@ -36,7 +36,7 @@ public interface MembersServiceFacadeV1 {
 
     void deleteOne(Long memberId, Members member);
 
-    Members findMember(Members member, Long memberId);
+    Members matchLoginMember(Members member, Long memberId);
 
     Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
             List<MemberDepartment> excludedDepartmentList,

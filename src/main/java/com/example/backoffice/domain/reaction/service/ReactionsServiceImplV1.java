@@ -60,7 +60,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
         // toMember, fromMember 정보가 notification으로 다 넘어가기에 Member Domain은 null 가능
         NotificationData membersNotification =
                 new NotificationData(toMember, fromMember, null, null, null, null, null);
-        notificationsServiceFacade.createNotification(membersNotification, NotificationType.MEMBER);
+        notificationsServiceFacade.createOne(membersNotification, NotificationType.MEMBER);
         return ReactionsConverter.toCreateMemberReactionDto(reaction, emoji.toString());
     }
 
@@ -98,7 +98,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
 
         NotificationData boardsNotification =
                 new NotificationData(board.getMember(), fromMember, board, null, null, null, null);
-        notificationsServiceFacade.createNotification(boardsNotification, NotificationType.BOARD);
+        notificationsServiceFacade.createOne(boardsNotification, NotificationType.BOARD);
         return ReactionsConverter.toCreateBoardReactionDto(
                 reaction.getId(), fromMember, board, emoji.toString());
     }
@@ -142,7 +142,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
         NotificationData commentsNotification =
                 new NotificationData(
                         comment.getMember(), fromMember, board, comment, null, null, null);
-        notificationsServiceFacade.createNotification(commentsNotification, NotificationType.COMMENT);
+        notificationsServiceFacade.createOne(commentsNotification, NotificationType.COMMENT);
         return ReactionsConverter.toCreateCommentReactionDto(
                 reaction.getId(), comment, fromMember, emoji.toString());
     }
@@ -187,7 +187,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
                 new NotificationData(
                         reply.getMember(), fromMember,
                         reply.getParent().getBoard(), comment, reply, null, null);
-        notificationsServiceFacade.createNotification(replyNotification, NotificationType.REPLY);
+        notificationsServiceFacade.createOne(replyNotification, NotificationType.REPLY);
         return ReactionsConverter.toCreateReplyReactionDto(
                 reaction.getId(), reply, fromMember, replyEmoji.toString());
     }

@@ -83,7 +83,7 @@ public class Scheduler {
                     .map(MembersEvaluations::getMember).toList();
             for(Members unCompletedEvaluationMember : unCompletedEvaluationMemberList){
                 String message = "설문 조사 마감 7일 전입니다. 신속히 마무리 해주시길 바랍니다.";
-                notificationsServiceFacade.createNotification(
+                notificationsServiceFacade.createOne(
                         NotificationsConverter.toNotificationData(
                                 unCompletedEvaluationMember, membersServiceFacade.findHRManager(),
                                 null, null, null, null, message),

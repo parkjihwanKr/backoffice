@@ -88,19 +88,19 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @Transactional(readOnly = true)
     public MembersResponseDto.ReadOneDto readOne(
-            Long memberId, Members member){
-        Members matchedMember = findMember(member, memberId);
+            Long memberId, Members loginMember){
+        Members matchedMember = matchLoginMember(loginMember, memberId);
         return MembersConverter.toReadOneDto(matchedMember);
     }
 
     @Override
     @Transactional
     public MembersResponseDto.UpdateOneDto updateOne(
-            Long memberId, Members member, MultipartFile multipartFile,
+            Long memberId, Members loginMember, MultipartFile multipartFile,
             MembersRequestDto.UpdateOneDto requestDto){
         // 엔티티가 영속성 컨택스트에 넣어야하기에
         // 수정을 하기 위해선 어떤 엔티티가 변경 되어야 하는지 알아야함
-        Members existingMember = findMember(member, memberId);
+        Members existingMember = matchLoginMember(loginMember, memberId);
 
         if(!requestDto.getMemberName().equals(existingMember.getMemberName())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER_NAME);
@@ -158,7 +158,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         updateMember.updateAttribute(
                 role, department, position, requestDto.getSalary());
 
-        notificationsService.saveByMemberInfo(
+        notificationsService.saveForChangeMemberInfo(
                 loginMember.getMemberName(), updateMember.getMemberName(),
                 updateMember.getDepartment());
 
@@ -175,7 +175,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         Members updateMember
                 = membersService.readOneForDifferentMemberCheck(loginMember.getId(), memberId);
 
-        System.out.println("1. test test test 진입");
         // 3. 로그인 멤버가 바꿀 권한이 있는지
         // 권한 : 부서가 재정부의 부장이거나 사장인 경우만 가능
         if((loginMember.getDepartment().equals(MemberDepartment.FINANCE) &&
@@ -184,14 +183,12 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
             updateMember.updateSalary(requestDto.getSalary());
 
-            System.out.println("if test test test 진입");
-            notificationsService.saveByMemberInfo(
+            notificationsService.saveForChangeMemberInfo(
                     loginMember.getMemberName(), updateMember.getMemberName(),
                     updateMember.getDepartment());
 
             return MembersConverter.toUpdateOneForSalaryDto(updateMember);
         }else{
-            System.out.println("else test test test 진입");
             throw new MembersCustomException(
                     MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
         }
@@ -201,21 +198,21 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @Transactional
     public MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
-            Long memberId, Members member, MultipartFile image){
-        findMember(member, memberId);
+            Long memberId, Members loginMember, MultipartFile image){
+        matchLoginMember(loginMember, memberId);
 
         String profileImageUrl = filesService.createImage(image);
 
-        member.updateProfileImage(profileImageUrl);
-        return MembersConverter.toUpdateOneForProfileImageDto(member);
+        loginMember.updateProfileImage(profileImageUrl);
+        return MembersConverter.toUpdateOneForProfileImageDto(loginMember);
     }
 
     // 프로필 이미지 삭제
     @Override
     @Transactional
     public MembersResponseDto.DeleteOneForProfileImageDto deleteOneForProfileImage(
-            Long memberId, Members member){
-        Members existMember = findMember(member, memberId);
+            Long memberId, Members loginMember){
+        Members existMember = matchLoginMember(loginMember, memberId);
         String existMemberProfileImageUrl = existMember.getProfileImageUrl();
         // 문자열이 비어 있거나, 빈 공백으로만 이루어져 있으면, true를 리턴
         if(existMemberProfileImageUrl.isBlank()){
@@ -224,19 +221,19 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         filesService.deleteImage(existMember.getProfileImageUrl());
         existMember.updateProfileImage(null);
 
-        return MembersConverter.toDeleteOneForProfileImageDto(member);
+        return MembersConverter.toDeleteOneForProfileImageDto(loginMember);
     }
 
     @Override
     @Transactional
     public void deleteOne(Long memberId, Members loginMember){
-        findMember(loginMember, memberId);
+        matchLoginMember(loginMember, memberId);
         membersService.deleteById(memberId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Members findMember(Members member, Long memberId){
+    public Members matchLoginMember(Members member, Long memberId){
         if(!member.getId().equals(memberId)){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
         }

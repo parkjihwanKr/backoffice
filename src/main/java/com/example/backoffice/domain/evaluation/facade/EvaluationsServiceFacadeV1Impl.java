@@ -373,7 +373,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         switch (notificationType) {
             case EVALUATION, UPDATE_EVALUATION -> {
                 for(Members member : memberList){
-                    notificationsServiceFacade.createNotification(
+                    notificationsServiceFacade.createOne(
                             NotificationsConverter.toNotificationData(
                                     loginMember, member, null, null,
                                     null, null, message),
