@@ -18,7 +18,8 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateNotificationResponseDto {
+    public static class CreateOneDto {
+        private String notificationId;
         private String message;
         private String toMemberName;
         private String fromMemberName;
@@ -32,7 +33,8 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateNotificationListResponseDto {
+    public static class CreateForAdminDto {
+        private List<String> notificationIdList;
         private String message;
         private String fromMemberName;
         private List<String> toMemberNameList;
@@ -44,7 +46,8 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadNotificationResponseDto {
+    public static class ReadOneDto {
+        private String notificationId;
         private String toMemberName;
         private String fromMemberName;
         private MemberDepartment fromMemberDepartment;
@@ -57,7 +60,20 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadNotificationListResponseDto {
+    public static class ReadDto {
+        private String notificationId;
+        private String toMemberName;
+        private String fromMemberName;
+        private LocalDateTime createdAt;
+        private Boolean isRead;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadAllDto {
+        private String notificationId;
         private String toMemberName;
         private String fromMemberName;
         private LocalDateTime createdAt;

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Favorities extends CommonEntity {
+public class Favorites extends CommonEntity {
 
     // fields
     @Id

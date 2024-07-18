@@ -6,14 +6,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface FilesService {
-    String createFileForMemberRole(MultipartFile file, Members member);
+public interface FilesServiceV1 {
+    String createOneForMemberRole(MultipartFile file, Members member);
 
-    String createFileForBoard(MultipartFile file, Boards board);
+    String createOneForBoard(MultipartFile file, Boards board);
 
     String createImage(MultipartFile image);
 
-    void deleteFile(Long boardId, List<String> fileList);
+    void delete(Long boardId, List<String> fileList);
 
     void deleteImage(String imageUrl);
 }

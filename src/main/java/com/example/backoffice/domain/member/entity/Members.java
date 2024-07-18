@@ -1,9 +1,8 @@
 package com.example.backoffice.domain.member.entity;
 
 import com.example.backoffice.domain.event.entity.Events;
-import com.example.backoffice.domain.favorite.entity.Favorities;
+import com.example.backoffice.domain.favorite.entity.Favorites;
 import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
-import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -74,14 +73,14 @@ public class Members extends CommonEntity {
     private Boolean onVacation;
 
     // relations
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reactions> reactionList;
+    /*@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reactions> reactionList;*/
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Events> eventList;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Favorities> favoritieList;
+    private List<Favorites> favoritieList;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MembersEvaluations> membersEvaluations;
@@ -115,12 +114,11 @@ public class Members extends CommonEntity {
         this.salary = salary;
     }
 
-    public void addEmoji(Reactions reaction){
-        this.reactionList.add(reaction);
+    public void addLoveCount(){
         this.loveCount++;
     }
 
-    public void deleteEmoji(){
+    public void deleteLoveCount(){
         this.loveCount--;
     }
 

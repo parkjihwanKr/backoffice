@@ -24,6 +24,6 @@ public interface NotificationsServiceV1 {
 
     Notifications findById(String notificationId);
 
-    Notifications saveByMemberInfo(
+    Notifications saveForChangeMemberInfo(
             String fromMemberName, String toMemberName, MemberDepartment fromMemberDepartment);
 }

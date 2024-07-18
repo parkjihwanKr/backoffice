@@ -21,13 +21,13 @@ public enum MemberPosition {
     }
 
     public static class Position {
-        public static final String CEO = "POSITION_CEO";
-        public static final String MANAGER = "POSITION_MANAGER";
-        public static final String DEPUTY_MANAGER = "POSITION_DEPUTY_MANAGER";
-        public static final String ASSISTANT_MANAGER = "POSITION_ASSISTANT_MANAGER";
-        public static final String SENIOR_STAFF = "POSITION_SENIOR_STAFF";
-        public static final String JUNIOR_STAFF = "POSITION_JUNIOR_STAFF";
-        public static final String STAFF = "POSITION_STAFF";
-        public static final String INTERN = "POSITION_INTERN";
+        public static final String CEO = "CEO";
+        public static final String MANAGER = "MANAGER";
+        public static final String DEPUTY_MANAGER = "DEPUTY_MANAGER";
+        public static final String ASSISTANT_MANAGER = "ASSISTANT_MANAGER";
+        public static final String SENIOR_STAFF = "SENIOR_STAFF";
+        public static final String JUNIOR_STAFF = "JUNIOR_STAFF";
+        public static final String STAFF = "STAFF";
+        public static final String INTERN = "INTERN";
     }
 }

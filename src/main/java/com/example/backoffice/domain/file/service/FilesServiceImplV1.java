@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FilesServiceImpl implements FilesService {
+public class FilesServiceImplV1 implements FilesServiceV1 {
 
     private final S3Util s3Util;
     private final FilesRepository filesRepository;
@@ -31,7 +31,7 @@ public class FilesServiceImpl implements FilesService {
     // 1. board의 게시글 -> writer, board id는 가지고 있을 것
     // 2. member의 권한 변경 증빙 서류 -> writer는 있어야할 것
     @Override
-    public String createFileForMemberRole(MultipartFile file, Members member) {
+    public String createOneForMemberRole(MultipartFile file, Members member) {
         String originalFilename = file.getOriginalFilename();
         String uuidOriginalFilename = UUID.randomUUID() + "_" + originalFilename;
         Files image = FilesConverter.toEntityForMemberRole(uuidOriginalFilename, member);
@@ -40,7 +40,7 @@ public class FilesServiceImpl implements FilesService {
     }
 
     @Override
-    public String createFileForBoard(MultipartFile file, Boards board) {
+    public String createOneForBoard(MultipartFile file, Boards board) {
         String filename = s3Util.uploadFile(file);
         Files fileForBoard = FilesConverter.toEntityForBoards(filename, board);
         filesRepository.save(fileForBoard);
@@ -54,7 +54,7 @@ public class FilesServiceImpl implements FilesService {
 
     @Override
     @Transactional
-    public void deleteFile(Long boardId, List<String> fileUrlList) {
+    public void delete(Long boardId, List<String> fileUrlList) {
         List<Files> files = filesRepository.findByBoardId(boardId);
 
         for (String fileUrl : fileUrlList) {

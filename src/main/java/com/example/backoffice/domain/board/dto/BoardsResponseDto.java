@@ -17,6 +17,7 @@ public class BoardsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadAllDto {
+        private Long boardId;
         private String title;
         private String writer;
         private String content;
@@ -32,8 +33,8 @@ public class BoardsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadOneDto {
-
         // Members.membername
+        private Long boardId;
         private String writer;
         private String title;
         private String content;
@@ -53,6 +54,7 @@ public class BoardsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneDto {
+        private Long boardId;
         private String writer;
         private String title;
         private String content;
@@ -65,6 +67,7 @@ public class BoardsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateOneDto {
+        private Long boardId;
         private String title;
         private String content;
         private String writer;

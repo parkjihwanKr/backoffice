@@ -30,6 +30,7 @@ public class BoardsConverter {
     public static Page<BoardsResponseDto.ReadAllDto> toReadAllDto(Page<Boards> boardPage){
         return boardPage.map(board -> {
             return BoardsResponseDto.ReadAllDto.builder()
+                    .boardId(board.getId())
                     .title(board.getTitle())
                     .writer(board.getMember().getMemberName())
                     .content(board.getContent())
@@ -63,6 +64,7 @@ public class BoardsConverter {
                     // 대댓글 리스트에 추가
                     if (commentReply.getParent().getId().equals(commentId) && !commentReply.getId().equals(commentId)) {
                         replyList.add(CommentsResponseDto.ReadCommentRepliesDto.builder()
+                                .commentId(commentId)
                                 .replyId(commentReply.getId())
                                 .replyWriter(commentReply.getMember().getMemberName())
                                 .replyContent(commentReply.getContent())
@@ -76,6 +78,7 @@ public class BoardsConverter {
 
                 // 최상위 댓글을 댓글 리스트에 추가
                 commentList.add(CommentsResponseDto.ReadBoardCommentsDto.builder()
+                        .boardId(board.getId())
                         .commentId(commentId)
                         .commentWriter(comment.getMember().getMemberName())
                         .commentContent(comment.getContent())
@@ -89,6 +92,7 @@ public class BoardsConverter {
         }
 
         return BoardsResponseDto.ReadOneDto.builder()
+                .boardId(board.getId())
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
                 .content(board.getContent())
@@ -107,6 +111,7 @@ public class BoardsConverter {
             Boards board, List<String> fileUrlList){
 
         return BoardsResponseDto.CreateOneDto.builder()
+                .boardId(board.getId())
                 .writer(board.getMember().getMemberName())
                 .title(board.getTitle())
                 .content(board.getContent())
@@ -129,6 +134,7 @@ public class BoardsConverter {
         }
 
         return BoardsResponseDto.UpdateOneDto.builder()
+                .boardId(board.getId())
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
                 .content(board.getContent())

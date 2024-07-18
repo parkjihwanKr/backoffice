@@ -37,6 +37,7 @@ public class EventsConverter {
     public static EventsResponseDto.ReadOneForCompanyEventDto toReadOneForCompanyEventDto(
             Events event) {
         return EventsResponseDto.ReadOneForCompanyEventDto.builder()
+                .eventId(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .startDate(event.getStartDate())
@@ -52,6 +53,7 @@ public class EventsConverter {
         for (Events events : eventList) {
             eventResponseDtoList.add(
                     EventsResponseDto.ReadOneForCompanyEventDto.builder()
+                            .eventId(events.getId())
                             .title(events.getTitle())
                             .startDate(events.getStartDate())
                             .endDate(events.getEndDate())
@@ -72,6 +74,7 @@ public class EventsConverter {
                 if (event.getStartDate().getMonth().equals(month)) {
                     monthlyEvents.add(
                             EventsResponseDto.ReadOneForCompanyEventDto.builder()
+                                    .eventId(event.getId())
                                     .title(event.getTitle())
                                     .description(event.getDescription())
                                     .startDate(event.getStartDate())
@@ -89,6 +92,7 @@ public class EventsConverter {
 
     public static EventsResponseDto.CreateOneForDepartmentEventDto toCreateOneForDepartmentDto(Events event){
         return EventsResponseDto.CreateOneForDepartmentEventDto.builder()
+                .eventId(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .startDate(event.getStartDate())
@@ -100,6 +104,7 @@ public class EventsConverter {
     public static EventsResponseDto.UpdateOneForDepartmentEventDto toUpdateOneForDepartmentEventDto(
             Events event){
         return EventsResponseDto.UpdateOneForDepartmentEventDto.builder()
+                .eventId(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .department(event.getDepartment())
@@ -113,6 +118,7 @@ public class EventsConverter {
     public static EventsResponseDto.CreateOneForVacationEventDto toCreateOneForVacationEventDto(
             Events event, Boolean urgent){
         return EventsResponseDto.CreateOneForVacationEventDto.builder()
+                .eventId(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .urgent(urgent)
@@ -127,6 +133,7 @@ public class EventsConverter {
         for(Events event : eventList){
             responseDtoList.add(
                     EventsResponseDto.ReadOneForVacationEventDto.builder()
+                            .eventId(event.getId())
                             .vacationMemberName(event.getMember().getMemberName())
                             .startDate(event.getStartDate())
                             .endDate(event.getEndDate())
@@ -139,6 +146,7 @@ public class EventsConverter {
     public static EventsResponseDto.UpdateOneForVacationEventDto toUpdateOneForVacationEventDto(
             Events vacation, String memberName){
         return EventsResponseDto.UpdateOneForVacationEventDto.builder()
+                .eventId(vacation.getId())
                 .vacationMemberName(memberName)
                 .startDate(vacation.getStartDate())
                 .endDate(vacation.getEndDate())
@@ -151,6 +159,7 @@ public class EventsConverter {
         for(Events event : eventList){
             responseDtoList.add(
                     EventsResponseDto.ReadMemberForVacationEventDto.builder()
+                            .eventId(event.getId())
                             .vacationMemberName(event.getMember().getMemberName())
                             .startDate(event.getStartDate())
                             .endDate(event.getEndDate())

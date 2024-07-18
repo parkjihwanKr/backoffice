@@ -15,6 +15,7 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneForCompanyEventDto {
+        private Long eventId;
         private String title;
         private String description;
         private LocalDateTime startDate;
@@ -27,6 +28,7 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadOneForCompanyEventDto {
+        private Long eventId;
         private String title;
         private String description;
         private MemberDepartment department;
@@ -41,6 +43,7 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneForDepartmentEventDto {
+        private Long eventId;
         private String title;
         private String description;
         private MemberDepartment department;
@@ -55,6 +58,7 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateOneForDepartmentEventDto {
+        private Long eventId;
         private String title;
         private String description;
         private MemberDepartment department;
@@ -69,6 +73,7 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneForVacationEventDto {
+        private Long eventId;
         private String title;
         private String description;
         private Boolean urgent;
@@ -81,6 +86,7 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadOneForVacationEventDto {
+        private Long eventId;
         private String vacationMemberName;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
@@ -91,6 +97,7 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadMemberForVacationEventDto {
+        private Long eventId;
         private String vacationMemberName;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
@@ -101,6 +108,7 @@ public class EventsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateOneForVacationEventDto {
+        private Long eventId;
         private String vacationMemberName;
         private LocalDateTime startDate;
         private LocalDateTime endDate;

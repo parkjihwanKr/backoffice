@@ -29,6 +29,7 @@ public class QuestionsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateOneDto {
+        private Long questionId;
         private Integer questionNumber;
         private String questionText;
         // 해당 타입에 따라 multipleChoiceAnswerList 활성화 여부 확인
@@ -47,6 +48,7 @@ public class QuestionsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneDto{
+        private Long questionId;
         private Long questionNumber;
         private String questionText;
         private QuestionsType questionsType;
@@ -58,6 +60,7 @@ public class QuestionsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneForOrderDto {
+        private Long questionId;
         private Long previousNumber;
         private Long updatedNumber;
         private String questionText;
@@ -70,6 +73,7 @@ public class QuestionsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ReadOneDto{
+        private Long questionId;
         private Long questionNumber;
         private String questionText;
         private QuestionsType questionsType;
@@ -92,6 +96,7 @@ public class QuestionsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class SubmitOneDto {
+        private Long questionId;
         private Long questionNumber;
         private String questionType;
         private String shortAnswer;

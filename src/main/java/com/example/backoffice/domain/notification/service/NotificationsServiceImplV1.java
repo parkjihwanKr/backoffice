@@ -73,7 +73,7 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
 
     @Override
     @Transactional
-    public Notifications saveByMemberInfo(
+    public Notifications saveForChangeMemberInfo(
             String fromMemberName, String toMemberName, MemberDepartment fromMemberDepartment) {
         Notifications notifications = NotificationsConverter.toEntity(
                 toMemberName, fromMemberName,

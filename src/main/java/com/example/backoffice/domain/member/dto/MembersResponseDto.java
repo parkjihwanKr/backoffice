@@ -17,6 +17,7 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneDto{
+        private Long memberId;
         // 접속 아이디
         private String memberName;
         // 실제 이름
@@ -32,7 +33,7 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadOneDto {
-
+        private Long memberId;
         private String memberName;
         private String email;
         private String address;
@@ -51,13 +52,13 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateOneDto{
+        private Long memberId;
         private String name;
         private String memberName;
         private String email;
         private String contact;
         private String address;
         private String introduction;
-        private Long loveCount;
         private String profileImageUrl;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
@@ -68,6 +69,7 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateOneForAttributeDto{
+        private Long memberId;
         private String memberName;
         private String fileName;
         private Long salary;
@@ -81,6 +83,7 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateOneForSalaryDto {
+        private Long memberId;
         private String memberName;
         private MemberRole memberRole;
         private MemberPosition memberPosition;
@@ -93,6 +96,7 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateOneForProfileImageDto{
+        private Long memberId;
         private String fromMemberName;
         private String profileImageUrl;
     }
@@ -102,6 +106,7 @@ public class MembersResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DeleteOneForProfileImageDto{
+        private Long memberId;
         private String fromMemberName;
     }
 
@@ -110,6 +115,7 @@ public class MembersResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneForVacationDaysDto {
+        private Long memberId;
         // 잔여 휴가 일 수
         private Integer vacationDays;
     }

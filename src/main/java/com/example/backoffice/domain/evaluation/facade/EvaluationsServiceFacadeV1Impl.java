@@ -76,7 +76,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
                 loginMember, memberList, title, evaluation, NotificationType.EVALUATION);
 
         return EvaluationsConverter.toCreateOneForDepartmentDto(
-                title, evaluation.getDescription(),loginMember.getMemberName(),
+                evaluation.getId(), title, evaluation.getDescription(),loginMember.getMemberName(),
                 evaluation.getStartDate(), evaluation.getEndDate());
     }
 
@@ -111,7 +111,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
         // 5. responseDto 작성
         return EvaluationsConverter.toCreateOneForCompanyDto(
-                loginMember.getMemberName(), title, evaluation.getDescription(),
+                evaluation.getId(), loginMember.getMemberName(), title, evaluation.getDescription(),
                 evaluation.getStartDate(), evaluation.getEndDate());
     }
 
@@ -128,7 +128,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
                 loginMember.getPosition());
 
         return EvaluationsConverter.toReadOneForDepartmentDto(
-                evaluation.getTitle(), evaluation.getDescription(),
+                evaluationId, evaluation.getTitle(), evaluation.getDescription(),
                 year, quarter, loginMember.getMemberName(),
                 evaluation.getQuestionList());
     }
@@ -145,7 +145,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         // membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationId);
 
         return EvaluationsConverter.toReadOneForCompanyDto(
-                evaluation.getTitle(), evaluation.getDescription(), evaluation.getYear(),
+                evaluationId, evaluation.getTitle(), evaluation.getDescription(), evaluation.getYear(),
                 loginMember.getMemberName(), evaluation.getQuestionList());
     }
 
@@ -181,8 +181,9 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
         // 5. 응답 DTO
         return EvaluationsConverter.toUpdateOneForDepartmentDto(
-                evaluation.getDepartment(), evaluation.getTitle(), evaluation.getDescription(),
-                evaluation.getYear(), evaluation.getQuarter(), loginMember.getMemberName(),
+                evaluationId, evaluation.getDepartment(), evaluation.getTitle(),
+                evaluation.getDescription(), evaluation.getYear(),
+                evaluation.getQuarter(), loginMember.getMemberName(),
                 evaluation.getStartDate(), evaluation.getEndDate());
     }
 
@@ -219,7 +220,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
         // 6. 응답 DTO 생성
         return EvaluationsConverter.toUpdateOneForCompanyDto(
-                evaluation.getTitle(), evaluation.getDescription(),
+                evaluationId, evaluation.getTitle(), evaluation.getDescription(),
                 evaluation.getYear(), evaluation.getStartDate(),
                 evaluation.getEndDate(), loginMember.getMemberName());
     }
@@ -265,7 +266,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
             throw new EvaluationsCustomException(EvaluationsExceptionCode.NOT_INPUT_EVALUATION_CHECKED);
         }
         membersEvaluation.isCompleted(true);
-        return EvaluationsConverter.toSubmitOneDto(loginMember.getMemberName());
+        return EvaluationsConverter.toSubmitOneDto(evaluationId, loginMember.getMemberName());
     }
 
     @Override
@@ -372,7 +373,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         switch (notificationType) {
             case EVALUATION, UPDATE_EVALUATION -> {
                 for(Members member : memberList){
-                    notificationsServiceFacade.createNotification(
+                    notificationsServiceFacade.createOne(
                             NotificationsConverter.toNotificationData(
                                     loginMember, member, null, null,
                                     null, null, message),

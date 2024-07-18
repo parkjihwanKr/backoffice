@@ -11,29 +11,26 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface NotificationsServiceFacadeV1 {
-    void createNotification(
-            NotificationData notificationData, NotificationType domainType);
+    void createOne(NotificationData notificationData, NotificationType domainType);
 
-    NotificationsResponseDto.ReadNotificationResponseDto readOne(
+    NotificationsResponseDto.ReadOneDto readOne(
             Long memberId, String notificationId, Members member);
 
-    NotificationsResponseDto.CreateNotificationListResponseDto createAdminNotification(
+    NotificationsResponseDto.CreateForAdminDto createForAdmin(
             Long adminId, Members member,
-            NotificationsRequestDto.CreateNotificationRequestDto requestDto);
+            NotificationsRequestDto.CreateForAdminDto requestDto);
 
-    Page<NotificationsResponseDto.ReadNotificationListResponseDto> readList(
+    Page<NotificationsResponseDto.ReadDto> read(
             Long memberId, Members member, Pageable pageable);
 
-    Page<NotificationsResponseDto.ReadNotificationListResponseDto> readUnreadList(
+    Page<NotificationsResponseDto.ReadDto> readUnread(
+            Long memberId, Members loginMember, Pageable pageable);
+
+    Page<NotificationsResponseDto.ReadDto> readRead(
             Long memberId, Members member, Pageable pageable);
 
-    Page<NotificationsResponseDto.ReadNotificationListResponseDto> readReadList(
-            Long memberId, Members member, Pageable pageable);
+    List<String> delete(
+            Long memberId, NotificationsRequestDto.DeleteDto requestDto, Members member);
 
-    void deleteNotification(
-            Long memberId, NotificationsRequestDto.DeleteNotificationRequestDto requestDto,
-            Members member);
-
-    List<NotificationsResponseDto.ReadNotificationListResponseDto> readAll(
-            Long memberId, Members member);
+    List<NotificationsResponseDto.ReadAllDto> readAll(Long memberId, Members member);
 }

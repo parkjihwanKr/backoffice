@@ -29,9 +29,7 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
         Boards board = boardsService.findById(boardId);
         Comments comment = CommentsConverter.toEntity(requestDto, board, member);
 
-        board.addComment(comment);
         comment.updateParent(comment);
-
         commentsRepository.save(comment);
 
         return CommentsConverter.toCreateCommentDto(comment, member);
@@ -72,17 +70,14 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
             Long boardId, Long commentId,
             CommentsRequestDto.CreateReplyDto requestDto, Members member){
         Boards board = boardsService.findById(boardId);
-        Comments comment = findById(commentId);
+        Comments parent = findById(commentId);
 
-        Comments reply = CommentsConverter.toReplyEntity(requestDto, board, member);
+        Comments reply = CommentsConverter.toReplyEntity(requestDto, board, member, parent);
 
-        isMatchedBoard(comment, board);
-        reply.updateParent(comment);
-        comment.addReply(reply);
-        board.addReply(comment);
+        isMatchedBoard(parent, board);
 
         commentsRepository.save(reply);
-        return CommentsConverter.toCreateReplyDto(comment, reply, member);
+        return CommentsConverter.toCreateReplyDto(parent, reply, member);
     }
 
     @Override
@@ -92,9 +87,7 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
             CommentsRequestDto.UpdateReplyDto requestDto, Members member){
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
-        Boards board = boardsService.findById(comment.getBoard().getId());
 
-        isMatchedBoard(comment, board);
         isMatchedComment(comment, reply);
 
         reply.update(requestDto.getContent());
@@ -107,15 +100,8 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
     public void deleteReply(Long commentId, Long replyId, Members member){
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
-        Boards board = boardsService.findById(comment.getBoard().getId());
 
         isMatchedComment(comment, reply);
-        isMatchedBoard(comment, board);
-
-        // 대댓글 삭제 로직
-        comment.getReplyList().removeIf(
-                commentReply -> commentReply.getId().equals(replyId));
-
         commentsRepository.deleteById(replyId);
     }
 
@@ -130,8 +116,7 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
     private void isMatchedBoard(Comments comment, Boards board){
         if(!comment.getBoard().getId().equals(board.getId())){
             throw new CommentsCustomException(
-                    CommentsExceptionCode.NOT_MATCHED_BOARD_COMMENT
-            );
+                    CommentsExceptionCode.NOT_MATCHED_BOARD_COMMENT);
         }
     }
 
