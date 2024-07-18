@@ -40,3 +40,6 @@ out/
 ### docker ###
 docker-compose.yml
 Dockerfile
+
+### docker enviorment variable settings
+.env
