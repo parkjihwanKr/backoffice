@@ -37,5 +37,3 @@ jobs:
     # test code는 빌드하지 않음
     - name: Build with Gradle
       run: ./gradlew assemble
-
-    # ci/cd push, pull request action 감지 테스트
