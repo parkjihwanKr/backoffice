@@ -47,5 +47,6 @@ jobs:
       run: ./gradlew assemble
 
     # test code 빌드
+    # 빌드 안되어야함.
     - name: Test with Gradle
       run: ./gradlew test
