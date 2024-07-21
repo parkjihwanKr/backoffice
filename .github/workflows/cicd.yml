@@ -59,10 +59,9 @@ jobs:
     - name: List Directory for debugging
       run: ls -al
 
-      # *.jar -> Docker Image Build
-      # 디렉토리 이름은 마음대로 /air_dns_test
+      # Docker 이미지 빌드
     - name: Docker Image Build
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest .
+      run: docker build -f ./BackOffice/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest ./BackOffice
 
       # DockerHub's Image push
     - name: DockerHub Push
