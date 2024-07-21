@@ -61,4 +61,4 @@ jobs:
       run: docker/login-action@v2
       with:
         username: ${{ secret.DOCKERHUB_USERNAME }}
-        passwrod: ${{ secret.DOCKERHUB_PASSWORD }}
+        password: ${{ secret.DOCKERHUB_PASSWORD }}
