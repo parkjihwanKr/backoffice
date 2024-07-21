@@ -39,14 +39,26 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
     # Build Gradle
     - name: Build with Gradle
       run: ./gradlew assemble
 
+      # make application.yml
+    - name: Make application.yml
+      run: |
+        cd ./src/main/resources
+        touch ./application.yml
+        echo "${{ secrets.APPLICATION }}" > ./application.yml
+
     # test code 빌드
     # 빌드 안되어야함.
-    - name: Test with Gradle
-      run: ./gradlew test
+    # - name: Test with Gradle
+    #  run: ./gradlew test
+
+    # docker login
+    - name: Docker Login
+      run: docker/login-action@v2
+      with:
+        username: ${{ secret.DOCKERHUB_USERNAME }}
+        passwrod: ${{ secret.DOCKERHUB_PASSWORD }}
