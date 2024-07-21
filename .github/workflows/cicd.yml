@@ -56,6 +56,9 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+    - name: List Directory for debugging
+      run: ls -al
+
       # *.jar -> Docker Image Build
       # 디렉토리 이름은 마음대로 /air_dns_test
     - name: Docker Image Build
