@@ -57,8 +57,8 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       # 전체 디렉토리 구조 확인
-    - name: List entire directory structure
-      run: find . -type d
+    - name: find Dockerfile
+      run: find . -name Dockerfile
 
     - name: Docker Image Build
       run: docker build -f ./BackOffice/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest ./BackOffice
