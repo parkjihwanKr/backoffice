@@ -56,13 +56,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    - name: List Directory for debugging
-      run: ls -al
+      # 전체 디렉토리 구조 확인
+    - name: List entire directory structure
+      run: find . -type d
 
-      # Docker 이미지 빌드
     - name: Docker Image Build
       run: docker build -f ./BackOffice/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest ./BackOffice
 
-      # DockerHub's Image push
-    - name: DockerHub Push
+    - name: DockerHub Image Push
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest
