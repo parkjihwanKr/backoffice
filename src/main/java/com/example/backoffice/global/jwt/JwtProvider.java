@@ -46,7 +46,7 @@ public class JwtProvider {
 
     private final MemberDetailsServiceImpl memberDetailsService;
 
-    @Value("${JWT_SECRET}")
+    @Value("${jwt.secret}")
     private String secretKey;
     private Key key;
 
