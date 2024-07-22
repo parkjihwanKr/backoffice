@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Java CI/CD with Gradle
 
 on:
   push:
@@ -49,6 +49,7 @@ jobs:
     # - name: Test with Gradle
     #  run: ./gradlew test
 
+    # CD
     # docker login
     - name: Docker Login
       uses: docker/login-action@v1
@@ -59,8 +60,21 @@ jobs:
     - name: find Dockerfile
       run: find . -name Dockerfile
 
-    - name: Docker Image Build
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest .
+    - name: Docker Image Build And Push
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest
 
-    - name: DockerHub Image Push
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest
+    - name: Run Application
+      uses: appleboy/ssh-action@v0.1.9
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        script: |
+          sudo docker kill backoffice
+          sudo docker rm -f backoffice
+          sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
+          sudo docker run -p 8082:8082 --name backoffice -d ${{ secrets.DOCKERHUB_USERNAME}}/backoffice
