@@ -47,6 +47,10 @@ jobs:
       - name: Verify application.yml
         run: cat ./src/main/resources/application.yml
 
+      # test code build
+      # - name: Test with Gradle
+      #   run: ./gradlew test
+
       # CD
       # docker login
       - name: Docker Login
@@ -75,8 +79,4 @@ jobs:
             sudo docker rm -f backoffice || true
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
-            sudo docker run -d -p 8080:8080 --name backoffice ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
-            sleep 10
-            sudo docker logs backoffice
-            sudo docker cp ./src/main/resources/application.yml backoffice:/app/src/main/resources/application.yml || true
-            sudo docker restart backoffice || true
+            sudo docker run -d -p 8082:8082 --name backoffice -e "SPRING_DATASOURCE_URL=jdbc:mysql://ec2-54-180-137-114.ap-northeast-2.compute.amazonaws.com:3306/backoffice" -e "SPRING_DATASOURCE_USERNAME=user" -e "SPRING_DATASOURCE_PASSWORD=Gooddog0036^" ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
