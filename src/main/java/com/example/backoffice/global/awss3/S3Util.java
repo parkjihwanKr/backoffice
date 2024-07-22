@@ -28,7 +28,7 @@ public class S3Util {
 
     private final AmazonS3Client amazonS3Client;
 
-    @Value("${YOUR_BUCKET_NAME}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     public String uploadImage(MultipartFile image) {

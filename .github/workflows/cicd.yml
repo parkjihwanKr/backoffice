@@ -1,11 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: Java CI/CD with Gradle
 
 on:
   push:
@@ -15,53 +8,78 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
-        distribution: 'temurin'
+        distribution: 'zulu'
 
-    # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-    # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+    # 권한 부여
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
-    - name: Build with Gradle Wrapper
-      run: ./gradlew build
-
-    # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
-    # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
-    #
-    # - name: Setup Gradle
-    #   uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
-    #   with:
-    #     gradle-version: '8.5'
-    #
-    # - name: Build with Gradle 8.5
-    #   run: gradle build
-
-  dependency-submission:
-
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
+    # gradle caching
+    - name: Gradle Caching
+      uses: actions/cache@v2
       with:
-        java-version: '17'
-        distribution: 'temurin'
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
 
-    # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
-    # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
-    - name: Generate and submit dependency graph
-      uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+    # Build Gradle
+    - name: Build with Gradle
+      run: ./gradlew assemble
+
+    # make application.yml
+    - name: Make application.yml
+      run: |
+        cd ./src/main/resources
+        touch ./application.yml
+        echo "${{ secrets.APPLICATION }}" > ./application.yml
+
+    # check application.yml
+    - name: Check application.yml
+      run: cat ./src/main/resources/application.yml
+
+    # test code build
+    # - name: Test with Gradle
+    #  run: ./gradlew test
+
+    # CD
+    # docker login
+    - name: Docker Login
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: find Dockerfile
+      run: find . -name Dockerfile
+
+    - name: Docker Image Build And Push
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest
+
+    - name: Run Application
+      uses: appleboy/ssh-action@v0.1.9
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        script: |
+          sudo docker kill backoffice
+          sudo docker rm -f backoffice
+          sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
+          sudo docker run -p 8082:8082 --name backoffice -d ${{ secrets.DOCKERHUB_USERNAME}}/backoffice
+
+# test4
