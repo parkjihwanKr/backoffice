@@ -37,12 +37,16 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assemble
 
-      # make application.yml
+    # make application.yml
     - name: Make application.yml
       run: |
         cd ./src/main/resources
         touch ./application.yml
         echo "${{ secrets.APPLICATION }}" > ./application.yml
+
+    # check application.yml
+    - name: Check application.yml
+      run: cat ./src/main/resources/application.yml
 
     # test code build
     # - name: Test with Gradle
