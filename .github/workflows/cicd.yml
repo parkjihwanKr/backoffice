@@ -44,8 +44,7 @@ jobs:
         touch ./application.yml
         echo "${{ secrets.APPLICATION }}" > ./application.yml
 
-    # test code 빌드
-    # 빌드 안되어야함.
+    # test code build
     # - name: Test with Gradle
     #  run: ./gradlew test
 
