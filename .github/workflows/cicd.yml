@@ -77,10 +77,20 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         port: 22
         script: |
-          sudo docker kill backoffice
-          sudo docker rm -f backoffice
-          sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
+          sudo docker kill backoffice || true
+          sudo docker rm -f backoffice || true
+          sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
-          sudo docker run -p 8082:8082 --name backoffice -d ${{ secrets.DOCKERHUB_USERNAME}}/backoffice
+          sudo docker run -e APPLICATION="${{ secrets.APPLICATION }}" -p 8082:8082 --name backoffice -d ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
 
+    - name: Create application.yml inside container
+      uses: appleboy/ssh-action@v0.1.9
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        script: |
+          CONTAINER_ID=$(sudo docker ps -qf "name=backoffice")
+          sudo docker exec -i $CONTAINER_ID /bin/sh -c "echo \"$APPLICATION\" > /app/src/main/resources/application.yml"
 # test6
