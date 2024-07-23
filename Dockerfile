@@ -1,5 +1,6 @@
 FROM openjdk:17-jdk-slim
-EXPOSE 8082
-ARG JAR_FILE=build/libs/*-SNAPSHOT.jar
+VOLUME /tmp
+ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]
+EXPOSE 8082
+ENTRYPOINT ["java","-jar","/app.jar"]
