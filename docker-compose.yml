@@ -2,7 +2,7 @@ version: '3'
 services:
   web:
     container_name: web
-    image: pjh3797/backoffice
+    image: ${DOCKERHUB_USERNAME}/backoffice
     expose:
       - 8082
     ports:
@@ -10,10 +10,23 @@ services:
     depends_on:
       - mongodb
       - redis
+    environment:
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
+      - CLOUD_AWS_CREDENTIALS_ACCESSKEY=${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
+      - CLOUD_AWS_CREDENTIALS_SECRETKEY=${CLOUD_AWS_CREDENTIALS_SECRETKEY}
+      - CLOUD_AWS_S3_BUCKET=${CLOUD_AWS_S3_BUCKET}
+      - CLOUD_AWS_REGION_STATIC=${CLOUD_AWS_REGION_STATIC}
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
+      - JWT_SECRET=${JWT_SECRET}
 
   mongodb:
     container_name: mongodb
-    image: mongodb:latest
+    image: mongo:latest
     hostname: mongodb
     ports:
       - 27017:27017
