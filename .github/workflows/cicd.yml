@@ -80,6 +80,4 @@ jobs:
             echo "CLOUD_AWS_REGION_STATIC=${{ secrets.CLOUD_AWS_REGION_STATIC }}" >> .env
             echo "SPRING_DATA_MONGODB_URI=${{ secrets.SPRING_DATA_MONGODB_URI }}" >> .env
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            docker-compose up -d
-            docker image prune -f
 # test3
