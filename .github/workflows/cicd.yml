@@ -37,22 +37,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assemble
 
-      # Create .env file from secrets
-      - name: Create .env file
-        run: |
-          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> .env
-          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
-          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
-          echo "SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=${{ secrets.SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT }}" >> .env
-          echo "SPRING_DATA_REDIS_HOST"=${{ secrets.SPRING_DATA_REDIS_HOST }}" >> .env
-          echo "SPRING_DATA_REDIS_PORT"=${{ secrets.SPRING_DATA_REDIS_PORT }}" >> .env
-          echo "CLOUD_AWS_CREDENTIALS_ACCESSKEY"=${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }}" >> .env
-          echo "CLOUD_AWS_CREDENTIALS_SECRETKEY"=${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }}" >> .env
-          echo "CLOUD_AWS_S3_BUCKET"=${{ secrets.CLOUD_AWS_S3_BUCKET }}" >> .env
-          echo "CLOUD_AWS_REGION_STATIC"=${{ secrets.CLOUD_AWS_REGION_STATIC }}" >> .env
-          echo "SPRING_DATA_MONGODB_URI=${{ secrets.SPRING_DATA_MONGODB_URI }}" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-
       # test code build
       # - name: Test with Gradle
       #   run: ./gradlew test
@@ -84,6 +68,18 @@ jobs:
             sudo docker rm -f backoffice || true
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
-            ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
-            sudo docker run --env-file .env -d -p 8082:8082 --name backoffice ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
+            sudo docker run -d -p 8082:8082 --name backoffice \
+              -e SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
+              -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
+              -e SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=${{ secrets.SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT }} \
+              -e SPRING_DATA_REDIS_HOST=${{ secrets.SPRING_DATA_REDIS_HOST }} \
+              -e SPRING_DATA_REDIS_PORT=${{ secrets.SPRING_DATA_REDIS_PORT }} \
+              -e CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }} \
+              -e CLOUD_AWS_CREDENTIALS_SECRETKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }} \
+              -e CLOUD_AWS_S3_BUCKET=${{ secrets.CLOUD_AWS_S3_BUCKET }} \
+              -e CLOUD_AWS_REGION_STATIC=${{ secrets.CLOUD_AWS_REGION_STATIC }} \
+              -e SPRING_DATA_MONGODB_URI=${{ secrets.SPRING_DATA_MONGODB_URI }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
 # test2
