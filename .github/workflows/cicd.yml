@@ -45,6 +45,10 @@ jobs:
           echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application-prod.yml
         shell: bash
 
+      # Verify application-prod.yml
+      - name: Verify application-prod.yml
+        run: cat ./src/main/resources/application-prod.yml
+
       # test code build
       # - name: Test with Gradle
       #   run: ./gradlew test
