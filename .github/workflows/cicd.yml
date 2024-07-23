@@ -41,11 +41,9 @@ jobs:
       - name: Create application.yml
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
-
-      # Verify application.yml
-      - name: Verify application.yml
-        run: cat ./src/main/resources/application.yml
+          touch ./application-prod.yml
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application-prod.yml
+        shell: bash
 
       # test code build
       # - name: Test with Gradle
@@ -64,18 +62,17 @@ jobs:
 
       - name: Docker Image Build And Push
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest .
+          docker build -f Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest
 
       - name: Run Application
-        uses: appleboy/ssh-action@v0.1.9
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
           script: |
-            sudo docker kill backoffice || true
             sudo docker rm -f backoffice || true
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
