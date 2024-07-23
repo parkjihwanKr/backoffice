@@ -85,7 +85,5 @@ jobs:
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
             ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
-            sudo docker run -d \
-              -p 8082:8082 \
-              --name backoffice --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/backoffic
+            sudo docker run --env-file .env -d -p 8082:8082 --name backoffice ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
 # test2
