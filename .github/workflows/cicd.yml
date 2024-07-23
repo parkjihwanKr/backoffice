@@ -82,4 +82,4 @@ jobs:
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
             docker-compose up -d
             docker image prune -f
-# test2
+# test3
