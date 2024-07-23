@@ -82,4 +82,6 @@ jobs:
               -e SPRING_DATA_MONGODB_URI=${{ secrets.SPRING_DATA_MONGODB_URI }} \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
+            docker-compose up -d
+            docker image prune -f
 # test2
