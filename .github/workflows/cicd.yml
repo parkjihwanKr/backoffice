@@ -75,10 +75,10 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           script: |
-            sudo docker rm -f backoffice || true
-            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
-            docker-compose up -d
-            docker image prune -f
+            cd /path/to/your/docker-compose
+            sudo docker-compose down
+            sudo docker-compose pull
+            sudo docker-compose up -d
+            sudo docker image prune -f
 
 # test3
