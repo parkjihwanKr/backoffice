@@ -11,10 +11,12 @@ services:
       - mysql
       - mongodb
       - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
 
   mongodb:
     container_name: mongodb
-    image: mongo
+    image: mongodb
     hostname: mongodb
     ports:
       - 27017:27017
