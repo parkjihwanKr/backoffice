@@ -36,10 +36,8 @@ jobs:
       # make application-prod.yml
       - name: Make application-prod.yml
         run: |
-          mkdir -p ./src/main/resources
-          cd ./src/main/resources
-          touch ./application-prod.yml
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application-prod.yml
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION }}" > src/main/resources/application-prod.yml
         shell: bash
 
       # Build Gradle
