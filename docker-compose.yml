@@ -1,22 +1,16 @@
 version: '3'
 services:
-  web:
-    image: "${DOCKERHUB_USERNAME}/backoffice"
-    expose:
-      - 8082
+  backoffice:
+    image: "${DOCKERHUB_USERNAME}/backoffice:latest"
     ports:
-      - 8082:8082
-    depends_on:
-      - mysql
-      - mongodb
-      - redis
+      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
 
   mongodb:
-    image: "mongodb:6.0"
+    image: "mongo:6.0"
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
 
