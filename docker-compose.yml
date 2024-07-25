@@ -8,21 +8,9 @@ services:
     ports:
       - 8082:8082
     depends_on:
+      - mysql
       - mongodb
       - redis
-    environment:
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
-      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
-      - CLOUD_AWS_CREDENTIALS_ACCESSKEY=${CLOUD_AWS_CREDENTIALS_ACCESSKEY}
-      - CLOUD_AWS_CREDENTIALS_SECRETKEY=${CLOUD_AWS_CREDENTIALS_SECRETKEY}
-      - CLOUD_AWS_S3_BUCKET=${CLOUD_AWS_S3_BUCKET}
-      - CLOUD_AWS_REGION_STATIC=${CLOUD_AWS_REGION_STATIC}
-      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
-      - JWT_SECRET=${JWT_SECRET}
 
   mongodb:
     container_name: mongodb
@@ -40,3 +28,14 @@ services:
     hostname: redis
     ports:
       - 6379:6379
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: backoffice
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 12341234
+    ports:
+      - "3306:3306"
