@@ -87,6 +87,7 @@ jobs:
           port: 22
           script: |
             cd /home/ubuntu
+            echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" > .env
             sudo docker rm -f backoffice || true
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
