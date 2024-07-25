@@ -78,7 +78,6 @@ jobs:
             sudo docker rm -f backoffice || true
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
-            docker-compose down
             docker-compose up -d
             docker image prune -f
 
