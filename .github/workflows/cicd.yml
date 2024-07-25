@@ -40,6 +40,9 @@ jobs:
           echo "${{ secrets.APPLICATION }}" > src/main/resources/application-prod.yml
         shell: bash
 
+      - name: Verify application-prod.yml
+        run: cat src/main/resources/application-prod.yml
+
       # Build Gradle
       - name: Build with Gradle
         run: ./gradlew assemble
