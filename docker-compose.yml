@@ -1,8 +1,7 @@
 version: '3'
 services:
   web:
-    container_name: web
-    image: ${DOCKERHUB_USERNAME}/backoffice
+    image: "${DOCKERHUB_USERNAME}/backoffice"
     expose:
       - 8082
     ports:
@@ -15,15 +14,11 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
 
   mongodb:
-    container_name: mongodb
-    image: mongodb
-    hostname: mongodb
+    image: "mongo:6.0"
     ports:
       - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: user
-      MONGO_INITDB_ROOT_PASSWORD: 12341234
-    restart: always
+    volumes:
+      - mongodb_data:/data/db
 
   redis:
     container_name: redis
