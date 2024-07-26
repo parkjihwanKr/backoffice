@@ -17,10 +17,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: mydatabase
+      MYSQL_ROOT_PASSWORD: 12341234
+      MYSQL_DATABASE: backoffice
       MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_PASSWORD: 12341234
     volumes:
       - mysql_data:/var/lib/mysql
 
