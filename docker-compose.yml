@@ -1,17 +1,44 @@
-version: '3'
+version: '3.8'
+
 services:
-  springboot-app:
-    image: backoffice:latest
+  backoffice:
+    image: "${DOCKERHUB_USERNAME}/backoffice:latest"
     ports:
-      - 8082:8082
+      - "8082:8082"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-125-173-241.ap-northeast-2.compute.amazonaws.com:3306/backoffice
+      - SPRING_PROFILES_ACTIVE=prod
     depends_on:
+      - mysql
       - redis
+      - mongodb
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   redis:
-    container_name: redis:latest
-    command: redis-server --port 6379
-    hostname: redis
+    image: redis:latest
     ports:
-      - 6379:6379
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mysql_data:
+  redis_data:
+  mongodb_data:
