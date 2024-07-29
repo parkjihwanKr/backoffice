@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backoffice:
-    image: "${DOCKERHUB_USERNAME}/backoffice:latest"
+    image: ${DOCKERHUB_USERNAME}/backoffice:latest
     ports:
       - "8082:8082"
     environment:
