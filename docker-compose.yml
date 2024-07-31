@@ -38,6 +38,9 @@ services:
       - "6380:6379"
     volumes:
       - redis_data:/data
+    command: [ "sh", "-c", "sysctl vm.overcommit_memory=1 && redis-server" ]
+    sysctls:
+      - net.core.somaxconn=511
 
   mongodb:
     image: mongo:6.0
