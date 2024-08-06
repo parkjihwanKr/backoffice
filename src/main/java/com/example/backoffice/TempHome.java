@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/v1")
 public class TempHome {
 
-    @GetMapping
+    @GetMapping("/goHome")
     public String goHome(){
         return "hello! test test test test";
     }

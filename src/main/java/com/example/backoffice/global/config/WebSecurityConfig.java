@@ -75,6 +75,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/v1/logout").authenticated()
                         .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/api/v1/goHome").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout
