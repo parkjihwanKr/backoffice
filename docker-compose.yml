@@ -5,44 +5,48 @@ services:
     image: ${DOCKERHUB_USERNAME}/backoffice:latest
     ports:
       - "8082:8082"
-    networks:
-      - app-network
     environment:
       - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       - redis
       - mongodb
+    networks:
+      - nginx_network
 
   redis:
     image: redis:latest
     ports:
       - "6380:6379"
-    networks:
-      - app-network
     volumes:
       - redis_data:/data
+    networks:
+      - nginx_network
 
   mongodb:
     image: mongo:6.0
     ports:
       - "27017:27017"
-    networks:
-      - app-network
     volumes:
-      - mongodb_data:/data
+      - mongodb_data:/data/db
+    networks:
+      - nginx_network
 
   nginx:
     image: nginx:latest
     ports:
       - "80:80"
-    networks:
-      - app-network
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./sites-available/default:/etc/nginx/sites-available/default
+      - ./sites-enabled:/etc/nginx/sites-enabled
+    depends_on:
+      - backoffice
+    networks:
+      - nginx_network
+
+networks:
+  nginx_network:
 
 volumes:
   redis_data:
   mongodb_data:
-
-networks:
-  app-network:
