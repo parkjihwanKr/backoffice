@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  my_network:
+    driver: bridge
+
 services:
   nginx:
     image: nginx:latest
@@ -9,6 +13,8 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - backoffice
+    networks:
+      - my_network
 
   backoffice:
     image: ${DOCKERHUB_USERNAME}/backoffice:latest
@@ -19,6 +25,8 @@ services:
     depends_on:
       - redis
       - mongodb
+    networks:
+      - my_network
 
   redis:
     image: redis:latest
@@ -26,6 +34,8 @@ services:
       - "6380:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - my_network
 
   mongodb:
     image: mongo:6.0
@@ -33,6 +43,8 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - my_network
 
 volumes:
   redis_data:
