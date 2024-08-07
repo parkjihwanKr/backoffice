@@ -7,6 +7,9 @@ services:
       - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - redis
+      - mongodb
     networks:
       - nginx_network
 
