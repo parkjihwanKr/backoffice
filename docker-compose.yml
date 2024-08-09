@@ -46,6 +46,7 @@ services:
 
 networks:
   nginx_network:
+    name: nginx_network
 
 volumes:
   redis_data:
