@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 @EnableMongoAuditing
 public class MongoDBConfig extends AbstractMongoClientConfiguration {
 
-    @Value("${}")
+    @Value("${spring.data.mongodb.uri}")
     private String mongodbUri;
 
     @Override
@@ -29,7 +29,7 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
 
     @Override
     public MongoClient mongoClient(){
-        return MongoClients.create("mongodb://"+mongodbUri+":27018/"+getDatabaseName());
+        return MongoClients.create("mongodb://"+mongodbUri+":27017/"+getDatabaseName());
     }
 
     @Bean
