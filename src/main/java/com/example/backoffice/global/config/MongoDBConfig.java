@@ -18,12 +18,19 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 @Configuration
 @EnableMongoAuditing
 public class MongoDBConfig extends AbstractMongoClientConfiguration {
+
     @Value("${spring.data.mongodb.uri}")
     private String mongodbUri;
 
     @Override
     public String getDatabaseName() {
         return "backoffice";
+    }
+
+    @Bean
+    @Override
+    public MongoClient mongoClient() {
+        return MongoClients.create(mongodbUri);
     }
 
     @Bean
