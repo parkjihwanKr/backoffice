@@ -1,5 +1,8 @@
 package com.example.backoffice.global.config;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -16,9 +19,17 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 @EnableMongoAuditing
 public class MongoDBConfig extends AbstractMongoClientConfiguration {
 
+    @Value("${}")
+    private String mongodbUri;
+
     @Override
     public String getDatabaseName() {
-        return "notification";
+        return "backoffice";
+    }
+
+    @Override
+    public MongoClient mongoClient(){
+        return MongoClients.create("mongodb://"+mongodbUri+":27018/"+getDatabaseName());
     }
 
     @Bean
