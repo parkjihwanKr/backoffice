@@ -11,7 +11,7 @@ services:
       - redis
       - mongodb
     networks:
-      - nginx_network
+      - backoffice_network
 
   redis:
     image: redis:latest
@@ -20,7 +20,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - nginx_network
+      - backoffice_network
 
   mongodb:
     image: mongo:6.0
@@ -29,24 +29,11 @@ services:
     volumes:
       - mongodb_data:/data/db
     networks:
-      - nginx_network
-
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./sites-available/default:/etc/nginx/sites-available/default
-      - ./sites-enabled:/etc/nginx/sites-enabled
-    depends_on:
-      - backoffice
-    networks:
-      - nginx_network
+      - backoffice_network
 
 networks:
-  nginx_network:
-    name: nginx_network
+  backoffice_network:
+    name: backoffice_network
 
 volumes:
   redis_data:
