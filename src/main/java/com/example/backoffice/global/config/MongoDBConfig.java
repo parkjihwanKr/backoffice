@@ -18,7 +18,6 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 @Configuration
 @EnableMongoAuditing
 public class MongoDBConfig extends AbstractMongoClientConfiguration {
-
     @Value("${spring.data.mongodb.uri}")
     private String mongodbUri;
 
