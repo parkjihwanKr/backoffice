@@ -26,11 +26,6 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
         return "backoffice";
     }
 
-    @Override
-    public MongoClient mongoClient(){
-        return MongoClients.create("mongodb://"+mongodbUri+":27017/"+getDatabaseName());
-    }
-
     @Bean
     public MongoMappingContext mongoMappingContext() {
         return new MongoMappingContext();
