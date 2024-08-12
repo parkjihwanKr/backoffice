@@ -1,75 +1,40 @@
-version: '3'
-services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    networks:
-      - springboot-network
+version: '3.8'
 
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
+services:
+  backoffice:
+    image: ${DOCKERHUB_USERNAME}/backoffice:latest
     ports:
-      - "3308:3306"
+      - "8082:8082"
     environment:
-      MYSQL_ROOT_PASSWORD: kdr14163^
-      MYSQL_DATABASE: backoffice
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p0"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - redis
+      - mongodb
     networks:
-      - springboot-network
+      - backoffice_network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backoffice_network
 
   mongodb:
-    image: mongo:4.4
-    container_name: mongodb
+    image: mongo:6.0
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: kdr14163^
-    healthcheck:
-      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
-      interval: 10s
-      timeout: 10s
-      retries: 5
+    volumes:
+      - mongodb_data:/data/db
     networks:
-      - springboot-network
-
-  springboot-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: springboot-app
-    depends_on:
-      mysql:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_started
-      mongodb:
-        condition: service_healthy
-    environment:
-      - SPRING_DATASOURCE_URL
-      - SPRING_DATASOURCE_USERNAME
-      - SPRING_DATASOURCE_PASSWORD
-      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
-      - SPRING_RABBITMQ_HOST
-      - SPRING_RABBITMQ_PORT
-      - SPRING_DATA_MONGODB_URI
-      - JWT_SECRET
-    ports:
-      - "8088:8080"
-    networks:
-      - springboot-network
+      - backoffice_network
 
 networks:
-  springboot-network:
-    driver: bridge
+  backoffice_network:
+    name: backoffice_network
+
+volumes:
+  redis_data:
+  mongodb_data:
