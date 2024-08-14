@@ -7,7 +7,7 @@ import com.example.backoffice.domain.member.entity.Members;
 public class FilesConverter {
 
     // entity : id, url, member, board
-    public static Files toEntityForMemberRole(String url, Members member){
+    public static Files toEntityForMemberRole(String url, Members member) {
         return Files.builder()
                 .url(url)
                 .member(member)
@@ -15,7 +15,7 @@ public class FilesConverter {
                 .build();
     }
 
-    public static Files toEntityForBoards(String url, Boards board){
+    public static Files toEntityForBoards(String url, Boards board) {
         return Files.builder()
                 .url(url)
                 .member(board.getMember())

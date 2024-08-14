@@ -1,9 +1,8 @@
 package com.example.backoffice.domain.comment.entity;
 
 import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.comment.dto.CommentsRequestDto;
-import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +25,10 @@ public class Comments extends CommonEntity {
 
     private String content;
 
+    private Long likeCount;
+
+    private Long unLikeCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Boards board;
@@ -39,18 +42,40 @@ public class Comments extends CommonEntity {
     private Comments parent;  // 부모 댓글
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comments> replies;
+    private List<Comments> replyList;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reactions> reactionList;
 
     // entity method
-    public void update(String content){
+    public void update(String content) {
         this.content = content;
     }
 
-    public void updateParent(Comments comment){
+    public void updateParent(Comments comment) {
         this.parent = comment;
     }
 
-    public void addReply(Comments reply){
-        this.replies.add(reply);
+    public void addReply(Comments reply) {
+        this.replyList.add(reply);
+    }
+
+    public void addEmoji(Reactions reaction, String emoji) {
+        reactionList.add(reaction);
+        if (emoji.equals("LIKE")) {
+            this.likeCount++;
+        }
+        if (emoji.equals("UNLIKE")) {
+            this.unLikeCount++;
+        }
+    }
+
+    public void deleteEmoji(String emoji) {
+        if (emoji.equals("LIKE")) {
+            this.likeCount--;
+        }
+        if (emoji.equals("UNLIKE")) {
+            this.unLikeCount--;
+        }
     }
 }

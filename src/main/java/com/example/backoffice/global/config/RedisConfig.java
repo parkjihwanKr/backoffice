@@ -12,10 +12,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    @Value("${REDIS_PORT}")
+    @Value("${spring.data.redis.port}")
     private Integer port;
 
-    @Value("${REDIS_HOST}")
+    @Value("${spring.data.redis.host}")
     private String host;
 
     @Bean
@@ -36,8 +36,10 @@ public class RedisConfig {
         return new JedisConnectionFactory(config);
     }
 
+
     @Bean
-    public RedisTemplate<String, Object> redisTemplateForToken(JedisConnectionFactory redisConnectionFactoryForToken) {
+    public RedisTemplate<String, Object> redisTemplateForToken(
+            JedisConnectionFactory redisConnectionFactoryForToken) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactoryForToken);
         template.setKeySerializer(new StringRedisSerializer());
@@ -46,7 +48,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplateForViewCount(JedisConnectionFactory redisConnectionFactoryForViewCount) {
+    public RedisTemplate<String, Object> redisTemplateForViewCount(
+            JedisConnectionFactory redisConnectionFactoryForViewCount) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactoryForViewCount);
         template.setKeySerializer(new StringRedisSerializer());

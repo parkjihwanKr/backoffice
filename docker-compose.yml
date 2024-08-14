@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backoffice:
+    image: ${DOCKERHUB_USERNAME}/backoffice:latest
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - redis
+      - mongodb
+    networks:
+      - backoffice_network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backoffice_network
+
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backoffice_network
+
+networks:
+  backoffice_network:
+    name: backoffice_network
+
+volumes:
+  redis_data:
+  mongodb_data:
