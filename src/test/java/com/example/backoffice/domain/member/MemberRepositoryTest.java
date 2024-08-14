@@ -32,12 +32,23 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    @DisplayName("MemberRepository setUp test success")
-    public void setUpTestSuccess(){
+    @DisplayName("setUp test success")
+    public void setUpSuccess(){
         // given -> 데이터
         Optional<Members> member = membersRepository.findById(1L);
         // when -> 증명하고 싶은 메서드
         // then -> 증명 과정
         Assertions.assertThat(1L).isEqualTo(member.get().getId());
+    }
+
+    @Test
+    @DisplayName("findByMemberName success")
+    public void findByMemberNameSuccess(){
+        // given
+        String adminName = membersRepository.findById(1L).orElseThrow().getMemberName();
+        // when
+        Optional<Members> admin = membersRepository.findByMemberName(adminName);
+        // then
+        Assertions.assertThat(adminName).isEqualTo(admin.get().getMemberName());
     }
 }
