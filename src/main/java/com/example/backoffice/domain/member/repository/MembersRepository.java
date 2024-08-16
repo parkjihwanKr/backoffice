@@ -30,4 +30,6 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
     List<Members> findAllByDepartment(MemberDepartment department);
 
     List<Members> findAllByPosition(MemberPosition position);
+
+    List<Members> findAllNotIn(Long exceptMemberId);
 }

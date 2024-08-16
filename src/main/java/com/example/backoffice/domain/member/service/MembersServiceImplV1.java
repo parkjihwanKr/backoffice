@@ -135,4 +135,10 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     public List<Members> findAllByPosition(MemberPosition position){
         return membersRepository.findAllByPosition(position);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllExceptLoginMember(Long exceptMemberId){
+        return membersRepository.findAllNotIn(exceptMemberId);
+    }
 }

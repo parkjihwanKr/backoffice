@@ -44,4 +44,6 @@ public interface MembersServiceV1 {
     List<Members> findAllByDepartment(MemberDepartment department);
 
     List<Members> findAllByPosition(MemberPosition position);
+
+    List<Members> findAllExceptLoginMember(Long exceptMemberId);
 }

@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         Members mainAdmin = MembersConverter.toAdminEntity(bcrytPassword);
         membersService.save(mainAdmin);
     }
-
 
     // 타당성 검사 추가
     @Override
@@ -100,22 +100,34 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             MembersRequestDto.UpdateOneDto requestDto){
         // 엔티티가 영속성 컨택스트에 넣어야하기에
         // 수정을 하기 위해선 어떤 엔티티가 변경 되어야 하는지 알아야함
-        Members existingMember = matchLoginMember(loginMember, memberId);
+        Members matchedMember = matchLoginMember(loginMember, memberId);
 
-        if(!requestDto.getMemberName().equals(existingMember.getMemberName())){
+        // 1. 요청dto의 멤버 네임과 db에 존재하는 memberName이 다르면 안됨
+        if(!requestDto.getMemberName().equals(matchedMember.getMemberName())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER_NAME);
         }
+        // 2. 요청dto의 password와 passwordConfirm이 다르면 안됨
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
+        // 3. 요청dto의 memberName이 나를 제외한 db에 존재하는 모든 멤버의 이름과 같으면 안됨
+        // 4. 요청dto의 contact가 나를 제외한 db에 존재하는 모든 멤버의 연락처와 같으면 안됨
+        List<Members> memberListExceptLoginMember
+                = membersService.findAllExceptLoginMember(matchedMember.getId());
+        for(Members member : memberListExceptLoginMember){
+            if(requestDto.getMemberName().equals(member.getMemberName())){
+                throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_MEMBER_NAME);
+            }
+        }
+
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
 
         String profileImageUrl = filesService.createImage(multipartFile);
-        existingMember.updateMemberInfo(
+        matchedMember.updateMemberInfo(
                 requestDto.getName(), requestDto.getEmail(), requestDto.getAddress(),
                 requestDto.getContact(), requestDto.getIntroduction(),
                 bCrytPassword, profileImageUrl);
-        return MembersConverter.toUpdateOneDto(existingMember);
+        return MembersConverter.toUpdateOneDto(matchedMember);
     }
 
     // 직원의 부서, 직위, 급여 등등 변경
@@ -156,7 +168,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         MemberPosition position = checkedPosition(requestDto.getPosition());
 
         updateMember.updateAttribute(
-                role, department, position, requestDto.getSalary());
+                role, department, position);
 
         notificationsService.saveForChangeMemberInfo(
                 loginMember.getMemberName(), updateMember.getMemberName(),

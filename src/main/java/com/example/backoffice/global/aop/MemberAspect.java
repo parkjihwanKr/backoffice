@@ -80,13 +80,11 @@ public class MemberAspect {
         MembersRequestDto.UpdateOneForAttributeDto requestDto =
                 (MembersRequestDto.UpdateOneForAttributeDto) joinPoint.getArgs()[2];
 
-        if (requestDto.getSalary() != null
-                && requestDto.getPosition() != null && requestDto.getDepartment() != null) {
+        if (requestDto.getPosition() != null && requestDto.getDepartment() != null) {
             String message = loginMember.getMemberName()
                     + "님이 "
                     + requestDto.getMemberName()
-                    + "님의 급여, 부서, 직책을 "
-                    + requestDto.getSalary() + ", "
+                    + "님의 부서, 직책을 "
                     + requestDto.getDepartment() + ", "
                     + requestDto.getPosition()
                     + "로 변경하였습니다.";
