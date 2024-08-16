@@ -29,7 +29,7 @@ public class Members extends CommonEntity {
     @Column
     private String name;
 
-    // 게임 접속 아이디
+    // 접속 아이디
     @Column(unique = true)
     private String memberName;
 

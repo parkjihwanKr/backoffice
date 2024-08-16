@@ -110,13 +110,16 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
-        // 3. 요청dto의 memberName이 나를 제외한 db에 존재하는 모든 멤버의 이름과 같으면 안됨
-        // 4. 요청dto의 contact가 나를 제외한 db에 존재하는 모든 멤버의 연락처와 같으면 안됨
+        // 3. 요청dto의 contact가 나를 제외한 db에 존재하는 모든 멤버의 연락처와 같으면 안됨
+        // 4. 요청dto의 email이 나를 제외한 db에 존재하는 모든 멤버의 이메일과 같으면 안됨
         List<Members> memberListExceptLoginMember
                 = membersService.findAllExceptLoginMember(matchedMember.getId());
         for(Members member : memberListExceptLoginMember){
-            if(requestDto.getMemberName().equals(member.getMemberName())){
-                throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_MEMBER_NAME);
+            if(requestDto.getEmail().equals(member.getEmail())){
+                throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_EMAIL);
+            }
+            if(requestDto.getContact().equals(member.getContact())){
+                throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
             }
         }
 
@@ -131,33 +134,41 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     // 직원의 부서, 직위, 급여 등등 변경
+    // 해당 변경 사항은 메인 어드민이거나 인사부장 제외하고는 인사 발령을 건드릴 수 없다.
+    // 인사 부장은 메인 어드민, 각 부서의 부장의 직위를 변경할 수 없다.
+    // 즉, 인사 부장은 메인 어드민을 제외한 각 부서의 직원들의 직책은 변경할 수 있다.
+    // ex) IT MANAGER -> SALES MANAGER
+    // 메인 어드민은 모든 직원의 직책, 직위를 변경할 수 있다.
     @Override
     @Transactional
     public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForAttributeDto requestDto,
-            MultipartFile multipartFile){
+            MultipartFile multipartFile) throws MembersCustomException {
         Members updateMember
                 = membersService.readOneForDifferentMemberCheck(loginMember.getId(), memberId);
         boolean isHRManager = loginMember.getPosition().equals(MemberPosition.MANAGER)
                 && loginMember.getDepartment().equals(MemberDepartment.HR);
         boolean isMainAdmin = loginMember.getPosition().equals(MemberPosition.CEO);
 
-        if(isHRManager){
-            // 1. 메인 어드민의 속성을 변경하려는 경우 예외
-            // 2. 각 부서장(Manager)의 직책을 변경하려는 경우 예외
-            // 3. 모든 부서의 차장을 부장으로 승진시키려는 경우 예외
-            if (requestDto.getPosition().equals(MemberPosition.CEO)
-                    || updateMember.getPosition().equals(MemberPosition.MANAGER)
-                    || (requestDto.getPosition().equals(MemberPosition.MANAGER)
-                        && updateMember.getPosition().equals(MemberPosition.ASSISTANT_MANAGER))) {
+        // 메인 어드민이 아닌 경우에 대한 처리
+        if (!isMainAdmin) {
+            // HR Manager일 경우의 권한 제한
+            if (isHRManager) {
+                // 메인 어드민 또는 부장을 변경하려는 시도는 금지됨
+                if (requestDto.getPosition().equals(MemberPosition.CEO.getPosition())
+                        || updateMember.getPosition().equals(MemberPosition.MANAGER)) {
+                    throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+                }
+
+                // 부장 직위를 부여하려는 시도는 금지됨
+                if (requestDto.getPosition().equals(MemberPosition.MANAGER.getPosition())) {
+                    throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+                }
+            } else {
+                // 메인 어드민도 아니고 HR Manager도 아닌 경우
                 throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
-        }
-
-        // 로그인 멤버가 메인 어드민이 아닌 경우 예외
-        if (!isMainAdmin && !isHRManager) {
-            throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
         }
 
         String document
