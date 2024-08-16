@@ -265,14 +265,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members findAdmin(
-            Long adminId, MemberRole role, MemberDepartment department){
-        return membersService.findByIdAndRoleAndDepartment(
-                adminId, role, department);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList){
