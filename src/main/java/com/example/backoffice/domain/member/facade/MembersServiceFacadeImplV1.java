@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         Members mainAdmin = MembersConverter.toAdminEntity(bcrytPassword);
         membersService.save(mainAdmin);
     }
-
 
     // 타당성 검사 추가
     @Override
@@ -100,52 +100,75 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             MembersRequestDto.UpdateOneDto requestDto){
         // 엔티티가 영속성 컨택스트에 넣어야하기에
         // 수정을 하기 위해선 어떤 엔티티가 변경 되어야 하는지 알아야함
-        Members existingMember = matchLoginMember(loginMember, memberId);
+        Members matchedMember = matchLoginMember(loginMember, memberId);
 
-        if(!requestDto.getMemberName().equals(existingMember.getMemberName())){
+        // 1. 요청dto의 멤버 네임과 db에 존재하는 memberName이 다르면 안됨
+        if(!requestDto.getMemberName().equals(matchedMember.getMemberName())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER_NAME);
         }
+        // 2. 요청dto의 password와 passwordConfirm이 다르면 안됨
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
+        // 3. 요청dto의 contact가 나를 제외한 db에 존재하는 모든 멤버의 연락처와 같으면 안됨
+        // 4. 요청dto의 email이 나를 제외한 db에 존재하는 모든 멤버의 이메일과 같으면 안됨
+        List<Members> memberListExceptLoginMember
+                = membersService.findAllExceptLoginMember(matchedMember.getId());
+        for(Members member : memberListExceptLoginMember){
+            if(requestDto.getEmail().equals(member.getEmail())){
+                throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_EMAIL);
+            }
+            if(requestDto.getContact().equals(member.getContact())){
+                throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
+            }
+        }
+
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
 
         String profileImageUrl = filesService.createImage(multipartFile);
-        existingMember.updateMemberInfo(
+        matchedMember.updateMemberInfo(
                 requestDto.getName(), requestDto.getEmail(), requestDto.getAddress(),
                 requestDto.getContact(), requestDto.getIntroduction(),
                 bCrytPassword, profileImageUrl);
-        return MembersConverter.toUpdateOneDto(existingMember);
+        return MembersConverter.toUpdateOneDto(matchedMember);
     }
 
     // 직원의 부서, 직위, 급여 등등 변경
+    // 해당 변경 사항은 메인 어드민이거나 인사부장 제외하고는 인사 발령을 건드릴 수 없다.
+    // 인사 부장은 메인 어드민, 각 부서의 부장의 직위를 변경할 수 없다.
+    // 즉, 인사 부장은 메인 어드민을 제외한 각 부서의 직원들의 직책은 변경할 수 있다.
+    // ex) IT MANAGER -> SALES MANAGER
+    // 메인 어드민은 모든 직원의 직책, 직위를 변경할 수 있다.
     @Override
     @Transactional
     public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForAttributeDto requestDto,
-            MultipartFile multipartFile){
+            MultipartFile multipartFile) throws MembersCustomException {
         Members updateMember
-                = membersService.readOneForDifferentMemberCheck(loginMember.getId(), memberId);
+                = membersService.checkDifferentMember(loginMember.getId(), memberId);
         boolean isHRManager = loginMember.getPosition().equals(MemberPosition.MANAGER)
                 && loginMember.getDepartment().equals(MemberDepartment.HR);
         boolean isMainAdmin = loginMember.getPosition().equals(MemberPosition.CEO);
 
-        if(isHRManager){
-            // 1. 메인 어드민의 속성을 변경하려는 경우 예외
-            // 2. 각 부서장(Manager)의 직책을 변경하려는 경우 예외
-            // 3. 모든 부서의 차장을 부장으로 승진시키려는 경우 예외
-            if (requestDto.getPosition().equals(MemberPosition.CEO)
-                    || updateMember.getPosition().equals(MemberPosition.MANAGER)
-                    || (requestDto.getPosition().equals(MemberPosition.MANAGER)
-                        && updateMember.getPosition().equals(MemberPosition.ASSISTANT_MANAGER))) {
+        // 메인 어드민이 아닌 경우에 대한 처리
+        if (!isMainAdmin) {
+            // HR Manager일 경우의 권한 제한
+            if (isHRManager) {
+                // 메인 어드민 또는 부장을 변경하려는 시도는 금지됨
+                if (requestDto.getPosition().equals(MemberPosition.CEO.getPosition())
+                        || updateMember.getPosition().equals(MemberPosition.MANAGER)) {
+                    throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+                }
+
+                // 부장 직위를 부여하려는 시도는 금지됨
+                if (requestDto.getPosition().equals(MemberPosition.MANAGER.getPosition())) {
+                    throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+                }
+            } else {
+                // 메인 어드민도 아니고 HR Manager도 아닌 경우
                 throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
             }
-        }
-
-        // 로그인 멤버가 메인 어드민이 아닌 경우 예외
-        if (!isMainAdmin && !isHRManager) {
-            throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
         }
 
         String document
@@ -156,7 +179,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         MemberPosition position = checkedPosition(requestDto.getPosition());
 
         updateMember.updateAttribute(
-                role, department, position, requestDto.getSalary());
+                role, department, position);
 
         notificationsService.saveForChangeMemberInfo(
                 loginMember.getMemberName(), updateMember.getMemberName(),
@@ -173,7 +196,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         // 1. 로그인 멤버가 바꾸려는 인물과 동일 인물이면 안됨
         // 2. 로그인 멤버가 자기 자신의 급여를 바꿀 순 없음
         Members updateMember
-                = membersService.readOneForDifferentMemberCheck(loginMember.getId(), memberId);
+                = membersService.checkDifferentMember(loginMember.getId(), memberId);
 
         // 3. 로그인 멤버가 바꿀 권한이 있는지
         // 권한 : 부서가 재정부의 부장이거나 사장인 경우만 가능
@@ -238,14 +261,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
         }
         return membersService.findById(memberId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members findAdmin(
-            Long adminId, MemberRole role, MemberDepartment department){
-        return membersService.findByIdAndRoleAndDepartment(
-                adminId, role, department);
     }
 
     @Override

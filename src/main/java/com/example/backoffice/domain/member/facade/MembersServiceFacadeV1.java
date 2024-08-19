@@ -3,9 +3,8 @@ package com.example.backoffice.domain.member.facade;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
-import com.example.backoffice.domain.member.entity.MemberPosition;
-import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.global.scheduler.ScheduledEventType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +25,7 @@ public interface MembersServiceFacadeV1 {
     MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(
             Long memberId, Members member,
             MembersRequestDto.UpdateOneForAttributeDto requestDto,
-            MultipartFile multipartFile);
+            MultipartFile multipartFile) throws MembersCustomException;
 
     MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
             Long memberId, Members member, MultipartFile image);
@@ -41,9 +40,6 @@ public interface MembersServiceFacadeV1 {
     Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList);
-
-    Members findAdmin(
-            Long adminId, MemberRole role, MemberDepartment department);
 
     MembersResponseDto.UpdateOneForSalaryDto updateOneForSalary(
             Long memberId, Members loginMember,

@@ -13,7 +13,7 @@ public interface MembersServiceV1 {
 
     Members findById(Long memberId);
 
-    Members readOneForDifferentMemberCheck(Long toMemberId, Long fromMemberId);
+    Members checkDifferentMember(Long toMemberId, Long fromMemberId);
 
     Members findByEmailOrMemberNameOrAddressOrContact(
             String email, String memberName, String address, String contact);
@@ -44,4 +44,6 @@ public interface MembersServiceV1 {
     List<Members> findAllByDepartment(MemberDepartment department);
 
     List<Members> findAllByPosition(MemberPosition position);
+
+    List<Members> findAllExceptLoginMember(Long exceptMemberId);
 }

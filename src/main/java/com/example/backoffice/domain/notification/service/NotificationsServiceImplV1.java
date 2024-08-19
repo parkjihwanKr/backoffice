@@ -74,11 +74,11 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
     @Override
     @Transactional
     public Notifications saveForChangeMemberInfo(
-            String fromMemberName, String toMemberName, MemberDepartment fromMemberDepartment) {
+            String fromMemberName, String toMemberName, MemberDepartment toMemberDepartment) {
         Notifications notifications = NotificationsConverter.toEntity(
                 toMemberName, fromMemberName,
                 toMemberName + "님께서 최근 바뀐 정보가 있습니다.",
-                NotificationType.MEMBER, fromMemberDepartment);
+                NotificationType.MEMBER, toMemberDepartment);
         return notificationRepository.save(notifications);
     }
 }

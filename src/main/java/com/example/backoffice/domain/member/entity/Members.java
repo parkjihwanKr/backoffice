@@ -29,7 +29,7 @@ public class Members extends CommonEntity {
     @Column
     private String name;
 
-    // 게임 접속 아이디
+    // 접속 아이디
     @Column(unique = true)
     private String memberName;
 
@@ -103,11 +103,10 @@ public class Members extends CommonEntity {
     }
 
     public void updateAttribute(
-            MemberRole role, MemberDepartment department, MemberPosition position, Long salary){
+            MemberRole role, MemberDepartment department, MemberPosition position){
         this.role = role;
         this.department = department;
         this.position = position;
-        this.salary = salary;
     }
 
     public void updateSalary(Long salary){

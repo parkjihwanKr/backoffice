@@ -66,7 +66,6 @@ public class MembersRequestDto {
     public static class UpdateOneForAttributeDto {
         @NotNull
         private String memberName;
-        private Long salary;
         private String role;
         private String department;
         private String position;

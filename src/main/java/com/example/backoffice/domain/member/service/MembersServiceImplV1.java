@@ -37,7 +37,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members readOneForDifferentMemberCheck(Long fromMemberId, Long toMemberId){
+    public Members checkDifferentMember(Long fromMemberId, Long toMemberId){
         if(toMemberId.equals(fromMemberId)){
             throw new MembersCustomException(MembersExceptionCode.MATCHED_LOGIN_MEMBER);
         }
@@ -134,5 +134,11 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Transactional(readOnly = true)
     public List<Members> findAllByPosition(MemberPosition position){
         return membersRepository.findAllByPosition(position);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllExceptLoginMember(Long exceptMemberId){
+        return membersRepository.findAllNotIn(exceptMemberId);
     }
 }
