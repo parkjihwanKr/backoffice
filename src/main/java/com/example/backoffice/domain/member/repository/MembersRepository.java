@@ -6,6 +6,7 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,5 +29,5 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     List<Members> findAllByPosition(MemberPosition position);
 
-    List<Members> findAllNotIn(Long exceptMemberId);
+    List<Members> findAllByIdNotIn(Collection<Long> ids);
 }

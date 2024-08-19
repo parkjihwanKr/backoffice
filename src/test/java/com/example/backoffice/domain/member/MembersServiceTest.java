@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -461,7 +462,7 @@ public class MembersServiceTest {
     public void findAllExceptLoginMemberSuccess(){
         // given
         Long loginMemberId = mainAdmin.getId();
-        when(membersRepository.findAllNotIn(loginMemberId))
+        when(membersRepository.findAllByIdNotIn(Collections.singletonList(loginMemberId)))
                 .thenReturn(List.of(memberOne, memberTwo, memberThree, memberFour));
 
         // when
