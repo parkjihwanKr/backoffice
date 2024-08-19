@@ -146,7 +146,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             MembersRequestDto.UpdateOneForAttributeDto requestDto,
             MultipartFile multipartFile) throws MembersCustomException {
         Members updateMember
-                = membersService.readOneForDifferentMemberCheck(loginMember.getId(), memberId);
+                = membersService.checkDifferentMember(loginMember.getId(), memberId);
         boolean isHRManager = loginMember.getPosition().equals(MemberPosition.MANAGER)
                 && loginMember.getDepartment().equals(MemberDepartment.HR);
         boolean isMainAdmin = loginMember.getPosition().equals(MemberPosition.CEO);
@@ -196,7 +196,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         // 1. 로그인 멤버가 바꾸려는 인물과 동일 인물이면 안됨
         // 2. 로그인 멤버가 자기 자신의 급여를 바꿀 순 없음
         Members updateMember
-                = membersService.readOneForDifferentMemberCheck(loginMember.getId(), memberId);
+                = membersService.checkDifferentMember(loginMember.getId(), memberId);
 
         // 3. 로그인 멤버가 바꿀 권한이 있는지
         // 권한 : 부서가 재정부의 부장이거나 사장인 경우만 가능

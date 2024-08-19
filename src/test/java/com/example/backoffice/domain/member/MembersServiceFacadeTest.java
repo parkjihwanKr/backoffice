@@ -581,7 +581,7 @@ public class MembersServiceFacadeTest {
         Members mainAdmin = setMainAdmin();
 
         Members updateMember = memberDetails.getMembers();
-        when(membersService.readOneForDifferentMemberCheck(
+        when(membersService.checkDifferentMember(
                 mainAdmin.getId(), updateMember.getId())).thenReturn(updateMember);
         when(notificationsService.saveForChangeMemberInfo(
                 mainAdmin.getMemberName(), updateMember.getMemberName(),

@@ -41,7 +41,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
             Long toMemberId, Members fromMember, ReactionsRequestDto requestDto) {
         // 1. 자기 자신이 아닌 다른 사람에게 리액션을 하는지?
         Members toMember
-                = membersService.readOneForDifferentMemberCheck(fromMember.getId(), toMemberId);
+                = membersService.checkDifferentMember(fromMember.getId(), toMemberId);
 
         // 2. 이미 준 사람에게 리액션을 중복해서 주는 것 방지
         if (reactionsRepository.existsByMemberAndReactor(toMember, fromMember)) {
@@ -69,7 +69,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
     public void deleteOneForMember(
             Long toMemberId, Long reactionId, Members fromMember) {
         Members toMember
-                = membersService.readOneForDifferentMemberCheck(fromMember.getId(), toMemberId);
+                = membersService.checkDifferentMember(fromMember.getId(), toMemberId);
         if (!reactionsRepository.existsByIdAndMemberAndReactor(reactionId, toMember, fromMember)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
@@ -84,7 +84,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
             Long boardId, Members fromMember,
             ReactionsRequestDto requestDto) {
         Boards board = boardsService.findById(boardId);
-        membersService.readOneForDifferentMemberCheck(
+        membersService.checkDifferentMember(
                 fromMember.getId(), board.getMember().getId());
         Emoji emoji = validateEmoji(requestDto.getEmoji(), EnumSet.of(Emoji.LIKE, Emoji.UNLIKE));
 
@@ -109,7 +109,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
 
         // 1. 예외 검증
         Boards board = boardsService.findById(boardId);
-        membersService.readOneForDifferentMemberCheck(member.getId(), board.getMember().getId());
+        membersService.checkDifferentMember(member.getId(), board.getMember().getId());
         if (!reactionsRepository.existsByIdAndBoardAndReactor(reactionId, board, member)) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
