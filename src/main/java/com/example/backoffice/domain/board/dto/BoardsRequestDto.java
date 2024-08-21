@@ -24,6 +24,5 @@ public class BoardsRequestDto {
     public static class UpdateOneDto {
         private String title;
         private String content;
-        private MultipartFile file;
     }
 }
