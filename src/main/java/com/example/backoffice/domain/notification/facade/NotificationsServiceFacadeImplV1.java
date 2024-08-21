@@ -41,10 +41,12 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                 .equals(notificationData.getFromMember().getMemberName())){
             return;
         }
+        System.out.println("Before generating notification entity");
         Notifications notification
                 = generateMessageAndEntity(notificationData, domainType);
+        System.out.println("After generating notification entity");
         notificationsService.save(notification);
-
+        System.out.println("After saving notification");
         sendNotificationForUser(
                 notificationData.getToMember().getMemberName(), notification);
     }
