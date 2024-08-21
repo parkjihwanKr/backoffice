@@ -59,6 +59,11 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'com.h2database:h2'
 
+	// mockito-inline -> static class, method 테스트
+	testImplementation 'org.mockito:mockito-inline:5.2.0'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
 	// s3 연동
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 

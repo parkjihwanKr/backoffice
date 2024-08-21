@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -139,6 +140,6 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     @Transactional(readOnly = true)
     public List<Members> findAllExceptLoginMember(Long exceptMemberId){
-        return membersRepository.findAllNotIn(exceptMemberId);
+        return membersRepository.findAllByIdNotIn(Collections.singletonList(exceptMemberId));
     }
 }

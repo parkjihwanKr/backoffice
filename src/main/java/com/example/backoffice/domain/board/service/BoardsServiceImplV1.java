@@ -101,7 +101,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     }
 
     // 조회수 로직
-    private void incrementViewCount(Boards board){
+    void incrementViewCount(Boards board){
         String currentMemberName
                 = SecurityContextHolder.getContext().getAuthentication().getName();
         String key = "boardId : " + board.getId() +
