@@ -14,7 +14,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadBoardCommentResponseDto{
+    public static class ReadBoardCommentsDto{
+        private Long boardId;
         private Long commentId;
         private String commentWriter;
         private String commentContent;
@@ -22,14 +23,15 @@ public class CommentsResponseDto {
         private Long unLikeCount;
         private LocalDateTime commentCreatedAt;
         private LocalDateTime commentModifiedAt;
-        private List<ReadCommentRepliesResponseDto> replyList;
+        private List<ReadCommentRepliesDto> replyList;
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateCommentsResponseDto{
+    public static class CreateCommentDto{
+        private Long commentId;
         private String writer;
         private String content;
         private LocalDateTime createdAt;
@@ -39,7 +41,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateCommentsResponseDto{
+    public static class UpdateCommentDto{
+        private Long commentId;
         private String writer;
         private String content;
         private Long likeCount;
@@ -52,20 +55,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateReplyResponseDto {
-        private String toMemberName;
-        private String parentContent;
-        private LocalDateTime parentCreatedAt;
-        private String fromMemberName;
-        private String childContent;
-        private LocalDateTime childCreatedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ReadCommentRepliesResponseDto {
+    public static class ReadCommentRepliesDto {
+        private Long commentId;
         private Long replyId;
         private String replyWriter;
         private String replyContent;
@@ -79,7 +70,24 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateReplyResponseDto {
+    public static class CreateReplyDto {
+        private Long commentId;
+        private Long replyId;
+        private String toMemberName;
+        private String parentContent;
+        private LocalDateTime parentCreatedAt;
+        private String fromMemberName;
+        private String childContent;
+        private LocalDateTime childCreatedAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateReplyDto {
+        private Long commentId;
+        private Long replyId;
         private String toMemberName;
         private String parentContent;
         private LocalDateTime parentCreatedAt;

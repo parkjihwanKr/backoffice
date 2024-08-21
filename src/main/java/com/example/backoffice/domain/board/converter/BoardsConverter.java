@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class BoardsConverter {
 
     public static Boards toEntity(
-            BoardsRequestDto.CreateBoardRequestDto requestDto, Members member){
+            BoardsRequestDto.CreateOneDto requestDto, Members member){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
@@ -27,9 +27,10 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static Page<BoardsResponseDto.ReadBoardListResponseDto> toReadDto(Page<Boards> boardPage){
+    public static Page<BoardsResponseDto.ReadAllDto> toReadAllDto(Page<Boards> boardPage){
         return boardPage.map(board -> {
-            return BoardsResponseDto.ReadBoardListResponseDto.builder()
+            return BoardsResponseDto.ReadAllDto.builder()
+                    .boardId(board.getId())
                     .title(board.getTitle())
                     .writer(board.getMember().getMemberName())
                     .content(board.getContent())
@@ -42,12 +43,12 @@ public class BoardsConverter {
         });
     }
 
-    public static BoardsResponseDto.ReadBoardResponseDto toReadOneDto(Boards board) {
+    public static BoardsResponseDto.ReadOneDto toReadOneDto(Boards board) {
         List<String> fileUrls = board.getFileList().stream()
                 .map(Files::getUrl)
                 .collect(Collectors.toList());
 
-        List<CommentsResponseDto.ReadBoardCommentResponseDto> commentList = new ArrayList<>();
+        List<CommentsResponseDto.ReadBoardCommentsDto> commentList = new ArrayList<>();
 
         // 댓글 리스트를 순회하면서 최상위 댓글과 대댓글을 구분하여 처리
         for (Comments comment : board.getCommentList()) {
@@ -56,13 +57,14 @@ public class BoardsConverter {
 
             // 최상위 댓글이 맞는지
             if (parentId.equals(commentId)) {
-                List<CommentsResponseDto.ReadCommentRepliesResponseDto> replyList = new ArrayList<>();
+                List<CommentsResponseDto.ReadCommentRepliesDto> replyList = new ArrayList<>();
 
                 // 해당 댓글의 대댓글 찾기
                 for (Comments commentReply : board.getCommentList()) {
                     // 대댓글 리스트에 추가
                     if (commentReply.getParent().getId().equals(commentId) && !commentReply.getId().equals(commentId)) {
-                        replyList.add(CommentsResponseDto.ReadCommentRepliesResponseDto.builder()
+                        replyList.add(CommentsResponseDto.ReadCommentRepliesDto.builder()
+                                .commentId(commentId)
                                 .replyId(commentReply.getId())
                                 .replyWriter(commentReply.getMember().getMemberName())
                                 .replyContent(commentReply.getContent())
@@ -75,7 +77,8 @@ public class BoardsConverter {
                 }
 
                 // 최상위 댓글을 댓글 리스트에 추가
-                commentList.add(CommentsResponseDto.ReadBoardCommentResponseDto.builder()
+                commentList.add(CommentsResponseDto.ReadBoardCommentsDto.builder()
+                        .boardId(board.getId())
                         .commentId(commentId)
                         .commentWriter(comment.getMember().getMemberName())
                         .commentContent(comment.getContent())
@@ -88,7 +91,8 @@ public class BoardsConverter {
             }
         }
 
-        return BoardsResponseDto.ReadBoardResponseDto.builder()
+        return BoardsResponseDto.ReadOneDto.builder()
+                .boardId(board.getId())
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
                 .content(board.getContent())
@@ -103,10 +107,11 @@ public class BoardsConverter {
     }
 
 
-    public static BoardsResponseDto.CreateBoardResponseDto toCreateDto(
+    public static BoardsResponseDto.CreateOneDto toCreateOneDto(
             Boards board, List<String> fileUrlList){
 
-        return BoardsResponseDto.CreateBoardResponseDto.builder()
+        return BoardsResponseDto.CreateOneDto.builder()
+                .boardId(board.getId())
                 .writer(board.getMember().getMemberName())
                 .title(board.getTitle())
                 .content(board.getContent())
@@ -115,20 +120,21 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static BoardsResponseDto.UpdateBoardResponseDto toUpdateDto(Boards board, List<String> fileUrlList){
+    public static BoardsResponseDto.UpdateOneDto toUpdateOneDto(Boards board, List<String> fileUrlList){
 
-        List<CommentsResponseDto.UpdateCommentsResponseDto> commentList = new ArrayList<>();
+        List<CommentsResponseDto.UpdateCommentDto> commentList = new ArrayList<>();
         if(!board.getCommentList().isEmpty()){
             for(int i = 0; i<board.getCommentList().size(); i++){
                 commentList.add(
-                        CommentsResponseDto.UpdateCommentsResponseDto.builder()
+                        CommentsResponseDto.UpdateCommentDto.builder()
                                 .content(board.getCommentList().get(i).getContent())
                                 .build()
                 );
             }
         }
 
-        return BoardsResponseDto.UpdateBoardResponseDto.builder()
+        return BoardsResponseDto.UpdateOneDto.builder()
+                .boardId(board.getId())
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
                 .content(board.getContent())

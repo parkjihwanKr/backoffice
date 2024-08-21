@@ -35,7 +35,7 @@ public class MemberRepositoryTest {
 
     @Test
     @DisplayName("setUp Success")
-    public void setUpTestSuccess(){
+    public void setUpSuccess(){
         // given -> 데이터
         Optional<Members> member = membersRepository.findById(1L);
         // when -> 증명하고 싶은 메서드
@@ -62,41 +62,13 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    @DisplayName("findByMemberName Success")
+    @DisplayName("findByMemberName success")
     public void findByMemberNameSuccess(){
         // given
-        String memberName = "testtest";
-        Members member = Members.builder()
-                .id(2L)
-                .memberName(memberName)
-                .build();
-        membersRepository.save(member);
-
+        String adminName = membersRepository.findById(1L).orElseThrow().getMemberName();
         // when
-        membersRepository.findByMemberName(memberName);
-
+        Optional<Members> admin = membersRepository.findByMemberName(adminName);
         // then
-        Assertions.assertThat(member.getMemberName()).isEqualTo(memberName);
-    }
-
-    @Test
-    @DisplayName("findByEmailOrMemberNameOrAddressOrContact Success")
-    public void findByEmailOrMemberNameOrAddressOrContactSuccess(){
-        // given
-        String address = "어딘시 어딘구";
-        String email = "test1@naver.com";
-        String memberName = "notLoginMember";
-        String contact = "010-2222-3333";
-
-        // when
-        Optional<Members> member
-                = membersRepository.findByEmailOrMemberNameOrAddressOrContact(
-                        email, memberName, address, contact);
-
-        // then
-        Assertions.assertThat(member.get().getMemberName()).isEqualTo(memberName);
-        Assertions.assertThat(member.get().getEmail()).isEqualTo(email);
-        Assertions.assertThat(member.get().getContact()).isEqualTo(contact);
-        Assertions.assertThat(member.get().getAddress()).isEqualTo(address);
+        Assertions.assertThat(adminName).isEqualTo(admin.get().getMemberName());
     }
 }

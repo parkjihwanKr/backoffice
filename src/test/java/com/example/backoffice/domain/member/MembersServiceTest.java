@@ -1,16 +1,13 @@
 package com.example.backoffice.domain.member;
 
-import com.example.backoffice.domain.file.service.FilesService;
-import com.example.backoffice.domain.member.converter.MembersConverter;
-import com.example.backoffice.domain.member.dto.MembersRequestDto;
-import com.example.backoffice.domain.member.dto.MembersResponseDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.repository.MembersRepository;
-import com.example.backoffice.domain.member.service.MembersServiceImpl;
-import com.example.backoffice.global.security.MemberDetailsImpl;
+import com.example.backoffice.domain.member.service.MembersServiceImplV1;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -19,487 +16,463 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-test.yml")
 public class MembersServiceTest {
-/*
-    private MemberDetailsImpl memberDetails;
 
     @InjectMocks
-    private MembersServiceImpl membersService;
-
-    @Mock
-    private FilesService filesService;
-
-    @Mock
-    private MembersConverter membersConverter;
+    private MembersServiceImplV1 membersService;
 
     @Mock
     private MembersRepository membersRepository;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    private Members mainAdmin;
+
+    private Members memberOne;
+
+    private Members memberTwo;
+
+    private Members memberThree;
+
+    private Members memberFour;
 
     @BeforeEach
-    public void setup(){
-        memberDetails = new MemberDetailsImpl(
-                Members.builder()
-                        .id(1L)
-                        .name("test User Name")
-                        .password("12341234")
-                        .memberName("test User NickName")
-                        .contact("010-2222-1212")
-                        .profileImageUrl(" ")
-                        .role(MemberRole.HR)
-                        .build()
-        );
-        Authentication authentication
-                = new UsernamePasswordAuthenticationToken(
-                        memberDetails, memberDetails.getPassword(),
-                        memberDetails.getAuthorities()
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    public void setUp(){
+        mainAdmin = Members.builder()
+                .id(1L)
+                .name("mainAdmin")
+                .password("12341234")
+                .memberName("mainAdmin")
+                .email("mainAdmin@naver.com")
+                .contact("010-1111-1212")
+                .profileImageUrl("profile111.png")
+                .address("여기 살아요")
+                .role(MemberRole.MAIN_ADMIN)
+                .department(MemberDepartment.HR)
+                .position(MemberPosition.CEO)
+                .remainingVacationDays(4)
+                .salary(207000000L)
+                .onVacation(false)
+                .build();
+
+        memberOne = Members.builder()
+                .id(2L)
+                .name("memberOne")
+                .password("123412341")
+                .memberName("memberOne")
+                .email("memberOne@naver.com")
+                .contact("010-1111-1212")
+                .profileImageUrl("profile.png")
+                .role(MemberRole.ADMIN)
+                .department(MemberDepartment.HR)
+                .position(MemberPosition.MANAGER)
+                .address("여기 살껄요?")
+                .remainingVacationDays(4)
+                .salary(77000000L)
+                .onVacation(false)
+                .build();
+
+        memberTwo = Members.builder()
+                .id(3L)
+                .name("memberTwo")
+                .password("12341234")
+                .memberName("memberTwo")
+                .email("memberTwo@naver.com")
+                .contact("010-2222-1212")
+                .profileImageUrl("profile2.png")
+                .role(MemberRole.EMPLOYEE)
+                .department(MemberDepartment.HR)
+                .position(MemberPosition.ASSISTANT_MANAGER)
+                .address("여기 살껄?")
+                .remainingVacationDays(4)
+                .salary(67000000L)
+                .onVacation(false)
+                .build();
+
+        memberThree = Members.builder()
+                .id(4L)
+                .name("memberThree")
+                .password("123412341234")
+                .memberName("memberThree")
+                .email("memberThree@naver.com")
+                .contact("010-2222-1313")
+                .profileImageUrl("profile3.png")
+                .role(MemberRole.EMPLOYEE)
+                .department(MemberDepartment.IT)
+                .position(MemberPosition.INTERN)
+                .address("여기 살껄요?")
+                .remainingVacationDays(4)
+                .salary(35000000L)
+                .onVacation(false)
+                .build();
+
+        memberFour = Members.builder()
+                .id(4L)
+                .name("memberFour")
+                .password("1234444234")
+                .memberName("memberFour")
+                .email("memberFour@naver.com")
+                .contact("010-4444-1313")
+                .profileImageUrl("profile4.png")
+                .role(MemberRole.EMPLOYEE)
+                .department(MemberDepartment.SALES)
+                .position(MemberPosition.INTERN)
+                .address("여기 살껄요요?")
+                .remainingVacationDays(4)
+                .salary(35000000L)
+                .onVacation(false)
+                .build();
     }
 
     @Test
     @Order(1)
-    @DisplayName("signup Success")
-    public void signupSuccess(){
+    @DisplayName("findById Success")
+    public void findByIdSuccess(){
         // given
-        MembersRequestDto.CreateMembersRequestDto requestDto =
-                MembersRequestDto.CreateMembersRequestDto.builder()
-                        .name("testMemberName")
-                        .password("12341234")
-                        .passwordConfirm("12341234")
-                        .memberName("testId")
-                        .address("어디시 어딘구 어딘가")
-                        .email("test@naver.com")
-                        .contact("010-1111-1111")
-                        .build();
-
-        given(passwordEncoder.encode(requestDto.getPassword())).willReturn("encodedPassword");
-
+        when(membersRepository.findById(memberOne.getId())).thenReturn(Optional.of(memberOne));
         // when
-        MembersResponseDto.CreateMembersResponseDto responseDto =
-                membersService.signup(requestDto);
+        Members foundMember = membersService.findById(2L);
         // then
-        assertEquals(requestDto.getMemberName(), responseDto.getMemberName());
-        assertEquals(requestDto.getAddress(), responseDto.getAddress());
-        assertEquals(requestDto.getEmail(), responseDto.getEmail());
-        assertEquals(requestDto.getContact(), responseDto.getContact());
+        assertEquals(foundMember.getId(), 2L);
     }
 
     @Test
     @Order(2)
-    @DisplayName("signup Exception : NOT_MATCHED_PASSWORD")
-    public void signupNotMatchedPassword(){
-        // given
-        MembersRequestDto.CreateMembersRequestDto requestDto =
-                MembersRequestDto.CreateMembersRequestDto.builder()
-                        .name("testMemberName")
-                        .password("12341234")
-                        .passwordConfirm("12341231")
-                        .memberName("testId")
-                        .address("어디시 어딘구 어딘가")
-                        .email("test@naver.com")
-                        .contact("010-1111-1111")
-                        .build();
-
-        // 밑에 해당하는 encode 작업이 일어나기 전에 Exception 터지는데, 불필요한 메서드
-        // given(passwordEncoder.encode(requestDto.getPassword())).willReturn("encodedPassword");
-
+    @DisplayName("findById Exception : NOT_FOUND_MEMBER")
+    public void findByIdNotFoundMember(){
         // when
-        Exception e = assertThrows(MembersCustomException.class,
-                () -> membersService.signup(requestDto));
+        MembersCustomException e
+                = assertThrows(MembersCustomException.class,
+                ()-> membersService.findById(memberOne.getId()));
 
         // then
-        // Exception
-        // 1. 예외가 터지는 파라미터 검증
-        // 2. 예외 메세지 검증
-        // 3. 예외가 터진 코드 밑의 코드가 일어나는지?
-        assertNotEquals(requestDto.getPasswordConfirm(), requestDto.getPassword());
-        assertEquals(MembersExceptionCode.NOT_MATCHED_PASSWORD.getMessage(),
-                e.getMessage());
-        verify(passwordEncoder, never()).encode(anyString());
-        verify(membersRepository, never()).save(any(Members.class));
+        assertEquals(e.getMessage(), MembersExceptionCode.NOT_FOUND_MEMBER.getMessage());
     }
-
     @Test
     @Order(3)
-    @DisplayName("signup Exception : EXIST_MEMBER")
-    public void signupExistMember(){
+    @DisplayName("checkDifferentMember Success")
+    public void checkDifferentMemberSuccess(){
         // given
-        MembersRequestDto.CreateMembersRequestDto requestDto =
-                MembersRequestDto.CreateMembersRequestDto.builder()
-                        .name("testMemberName")
-                        .password("12341234")
-                        .passwordConfirm("12341234")
-                        .memberName("testId")
-                        .address("어디시 어딘구 어딘가")
-                        .email("test@naver.com")
-                        .contact("010-1111-1111")
-                        .build();
-
-        Members existingMember = Members.builder().build();
-        when(membersRepository.findByEmailOrMemberNameOrAddressOrContact(
-                anyString(), anyString(), anyString(), anyString())).thenReturn(Optional.of(existingMember));
-
+        when(membersRepository.findById(memberTwo.getId())).thenReturn(Optional.of(memberTwo));
         // when
-        Exception e = assertThrows(MembersCustomException.class,
-                () -> membersService.signup(requestDto));
-
+        Members checkedMember
+                = membersService.checkDifferentMember(memberOne.getId(), memberTwo.getId());
         // then
-        assertNotEquals(requestDto.getEmail(), existingMember.getEmail());
-        assertNotEquals(requestDto.getContact(), existingMember.getContact());
-        assertNotEquals(requestDto.getAddress(), existingMember.getAddress());
-        assertNotEquals(requestDto.getMemberName(), existingMember.getMemberName());
-        assertEquals(
-                MembersExceptionCode.EXISTS_MEMBER.getMessage(), e.getMessage());
-        verify(passwordEncoder, never()).encode(anyString());
-        verify(membersRepository, never()).save(any(Members.class));
+        assertEquals(memberTwo.getMemberName(), checkedMember.getMemberName());
     }
 
     @Test
     @Order(4)
-    @DisplayName("readInfo Success")
-    public void readInfoSuccess(){
+    @DisplayName("checkDifferentMember Exception : MATCHED_LOGIN_MEMBER")
+    public void checkDifferentMemberMatchedLoginMember(){
+        // given
+        Long sameMemberOneId = 2L;
         // when
-        MembersResponseDto.ReadMemberResponseDto responseDto =
-                membersService.readInfo(1L, memberDetails.getMembers());
+        MembersCustomException e
+                = assertThrows(MembersCustomException.class,
+                ()-> membersService.checkDifferentMember(memberOne.getId(), sameMemberOneId));
         // then
-        assertEquals(responseDto.getMemberName(), memberDetails.getUsername());
-        assertEquals(responseDto.getRole(), memberDetails.getMembers().getRole());
+        assertEquals(e.getMessage(), MembersExceptionCode.MATCHED_LOGIN_MEMBER.getMessage());
     }
 
     @Test
     @Order(5)
-    @DisplayName("findMember Success")
-    public void findMember(){
+    @DisplayName("checkDifferentMember Exception : NOT_FOUND_MEMBER")
+    public void checkDifferentMemberNotFoundMember(){
+        // repository에 저장이 되어있다는 when().thenReturn문이 없기에
+        // repository에 해당 member 정보가 저장되어져 있지 않다는 설정
         // when
-        Members member = membersService.findMember(memberDetails.getMembers(), 1L);
+        MembersCustomException e
+                = assertThrows(MembersCustomException.class,
+                ()-> membersService.checkDifferentMember(memberOne.getId(), memberTwo.getId()));
         // then
-        assertEquals(member.getMemberName(), memberDetails.getUsername());
-        assertEquals(member.getId(), memberDetails.getMembers().getId());
+        assertEquals(e.getMessage(), MembersExceptionCode.NOT_FOUND_MEMBER.getMessage());
     }
 
     @Test
     @Order(6)
-    @DisplayName("findMember Exception : NOT_FOUND_MEMBER")
-    public void findMemberNotFoundMember(){
+    @DisplayName("findByEmailOrMemberNameOrAddressOrContact Success")
+    public void findByEmailOrMemberNameOrAddressOrContactSuccess(){
+        // given
+        when(membersRepository.findByEmailOrMemberNameOrAddressOrContact(
+                memberOne.getEmail(), memberOne.getMemberName(),
+                memberOne.getAddress(), memberOne.getContact()
+        )).thenReturn(Optional.of(memberOne));
+
         // when
-        Exception e =  assertThrows(
-                MembersCustomException.class,
-                () -> membersService.findMember(
-                        memberDetails.getMembers(), 2L)
-        );
+        Members foundMember
+                = membersService.findByEmailOrMemberNameOrAddressOrContact(
+                        memberOne.getEmail(), memberOne.getMemberName(),
+                memberOne.getAddress(), memberOne.getContact());
+
         // then
-        assertEquals(
-                MembersExceptionCode.NOT_FOUND_MEMBER.getMessage(), e.getMessage());
+        assertEquals(memberOne.getEmail(), foundMember.getEmail());
+        assertEquals(memberOne.getMemberName(), foundMember.getMemberName());
+        assertEquals(memberOne.getAddress(), foundMember.getAddress());
+        assertEquals(memberOne.getContact(), foundMember.getContact());
     }
 
     @Test
     @Order(7)
-    @DisplayName("updateMember Success")
-    public void updateMemberSuccess(){
+    @DisplayName("existsById Success")
+    public void existsByIdSuccess(){
         // given
-        Members existingMember = Members.builder()
-                .id(1L)
-                .name("test User Name")
-                .memberName("test User NickName")
-                .password("12341234")
-                .address("어디시 어딘구 어딘가")
-                .build();
-
-        membersRepository.save(existingMember);  // 저장된 멤버 객체 설정
-
-        MembersRequestDto.UpdateMemberRequestDto requestDto =
-                MembersRequestDto.UpdateMemberRequestDto.builder()
-                        .name("updated Name")
-                        .password("12341234")
-                        .passwordConfirm("12341234")
-                        .memberName("test User NickName")
-                        .address("updated Address")
-                        .email("updated@naver.com")
-                        .contact("010-1111-1111")
-                        .build();
-
-        given(membersRepository.save(any(Members.class)))
-                .willAnswer(invocation -> invocation.getArgument(0));
-        given(passwordEncoder.encode(requestDto.getPassword()))
-                .willReturn("encodedPassword");
-
+        when(membersRepository.existsById(memberOne.getId())).thenReturn(true);
         // when
-        MembersResponseDto.UpdateMemberResponseDto responseDto =
-                membersService.updateMember(
-                        1L, memberDetails.getMembers(), requestDto);
-
+        Boolean isTrue = membersService.existsById(memberOne.getId());
         // then
-        assertNotNull(responseDto);
-        assertEquals(requestDto.getAddress(), responseDto.getAddress());
-        assertEquals(requestDto.getName(), responseDto.getName());
-        assertEquals(requestDto.getEmail(), responseDto.getEmail());
-        assertEquals(requestDto.getContact(), responseDto.getContact());
+        assertTrue(isTrue);
     }
 
     @Test
     @Order(8)
-    @DisplayName("updateMember Exception : NOT_MATCHED_MEMBER_NAME")
-    public void updateMemberNotMatchedMemberName(){
+    @DisplayName("save && signup Success")
+    public void saveSuccess(){
         // given
-        Members existingMember = Members.builder()
-                .id(1L)
-                .name("test User Name")
-                .memberName("test User NickName")
-                .password("12341234")
-                .address("어디시 어딘구 어딘가")
-                .build();
-
-        membersRepository.save(existingMember);  // 저장된 멤버 객체 설정
-
-        MembersRequestDto.UpdateMemberRequestDto requestDto =
-                MembersRequestDto.UpdateMemberRequestDto.builder()
-                        .name("updated Name")
-                        .password("12341234")
-                        .passwordConfirm("12341234")
-                        .memberName("Not matched NickName")
-                        .address("updated Address")
-                        .email("updated@naver.com")
-                        .contact("010-1111-1111")
-                        .build();
+        when(membersRepository.save(memberOne)).thenReturn(memberOne);
 
         // when
-        MembersCustomException e = assertThrows(MembersCustomException.class,
-                ()-> membersService.updateMember(
-                        1L, existingMember, requestDto));
+        Members saveMember = membersService.save(memberOne);
+
         // then
-        assertNotEquals(requestDto.getMemberName(), existingMember.getMemberName());
-        verify(passwordEncoder, never()).encode(anyString());
-        assertEquals(
-                MembersExceptionCode.NOT_MATCHED_MEMBER_NAME.getMessage(),
-                e.getMessage());
+        verify(membersRepository).save(memberOne);
+        assertEquals(memberOne.getMemberName(), saveMember.getMemberName());
+        assertEquals(memberOne.getId(), saveMember.getId());
+        assertEquals(memberOne.getEmail(), saveMember.getEmail());
+        assertEquals(memberOne.getName(), saveMember.getName());
     }
 
     @Test
     @Order(9)
-    @DisplayName("updateMember Exception : NOT_MATCHED_PASSWORD")
-    public void updateMemberNotMatchedPassword(){
+    @DisplayName("deleteById Success")
+    public void deleteByIdSuccess(){
         // given
-        Members existingMember = Members.builder()
-                .id(1L)
-                .name("test User Name")
-                .memberName("test User NickName")
-                .password("12341234")
-                .address("어디시 어딘구 어딘가")
-                .build();
-
-        membersRepository.save(existingMember);  // 저장된 멤버 객체 설정
-
-        MembersRequestDto.UpdateMemberRequestDto requestDto =
-                MembersRequestDto.UpdateMemberRequestDto.builder()
-                        .name("updated Name")
-                        .password("12341234")
-                        .passwordConfirm("Not Matched Password")
-                        .memberName("test User NickName")
-                        .address("updated Address")
-                        .email("updated@naver.com")
-                        .contact("010-1111-1111")
-                        .build();
-
+        Long memberId = 2L;
         // when
-        MembersCustomException e = assertThrows(MembersCustomException.class,
-                ()-> membersService.updateMember(
-                        1L, existingMember, requestDto));
-
+        membersService.deleteById(memberId);
         // then
-        assertEquals(requestDto.getMemberName(), existingMember.getMemberName());
-        assertNotEquals(requestDto.getPassword(), requestDto.getPasswordConfirm());
-        verify(passwordEncoder, never()).encode(anyString());
-        assertEquals(
-                MembersExceptionCode.NOT_MATCHED_PASSWORD.getMessage(),
-                e.getMessage());
+        verify(membersRepository).deleteById(memberId);
     }
 
     @Test
     @Order(10)
-    @DisplayName("updateMemberRoleSuccess")
-    public void updateMemberRoleSuccess(){
+    @DisplayName("findAllById Success")
+    public void findAllByIdSuccess(){
         // given
-        Members member = Members.builder()
-                .id(1L)
-                .name("test name")
-                .role(MemberRole.HR)
-                .build();
+        List<Long> foundIdList
+                = List.of(mainAdmin.getId(), memberOne.getId(), memberTwo.getId());
 
-        MultipartFile file
-                = new MockMultipartFile(
-                        "file", "document.pdf",
-                "application/pdf", "PDF content".getBytes());
-        String documentPath = "path/to/document.pdf";
-
-        when(filesService.createFileForMemberRole(
-                any(MultipartFile.class), any(Members.class)))
-                .thenReturn(documentPath);
+        when(membersRepository.findAllById(foundIdList))
+                .thenReturn(List.of(mainAdmin, memberOne, memberTwo));
 
         // when
-        MembersResponseDto.UpdateMemberRoleResponseDto responseDto
-                = membersService.updateMemberRole(1L, member, file);
+        List<Members> foundMemberList = membersService.findAllById(foundIdList);
 
         // then
-        assertNotNull(responseDto);
-        assertEquals(documentPath, responseDto.getFileName());
-
-        verify(membersRepository).save(member);
-        verify(filesService).createFileForMemberRole(file, member);
+        assertTrue(foundMemberList.containsAll(List.of(mainAdmin, memberOne, memberTwo)));
     }
 
     @Test
     @Order(11)
-    @DisplayName("updateMemberProfileImageUrl Success")
-    public void updateMemberProfileImageUrlSuccess(){
+    @DisplayName("findByDepartmentNotInAndIdNotIn Success")
+    public void findByDepartmentNotInAndIdNotInSuccess(){
         // given
-        Members member = Members.builder()
-                .id(1L)
-                .name("test name")
-                .role(MemberRole.HR)
-                .build();
+        List<MemberDepartment> excludedDepartmentList = List.of(MemberDepartment.IT);
+        List<Long> excludedIdList = List.of(1L);
 
-        MultipartFile image
-                = new MockMultipartFile(
-                "profileImage", "profile.png",
-                "application/png", "PNG content".getBytes());
+        when(membersRepository.findByDepartmentNotInAndIdNotIn(excludedDepartmentList, excludedIdList))
+                .thenReturn(List.of(memberOne, memberTwo));
 
         // when
-        MembersResponseDto.UpdateMemberProfileImageUrlResponseDto responseDto
-                = membersService.updateMemberProfileImageUrl(1L, member, image);
+        List<Members> memberList
+                = membersService.findByDepartmentNotInAndIdNotIn(
+                        excludedDepartmentList, excludedIdList);
 
         // then
-        assertNotNull(responseDto);
-
-        verify(membersRepository).save(member);
-        verify(filesService).createImage(image);
+        assertEquals(2, memberList.size());
+        assertEquals(2L, memberList.get(0).getId());
+        assertEquals(3L, memberList.get(1).getId());
     }
 
     @Test
     @Order(12)
-    @DisplayName("deleteMemberProfileImage Success")
-    public void deleteMemberProfileImageSuccess() {
+    @DisplayName("findByIdAndRoleAndDepartment Success")
+    public void findByIdAndRoleAndDepartmentSuccess() {
         // given
-        Members member = Members.builder()
-                .id(1L)
-                .profileImageUrl("http://example.com/image.jpg")
-                .build();
+        Long foundId = memberOne.getId();
+        MemberRole foundRole = memberOne.getRole();
+        MemberDepartment foundDepartment = memberOne.getDepartment();
 
+        when(membersRepository.findByIdAndRoleAndDepartment(foundId, foundRole, foundDepartment))
+                .thenReturn(Optional.of(memberOne));
         // when
-        MembersResponseDto.DeleteMemberProfileImageResponseDto responseDto
-                = membersService.deleteMemberProfileImage(1L, member);
+        Members foundMember
+                = membersService.findByIdAndRoleAndDepartment(foundId, foundRole, foundDepartment);
 
         // then
-        assertNotNull(responseDto);
-        assertEquals(responseDto.getFromMemberName(), member.getMemberName());
-        assertNull(member.getProfileImageUrl());
-    }
-
-    @Test
-    @DisplayName("deleteMemberProfileImage Exception : NOT_BLANK_IMAGE_FILE")
-    public void deleteMemberProfileImageExceptionTest() {
-        // when
-        MembersCustomException e = assertThrows(MembersCustomException.class,
-                () -> membersService.deleteMemberProfileImage(
-                        memberDetails.getMembers().getId(), memberDetails.getMembers()),
-                MembersExceptionCode.NOT_BLANK_IMAGE_FILE.getMessage());
-
-        //then
-        assertEquals(
-                MembersExceptionCode.NOT_BLANK_IMAGE_FILE.getMessage(),
-                e.getMessage());
+        assertEquals(foundMember.getId(), foundId);
     }
 
     @Test
     @Order(13)
-    @DisplayName("deleteMember Success")
-    public void deleteMemberSuccess(){
+    @DisplayName("findHRManager Success")
+    public void findHRManagerSuccess(){
+        // given
+        when(membersRepository.findByPositionAndDepartment(
+                MemberPosition.MANAGER, MemberDepartment.HR))
+                .thenReturn(Optional.of(memberOne));
         // when
-        membersService.deleteMember(1L, memberDetails.getMembers());
+        Members hrManager = membersService.findHRManager();
         // then
-        verify(membersRepository).deleteById(1L);
+        assertEquals(memberOne.getDepartment(), hrManager.getDepartment());
+        assertEquals(memberOne.getPosition(), hrManager.getPosition());
     }
 
     @Test
     @Order(14)
-    @DisplayName("validateMember Success")
-    public void validateMemberSuccess(){
+    @DisplayName("findHRManager Exception : NOT_FOUND_HR_MANAGER")
+    public void findHRManagerNotFoundHRManager(){
         // given
-        Members member = Members.builder()
-                .id(2L)
-                .memberName("test Username")
-                .name("test id")
-                .build();
-
-        when(membersRepository.findById(1L)).thenReturn(Optional.of(memberDetails.getMembers()));
-
+        when(membersRepository.findByPositionAndDepartment(
+                MemberPosition.MANAGER, MemberDepartment.HR))
+                .thenReturn(Optional.empty());
         // when
-        membersService.validateMember(1L, member.getId());
-
+        MembersCustomException e
+                = assertThrows(MembersCustomException.class, ()-> membersService.findHRManager());
         // then
-        assertNotEquals(member.getId(), memberDetails.getMembers().getId());
-        assertNotEquals(member, memberDetails.getMembers());
+        assertEquals(e.getMessage(), MembersExceptionCode.NOT_FOUND_HR_MANAGER.getMessage());
     }
 
     @Test
     @Order(15)
-    @DisplayName("validateMember Exception : MATCHED_LOGIN_MEMBER")
-    public void validateMemberMatchedLoginMember(){
+    @DisplayName("findMemberTotalCount Success")
+    public void findMemberTotalCountSuccess(){
         // given
-        Members member = Members.builder()
-                .id(1L)
-                .name("test User Name")
-                .password("12341234")
-                .memberName("test User NickName")
-                .contact("010-2222-1212")
-                .profileImageUrl(" ")
-                .role(MemberRole.HR)
-                .build();
-
+        Long expectedTotalCount = 4L;
+        when(membersRepository.count()).thenReturn(expectedTotalCount);
         // when
-        MembersCustomException e = assertThrows(MembersCustomException.class,
-                ()-> membersService.validateMember(
-                        member.getId(), memberDetails.getMembers().getId()));
-
+        Long memberTotalCount = membersService.findMemberTotalCount();
         // then
-        assertEquals(member.getId(), memberDetails.getMembers().getId());
-        assertEquals(member.getMemberName(), memberDetails.getMembers().getMemberName());
-        assertEquals(
-                MembersExceptionCode.MATCHED_LOGIN_MEMBER.getMessage(),
-                e.getMessage());
+        assertEquals(memberTotalCount, expectedTotalCount);
     }
 
     @Test
-    @Order(15)
-    @DisplayName("validateMember Exception : NOT_FOUND_MEMBER")
-    public void validateMemberNotFoundMember(){
+    @Order(16)
+    @DisplayName("findByMemberName Success")
+    public void findByMemberNameSuccess(){
+        // given
+        String foundMemberName = memberOne.getMemberName();
+        when(membersRepository.findByMemberName(foundMemberName))
+                .thenReturn(Optional.of(memberOne));
         // when
-        MembersCustomException e = assertThrows(MembersCustomException.class,
-                ()-> membersService.validateMember(
-                        memberDetails.getMembers().getId(), 2L));
+        Members foundMember = membersService.findByMemberName(foundMemberName);
+        // then
+        assertEquals(foundMember.getMemberName(), foundMemberName);
+    }
+
+    @Test
+    @Order(17)
+    @DisplayName("findByMemberName Exception : NOT_FOUND_MEMBER")
+    public void findByMemberNameNotFoundMember(){
+        // given
+        String foundMemberName = memberOne.getMemberName();
+        when(membersRepository.findByMemberName(foundMemberName))
+                .thenReturn(Optional.empty());
+        // when
+        MembersCustomException e = assertThrows(
+                MembersCustomException.class,
+                () -> membersService.findByMemberName(foundMemberName));
 
         // then
-        assertNotEquals(2L, memberDetails.getMembers().getId());
-        assertEquals(
-                MembersExceptionCode.NOT_FOUND_MEMBER.getMessage(),
-                e.getMessage());
-    }*/
+        assertEquals(e.getMessage(), MembersExceptionCode.NOT_FOUND_MEMBER.getMessage());
+    }
+
+    @Test
+    @Order(18)
+    @DisplayName("findAll Success")
+    public void findAllSuccess(){
+        // given
+        when(membersRepository.findAll())
+                .thenReturn(List.of(mainAdmin, memberOne, memberTwo, memberThree));
+
+        // when
+        List<Members> memberList = membersService.findAll();
+
+        // then
+        assertEquals(memberList.size(), 4);
+        assertEquals(memberList.get(0).getId(), mainAdmin.getId());
+        assertEquals(memberList.get(1).getId(), memberOne.getId());
+        assertEquals(memberList.get(2).getId(), memberTwo.getId());
+        assertEquals(memberList.get(3).getId(), memberThree.getId());
+    }
+
+    @Test
+    @Order(19)
+    @DisplayName("findAllByDepartment Success")
+    public void findAllByDepartmentSuccess(){
+        // given
+        when(membersRepository.findAllByDepartment(MemberDepartment.HR))
+                .thenReturn(List.of(mainAdmin, memberOne, memberTwo));
+
+        // when
+        List<Members> hrDepartmentMemberList = membersService.findAllByDepartment(MemberDepartment.HR);
+
+        // then
+        assertEquals(hrDepartmentMemberList.size(), 3);
+        assertEquals(hrDepartmentMemberList.get(0).getDepartment(), mainAdmin.getDepartment());
+        assertEquals(hrDepartmentMemberList.get(1).getDepartment(), memberOne.getDepartment());
+        assertEquals(hrDepartmentMemberList.get(2).getDepartment(), memberTwo.getDepartment());
+        assertEquals(hrDepartmentMemberList.get(0).getId(), mainAdmin.getId());
+        assertEquals(hrDepartmentMemberList.get(1).getId(), memberOne.getId());
+        assertEquals(hrDepartmentMemberList.get(2).getId(), memberTwo.getId());
+    }
+
+    @Test
+    @Order(20)
+    @DisplayName("findAllByPosition Success")
+    public void findAllByPositionSuccess(){
+        // given
+        when(membersRepository.findAllByPosition(MemberPosition.INTERN))
+                .thenReturn(List.of(memberThree, memberFour));
+        // when
+        List<Members> samePositionMemberList
+                = membersService.findAllByPosition(MemberPosition.INTERN);
+
+        // then
+        assertEquals(samePositionMemberList.size(), 2);
+        assertEquals(samePositionMemberList.get(0).getPosition(), memberThree.getPosition());
+        assertEquals(samePositionMemberList.get(1).getPosition(), memberFour.getPosition());
+        assertEquals(samePositionMemberList.get(0).getId(), memberThree.getId());
+        assertEquals(samePositionMemberList.get(1).getId(), memberFour.getId());
+    }
+
+    @Test
+    @Order(21)
+    @DisplayName("findAllExceptLoginMember Success")
+    public void findAllExceptLoginMemberSuccess(){
+        // given
+        Long loginMemberId = mainAdmin.getId();
+        when(membersRepository.findAllByIdNotIn(Collections.singletonList(loginMemberId)))
+                .thenReturn(List.of(memberOne, memberTwo, memberThree, memberFour));
+
+        // when
+        List<Members> memberListExceptLoginMember = membersService.findAllExceptLoginMember(loginMemberId);
+
+        // then
+        assertEquals(memberListExceptLoginMember.size(), 4);
+        assertEquals(memberListExceptLoginMember.get(0).getId(), memberOne.getId());
+        assertEquals(memberListExceptLoginMember.get(1).getId(), memberTwo.getId());
+        assertEquals(memberListExceptLoginMember.get(2).getId(), memberThree.getId());
+        assertEquals(memberListExceptLoginMember.get(3).getId(), memberFour.getId());
+    }
 }

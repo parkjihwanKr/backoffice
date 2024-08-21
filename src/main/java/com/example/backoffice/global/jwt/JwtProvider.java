@@ -17,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -47,23 +46,23 @@ public class JwtProvider {
 
     private final MemberDetailsServiceImpl memberDetailsService;
 
-    @Value("${JWT_SECRET}")
+    @Value("${jwt.secret}")
     private String secretKey;
     private Key key;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         byte[] bytes = Base64.getDecoder().decode(secretKey);
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public TokenDto createToken(String username, MemberRole role){
+    public TokenDto createToken(String username, MemberRole role) {
         Date now = new Date();
         String accessToken = Jwts.builder()
                 .setSubject(username)
                 .claim(AUTHORIZATION_KEY, role)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime()+accessTokenExpiration))
+                .setExpiration(new Date(now.getTime() + accessTokenExpiration))
                 .signWith(key, signatureAlgorithm)
                 .compact();
 
@@ -71,14 +70,14 @@ public class JwtProvider {
                 .setSubject(username)
                 .claim(AUTHORIZATION_KEY, role)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime()+refreshTokenExpiration))
+                .setExpiration(new Date(now.getTime() + refreshTokenExpiration))
                 .signWith(key, signatureAlgorithm)
                 .compact();
 
         return TokenDto.of(accessToken, refreshToken);
     }
 
-    public void setTokenForCookie(TokenDto tokenDto){
+    public void setTokenForCookie(TokenDto tokenDto) {
         String accessToken = URLEncoder.encode(BEARER_PREFIX + tokenDto.getAccessToken(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         String refreshToken = URLEncoder.encode(BEARER_PREFIX + tokenDto.getRefreshToken(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
 
@@ -86,7 +85,7 @@ public class JwtProvider {
         makeTokenCookie(REFRESH_TOKEN_HEADER, refreshToken);
     }
 
-    private Cookie makeTokenCookie(String header, String value){
+    private Cookie makeTokenCookie(String header, String value) {
         Cookie cookie = new Cookie(header, value);
         cookie.setPath("/");
         cookie.setSecure(true);
@@ -137,14 +136,14 @@ public class JwtProvider {
         return claims.getSubject();
     }
 
-    public String getJwtFromHeader(HttpServletRequest req){
+    public String getJwtFromHeader(HttpServletRequest req) {
         String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
-        log.info("bearer_token : "+bearerToken);
+        log.info("bearer_token : " + bearerToken);
         return removeBearerPrefix(bearerToken);
     }
 
-    public String removeBearerPrefix(String bearerToken){
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)){
+    public String removeBearerPrefix(String bearerToken) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }
         return null;

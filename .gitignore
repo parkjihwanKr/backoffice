@@ -37,6 +37,6 @@ out/
 ### VS Code ###
 .vscode/
 
-### docker ###
-docker-compose.yml
-Dockerfile
+### docker enviorment variable settings
+.env
+application.yml

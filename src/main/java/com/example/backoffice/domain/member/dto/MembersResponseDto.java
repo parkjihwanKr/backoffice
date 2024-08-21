@@ -1,14 +1,14 @@
 package com.example.backoffice.domain.member.dto;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
-import com.example.backoffice.domain.member.entity.Members;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class MembersResponseDto {
 
@@ -16,7 +16,8 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateMembersResponseDto{
+    public static class CreateOneDto{
+        private Long memberId;
         // 접속 아이디
         private String memberName;
         // 실제 이름
@@ -31,8 +32,8 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadMemberResponseDto {
-
+    public static class ReadOneDto {
+        private Long memberId;
         private String memberName;
         private String email;
         private String address;
@@ -40,20 +41,25 @@ public class MembersResponseDto {
         private Long loveCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        private Boolean onVacation;
+        private Integer remainingVacationDays;
+        private MemberDepartment department;
+        private MemberPosition position;
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberResponseDto{
+    public static class UpdateOneDto{
+        private Long memberId;
         private String name;
         private String memberName;
         private String email;
         private String contact;
         private String address;
         private String introduction;
-        private Long loveCount;
+        private String profileImageUrl;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -62,16 +68,35 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberAttributeResponseDto{
-        private String fromMemberName;
+    public static class UpdateOneForAttributeDto{
+        private Long memberId;
+        private String memberName;
         private String fileName;
+        private Long salary;
+        private MemberRole memberRole;
+        private MemberPosition memberPosition;
+        private MemberDepartment memberDepartment;
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateMemberProfileImageUrlResponseDto{
+    public static class UpdateOneForSalaryDto {
+        private Long memberId;
+        private String memberName;
+        private MemberRole memberRole;
+        private MemberPosition memberPosition;
+        private MemberDepartment memberDepartment;
+        private Long changedSalary;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateOneForProfileImageDto{
+        private Long memberId;
         private String fromMemberName;
         private String profileImageUrl;
     }
@@ -80,7 +105,18 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeleteMemberProfileImageResponseDto{
+    public static class DeleteOneForProfileImageDto{
+        private Long memberId;
         private String fromMemberName;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForVacationDaysDto {
+        private Long memberId;
+        // 잔여 휴가 일 수
+        private Integer vacationDays;
     }
 }

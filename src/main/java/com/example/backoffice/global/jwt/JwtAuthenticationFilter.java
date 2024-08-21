@@ -3,7 +3,6 @@ package com.example.backoffice.global.jwt;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.jwt.dto.TokenDto;
-import com.example.backoffice.global.redis.RedisProvider;
 import com.example.backoffice.global.redis.TokenRedisProvider;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,9 +33,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 로그아웃 로직일때 인증절차를 밟지 않고 LogoutFilter에서 끝냄
         log.info("attemptAuthentication()");
         try {
-            MembersRequestDto.LoginMemberRequestDto requestDto
+            MembersRequestDto.LoginDto requestDto
                     = new ObjectMapper().readValue(request.getInputStream(),
-                    MembersRequestDto.LoginMemberRequestDto.class);
+                    MembersRequestDto.LoginDto.class);
 
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -62,13 +61,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = JwtProvider.REFRESH_TOKEN_HEADER;
         response.setHeader(refreshToken, tokenDto.getRefreshToken());
         tokenRedisProvider.saveToken(
-                refreshToken + " : "+username,
+                refreshToken + " : " + username,
                 Math.toIntExact(
                         jwtProvider.getRefreshTokenExpiration() / 1000),
                 tokenDto.getRefreshToken()
         );
-        log.info("AccessToken : "+tokenDto.getAccessToken());
-        log.info("RefreshToken : "+tokenDto.getRefreshToken());
+        log.info("AccessToken : " + tokenDto.getAccessToken());
+        log.info("RefreshToken : " + tokenDto.getRefreshToken());
         // response.setHeader(); 없을 때 넣어주는데, 중복된 토큰이 있으면 업데이트 해준다.
     }
 

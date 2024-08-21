@@ -12,7 +12,7 @@ public class BoardsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateBoardRequestDto {
+    public static class CreateOneDto {
         private String title;
         private String content;
     }
@@ -21,17 +21,8 @@ public class BoardsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateBoardRequestDto {
+    public static class UpdateOneDto {
         private String title;
         private String content;
-        private MultipartFile file;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateImageBoardRequestDto{
-        private MultipartFile file;
     }
 }

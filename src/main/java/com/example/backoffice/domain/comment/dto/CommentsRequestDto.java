@@ -11,7 +11,7 @@ public class CommentsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateCommentsRequestDto {
+    public static class CreateCommentDto {
         private String content;
     }
 
@@ -19,7 +19,14 @@ public class CommentsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateCommentsRequestDto {
+    public static class UpdateCommentDto {
+        private String content;
+    }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateReplyDto {
         private String content;
     }
 
@@ -27,15 +34,7 @@ public class CommentsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateReplyRequestDto {
-        private String content;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateReplyRequestDto {
+    public static class UpdateReplyDto {
         private String content;
     }
 }

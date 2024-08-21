@@ -32,8 +32,9 @@ public class WebSecurityConfig {
     private final TokenRedisProvider tokenRedisProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomLogoutHandler customLogoutHandler;
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -74,6 +75,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/v1/logout").authenticated()
                         .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/api/v1/goHome").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout
@@ -88,7 +90,10 @@ public class WebSecurityConfig {
 
         ;
         // 필터 순서 조정
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+        /*http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        return http.build();*/
     }
 }

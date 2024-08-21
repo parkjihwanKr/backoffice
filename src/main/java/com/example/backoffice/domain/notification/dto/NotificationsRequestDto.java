@@ -14,7 +14,7 @@ public class NotificationsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateOneForAdminDto{
+    public static class CreateForAdminDto {
         private String message;
         private List<Long> excludedMemberIdList;
         private List<MemberDepartment> excludedMemberDepartment;

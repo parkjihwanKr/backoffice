@@ -16,7 +16,8 @@ public class BoardsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadBoardListResponseDto {
+    public static class ReadAllDto {
+        private Long boardId;
         private String title;
         private String writer;
         private String content;
@@ -31,9 +32,9 @@ public class BoardsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadBoardResponseDto {
-
+    public static class ReadOneDto {
         // Members.membername
+        private Long boardId;
         private String writer;
         private String title;
         private String content;
@@ -42,16 +43,18 @@ public class BoardsResponseDto {
         private Long unLikeCount;
         private Long viewCount;
         // CommentList
-        private List<CommentsResponseDto.ReadBoardCommentResponseDto> commentList;
+        private List<CommentsResponseDto.ReadBoardCommentsDto> commentList;
         private List<String> fileList;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
+
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateBoardResponseDto {
+    public static class CreateOneDto {
+        private Long boardId;
         private String writer;
         private String title;
         private String content;
@@ -63,7 +66,8 @@ public class BoardsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateBoardResponseDto {
+    public static class UpdateOneDto {
+        private Long boardId;
         private String title;
         private String content;
         private String writer;
@@ -74,18 +78,5 @@ public class BoardsResponseDto {
         private Long viewCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateImageBoardResponseDto {
-        private String title;
-        private String content;
-        private String writer;
-        private List<Comments> commentList;
-        private Long likeCount;
-        private LocalDateTime createdAt;
     }
 }

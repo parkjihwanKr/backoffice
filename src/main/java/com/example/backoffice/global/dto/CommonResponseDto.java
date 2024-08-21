@@ -13,7 +13,7 @@ public class CommonResponseDto<T> {
     private String message;
     private Integer httpStatusCode;
 
-    public CommonResponseDto(T data, String message){
+    public CommonResponseDto(T data, String message) {
         this.data = data;
         this.message = message;
     }

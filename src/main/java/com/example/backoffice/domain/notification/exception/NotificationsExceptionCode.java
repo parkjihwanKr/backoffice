@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum NotificationsExceptionCode {
     NOT_FOUND_NOTIFICATION(HttpStatus.BAD_REQUEST, "NOTIFICATION-001", "해당 알림을 찾을 수 없습니다."),
     NOT_MATCHED_REACTION_TYPE(HttpStatus.BAD_REQUEST, "NOTIFICATION-002", "해당 반응과 매칭되지 않습니다."),
+    NOT_ACCESS_POSITION(HttpStatus.FORBIDDEN, "NOTIFICATION-003", "해당 알림에 대한 접근 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
