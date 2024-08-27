@@ -339,6 +339,12 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         return membersService.findAllByPosition(memberPosition);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByMemberName(String memberName){
+        return membersService.findByMemberName(memberName);
+    }
+
     private MembersExceptionEnum findExceptionType(
             MembersRequestDto.CreateOneDto requestDto, Members duplicatedInfoMember){
         if(requestDto.getContact().equals(duplicatedInfoMember.getContact())){

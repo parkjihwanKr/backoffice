@@ -12,21 +12,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
 public class NotificationsController {
 
     private final NotificationsServiceFacadeV1 notificationsServiceFacade;
 
     // 알림 단건 조회
-    @GetMapping("/members/{memberId}/notifications/{notificationId}")
+    @GetMapping("/api/v1/members/{memberId}/notifications/{notificationId}")
     public ResponseEntity<CommonResponseDto<NotificationsResponseDto.ReadOneDto>> readOne(
             @PathVariable Long memberId, @PathVariable String notificationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
@@ -38,7 +40,6 @@ public class NotificationsController {
                 )
         );
     }
-
     // 알림 삭제
     @DeleteMapping("/members/{memberId}/notifications")
     public ResponseEntity<CommonResponseDto<List<String>>> delete(
@@ -52,24 +53,18 @@ public class NotificationsController {
                         deleteIdList, "알림 삭제 성공", 200));
     }
 
+    // 실시간 알림 요청
     // 관리자 전용 단체 메세지 전달
-    @PostMapping("/admins/{adminId}/notifications")
-    public ResponseEntity<CommonResponseDto<NotificationsResponseDto.CreateForAdminDto>> createForAdmin(
-            @PathVariable Long adminId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody NotificationsRequestDto.CreateForAdminDto requestDto) {
-        NotificationsResponseDto.CreateForAdminDto responseDto
-                = notificationsServiceFacade.createForAdmin(
-                adminId, memberDetails.getMembers(), requestDto);
-        return ResponseEntity.ok().body(
-                new CommonResponseDto<>(
-                        responseDto, "전체 알림 전송 성공", 200
-                )
-        );
+    @MessageMapping("/admins/notifications")
+    public void createForAdmin(
+            @Payload NotificationsRequestDto.CreateForAdminDto requestDto,
+            Principal principal){
+        // userDetails.getUsername(); = member.getMemberName();
+        notificationsServiceFacade.createForAdmin(principal.getName(), requestDto);
     }
 
     // 알림 리스트 조회
-    @GetMapping("/members/{memberId}/notifications")
+    @GetMapping("/api/v1/members/{memberId}/notifications")
     public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> read(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -80,7 +75,7 @@ public class NotificationsController {
     }
 
     // 읽지 않은 알림 리스트 조회
-    @GetMapping("/members/{memberId}/notifications/unread")
+    @GetMapping("/api/v1/members/{memberId}/notifications/unread")
     public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> readUnRead(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -92,7 +87,7 @@ public class NotificationsController {
     }
 
     // 읽은 알림 리스트 조회
-    @GetMapping("/members/{memberId}/notifications/read")
+    @GetMapping("/api/v1/members/{memberId}/notifications/read")
     public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> readRead(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -104,7 +99,7 @@ public class NotificationsController {
     }
 
     // 모든 알림 리스트를 '읽음' 버튼으로 모두 읽음으로 변경
-    @PostMapping("/members/{memberId}/notifications/changeIsReadTrue")
+    @PostMapping("/api/v1/members/{memberId}/notifications/changeIsReadTrue")
     public ResponseEntity<CommonResponseDto<List<NotificationsResponseDto.ReadAllDto>>> readAll(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
