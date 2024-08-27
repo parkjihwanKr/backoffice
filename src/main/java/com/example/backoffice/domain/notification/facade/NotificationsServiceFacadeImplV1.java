@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.notification.facade;
 
+import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
@@ -41,14 +42,14 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                 .equals(notificationData.getFromMember().getMemberName())){
             return;
         }
-        System.out.println("Before generating notification entity");
+
         Notifications notification
                 = generateMessageAndEntity(notificationData, domainType);
-        System.out.println("After generating notification entity");
         notificationsService.save(notification);
-        System.out.println("After saving notification");
+
         sendNotificationForUser(
                 notificationData.getToMember().getMemberName(), notification);
+        //System.out.println("sendNotificationForUser method executed..");
     }
 
     @Override
@@ -87,9 +88,12 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
 
     @Override
     @Transactional
-    public NotificationsResponseDto.CreateForAdminDto createForAdmin(
-            Long adminId, Members admin,
+    public void createForAdmin(
+            String adminName,
             NotificationsRequestDto.CreateForAdminDto requestDto){
+        // 0. adminName으로 해당 멤버의 객체 정보를 가져옴
+        Members admin = membersServiceFacade.findByMemberName(adminName);
+        System.out.println(admin.getMemberName());
         // 1. 해당 어드민 계정이 맞는지 -> 멤버 검증까지 같이 됨
         if(!admin.getPosition().equals(MemberPosition.CEO)){
             throw new NotificationsCustomException(NotificationsExceptionCode.NOT_ACCESS_POSITION);
@@ -106,9 +110,14 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
         // 1. ADMIN(자기 자신) 또한 알림 메세지에 들어감 -> 자기 자신은 알림에 넣지 않는 식으로 변경 o
         // 2. excludedIdList가 null이면 오류가 뜸 -> 빈칸 리스트가 들어갈 수 있게 조정 o
         // 3. Notifcation jpaRepository에 왜 들어가는지 모르겠음. -> test settings 때문
+        List<MemberDepartment> excludedMemberDepartmentList = new ArrayList<>();
+        for(String departmentName : requestDto.getExcludedMemberDepartment()){
+            excludedMemberDepartmentList.add(
+                    MembersConverter.toDepartment(departmentName));
+        }
         Map<String, MemberDepartment> memberNamesAndDepartment
                 = membersServiceFacade.findMemberNameListExcludingDepartmentListAndIdList(
-                requestDto.getExcludedMemberDepartment(), requestDto.getExcludedMemberIdList());
+                excludedMemberDepartmentList, requestDto.getExcludedMemberIdList());
 
         Set<MemberDepartment> memberDepartmentSet = new HashSet<>();
         List<Notifications> notificationList = new ArrayList<>();
@@ -130,8 +139,11 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                 sendNotificationForUser(memberName, notification);
             }
         });
+        System.out.println("code end!");
         // 해당 memberRoleList 테스트 후, 설정 예정
-        return NotificationsConverter.toCreateForAdminDto(admin, memberDepartmentSet, notificationList, message);
+        /*NotificationsResponseDto.CreateForAdminDto responseDto
+                = NotificationsConverter.toCreateForAdminDto(
+                        admin, memberDepartmentSet, notificationList, message);*/
     }
 
     @Override
@@ -274,7 +286,7 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
         };
     }
 
-    private void sendNotificationForUser(String toMemberName, Notifications notification){
+    public void sendNotificationForUser(String toMemberName, Notifications notification){
         simpMessagingTemplate.convertAndSendToUser(toMemberName, "/queue/notifications", notification);
     }
 

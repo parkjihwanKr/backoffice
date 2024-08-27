@@ -66,13 +66,19 @@ public class WebSecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(request -> {
                             CorsConfiguration configuration = new CorsConfiguration();
+                            // local 환경 테스트를 위한 임시 허용
+                            // 이거 계속 오류 -> 해결 방법 강구
+                            configuration.addAllowedOriginPattern("*");
                             // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
                             configuration.setAllowedHeaders(Arrays.asList("Authorization", "RefreshToken", "Cache-Control", "Content-Type"));
+                            configuration.setAllowCredentials(true);
                             return configuration;
                         })
                 )
                 .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/websocket").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/v1/logout").authenticated()
                         .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/api/v1/goHome").permitAll()

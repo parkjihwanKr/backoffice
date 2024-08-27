@@ -59,7 +59,7 @@ public class NotificationsConverter {
                 .build();
     }
 
-    public static NotificationsResponseDto.CreateForAdminDto toCreateForAdminDto(
+    /*public static NotificationsResponseDto.CreateForAdminDto toCreateForAdminDto(
             Members mainAdmin, Set<MemberDepartment> memberDepartmentSet,
             List<Notifications> notificationList, String message) {
         List<String> toMemberNameList = new ArrayList<>();
@@ -78,7 +78,7 @@ public class NotificationsConverter {
                 .toMemberDepartmentSet(memberDepartmentSet)
                 .toMemberNameList(toMemberNameList)
                 .build();
-    }
+    }*/
 
     public static Page<NotificationsResponseDto.ReadDto> toReadDto(
             Page<Notifications> notificationPage) {

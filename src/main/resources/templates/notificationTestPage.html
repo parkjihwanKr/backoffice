@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>STOMP Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h1>STOMP WebSocket Test</h1>
+<button onclick="sendNotification()">Send Notification</button>
+
+<script>
+    // JWT 토큰을 강제로 localStorage에 저장
+    const forcedJwtToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJBRE1JTiIsImlhdCI6MTcyNDY0ODkzMCwiZXhwIjoxNzI0NjUyNTMwfQ.2VNU-1em6zFrHg1XBfrjrKZmOiPdIu7dMVOFmsmNzbU';
+    localStorage.setItem('jwtToken', forcedJwtToken);
+
+    // WebSocket 연결 설정
+    const socket = new SockJS('http://localhost:8080/ws');
+    const stompClient = Stomp.over(socket);
+
+    // localStorage에서 JWT 토큰을 가져옴
+    const jwtToken = localStorage.getItem('jwtToken');
+
+    if (jwtToken) {
+        stompClient.connect({
+            Authorization: 'Bearer ' + jwtToken
+        }, function (frame) {
+            console.log('Connected: ' + frame);
+
+            // 알림을 받는 구독 설정
+            stompClient.subscribe('/user/queue/notifications', function (message) {
+                console.log('Received notification: ' + message.body);
+            });
+        });
+    } else {
+        console.error('JWT Token is not available');
+    }
+
+    // 메시지 전송 함수
+    function sendNotification() {
+        const payload = {
+            title: "Important Notice",
+            message: "This is a message for all admins."
+        };
+        stompClient.send("/app/admins/notifications", {}, JSON.stringify(payload));
+    }
+</script>
+</body>
+</html>

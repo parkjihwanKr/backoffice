@@ -28,7 +28,8 @@ public class NotificationsResponseDto {
         private LocalDateTime createdAt;
     }
 
-    // 어드민의 전체 알림 발송
+    // # testing
+    /*// 어드민의 전체 알림 발송
     @Getter
     @Builder
     @NoArgsConstructor
@@ -40,7 +41,7 @@ public class NotificationsResponseDto {
         private List<String> toMemberNameList;
         private Set<MemberDepartment> toMemberDepartmentSet;
         private MemberRole fromAdminRole;
-    }
+    }*/
 
     @Getter
     @Builder

@@ -53,6 +53,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
+	// websocket client test
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 	// test code
 	// database : h2
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -16,8 +16,8 @@ public interface NotificationsServiceFacadeV1 {
     NotificationsResponseDto.ReadOneDto readOne(
             Long memberId, String notificationId, Members member);
 
-    NotificationsResponseDto.CreateForAdminDto createForAdmin(
-            Long adminId, Members member,
+    void createForAdmin(
+            String memberName,
             NotificationsRequestDto.CreateForAdminDto requestDto);
 
     Page<NotificationsResponseDto.ReadDto> read(

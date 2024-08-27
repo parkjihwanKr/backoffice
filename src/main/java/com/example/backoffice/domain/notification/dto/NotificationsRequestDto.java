@@ -1,6 +1,5 @@
 package com.example.backoffice.domain.notification.dto;
 
-import com.example.backoffice.domain.member.entity.MemberDepartment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +16,7 @@ public class NotificationsRequestDto {
     public static class CreateForAdminDto {
         private String message;
         private List<Long> excludedMemberIdList;
-        private List<MemberDepartment> excludedMemberDepartment;
+        private List<String> excludedMemberDepartment;
     }
 
     @Getter
