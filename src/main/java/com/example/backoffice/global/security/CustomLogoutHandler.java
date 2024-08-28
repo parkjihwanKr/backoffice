@@ -2,6 +2,7 @@ package com.example.backoffice.global.security;
 
 import com.example.backoffice.global.exception.AuthenticationCustomException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.JwtProvider;
 import com.example.backoffice.global.jwt.JwtStatus;
 import com.example.backoffice.global.redis.TokenRedisProvider;
@@ -20,6 +21,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     private final JwtProvider jwtProvider;
     private final TokenRedisProvider tokenRedisProvider;
+    private final CookieUtil cookieUtil;
 
     // 3. accessToken, refreshToken 삭제
     // 4. logout 진행
@@ -36,7 +38,12 @@ public class CustomLogoutHandler implements LogoutHandler {
                     tokenRedisProvider.getRefreshTokenValue(redisTokenKey).equals(null)) {
                 // 3. 보안을 위해 로그아웃하면 refreshToken 삭제
                 tokenRedisProvider.deleteToken(redisTokenKey);
-                log.info("logout success!");
+                log.info("delete refresh token success!");
+
+                // 4. 쿠키 삭제
+                cookieUtil.deleteCookie(response, "accessToken");
+                cookieUtil.deleteCookie(response, "refreshToken");
+                log.info("delete cookie in server success!");
             }
         } catch (Exception e) {
             throw new AuthenticationCustomException(
