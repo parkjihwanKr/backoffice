@@ -1,6 +1,8 @@
 package com.example.backoffice.global.jwt;
 
 import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.dto.TokenDto;
 import com.example.backoffice.global.security.MemberDetailsServiceImpl;
 import io.jsonwebtoken.*;
@@ -37,7 +39,7 @@ import java.util.stream.Collectors;
 public class JwtProvider {
     public static String BEARER_PREFIX = "Bearer ";
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String REFRESH_TOKEN_HEADER = "RefreshToken";
+    public static final String REFRESH_TOKEN_HEADER = "refreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
     // private static final long TOKEN_TIME = 60 * 60 * 1000L;
     public Long accessTokenExpiration = 1000 * 60 * 60L;
@@ -127,6 +129,7 @@ public class JwtProvider {
                 .getBody();
     }
 
+    // getUsernameFromRemovedJwtToken
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -136,10 +139,23 @@ public class JwtProvider {
         return claims.getSubject();
     }
 
+    // getAccessTokenFromHeader
     public String getJwtFromHeader(HttpServletRequest req) {
-        String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
-        log.info("bearer_token : " + bearerToken);
-        return removeBearerPrefix(bearerToken);
+        String accessToken = req.getHeader(AUTHORIZATION_HEADER);
+        if (accessToken == null){
+            String refreshToken = getRefreshTokenFromHeader(req);
+        }
+        log.info("Access Token : " + accessToken);
+        return removeBearerPrefix(accessToken);
+    }
+
+    // getRefreshTokenFromHeader
+    public String getRefreshTokenFromHeader(HttpServletRequest request){
+        String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
+        if (refreshToken == null){
+            throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+        }
+        return removeBearerPrefix(refreshToken);
     }
 
     public String removeBearerPrefix(String bearerToken) {

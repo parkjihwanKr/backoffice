@@ -1,6 +1,7 @@
 package com.example.backoffice.global.jwt;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,11 +39,34 @@ public class CookieUtil {
     }
 
     public void deleteCookie(HttpServletResponse response, String cookieName) {
-        Cookie cookie = new Cookie(cookieName, null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(this.isSecure); // 로컬 환경에서는 false, 프로덕션에서는 true로 설정
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // 쿠키 삭제
-        response.addCookie(cookie);
+        if(!isSecure){
+            // 로컬
+            Cookie cookie = new Cookie(cookieName, null);
+            cookie.setHttpOnly(false);
+            cookie.setSecure(this.isSecure); // 로컬 환경에서는 false, 프로덕션에서는 true로 설정
+            cookie.setPath("/");
+            cookie.setMaxAge(0); // 쿠키 삭제
+            response.addCookie(cookie);
+        }else{
+            // 배포
+            Cookie cookie = new Cookie(cookieName, null);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(this.isSecure); // 로컬 환경에서는 false, 프로덕션에서는 true로 설정
+            cookie.setPath("/");
+            cookie.setMaxAge(0); // 쿠키 삭제
+            response.addCookie(cookie);
+        }
+    }
+
+    public String getCookieValue(HttpServletRequest request, String cookieName){
+        Cookie[] cookieList = request.getCookies();
+        if(cookieList != null){
+            for (Cookie cookie : cookieList){
+                if (cookieName.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }

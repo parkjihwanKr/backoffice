@@ -38,6 +38,8 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     private final MembersServiceV1 membersService;
     private final NotificationsServiceV1 notificationsService;
     private final PasswordEncoder passwordEncoder;
+
+    // 해당 부분 지워야함
     @PostConstruct
     public void createOneForAdmin(){
         if(membersService.existsById(1L)){
