@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -81,4 +82,23 @@ public class BoardsController {
                 )
         );
     }
+
+    // 부서별 게시글 읽기
+
+    // 부서별 게시글 생성 - {MemberDepartment : IT, SALES, MARKETING, FINANCE, ...}
+    @PostMapping(
+            value = "/department",
+            consumes = {MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<BoardsResponseDto.CreateOneForDepartmentDto> createOneForDepartment(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestPart(value = "data") @Valid BoardsRequestDto.CreateOneForDepartmentDto requestDto,
+            @RequestPart(value = "files") List<MultipartFile> files){
+        BoardsResponseDto.CreateOneForDepartmentDto responseDto
+                = boardsService.createOneForDepartment(
+                        memberDetails.getMembers(), requestDto, files);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+    // 부서별 게시글 수정
+    // 부서별 게시글 삭제
 }

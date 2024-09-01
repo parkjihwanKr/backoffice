@@ -43,6 +43,10 @@ public class Boards extends CommonEntity {
     @Column
     private Long unLikeCount;
 
+    @Enumerated(EnumType.STRING)
+    private BoardType boardType;
+
+    private Boolean isImportant;
     // relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

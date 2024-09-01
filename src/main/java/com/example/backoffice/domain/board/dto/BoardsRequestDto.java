@@ -15,6 +15,7 @@ public class BoardsRequestDto {
     public static class CreateOneDto {
         private String title;
         private String content;
+        private Boolean isImportant;
     }
 
     @Getter
@@ -24,5 +25,28 @@ public class BoardsRequestDto {
     public static class UpdateOneDto {
         private String title;
         private String content;
+        private Boolean isImportant;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateOneForDepartmentDto {
+        private String title;
+        private String content;
+        private Boolean isImportant;
+        private String department;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateOneForDepartmentDto {
+        private String title;
+        private String content;
+        private Boolean isImportant;
+        private String department;
     }
 }

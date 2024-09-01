@@ -15,12 +15,16 @@ public interface BoardsServiceV1 {
     Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable);
     BoardsResponseDto.ReadOneDto readOne(Long boardId);
     BoardsResponseDto.CreateOneDto createOne(
-            Members member, BoardsRequestDto.CreateOneDto requestDto,
+            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files);
     BoardsResponseDto.UpdateOneDto updateOne(
-            Long boardId, Members member,
+            Long boardId, Members loginMember,
             BoardsRequestDto.UpdateOneDto requestDto,
             List <MultipartFile> files);
+
+    BoardsResponseDto.CreateOneForDepartmentDto createOneForDepartment(
+            Members loginMember, BoardsRequestDto.CreateOneForDepartmentDto requestDto,
+            List<MultipartFile> files);
     void deleteOne(Long boardId, Members member);
     Boards findById(Long boardId);
 }

@@ -2,6 +2,7 @@ package com.example.backoffice.domain.board.converter;
 
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
+import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
@@ -9,6 +10,7 @@ import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,11 +18,27 @@ import java.util.stream.Collectors;
 public class BoardsConverter {
 
     public static Boards toEntity(
-            BoardsRequestDto.CreateOneDto requestDto, Members member){
+            BoardsRequestDto.CreateOneDto requestDto, Members member, BoardType boardType){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
+                .isImportant(requestDto.getIsImportant())
+                .boardType(boardType)
+                .likeCount(0L)
+                .unLikeCount(0L)
+                .viewCount(0L)
+                .build();
+    }
+
+    public static Boards toEntityForDepartment(
+            BoardsRequestDto.CreateOneForDepartmentDto requestDto, Members member, BoardType boardType){
+        return Boards.builder()
+                .member(member)
+                .title(requestDto.getTitle())
+                .content(requestDto.getContent())
+                .isImportant(requestDto.getIsImportant())
+                .boardType(boardType)
                 .likeCount(0L)
                 .unLikeCount(0L)
                 .viewCount(0L)
@@ -39,6 +57,7 @@ public class BoardsConverter {
                     .viewCount(board.getViewCount())
                     .createdAt(board.getCreatedAt())
                     .modifiedAt(board.getModifiedAt())
+                    .boardType(board.getBoardType())
                     .build();
         });
     }
@@ -103,13 +122,13 @@ public class BoardsConverter {
                 .commentList(commentList)
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
+                .boardType(board.getBoardType())
                 .build();
     }
 
 
     public static BoardsResponseDto.CreateOneDto toCreateOneDto(
             Boards board, List<String> fileUrlList){
-
         return BoardsResponseDto.CreateOneDto.builder()
                 .boardId(board.getId())
                 .writer(board.getMember().getMemberName())
@@ -117,11 +136,11 @@ public class BoardsConverter {
                 .content(board.getContent())
                 .fileList(fileUrlList)
                 .createdAt(board.getCreatedAt())
+                .boardType(board.getBoardType())
                 .build();
     }
 
     public static BoardsResponseDto.UpdateOneDto toUpdateOneDto(Boards board, List<String> fileUrlList){
-
         List<CommentsResponseDto.UpdateCommentDto> commentList = new ArrayList<>();
         if(!board.getCommentList().isEmpty()){
             for(int i = 0; i<board.getCommentList().size(); i++){
@@ -145,6 +164,23 @@ public class BoardsConverter {
                 .viewCount(board.getViewCount())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
+                .boardType(board.getBoardType())
+                .build();
+    }
+
+    public static BoardsResponseDto.CreateOneForDepartmentDto toCreateOneForDepartmentDto (
+            String title, String content, Boolean isImportant, String writer,
+            Long boardId, BoardType boardType, List<String> fileUrlList,
+            LocalDateTime createdAt){
+        return BoardsResponseDto.CreateOneForDepartmentDto.builder()
+                .boardId(boardId)
+                .title(title)
+                .content(content)
+                .isImportant(isImportant)
+                .writer(writer)
+                .createdAt(createdAt)
+                .boardType(boardType)
+                .fileList(fileUrlList)
                 .build();
     }
 }

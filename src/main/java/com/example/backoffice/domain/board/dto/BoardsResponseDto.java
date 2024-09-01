@@ -1,7 +1,9 @@
 package com.example.backoffice.domain.board.dto;
 
+import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +26,8 @@ public class BoardsResponseDto {
         private Long likeCount;
         private Long unLikeCount;
         private Long viewCount;
+        private Boolean isImportant;
+        private BoardType boardType;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -38,6 +42,8 @@ public class BoardsResponseDto {
         private String writer;
         private String title;
         private String content;
+        private BoardType boardType;
+        private Boolean isImportant;
         // Like.count
         private Long likeCount;
         private Long unLikeCount;
@@ -58,6 +64,8 @@ public class BoardsResponseDto {
         private String writer;
         private String title;
         private String content;
+        private Boolean isImportant;
+        private BoardType boardType;
         private LocalDateTime createdAt;
         private List<String> fileList;
     }
@@ -76,7 +84,39 @@ public class BoardsResponseDto {
         private Long likeCount;
         private Long unLikeCount;
         private Long viewCount;
+        private Boolean isImportant;
+        private BoardType boardType;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateOneForDepartmentDto {
+        private Long boardId;
+        private String writer;
+        private String title;
+        private String content;
+        private LocalDateTime createdAt;
+        private Boolean isImportant;
+        private BoardType boardType;
+        private List<String> fileList;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateOneForDepartmentDto {
+        private Long boardId;
+        private String writer;
+        private String title;
+        private String content;
+        private LocalDateTime createdAt;
+        private Boolean isImportant;
+        private BoardType boardType;
+        private List<String> fileList;
     }
 }

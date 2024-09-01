@@ -3,11 +3,15 @@ package com.example.backoffice.domain.board.service;
 import com.example.backoffice.domain.board.converter.BoardsConverter;
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
+import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
 import com.example.backoffice.domain.file.service.FilesServiceV1;
+import com.example.backoffice.domain.member.converter.MembersConverter;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.redis.ViewCountRedisProvider;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +51,14 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Override
     @Transactional
     public BoardsResponseDto.CreateOneDto createOne(
-            Members member, BoardsRequestDto.CreateOneDto requestDto,
+            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files){
-        Boards board = BoardsConverter.toEntity(requestDto, member);
+        // 만들 자격 추가 : 전체 게시판을 만들 수 있는 인원은 권한이 admin이거나 main_admin만 가능
+        if(!(loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
+                || loginMember.getRole().equals(MemberRole.ADMIN))){
+            throw new BoardsCustomException(BoardsExceptionCode.UNAUTHORIZED_DEPARTMENT_BOARD_CREATION);
+        }
+        Boards board = BoardsConverter.toEntity(requestDto, loginMember, BoardType.GENERAL);
         List<String> fileUrlList = new ArrayList<>();
         boardsRepository.save(board);
         for (MultipartFile file : files) {
@@ -82,6 +91,41 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             afterFileUrlList.add(fileUrl);
         }
         return BoardsConverter.toUpdateOneDto(board, afterFileUrlList);
+    }
+
+    @Override
+    @Transactional
+    public BoardsResponseDto.CreateOneForDepartmentDto createOneForDepartment(
+            Members loginMember, BoardsRequestDto.CreateOneForDepartmentDto requestDto,
+            List<MultipartFile> files){
+        // 1. 해당 멤버가 부서 게시판을 만들 자격이 있는지?
+        String department = requestDto.getDepartment();
+        MemberDepartment memberDepartment
+                = MembersConverter.toDepartment(department);
+        // 1-1. 만드려는 부서 게시판의 멤버 부서가 같지 않을 때
+        if(!loginMember.getDepartment().equals(memberDepartment)) {
+            // 1-2. 만드려는 부서 게시판과 멤버 부서가 같지 않더라도 메인 어드민은 가능
+            if (!loginMember.getRole().equals(MemberRole.MAIN_ADMIN)) {
+                throw new BoardsCustomException(
+                        BoardsExceptionCode.UNAUTHORIZED_DEPARTMENT_BOARD_CREATION);
+            }
+        }
+
+        Boards departmentBoard = BoardsConverter.toEntityForDepartment(
+                requestDto, loginMember, BoardType.DEPARTMENT);
+
+        List<String> fileUrlList = new ArrayList<>();
+        boardsRepository.save(departmentBoard);
+        for (MultipartFile file : files) {
+            String fileName = filesService.createOneForBoard(file, departmentBoard);
+            fileUrlList.add(fileName);
+        }
+
+        return BoardsConverter.toCreateOneForDepartmentDto(
+                departmentBoard.getTitle(), departmentBoard.getContent(),
+                departmentBoard.getIsImportant(), loginMember.getMemberName(),
+                departmentBoard.getId(), departmentBoard.getBoardType(),
+                fileUrlList, departmentBoard.getCreatedAt());
     }
 
     @Override
