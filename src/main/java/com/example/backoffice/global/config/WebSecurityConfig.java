@@ -1,5 +1,6 @@
 package com.example.backoffice.global.config;
 
+import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.JwtAuthenticationFilter;
 import com.example.backoffice.global.jwt.JwtAuthorizationFilter;
 import com.example.backoffice.global.jwt.JwtProvider;
@@ -32,6 +33,7 @@ public class WebSecurityConfig {
     private final TokenRedisProvider tokenRedisProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomLogoutHandler customLogoutHandler;
+    private final CookieUtil cookieUtil;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -45,7 +47,9 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider, tokenRedisProvider);
+        JwtAuthenticationFilter filter
+                = new JwtAuthenticationFilter(
+                        jwtProvider, tokenRedisProvider, cookieUtil);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
@@ -66,22 +70,21 @@ public class WebSecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(request -> {
                             CorsConfiguration configuration = new CorsConfiguration();
-                            // local 환경 테스트를 위한 임시 허용
-                            // 이거 계속 오류 -> 해결 방법 강구
-                            configuration.addAllowedOriginPattern("*");
+                            // local 환경 테스트를 위한 임시 허용,
+                            // production 환경에선 ec2 서버의 도메인 또는 router53에서 산 도메인을 적어서 열어줘야함
+                            configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000"));
+                            // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
                             // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
-                            configuration.setAllowedHeaders(Arrays.asList("Authorization", "RefreshToken", "Cache-Control", "Content-Type"));
+                            configuration.setAllowedHeaders(Arrays.asList("Authorization", "refreshToken", "Cache-Control", "Content-Type"));
                             configuration.setAllowCredentials(true);
                             return configuration;
                         })
                 )
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/websocket").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/api/v1/logout").authenticated()
-                        .requestMatchers("/api/v1/**").permitAll()
-                        .requestMatchers("/api/v1/goHome").permitAll()
+                        .requestMatchers(
+                                "/websocket", "/ws/**","/",
+                                "/api/v1/login","/api/v1/signup").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout
