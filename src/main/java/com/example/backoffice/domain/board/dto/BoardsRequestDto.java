@@ -16,6 +16,7 @@ public class BoardsRequestDto {
         private String content;
         private Boolean isImportant;
         private String department;
+        private Boolean isLocked;
     }
 
     @Getter
@@ -26,5 +27,7 @@ public class BoardsRequestDto {
         private String title;
         private String content;
         private Boolean isImportant;
+        private String department;
+        private Boolean isLocked;
     }
 }

@@ -2,6 +2,7 @@ package com.example.backoffice.domain.board.entity;
 
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.entity.Files;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
@@ -41,10 +42,16 @@ public class Boards extends CommonEntity {
     @Column
     private Long unLikeCount;
 
+    private Boolean isImportant;
+
+    private Boolean isLocked;
+
     @Enumerated(EnumType.STRING)
     private BoardType boardType;
 
-    private Boolean isImportant;
+    @Enumerated(EnumType.STRING)
+    private MemberDepartment department;
+
     // relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

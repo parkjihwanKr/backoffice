@@ -26,6 +26,7 @@ public class BoardsResponseDto {
         private Long unLikeCount;
         private Long viewCount;
         private Boolean isImportant;
+        private Boolean isLocked;
         private BoardType boardType;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
@@ -43,6 +44,7 @@ public class BoardsResponseDto {
         private String content;
         private BoardType boardType;
         private Boolean isImportant;
+        private Boolean isLocked;
         // Like.count
         private Long likeCount;
         private Long unLikeCount;
@@ -64,6 +66,7 @@ public class BoardsResponseDto {
         private String title;
         private String content;
         private Boolean isImportant;
+        private Boolean isLocked;
         private BoardType boardType;
         private LocalDateTime createdAt;
         private List<String> fileList;
@@ -84,6 +87,7 @@ public class BoardsResponseDto {
         private Long unLikeCount;
         private Long viewCount;
         private Boolean isImportant;
+        private Boolean isLocked;
         private BoardType boardType;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;

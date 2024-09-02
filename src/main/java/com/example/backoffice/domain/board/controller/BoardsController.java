@@ -83,24 +83,28 @@ public class BoardsController {
     }
 
     // 부서별 전체 게시글 읽기
-    @GetMapping("/department")
+    @GetMapping("/{department}")
     public ResponseEntity<Page<BoardsResponseDto.ReadAllDto>> readAllForDepartment(
+            @PathVariable String department,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         Page<BoardsResponseDto.ReadAllDto> responseDtoList =
-                boardsService.readAllForDepartment(pageable);
+                boardsService.readAllForDepartment(department, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     // 부서별 게시글 하나 읽기
-    @GetMapping("/boards/{boardId}/department")
+    @GetMapping("/boards/{department}/{boardId}")
     public ResponseEntity<BoardsResponseDto.ReadOneDto> readOneForDepartment(
+            @PathVariable String department,
             @PathVariable Long boardId){
         BoardsResponseDto.ReadOneDto responseDto
-                = boardsService.readOneForDepartment(boardId);
+                = boardsService.readOneForDepartment(department, boardId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 부서별 게시글 생성 - {MemberDepartment : IT, SALES, MARKETING, FINANCE, ...}
+    // ResponseDto는 CreateOneDto와 다를게 없어서 따로 만들지 않음.
+    // RequestDto는 isLocked의 false, true를 받아야 되기에 RequestDto만 따로 만듦.
     @PostMapping(
             value = "/department",
             consumes = {MediaType.APPLICATION_JSON_VALUE,
@@ -138,7 +142,7 @@ public class BoardsController {
                         200, "부서 게시판 삭제 성공", null));
     }
 
-    // 게시판의 중요도
+    // 게시판의 중요도 수정
     @PatchMapping("/boards/{boardId}/markAsImportant")
     public ResponseEntity<CommonResponse<Void>> updateOneForMarkAsImportant(
             @PathVariable Long boardId,
@@ -148,5 +152,5 @@ public class BoardsController {
                 new CommonResponse<>(
                         200, "게시글 중요 체크 성공", null));
     }
-    // 게시판의 중요도 삭제
+    // 부서 게시판의 잠금 수정
 }

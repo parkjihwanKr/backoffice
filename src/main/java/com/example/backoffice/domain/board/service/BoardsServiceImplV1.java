@@ -16,6 +16,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.redis.ViewCountRedisProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,8 +67,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
                 || loginMember.getRole().equals(MemberRole.ADMIN))){
             throw new BoardsCustomException(BoardsExceptionCode.UNAUTHORIZED_DEPARTMENT_BOARD_CREATION);
         }
-
-        return saveBoardAndFiles(loginMember, requestDto, files, BoardType.GENERAL);
+        Boards board = BoardsConverter.toEntity(requestDto, loginMember);
+        return saveBoardWithFiles(files, board);
     }
 
     @Override
@@ -113,26 +115,49 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             }
         }
 
-        return saveBoardAndFiles(
-                loginMember, requestDto, files, BoardType.DEPARTMENT);
+        Boards departmentBoard = BoardsConverter.toEntityForDepartment(
+                requestDto, loginMember, memberDepartment);
+        return saveBoardWithFiles(files, departmentBoard);
     }
 
     // 모든 멤버가 접근은 가능하되, 자기가 포함되어진 부서가 아닌 멤버에게는 읽기만 허용
     @Override
     @Transactional(readOnly = true)
-    public Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(Pageable pageable){
+    public Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(
+            String departmentName, Pageable pageable){
+        // 1. 부서에 해당하는 게시글 모두 조회
+        MemberDepartment department = MembersConverter.toDepartment(departmentName);
         Page<Boards> boardList
-                = boardsRepository.findAllByBoardType(pageable, BoardType.DEPARTMENT);
-        return BoardsConverter.toReadAllDto(boardList);
+                = boardsRepository.findAllByDepartment(pageable, department);
+
+        Members loginMember = getLoginMember();
+
+        // 2. 접근 가능한 게시글 필터링
+        List<Boards> accessedBoards = boardList.stream()
+                .filter(board -> !board.getIsLocked() || board.getDepartment().equals(loginMember.getDepartment()))
+                .collect(Collectors.toList());
+
+        // 3. 필터링된 리스트를 Page로 변환
+        Page<Boards> accessedBoardList
+                = new PageImpl<>(accessedBoards, pageable, accessedBoards.size());
+
+        return BoardsConverter.toReadAllDto(accessedBoardList);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BoardsResponseDto.ReadOneDto readOneForDepartment(Long boardId){
-        Boards departmentBoard = findById(boardId);
-        if(!departmentBoard.getBoardType().equals(BoardType.DEPARTMENT)){
-            throw new BoardsCustomException(BoardsExceptionCode.NOT_DEPARTMENT_BOARD);
+    public BoardsResponseDto.ReadOneDto readOneForDepartment(
+            String departmentName, Long boardId){
+        MemberDepartment department = MembersConverter.toDepartment(departmentName);
+
+        Boards departmentBoard = findByIdAndDepartment(boardId, department);
+
+        if(departmentBoard.getIsLocked()
+                && !getLoginMember().getDepartment().equals(
+                        departmentBoard.getDepartment())){
+            throw new BoardsCustomException(BoardsExceptionCode.UNAUTHORIZED_ACCESS);
         }
+
         incrementViewCount(departmentBoard);
         return BoardsConverter.toReadOneDto(departmentBoard);
     }
@@ -157,6 +182,19 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         return updateBoardWithFiles(departmentBoard, requestDto, files);
     }
 
+    @Transactional
+    public BoardsResponseDto.CreateOneDto saveBoardWithFiles(List<MultipartFile> files, Boards board) {
+        boardsRepository.save(board);
+
+        List<String> fileUrlList = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String fileName = filesService.createOneForBoard(file, board);
+            fileUrlList.add(fileName);
+        }
+
+        return BoardsConverter.toCreateOneDto(board, fileUrlList);
+    }
+
     @Override
     @Transactional
     public void updateOneForMarkAsImportant(Long boardId, Members loginMember){
@@ -169,28 +207,27 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Transactional(readOnly = true)
     public Boards findById(Long boardId) {
         return boardsRepository.findById(boardId).orElseThrow(
-                () -> new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD)
-        );
+                () -> new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD));
     }
 
-    public void isMatchedBoardOwner(Long memberId, Long boardOwnerId){
+    @Transactional(readOnly = true)
+    public Boards findByIdAndDepartment(Long boardId, MemberDepartment department){
+        return boardsRepository.findByIdAndDepartment(boardId, department).orElseThrow(
+                ()-> new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD));
+    }
+
+    private void isMatchedBoardOwner(Long memberId, Long boardOwnerId){
         if(!boardOwnerId.equals(memberId)){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_BOARD_OWNER);
         }
     }
 
-    @Transactional
-    public BoardsResponseDto.CreateOneDto saveBoardAndFiles(Members member, BoardsRequestDto.CreateOneDto requestDto, List<MultipartFile> files, BoardType boardType) {
-        Boards board = BoardsConverter.toEntity(requestDto, member, boardType);
-        boardsRepository.save(board);
-
-        List<String> fileUrlList = new ArrayList<>();
-        for (MultipartFile file : files) {
-            String fileName = filesService.createOneForBoard(file, board);
-            fileUrlList.add(fileName);
+    private Members getLoginMember(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new SecurityException("사용자가 인증되지 않았습니다.");
         }
-
-        return BoardsConverter.toCreateOneDto(board, fileUrlList);
+        return (Members) authentication.getPrincipal();
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -216,7 +253,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     }
 
     // 조회수 로직
-    void incrementViewCount(Boards board){
+    private void incrementViewCount(Boards board){
         String currentMemberName = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getName)
                 .orElse("anonymousUser");

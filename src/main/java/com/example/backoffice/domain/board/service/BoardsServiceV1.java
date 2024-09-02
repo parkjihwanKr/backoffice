@@ -31,9 +31,11 @@ public interface BoardsServiceV1 {
             Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files);
 
-    Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(Pageable pageable);
+    Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(
+            String departmentName, Pageable pageable);
 
-    BoardsResponseDto.ReadOneDto readOneForDepartment(Long boardId);
+    BoardsResponseDto.ReadOneDto readOneForDepartment(
+            String departmentName, Long boardId);
 
     BoardsResponseDto.UpdateOneDto updateOneForDepartment(
             Long boardId, Members loginMember,

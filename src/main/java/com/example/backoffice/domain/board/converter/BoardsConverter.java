@@ -7,6 +7,7 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.entity.Files;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 
@@ -17,13 +18,32 @@ import java.util.stream.Collectors;
 public class BoardsConverter {
 
     public static Boards toEntity(
-            BoardsRequestDto.CreateOneDto requestDto, Members member, BoardType boardType){
+            BoardsRequestDto.CreateOneDto requestDto, Members member){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .isImportant(requestDto.getIsImportant())
-                .boardType(boardType)
+                .boardType(BoardType.GENERAL)
+                .department(null)
+                .isLocked(false)
+                .likeCount(0L)
+                .unLikeCount(0L)
+                .viewCount(0L)
+                .build();
+    }
+
+    public static Boards toEntityForDepartment(
+            BoardsRequestDto.CreateOneDto requestDto,
+            Members member, MemberDepartment department){
+        return Boards.builder()
+                .member(member)
+                .title(requestDto.getTitle())
+                .content(requestDto.getContent())
+                .isImportant(requestDto.getIsImportant())
+                .isLocked(requestDto.getIsLocked())
+                .boardType(BoardType.DEPARTMENT)
+                .department(department)
                 .likeCount(0L)
                 .unLikeCount(0L)
                 .viewCount(0L)
@@ -37,6 +57,7 @@ public class BoardsConverter {
                     .title(board.getTitle())
                     .writer(board.getMember().getMemberName())
                     .content(board.getContent())
+                    .isImportant(board.getIsImportant())
                     .likeCount(board.getLikeCount())
                     .unLikeCount(board.getUnLikeCount())
                     .viewCount(board.getViewCount())
