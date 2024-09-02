@@ -17,14 +17,17 @@ import com.example.backoffice.global.redis.ViewCountRedisProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,21 +61,14 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     public BoardsResponseDto.CreateOneDto createOne(
             Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files){
-        // department 입력란에 null 일 때?
 
         // 만들 자격 추가 : 전체 게시판을 만들 수 있는 인원은 권한이 admin이거나 main_admin만 가능
         if(!(loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
                 || loginMember.getRole().equals(MemberRole.ADMIN))){
             throw new BoardsCustomException(BoardsExceptionCode.UNAUTHORIZED_DEPARTMENT_BOARD_CREATION);
         }
-        Boards board = BoardsConverter.toEntity(requestDto, loginMember, BoardType.GENERAL);
-        List<String> fileUrlList = new ArrayList<>();
-        boardsRepository.save(board);
-        for (MultipartFile file : files) {
-            String fileName = filesService.createOneForBoard(file, board);
-            fileUrlList.add(fileName);
-        }
-        return BoardsConverter.toCreateOneDto(board, fileUrlList);
+
+        return saveBoardAndFiles(loginMember, requestDto, files, BoardType.GENERAL);
     }
 
     @Override
@@ -90,7 +86,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         // 해당 멤버가 게시판의 주인인지?
         isMatchedBoardOwner(loginMember.getId(), board);
 
-        return updateBoardAndFile(board, requestDto, files);
+        return updateBoardWithFiles(board, requestDto, files);
     }
 
     @Override
@@ -119,17 +115,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             }
         }
 
-        Boards departmentBoard = BoardsConverter.toEntity(
-                requestDto, loginMember, BoardType.DEPARTMENT);
-
-        List<String> fileUrlList = new ArrayList<>();
-        boardsRepository.save(departmentBoard);
-        for (MultipartFile file : files) {
-            String fileName = filesService.createOneForBoard(file, departmentBoard);
-            fileUrlList.add(fileName);
-        }
-
-        return BoardsConverter.toCreateOneDto(departmentBoard, fileUrlList);
+        return saveBoardAndFiles(
+                loginMember, requestDto, files, BoardType.DEPARTMENT);
     }
 
     // 모든 멤버가 접근은 가능하되, 자기가 포함되어진 부서가 아닌 멤버에게는 읽기만 허용
@@ -169,7 +156,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         // 3. 게시글의 소유자 확인
         isMatchedBoardOwner(loginMember.getId(), departmentBoard);
 
-        return updateBoardAndFile(departmentBoard, requestDto, files);
+        return updateBoardWithFiles(departmentBoard, requestDto, files);
     }
 
     @Transactional(readOnly = true)
@@ -186,7 +173,21 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     }
 
     @Transactional
-    public BoardsResponseDto.UpdateOneDto updateBoardAndFile(
+    public BoardsResponseDto.CreateOneDto saveBoardAndFiles(Members member, BoardsRequestDto.CreateOneDto requestDto, List<MultipartFile> files, BoardType boardType) {
+        Boards board = BoardsConverter.toEntity(requestDto, member, boardType);
+        boardsRepository.save(board);
+
+        List<String> fileUrlList = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String fileName = filesService.createOneForBoard(file, board);
+            fileUrlList.add(fileName);
+        }
+
+        return BoardsConverter.toCreateOneDto(board, fileUrlList);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public BoardsResponseDto.UpdateOneDto updateBoardWithFiles(
             Boards board, BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files){
         board.update(requestDto.getTitle(), requestDto.getContent());
@@ -209,8 +210,10 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     // 조회수 로직
     void incrementViewCount(Boards board){
-        String currentMemberName
-                = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentMemberName = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Authentication::getName)
+                .orElse("anonymousUser");
+
         String key = "boardId : " + board.getId() +
                 ", viewMemberName : " + currentMemberName;
 
