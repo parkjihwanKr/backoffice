@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.board.dto;
 
+import com.example.backoffice.domain.board.entity.BoardType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,7 @@ public class BoardsRequestDto {
         private String title;
         private String content;
         private Boolean isImportant;
+        private String department;
     }
 
     @Getter
@@ -26,17 +28,6 @@ public class BoardsRequestDto {
         private String title;
         private String content;
         private Boolean isImportant;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CreateOneForDepartmentDto {
-        private String title;
-        private String content;
-        private Boolean isImportant;
-        private String department;
     }
 
     @Getter

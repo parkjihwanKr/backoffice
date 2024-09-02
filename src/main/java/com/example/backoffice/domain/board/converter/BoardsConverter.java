@@ -31,20 +31,6 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static Boards toEntityForDepartment(
-            BoardsRequestDto.CreateOneForDepartmentDto requestDto, Members member, BoardType boardType){
-        return Boards.builder()
-                .member(member)
-                .title(requestDto.getTitle())
-                .content(requestDto.getContent())
-                .isImportant(requestDto.getIsImportant())
-                .boardType(boardType)
-                .likeCount(0L)
-                .unLikeCount(0L)
-                .viewCount(0L)
-                .build();
-    }
-
     public static Page<BoardsResponseDto.ReadAllDto> toReadAllDto(Page<Boards> boardPage){
         return boardPage.map(board -> {
             return BoardsResponseDto.ReadAllDto.builder()
@@ -165,22 +151,6 @@ public class BoardsConverter {
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
                 .boardType(board.getBoardType())
-                .build();
-    }
-
-    public static BoardsResponseDto.CreateOneForDepartmentDto toCreateOneForDepartmentDto (
-            String title, String content, Boolean isImportant, String writer,
-            Long boardId, BoardType boardType, List<String> fileUrlList,
-            LocalDateTime createdAt){
-        return BoardsResponseDto.CreateOneForDepartmentDto.builder()
-                .boardId(boardId)
-                .title(title)
-                .content(content)
-                .isImportant(isImportant)
-                .writer(writer)
-                .createdAt(createdAt)
-                .boardType(boardType)
-                .fileList(fileUrlList)
                 .build();
     }
 }

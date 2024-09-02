@@ -36,7 +36,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Override
     @Transactional(readOnly = true)
     public Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable){
-        Page<Boards> boardList = boardsRepository.findAll(pageable);
+        Page<Boards> boardList
+                = boardsRepository.findAllByBoardType(pageable, BoardType.GENERAL);
         return BoardsConverter.toReadAllDto(boardList);
     }
 
@@ -44,6 +45,9 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Transactional
     public BoardsResponseDto.ReadOneDto readOne(Long boardId){
         Boards board = findById(boardId);
+        if(!board.getBoardType().equals(BoardType.GENERAL)){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_GENERAL_BOARD);
+        }
         incrementViewCount(board);
         return BoardsConverter.toReadOneDto(board);
     }
@@ -53,6 +57,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     public BoardsResponseDto.CreateOneDto createOne(
             Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files){
+        // department 입력란에 null 일 때?
+
         // 만들 자격 추가 : 전체 게시판을 만들 수 있는 인원은 권한이 admin이거나 main_admin만 가능
         if(!(loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
                 || loginMember.getRole().equals(MemberRole.ADMIN))){
@@ -95,8 +101,18 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     @Override
     @Transactional
-    public BoardsResponseDto.CreateOneForDepartmentDto createOneForDepartment(
-            Members loginMember, BoardsRequestDto.CreateOneForDepartmentDto requestDto,
+    public void deleteOne(Long boardId, Members member){
+        Boards board = findById(boardId);
+        if(!member.getId().equals(board.getMember().getId())){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_MEMBER);
+        }
+        boardsRepository.deleteById(boardId);
+    }
+
+    @Override
+    @Transactional
+    public BoardsResponseDto.CreateOneDto createOneForDepartment(
+            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files){
         // 1. 해당 멤버가 부서 게시판을 만들 자격이 있는지?
         String department = requestDto.getDepartment();
@@ -111,7 +127,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             }
         }
 
-        Boards departmentBoard = BoardsConverter.toEntityForDepartment(
+        Boards departmentBoard = BoardsConverter.toEntity(
                 requestDto, loginMember, BoardType.DEPARTMENT);
 
         List<String> fileUrlList = new ArrayList<>();
@@ -121,22 +137,29 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             fileUrlList.add(fileName);
         }
 
-        return BoardsConverter.toCreateOneForDepartmentDto(
-                departmentBoard.getTitle(), departmentBoard.getContent(),
-                departmentBoard.getIsImportant(), loginMember.getMemberName(),
-                departmentBoard.getId(), departmentBoard.getBoardType(),
-                fileUrlList, departmentBoard.getCreatedAt());
+        return BoardsConverter.toCreateOneDto(departmentBoard, fileUrlList);
+    }
+
+    // 모든 멤버가 접근은 가능하되, 자기가 포함되어진 부서가 아닌 멤버에게는 읽기만 허용
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(Pageable pageable){
+        Page<Boards> boardList
+                = boardsRepository.findAllByBoardType(pageable, BoardType.DEPARTMENT);
+        return BoardsConverter.toReadAllDto(boardList);
     }
 
     @Override
-    @Transactional
-    public void deleteOne(Long boardId, Members member){
-        Boards board = findById(boardId);
-        if(!member.getId().equals(board.getMember().getId())){
-            throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_MEMBER);
+    @Transactional(readOnly = true)
+    public BoardsResponseDto.ReadOneDto readOneForDepartment(Long boardId){
+        Boards departmentBoard = findById(boardId);
+        if(!departmentBoard.getBoardType().equals(BoardType.DEPARTMENT)){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_DEPARTMENT_BOARD);
         }
-        boardsRepository.deleteById(boardId);
+        incrementViewCount(departmentBoard);
+        return BoardsConverter.toReadOneDto(departmentBoard);
     }
+
     @Transactional(readOnly = true)
     public Boards findById(Long boardId) {
         return boardsRepository.findById(boardId).orElseThrow(

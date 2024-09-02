@@ -34,14 +34,14 @@ public class BoardsController {
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         Page<BoardsResponseDto.ReadAllDto> responseDtoList =
                 boardsService.readAll(pageable);
-        return ResponseEntity.ok(responseDtoList);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     // 게시글 하나 읽기
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardsResponseDto.ReadOneDto> readOne(@PathVariable long boardId){
         BoardsResponseDto.ReadOneDto responseDto = boardsService.readOne(boardId);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 게시글 게시
@@ -53,7 +53,7 @@ public class BoardsController {
             @RequestPart(value = "files") List<MultipartFile> files){
         BoardsResponseDto.CreateOneDto responseDto =
                 boardsService.createOne(memberDetails.getMembers(), requestDto, files);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 게시글 수정
@@ -67,7 +67,7 @@ public class BoardsController {
         BoardsResponseDto.UpdateOneDto responseDto
                 = boardsService.updateOne(
                         boardId, memberDetails.getMembers(), requestDto, files);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 게시글 삭제
@@ -83,18 +83,34 @@ public class BoardsController {
         );
     }
 
-    // 부서별 게시글 읽기
+    // 부서별 전체 게시글 읽기
+    @GetMapping("/department")
+    public ResponseEntity<Page<BoardsResponseDto.ReadAllDto>> readAllForDepartment(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+        Page<BoardsResponseDto.ReadAllDto> responseDtoList =
+                boardsService.readAllForDepartment(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
+
+    // 부서별 게시글 하나 읽기
+    @GetMapping("/boards/{boardId}/department")
+    public ResponseEntity<BoardsResponseDto.ReadOneDto> readOneForDepartment(
+            @PathVariable Long boardId){
+        BoardsResponseDto.ReadOneDto responseDto
+                = boardsService.readOneForDepartment(boardId);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
     // 부서별 게시글 생성 - {MemberDepartment : IT, SALES, MARKETING, FINANCE, ...}
     @PostMapping(
             value = "/department",
             consumes = {MediaType.APPLICATION_JSON_VALUE,
             MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<BoardsResponseDto.CreateOneForDepartmentDto> createOneForDepartment(
+    public ResponseEntity<BoardsResponseDto.CreateOneDto> createOneForDepartment(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestPart(value = "data") @Valid BoardsRequestDto.CreateOneForDepartmentDto requestDto,
+            @RequestPart(value = "data") @Valid BoardsRequestDto.CreateOneDto requestDto,
             @RequestPart(value = "files") List<MultipartFile> files){
-        BoardsResponseDto.CreateOneForDepartmentDto responseDto
+        BoardsResponseDto.CreateOneDto responseDto
                 = boardsService.createOneForDepartment(
                         memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
