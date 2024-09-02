@@ -40,5 +40,7 @@ public interface BoardsServiceV1 {
             BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files);
 
+    void updateOneForMarkAsImportant(Long boardId, Members loginMember);
+
     Boards findById(Long boardId);
 }

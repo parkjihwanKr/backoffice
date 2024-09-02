@@ -157,6 +157,15 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         return updateBoardWithFiles(departmentBoard, requestDto, files);
     }
 
+    @Override
+    @Transactional
+    public void updateOneForMarkAsImportant(Long boardId, Members loginMember){
+        Boards board = findById(boardId);
+        isMatchedBoardOwner(loginMember.getId(), board.getMember().getId());
+
+        board.updateIsImportant(!board.getIsImportant());
+    }
+
     @Transactional(readOnly = true)
     public Boards findById(Long boardId) {
         return boardsRepository.findById(boardId).orElseThrow(

@@ -3,7 +3,6 @@ package com.example.backoffice.domain.board.dto;
 import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
-import com.example.backoffice.domain.member.entity.MemberDepartment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

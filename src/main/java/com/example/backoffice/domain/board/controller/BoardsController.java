@@ -139,5 +139,14 @@ public class BoardsController {
     }
 
     // 게시판의 중요도
+    @PatchMapping("/boards/{boardId}/markAsImportant")
+    public ResponseEntity<CommonResponse<Void>> updateOneForMarkAsImportant(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        boardsService.updateOneForMarkAsImportant(boardId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        200, "게시글 중요 체크 성공", null));
+    }
     // 게시판의 중요도 삭제
 }

@@ -1,10 +1,9 @@
 package com.example.backoffice.domain.board.entity;
 
-import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.entity.Files;
-import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -73,6 +72,9 @@ public class Boards extends CommonEntity {
         this.content = content;
     }
 
+    public void updateIsImportant(Boolean isImportant){
+        this.isImportant = isImportant;
+    }
     public void addEmoji(Reactions reaction, String emoji){
         reactionList.add(reaction);
         if(emoji.equals("LIKE")){
