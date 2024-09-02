@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -129,6 +128,16 @@ public class BoardsController {
     }
 
     // 부서별 게시글 삭제
+    @DeleteMapping("/boards/{boardId}/department")
+    public ResponseEntity<CommonResponse<Void>> deleteOneForDepartment(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        boardsService.deleteOne(boardId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        200, "부서 게시판 삭제 성공", null));
+    }
+
     // 게시판의 중요도
     // 게시판의 중요도 삭제
 }

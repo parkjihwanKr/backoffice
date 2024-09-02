@@ -23,10 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -84,7 +82,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         }
 
         // 해당 멤버가 게시판의 주인인지?
-        isMatchedBoardOwner(loginMember.getId(), board);
+        isMatchedBoardOwner(loginMember.getId(), board.getMember().getId());
 
         return updateBoardWithFiles(board, requestDto, files);
     }
@@ -93,7 +91,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Transactional
     public void deleteOne(Long boardId, Members loginMember){
         Boards board = findById(boardId);
-        isMatchedBoardOwner(loginMember.getId(),board);
+        isMatchedBoardOwner(loginMember.getId(),board.getMember().getId());
         boardsRepository.deleteById(boardId);
     }
 
@@ -154,7 +152,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         }
 
         // 3. 게시글의 소유자 확인
-        isMatchedBoardOwner(loginMember.getId(), departmentBoard);
+        isMatchedBoardOwner(loginMember.getId(), departmentBoard.getMember().getId());
 
         return updateBoardWithFiles(departmentBoard, requestDto, files);
     }
@@ -166,8 +164,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         );
     }
 
-    public void isMatchedBoardOwner(Long memberId, Boards board){
-        if(!board.getMember().getId().equals(memberId)){
+    public void isMatchedBoardOwner(Long memberId, Long boardOwnerId){
+        if(!boardOwnerId.equals(memberId)){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_BOARD_OWNER);
         }
     }
@@ -225,17 +223,18 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         if (currentCount == null) {
             currentCount = 0L;
         }
-        Long viewCount;
+
+        // Long viewCount;
         // 게시글 작성자가 현재 로그인한 사용자와 같은 경우
         if (board.getMember().getMemberName().equals(currentMemberName)) {
             if (currentCount < 1) {
-                viewCount = viewCountRedisProvider.incrementViewCount(key);
+                viewCountRedisProvider.incrementViewCount(key);
                 board.incrementViewCount();
             }
         } else {
             // 게시글 작성자가 현재 로그인한 사용자와 다른 경우
             if (currentCount < 3) {
-                viewCount = viewCountRedisProvider.incrementViewCount(key);
+                viewCountRedisProvider.incrementViewCount(key);
                 board.incrementViewCount();
             }
         }
