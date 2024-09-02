@@ -116,5 +116,19 @@ public class BoardsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
     // 부서별 게시글 수정
+    @PatchMapping("/boards/{boardId}/department")
+    public ResponseEntity<BoardsResponseDto.UpdateOneDto> updateOneForDepartment(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestPart(value = "data") @Valid BoardsRequestDto.UpdateOneDto requestDto,
+            @RequestPart(value = "files") List<MultipartFile> files){
+        BoardsResponseDto.UpdateOneDto responseDto
+                = boardsService.updateOneForDepartment(
+                        boardId, memberDetails.getMembers(), requestDto, files);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
     // 부서별 게시글 삭제
+    // 게시판의 중요도
+    // 게시판의 중요도 삭제
 }

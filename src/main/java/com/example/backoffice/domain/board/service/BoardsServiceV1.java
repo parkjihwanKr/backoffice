@@ -35,5 +35,10 @@ public interface BoardsServiceV1 {
 
     BoardsResponseDto.ReadOneDto readOneForDepartment(Long boardId);
 
+    BoardsResponseDto.UpdateOneDto updateOneForDepartment(
+            Long boardId, Members loginMember,
+            BoardsRequestDto.UpdateOneDto requestDto,
+            List<MultipartFile> files);
+
     Boards findById(Long boardId);
 }

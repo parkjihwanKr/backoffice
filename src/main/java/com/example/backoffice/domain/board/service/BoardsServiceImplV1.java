@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -77,35 +78,26 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Override
     @Transactional
     public BoardsResponseDto.UpdateOneDto updateOne(
-            Long boardId, Members member,
+            Long boardId, Members loginMember,
             BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files){
         Boards board = findById(boardId);
-        board.update(requestDto.getTitle(), requestDto.getContent());
-        // 삭제 전 urlList, 삭제 후 urlList
-        List<String> beforeFileUrlList = new ArrayList<>();
-        List<String> afterFileUrlList = new ArrayList<>();
 
-        for(int i = 0; i<board.getFileList().size(); i++){
-            beforeFileUrlList.add(board.getFileList().get(i).getUrl());
+        if(!board.getBoardType().equals(BoardType.GENERAL)){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_GENERAL_BOARD);
         }
-        board.getFileList().clear();
-        filesService.delete(board.getId(), beforeFileUrlList);
-        for (MultipartFile file : files) {
-            // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
-            String fileUrl = filesService.createOneForBoard(file, board);
-            afterFileUrlList.add(fileUrl);
-        }
-        return BoardsConverter.toUpdateOneDto(board, afterFileUrlList);
+
+        // 해당 멤버가 게시판의 주인인지?
+        isMatchedBoardOwner(loginMember.getId(), board);
+
+        return updateBoardAndFile(board, requestDto, files);
     }
 
     @Override
     @Transactional
-    public void deleteOne(Long boardId, Members member){
+    public void deleteOne(Long boardId, Members loginMember){
         Boards board = findById(boardId);
-        if(!member.getId().equals(board.getMember().getId())){
-            throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_MEMBER);
-        }
+        isMatchedBoardOwner(loginMember.getId(),board);
         boardsRepository.deleteById(boardId);
     }
 
@@ -160,11 +152,59 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         return BoardsConverter.toReadOneDto(departmentBoard);
     }
 
+    @Override
+    @Transactional
+    public BoardsResponseDto.UpdateOneDto updateOneForDepartment(
+            Long boardId, Members loginMember,
+            BoardsRequestDto.UpdateOneDto requestDto,
+            List<MultipartFile> files){
+        // 1. 게시글 존재 유무
+        Boards departmentBoard = findById(boardId);
+
+        // 2. 게시글의 타입 확인
+        if(!departmentBoard.getBoardType().equals(BoardType.DEPARTMENT)){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_DEPARTMENT_BOARD);
+        }
+
+        // 3. 게시글의 소유자 확인
+        isMatchedBoardOwner(loginMember.getId(), departmentBoard);
+
+        return updateBoardAndFile(departmentBoard, requestDto, files);
+    }
+
     @Transactional(readOnly = true)
     public Boards findById(Long boardId) {
         return boardsRepository.findById(boardId).orElseThrow(
                 () -> new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD)
         );
+    }
+
+    public void isMatchedBoardOwner(Long memberId, Boards board){
+        if(!board.getMember().getId().equals(memberId)){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_MATCHED_BOARD_OWNER);
+        }
+    }
+
+    @Transactional
+    public BoardsResponseDto.UpdateOneDto updateBoardAndFile(
+            Boards board, BoardsRequestDto.UpdateOneDto requestDto,
+            List<MultipartFile> files){
+        board.update(requestDto.getTitle(), requestDto.getContent());
+        // 삭제 전 urlList, 삭제 후 urlList
+        List<String> beforeFileUrlList = new ArrayList<>();
+        List<String> afterFileUrlList = new ArrayList<>();
+
+        for(int i = 0; i<board.getFileList().size(); i++){
+            beforeFileUrlList.add(board.getFileList().get(i).getUrl());
+        }
+        board.getFileList().clear();
+        filesService.delete(board.getId(), beforeFileUrlList);
+        for (MultipartFile file : files) {
+            // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
+            String fileUrl = filesService.createOneForBoard(file, board);
+            afterFileUrlList.add(fileUrl);
+        }
+        return BoardsConverter.toUpdateOneDto(board, afterFileUrlList);
     }
 
     // 조회수 로직

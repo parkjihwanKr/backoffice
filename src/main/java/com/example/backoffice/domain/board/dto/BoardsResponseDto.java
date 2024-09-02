@@ -89,19 +89,4 @@ public class BoardsResponseDto {
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateOneForDepartmentDto {
-        private Long boardId;
-        private String writer;
-        private String title;
-        private String content;
-        private LocalDateTime createdAt;
-        private Boolean isImportant;
-        private BoardType boardType;
-        private List<String> fileList;
-    }
 }
