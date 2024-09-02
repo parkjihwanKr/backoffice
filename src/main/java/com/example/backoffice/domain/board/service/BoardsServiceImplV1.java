@@ -204,6 +204,18 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         board.updateIsImportant(!board.getIsImportant());
     }
 
+    @Override
+    @Transactional
+    public void updateOneForMarkAsLocked(Long boardId, Members loginMember){
+        Boards board = findById(boardId);
+        if(!board.getBoardType().equals(BoardType.DEPARTMENT)){
+            throw new BoardsCustomException(BoardsExceptionCode.NOT_DEPARTMENT_BOARD);
+        }
+        isMatchedBoardOwner(loginMember.getId(), board.getMember().getId());
+
+        board.updateIsLocked(!board.getIsLocked());
+    }
+
     @Transactional(readOnly = true)
     public Boards findById(Long boardId) {
         return boardsRepository.findById(boardId).orElseThrow(

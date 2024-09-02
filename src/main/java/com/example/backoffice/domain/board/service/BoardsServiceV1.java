@@ -44,5 +44,7 @@ public interface BoardsServiceV1 {
 
     void updateOneForMarkAsImportant(Long boardId, Members loginMember);
 
+    void updateOneForMarkAsLocked(Long boardId, Members LoginMember);
+
     Boards findById(Long boardId);
 }

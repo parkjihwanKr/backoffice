@@ -82,6 +82,10 @@ public class Boards extends CommonEntity {
     public void updateIsImportant(Boolean isImportant){
         this.isImportant = isImportant;
     }
+
+    public void updateIsLocked(Boolean isLocked){
+        this.isLocked = isLocked;
+    }
     public void addEmoji(Reactions reaction, String emoji){
         reactionList.add(reaction);
         if(emoji.equals("LIKE")){

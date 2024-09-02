@@ -61,7 +61,7 @@ public class BoardsController {
                     MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<BoardsResponseDto.UpdateOneDto> updateOne(
             @PathVariable long boardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestPart(value = "data") BoardsRequestDto.UpdateOneDto requestDto,
+            @RequestPart(value = "data") @Valid BoardsRequestDto.UpdateOneDto requestDto,
             @RequestPart(value = "files") List<MultipartFile> files){
         BoardsResponseDto.UpdateOneDto responseDto
                 = boardsService.updateOne(
@@ -103,8 +103,6 @@ public class BoardsController {
     }
 
     // 부서별 게시글 생성 - {MemberDepartment : IT, SALES, MARKETING, FINANCE, ...}
-    // ResponseDto는 CreateOneDto와 다를게 없어서 따로 만들지 않음.
-    // RequestDto는 isLocked의 false, true를 받아야 되기에 RequestDto만 따로 만듦.
     @PostMapping(
             value = "/department",
             consumes = {MediaType.APPLICATION_JSON_VALUE,
@@ -118,6 +116,7 @@ public class BoardsController {
                         memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
     // 부서별 게시글 수정
     @PatchMapping("/boards/{boardId}/department")
     public ResponseEntity<BoardsResponseDto.UpdateOneDto> updateOneForDepartment(
@@ -153,4 +152,14 @@ public class BoardsController {
                         200, "게시글 중요 체크 성공", null));
     }
     // 부서 게시판의 잠금 수정
+    @PatchMapping("/boards/{boardId}/markAsLocked")
+    public ResponseEntity<CommonResponse<Void>> updateDepartmentForMarkAsLocked(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        boardsService.updateOneForMarkAsLocked(boardId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        200, "부서 게시글을 부서원만 볼 수 있게 변경 성공",
+                        null));
+    }
 }
