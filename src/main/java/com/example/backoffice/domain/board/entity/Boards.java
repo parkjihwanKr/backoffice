@@ -47,6 +47,9 @@ public class Boards extends CommonEntity {
     private Boolean isLocked;
 
     @Enumerated(EnumType.STRING)
+    private BoardCategories categories;
+
+    @Enumerated(EnumType.STRING)
     private BoardType boardType;
 
     @Enumerated(EnumType.STRING)
@@ -74,9 +77,16 @@ public class Boards extends CommonEntity {
         this.viewCount++;
     }
 
-    public void update(String title, String content){
+    public void update(
+            String title, String content, Boolean isImportant,
+            Boolean isLocked, MemberDepartment department,
+            BoardCategories categories){
         this.title = title;
         this.content = content;
+        this.isImportant = isImportant;
+        this.isLocked = isLocked;
+        this.department = department;
+        this.categories = categories;
     }
 
     public void updateIsImportant(Boolean isImportant){

@@ -3,6 +3,8 @@ package com.example.backoffice.domain.board.dto;
 import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
+import com.example.backoffice.domain.file.dto.FilesResponseDto;
+import com.example.backoffice.domain.file.entity.Files;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,12 +24,15 @@ public class BoardsResponseDto {
         private String title;
         private String writer;
         private String content;
+        private String categories;
         private Long likeCount;
         private Long unLikeCount;
         private Long viewCount;
+        private Long commentCount;
         private Boolean isImportant;
         private Boolean isLocked;
         private BoardType boardType;
+        private List<FilesResponseDto.ReadOneDto> fileList;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -45,6 +50,7 @@ public class BoardsResponseDto {
         private BoardType boardType;
         private Boolean isImportant;
         private Boolean isLocked;
+        private String category;
         // Like.count
         private Long likeCount;
         private Long unLikeCount;
@@ -81,6 +87,7 @@ public class BoardsResponseDto {
         private String title;
         private String content;
         private String writer;
+        private String category;
         private List<Comments> commentList;
         private List<String> fileList;
         private Long likeCount;

@@ -3,6 +3,7 @@ package com.example.backoffice.domain.board.service;
 import com.example.backoffice.domain.board.converter.BoardsConverter;
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
+import com.example.backoffice.domain.board.entity.BoardCategories;
 import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
@@ -39,10 +40,31 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable){
-        Page<Boards> boardList
-                = boardsRepository.findAllByBoardType(pageable, BoardType.GENERAL);
-        return BoardsConverter.toReadAllDto(boardList);
+    public Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable) {
+        // 1. 상단에 고정할 중요한 게시글 3개
+        List<Boards> importantBoardList = boardsRepository.findTop3ByIsImportantTrueOrderByModifiedAtDesc();
+
+        // 2. 중요한 게시글을 제외한 나머지 게시글을 최신순으로 가져옵니다.
+        Page<Boards> otherBoardPage = boardsRepository.findByIsImportantFalseOrderByModifiedAtDesc(pageable);
+
+        // 3. 중요한 게시글(3개)을 상단에 배치하고, 그 뒤에 나머지 게시글을 붙입니다.
+        List<Boards> combinedBoards = new ArrayList<>(importantBoardList);
+        combinedBoards.addAll(otherBoardPage.getContent());
+
+        // 4. 댓글 수를 가져와서 각 게시글에 댓글 수를 추가합니다.
+        List<BoardsResponseDto.ReadAllDto> boardDtoList = combinedBoards.stream()
+                .map(board -> {
+                    Long commentCount = (long) board.getCommentList().size();  // 댓글 수 계산
+                    return BoardsConverter.toReadAllDto(board, commentCount);
+                })
+                .collect(Collectors.toList());
+
+        // 5. combinedBoards 리스트를 Page로 변환합니다.
+        Page<BoardsResponseDto.ReadAllDto> finalBoardPage
+                = new PageImpl<>(boardDtoList, pageable, otherBoardPage.getTotalElements());
+
+        // 6. 변환된 Page<BoardsResponseDto.ReadAllDto>를 반환합니다.
+        return finalBoardPage;
     }
 
     @Override
@@ -67,7 +89,9 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
                 || loginMember.getRole().equals(MemberRole.ADMIN))){
             throw new BoardsCustomException(BoardsExceptionCode.UNAUTHORIZED_DEPARTMENT_BOARD_CREATION);
         }
-        Boards board = BoardsConverter.toEntity(requestDto, loginMember);
+        BoardCategories categories
+                = BoardsConverter.toCategories(requestDto.getCategory());
+        Boards board = BoardsConverter.toEntity(requestDto, loginMember, categories);
         return saveBoardWithFiles(files, board);
     }
 
@@ -100,10 +124,9 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Override
     @Transactional
     public BoardsResponseDto.CreateOneDto createOneForDepartment(
-            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
-            List<MultipartFile> files){
+            String department, Members loginMember,
+            BoardsRequestDto.CreateOneDto requestDto, List<MultipartFile> files){
         // 1. 해당 멤버가 부서 게시판을 만들 자격이 있는지?
-        String department = requestDto.getDepartment();
         MemberDepartment memberDepartment
                 = MembersConverter.toDepartment(department);
         // 1-1. 만드려는 부서 게시판의 멤버 부서가 같지 않을 때
@@ -127,8 +150,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             String departmentName, Pageable pageable){
         // 1. 부서에 해당하는 게시글 모두 조회
         MemberDepartment department = MembersConverter.toDepartment(departmentName);
-        Page<Boards> boardList
-                = boardsRepository.findAllByDepartment(pageable, department);
+        Page<Boards> boardList = boardsRepository.findAllByDepartment(pageable, department);
 
         Members loginMember = getLoginMember();
 
@@ -137,12 +159,21 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
                 .filter(board -> !board.getIsLocked() || board.getDepartment().equals(loginMember.getDepartment()))
                 .collect(Collectors.toList());
 
-        // 3. 필터링된 리스트를 Page로 변환
-        Page<Boards> accessedBoardList
-                = new PageImpl<>(accessedBoards, pageable, accessedBoards.size());
+        // 3. 각 게시글의 댓글 수를 계산하여 DTO로 변환
+        List<BoardsResponseDto.ReadAllDto> boardDtoList = accessedBoards.stream()
+                .map(board -> {
+                    Long commentCount = (long) board.getCommentList().size();  // 댓글 수 계산
+                    return BoardsConverter.toReadAllDto(board, commentCount);
+                })
+                .collect(Collectors.toList());
 
-        return BoardsConverter.toReadAllDto(accessedBoardList);
+        // 4. 필터링된 리스트를 Page로 변환
+        Page<BoardsResponseDto.ReadAllDto> accessedBoardListDto
+                = new PageImpl<>(boardDtoList, pageable, accessedBoards.size());
+
+        return accessedBoardListDto;
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -165,7 +196,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Override
     @Transactional
     public BoardsResponseDto.UpdateOneDto updateOneForDepartment(
-            Long boardId, Members loginMember,
+            String department, Long boardId, Members loginMember,
             BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files){
         // 1. 게시글 존재 유무
@@ -182,14 +213,24 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         return updateBoardWithFiles(departmentBoard, requestDto, files);
     }
 
+    @Override
+    @Transactional
+    public void deleteOneForDepartment(
+            String department, Long boardId, Members loginMember){
+
+    }
+
+    // RequestPart files required = false로 인하여 files가 null일 수 있는 경우의 수 발생
     @Transactional
     public BoardsResponseDto.CreateOneDto saveBoardWithFiles(List<MultipartFile> files, Boards board) {
         boardsRepository.save(board);
 
         List<String> fileUrlList = new ArrayList<>();
-        for (MultipartFile file : files) {
-            String fileName = filesService.createOneForBoard(file, board);
-            fileUrlList.add(fileName);
+        if(files != null){
+            for (MultipartFile file : files) {
+                String fileName = filesService.createOneForBoard(file, board);
+                fileUrlList.add(fileName);
+            }
         }
 
         return BoardsConverter.toCreateOneDto(board, fileUrlList);
@@ -246,7 +287,22 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     public BoardsResponseDto.UpdateOneDto updateBoardWithFiles(
             Boards board, BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files){
-        board.update(requestDto.getTitle(), requestDto.getContent());
+        // Department board, General board 구분
+        MemberDepartment department
+                = MembersConverter.toDepartment(requestDto.getDepartment());
+        if(requestDto.getCategory() == null){
+            // department
+            board.update(requestDto.getTitle(), requestDto.getContent(),
+                    requestDto.getIsImportant(), requestDto.getIsLocked(),
+                    department, null);
+        }else{
+            // general
+            BoardCategories categories
+                    = BoardsConverter.toCategories(requestDto.getCategory());
+            board.update(requestDto.getTitle(), requestDto.getContent(),
+                    requestDto.getIsImportant(), false,
+                    department, categories);
+        }
         // 삭제 전 urlList, 삭제 후 urlList
         List<String> beforeFileUrlList = new ArrayList<>();
         List<String> afterFileUrlList = new ArrayList<>();

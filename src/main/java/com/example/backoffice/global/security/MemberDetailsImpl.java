@@ -29,6 +29,11 @@ public class MemberDetailsImpl implements UserDetails {
         return authorities;
     }
 
+    // 멤버 자체를 불러와야하는 경우가 생김
+    public Members getMember(){
+        return this.members;
+    }
+
     @Override
     public String getPassword() {
         return this.members.getPassword();

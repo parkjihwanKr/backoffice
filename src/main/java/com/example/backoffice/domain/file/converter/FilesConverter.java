@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.file.converter;
 
 import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.Members;
 
@@ -20,6 +21,13 @@ public class FilesConverter {
                 .url(url)
                 .member(board.getMember())
                 .board(board)
+                .build();
+    }
+
+    public static FilesResponseDto.ReadOneDto toReadOneDto(Files file){
+        return FilesResponseDto.ReadOneDto.builder()
+                .id(file.getId())
+                .url(file.getUrl())
                 .build();
     }
 }

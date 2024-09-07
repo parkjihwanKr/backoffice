@@ -2,14 +2,18 @@ package com.example.backoffice.domain.board.converter;
 
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
+import com.example.backoffice.domain.board.entity.BoardCategories;
 import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.board.exception.BoardsCustomException;
+import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
+import com.example.backoffice.domain.file.converter.FilesConverter;
+import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
-import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +22,16 @@ import java.util.stream.Collectors;
 public class BoardsConverter {
 
     public static Boards toEntity(
-            BoardsRequestDto.CreateOneDto requestDto, Members member){
+            BoardsRequestDto.CreateOneDto requestDto, Members member,
+            BoardCategories category){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .isImportant(requestDto.getIsImportant())
                 .boardType(BoardType.GENERAL)
-                .department(null)
+                .department(member.getDepartment())
+                .categories(category)
                 .isLocked(false)
                 .likeCount(0L)
                 .unLikeCount(0L)
@@ -50,23 +56,32 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static Page<BoardsResponseDto.ReadAllDto> toReadAllDto(Page<Boards> boardPage){
-        return boardPage.map(board -> {
-            return BoardsResponseDto.ReadAllDto.builder()
-                    .boardId(board.getId())
-                    .title(board.getTitle())
-                    .writer(board.getMember().getMemberName())
-                    .content(board.getContent())
-                    .isImportant(board.getIsImportant())
-                    .likeCount(board.getLikeCount())
-                    .unLikeCount(board.getUnLikeCount())
-                    .viewCount(board.getViewCount())
-                    .createdAt(board.getCreatedAt())
-                    .modifiedAt(board.getModifiedAt())
-                    .boardType(board.getBoardType())
-                    .build();
-        });
+    public static BoardsResponseDto.ReadAllDto toReadAllDto(Boards board, Long commentCount) {
+        // 게시글에 대한 File DTO 리스트 생성
+        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = board.getFileList().stream()
+                .map(FilesConverter::toReadOneDto)
+                .collect(Collectors.toList());
+
+        // 게시글 DTO 생성
+        return BoardsResponseDto.ReadAllDto.builder()
+                .boardId(board.getId())
+                .title(board.getTitle())
+                .writer(board.getMember().getMemberName())
+                .content(board.getContent())
+                .isImportant(board.getIsImportant())
+                .isLocked(board.getIsLocked())
+                .likeCount(board.getLikeCount())
+                .unLikeCount(board.getUnLikeCount())
+                .viewCount(board.getViewCount())
+                .commentCount(commentCount)  // 댓글 수 추가
+                .fileList(fileResponseDtoList)
+                .createdAt(board.getCreatedAt())
+                .modifiedAt(board.getModifiedAt())
+                .boardType(board.getBoardType())
+                .build();
     }
+
+
 
     public static BoardsResponseDto.ReadOneDto toReadOneDto(Boards board) {
         List<String> fileUrls = board.getFileList().stream()
@@ -124,6 +139,8 @@ public class BoardsConverter {
                 .likeCount(board.getLikeCount())
                 .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
+                .isImportant(board.getIsImportant())
+                .isLocked(board.getIsLocked())
                 .fileList(fileUrls)
                 .commentList(commentList)
                 .createdAt(board.getCreatedAt())
@@ -172,5 +189,14 @@ public class BoardsConverter {
                 .modifiedAt(board.getModifiedAt())
                 .boardType(board.getBoardType())
                 .build();
+    }
+
+    public static BoardCategories toCategories(String categoryName){
+        for(BoardCategories categories : BoardCategories.values()){
+            if(categories.getLabel().equalsIgnoreCase(categoryName)){
+                return categories;
+            }
+        }
+        throw new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD_CATEGORIES);
     }
 }

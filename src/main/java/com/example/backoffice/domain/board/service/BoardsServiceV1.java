@@ -28,8 +28,8 @@ public interface BoardsServiceV1 {
     void deleteOne(Long boardId, Members member);
 
     BoardsResponseDto.CreateOneDto createOneForDepartment(
-            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
-            List<MultipartFile> files);
+            String department, Members loginMember,
+            BoardsRequestDto.CreateOneDto requestDto, List<MultipartFile> files);
 
     Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(
             String departmentName, Pageable pageable);
@@ -38,9 +38,12 @@ public interface BoardsServiceV1 {
             String departmentName, Long boardId);
 
     BoardsResponseDto.UpdateOneDto updateOneForDepartment(
-            Long boardId, Members loginMember,
+            String department, Long boardId, Members loginMember,
             BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files);
+
+    void deleteOneForDepartment(
+            String department, Long boardId, Members loginMember);
 
     void updateOneForMarkAsImportant(Long boardId, Members loginMember);
 

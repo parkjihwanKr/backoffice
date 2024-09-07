@@ -14,8 +14,8 @@ public class BoardsRequestDto {
     public static class CreateOneDto {
         private String title;
         private String content;
+        private String category;
         private Boolean isImportant;
-        private String department;
         private Boolean isLocked;
     }
 
@@ -26,6 +26,7 @@ public class BoardsRequestDto {
     public static class UpdateOneDto {
         private String title;
         private String content;
+        private String category;
         private Boolean isImportant;
         private String department;
         private Boolean isLocked;
