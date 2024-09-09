@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,17 +42,29 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Override
     @Transactional(readOnly = true)
     public Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable) {
-        // 1. 상단에 고정할 중요한 게시글 3개
-        List<Boards> importantBoardList = boardsRepository.findTop3ByIsImportantTrueOrderByModifiedAtDesc();
+        // 1. 중요한 게시글(isImportant == true)을 ModifiedAt 기준으로 내림차순 정렬하여 가져옵니다.
+        List<Boards> importantBoardsByModifiedAt = boardsRepository.findByIsImportantTrueOrderByModifiedAtDesc();
 
-        // 2. 중요한 게시글을 제외한 나머지 게시글을 최신순으로 가져옵니다.
-        Page<Boards> otherBoardPage = boardsRepository.findByIsImportantFalseOrderByModifiedAtDesc(pageable);
+        // 2. 상단에 고정할 중요한 게시글 3개를 추출합니다.
+        List<Boards> topImportantBoards = importantBoardsByModifiedAt.stream()
+                .limit(3)
+                .toList();
 
-        // 3. 중요한 게시글(3개)을 상단에 배치하고, 그 뒤에 나머지 게시글을 붙입니다.
-        List<Boards> combinedBoards = new ArrayList<>(importantBoardList);
-        combinedBoards.addAll(otherBoardPage.getContent());
+        // 3. 나머지 중요한 게시글은 CreatedAt 기준으로 정렬합니다.
+        List<Boards> remainingImportantBoards = importantBoardsByModifiedAt.stream()
+                .skip(3)
+                .sorted(Comparator.comparing(Boards::getCreatedAt))
+                .toList();
 
-        // 4. 댓글 수를 가져와서 각 게시글에 댓글 수를 추가합니다.
+        // 4. 중요한 게시글 외의 일반 게시글(isImportant == false)을 CreatedAt 기준으로 가져옵니다.
+        Page<Boards> otherBoardPage = boardsRepository.findByIsImportantFalseOrderByCreatedAtDesc(pageable);
+
+        // 5. 중요한 게시글과 일반 게시글을 합칩니다.
+        List<Boards> combinedBoards = new ArrayList<>(topImportantBoards);
+        combinedBoards.addAll(remainingImportantBoards);  // 남은 중요한 게시글 추가
+        combinedBoards.addAll(otherBoardPage.getContent());  // 일반 게시글 추가
+
+        // 6. 댓글 수를 가져와서 각 게시글에 댓글 수를 추가합니다.
         List<BoardsResponseDto.ReadAllDto> boardDtoList = combinedBoards.stream()
                 .map(board -> {
                     Long commentCount = (long) board.getCommentList().size();  // 댓글 수 계산
@@ -59,13 +72,13 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
                 })
                 .collect(Collectors.toList());
 
-        // 5. combinedBoards 리스트를 Page로 변환합니다.
-        Page<BoardsResponseDto.ReadAllDto> finalBoardPage
-                = new PageImpl<>(boardDtoList, pageable, otherBoardPage.getTotalElements());
+        // 7. 전체 게시글의 수를 계산합니다 (중요 게시글 + 나머지 게시글)
+        long totalBoardCount = importantBoardsByModifiedAt.size() + otherBoardPage.getTotalElements();
 
-        // 6. 변환된 Page<BoardsResponseDto.ReadAllDto>를 반환합니다.
-        return finalBoardPage;
+        // 8. combinedBoards 리스트를 Page로 변환하여 반환합니다.
+        return new PageImpl<>(boardDtoList, pageable, totalBoardCount);
     }
+
 
     @Override
     @Transactional
