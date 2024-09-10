@@ -5,14 +5,14 @@ import lombok.Getter;
 @Getter
 public enum MemberPosition {
 
-    CEO(Position.CEO),
-    MANAGER(Position.MANAGER),
-    DEPUTY_MANAGER(Position.DEPUTY_MANAGER),
-    ASSISTANT_MANAGER(Position.ASSISTANT_MANAGER),
-    SENIOR_STAFF(Position.SENIOR_STAFF),
-    JUNIOR_STAFF(Position.JUNIOR_STAFF),
-    STAFF(Position.STAFF),
-    INTERN(Position.INTERN);
+    CEO(MemberPositionLabel.CEO),
+    MANAGER(MemberPositionLabel.MANAGER),
+    DEPUTY_MANAGER(MemberPositionLabel.DEPUTY_MANAGER),
+    ASSISTANT_MANAGER(MemberPositionLabel.ASSISTANT_MANAGER),
+    SENIOR_STAFF(MemberPositionLabel.SENIOR_STAFF),
+    JUNIOR_STAFF(MemberPositionLabel.JUNIOR_STAFF),
+    STAFF(MemberPositionLabel.STAFF),
+    INTERN(MemberPositionLabel.INTERN);
 
     private final String position;
 
@@ -20,7 +20,7 @@ public enum MemberPosition {
         this.position = position;
     }
 
-    public static class Position {
+    public static class MemberPositionLabel {
         public static final String CEO = "CEO";
         public static final String MANAGER = "MANAGER";
         public static final String DEPUTY_MANAGER = "DEPUTY_MANAGER";
