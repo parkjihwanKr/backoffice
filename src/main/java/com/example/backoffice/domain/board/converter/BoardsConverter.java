@@ -131,10 +131,13 @@ public class BoardsConverter {
             }
         }
 
+        Long commentCount = (long) commentList.size();
         return BoardsResponseDto.ReadOneDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
                 .writer(board.getMember().getMemberName())
+                .department(board.getDepartment())
+                .position(board.getMember().getPosition())
                 .content(board.getContent())
                 .likeCount(board.getLikeCount())
                 .unLikeCount(board.getUnLikeCount())
@@ -142,7 +145,9 @@ public class BoardsConverter {
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
                 .fileList(fileUrls)
+                .category(board.getCategories().getLabel())
                 .commentList(commentList)
+                .commentCount(commentCount)
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
                 .boardType(board.getBoardType())
@@ -163,25 +168,36 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static BoardsResponseDto.UpdateOneDto toUpdateOneDto(Boards board, List<String> fileUrlList){
+    public static BoardsResponseDto.UpdateOneDto toUpdateOneDto(
+            String writerName, Boards board, List<String> fileUrlList){
         List<CommentsResponseDto.UpdateCommentDto> commentList = new ArrayList<>();
         if(!board.getCommentList().isEmpty()){
             for(int i = 0; i<board.getCommentList().size(); i++){
                 commentList.add(
                         CommentsResponseDto.UpdateCommentDto.builder()
+                                .commentId(board.getCommentList().get(i).getId())
                                 .content(board.getCommentList().get(i).getContent())
-                                .build()
-                );
+                                .createdAt(board.getCommentList().get(i).getCreatedAt())
+                                .writer(board.getCommentList().get(i).getMember().getMemberName())
+                                .modifiedAt(board.getCommentList().get(i).getModifiedAt())
+                                .likeCount(board.getCommentList().get(i).getLikeCount())
+                                .unLikeCount(board.getCommentList().get(i).getUnLikeCount())
+                                .build());
             }
         }
 
         return BoardsResponseDto.UpdateOneDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
-                .writer(board.getMember().getMemberName())
+                .writer(writerName)
                 .content(board.getContent())
                 .fileList(fileUrlList)
-                .commentList(board.getCommentList())
+                .category(board.getCategories().getLabel())
+                .commentList(commentList)
+                .isImportant(board.getIsImportant())
+                .isLocked(board.getIsLocked())
+                .department(board.getDepartment())
+                .position(board.getMember().getPosition())
                 .likeCount(board.getLikeCount())
                 .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())

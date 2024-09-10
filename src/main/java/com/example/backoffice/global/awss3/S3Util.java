@@ -41,7 +41,7 @@ public class S3Util {
 
     // fileUrl 형식 : https://pjhawss3bucket.s3.ap-northeast-2.amazonaws.com/eba046ba-6b29-463e-9649-ad75486e05b5_ec2.png
     public void removeFile(String fileUrl) {
-        System.out.println(fileUrl);
+        // System.out.println(fileUrl);
         try {
             // URL 디코딩
             String decodedUrl = URLDecoder.decode(fileUrl, StandardCharsets.UTF_8);

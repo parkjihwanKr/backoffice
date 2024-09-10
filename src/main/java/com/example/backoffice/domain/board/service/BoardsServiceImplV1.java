@@ -123,7 +123,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         // 해당 멤버가 게시판의 주인인지?
         isMatchedBoardOwner(loginMember.getId(), board.getMember().getId());
 
-        return updateBoardWithFiles(board, requestDto, files);
+        return updateBoardWithFiles(loginMember.getMemberName(), board, requestDto, files);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         // 3. 게시글의 소유자 확인
         isMatchedBoardOwner(loginMember.getId(), departmentBoard.getMember().getId());
 
-        return updateBoardWithFiles(departmentBoard, requestDto, files);
+        return updateBoardWithFiles(loginMember.getMemberName(), departmentBoard, requestDto, files);
     }
 
     @Override
@@ -298,7 +298,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     @Transactional(rollbackFor = Exception.class)
     public BoardsResponseDto.UpdateOneDto updateBoardWithFiles(
-            Boards board, BoardsRequestDto.UpdateOneDto requestDto,
+            String writerName, Boards board,
+            BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files){
         // Department board, General board 구분
         MemberDepartment department
@@ -325,12 +326,17 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         }
         board.getFileList().clear();
         filesService.delete(board.getId(), beforeFileUrlList);
-        for (MultipartFile file : files) {
-            // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
-            String fileUrl = filesService.createOneForBoard(file, board);
-            afterFileUrlList.add(fileUrl);
+
+        // 업로드 하는 파일이 없으면 에러가 남.
+        if(files != null){
+            for (MultipartFile file : files) {
+                // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
+                String fileUrl = filesService.createOneForBoard(file, board);
+                afterFileUrlList.add(fileUrl);
+            }
         }
-        return BoardsConverter.toUpdateOneDto(board, afterFileUrlList);
+
+        return BoardsConverter.toUpdateOneDto(writerName, board, afterFileUrlList);
     }
 
     // 조회수 로직

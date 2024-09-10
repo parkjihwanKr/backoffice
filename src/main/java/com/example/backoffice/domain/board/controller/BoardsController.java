@@ -43,7 +43,10 @@ public class BoardsController {
     }
 
     // 게시글 게시
-    @PostMapping(value = "/boards", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(
+            value = "/boards",
+            consumes = {MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<BoardsResponseDto.CreateOneDto> createOne(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") @Valid BoardsRequestDto.CreateOneDto requestDto,
@@ -53,12 +56,15 @@ public class BoardsController {
     }
 
     // 게시글 수정
-    @PatchMapping(value = "/boards/{boardId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(
+            value = "/boards/{boardId}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<BoardsResponseDto.UpdateOneDto> updateOne(
             @PathVariable long boardId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestPart(value = "data") @Valid BoardsRequestDto.UpdateOneDto requestDto,
-            @RequestPart(value = "files") List<MultipartFile> files) {
+            @RequestPart(value = "data") BoardsRequestDto.UpdateOneDto requestDto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         BoardsResponseDto.UpdateOneDto responseDto = boardsService.updateOne(boardId, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
