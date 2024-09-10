@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 public class BoardsRequestDto {
 
@@ -14,8 +15,6 @@ public class BoardsRequestDto {
     public static class CreateOneDto {
         private String title;
         private String content;
-        private Boolean isImportant;
-        private String department;
     }
 
     @Getter
@@ -25,6 +24,5 @@ public class BoardsRequestDto {
     public static class UpdateOneDto {
         private String title;
         private String content;
-        private Boolean isImportant;
     }
 }

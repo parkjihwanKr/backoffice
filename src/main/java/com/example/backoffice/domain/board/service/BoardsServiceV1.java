@@ -13,34 +13,14 @@ import java.util.List;
 public interface BoardsServiceV1 {
 
     Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable);
-
     BoardsResponseDto.ReadOneDto readOne(Long boardId);
-
     BoardsResponseDto.CreateOneDto createOne(
-            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
+            Members member, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files);
-
     BoardsResponseDto.UpdateOneDto updateOne(
-            Long boardId, Members loginMember,
+            Long boardId, Members member,
             BoardsRequestDto.UpdateOneDto requestDto,
             List <MultipartFile> files);
-
     void deleteOne(Long boardId, Members member);
-
-    BoardsResponseDto.CreateOneDto createOneForDepartment(
-            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
-            List<MultipartFile> files);
-
-    Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(Pageable pageable);
-
-    BoardsResponseDto.ReadOneDto readOneForDepartment(Long boardId);
-
-    BoardsResponseDto.UpdateOneDto updateOneForDepartment(
-            Long boardId, Members loginMember,
-            BoardsRequestDto.UpdateOneDto requestDto,
-            List<MultipartFile> files);
-
-    void updateOneForMarkAsImportant(Long boardId, Members loginMember);
-
     Boards findById(Long boardId);
 }
