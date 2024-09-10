@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-public class ReactionController {
+public class ReactionsController {
 
     private final ReactionsServiceV1 reactionsService;
 
