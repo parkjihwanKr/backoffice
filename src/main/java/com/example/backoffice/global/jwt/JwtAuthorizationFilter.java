@@ -29,6 +29,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+
+        // 회원가입이나 로그인 경로에 대해서는 필터를 건너뜁니다.
+        if (requestURI.equals("/api/v1/signup") || requestURI.equals("/api/v1/login")) {
+            filterChain.doFilter(request, response);
+            return;  // 필터를 더 이상 진행하지 않음
+        }
+
         String accessToken = jwtProvider.getJwtFromHeader(request);
         log.info("doFilterInternal!!");
         log.info("accessToken : " + accessToken);
