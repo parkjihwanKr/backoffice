@@ -1,16 +1,13 @@
 package com.example.backoffice.domain.board.entity;
 
-import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.entity.Files;
-import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.reaction.entity.Reactions;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +16,7 @@ import java.util.List;
 @Entity
 @Builder
 @Table(name = "boards")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Boards extends CommonEntity {
 
@@ -28,7 +25,8 @@ public class Boards extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @NotBlank(message = "Title must not be blank")
+    @Column(nullable = false, length = 100)
     private String title;
 
     @Column
@@ -43,6 +41,10 @@ public class Boards extends CommonEntity {
     @Column
     private Long unLikeCount;
 
+    @Enumerated(EnumType.STRING)
+    private BoardType boardType;
+
+    private Boolean isImportant;
     // relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -70,6 +72,9 @@ public class Boards extends CommonEntity {
         this.content = content;
     }
 
+    public void updateIsImportant(Boolean isImportant){
+        this.isImportant = isImportant;
+    }
     public void addEmoji(Reactions reaction, String emoji){
         reactionList.add(reaction);
         if(emoji.equals("LIKE")){
