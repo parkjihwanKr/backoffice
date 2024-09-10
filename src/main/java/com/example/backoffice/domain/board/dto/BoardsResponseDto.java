@@ -1,6 +1,5 @@
 package com.example.backoffice.domain.board.dto;
 
-import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.comment.dto.CommentsResponseDto;
 import com.example.backoffice.domain.comment.entity.Comments;
 import lombok.AllArgsConstructor;
@@ -25,8 +24,6 @@ public class BoardsResponseDto {
         private Long likeCount;
         private Long unLikeCount;
         private Long viewCount;
-        private Boolean isImportant;
-        private BoardType boardType;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -41,8 +38,6 @@ public class BoardsResponseDto {
         private String writer;
         private String title;
         private String content;
-        private BoardType boardType;
-        private Boolean isImportant;
         // Like.count
         private Long likeCount;
         private Long unLikeCount;
@@ -63,8 +58,6 @@ public class BoardsResponseDto {
         private String writer;
         private String title;
         private String content;
-        private Boolean isImportant;
-        private BoardType boardType;
         private LocalDateTime createdAt;
         private List<String> fileList;
     }
@@ -83,8 +76,6 @@ public class BoardsResponseDto {
         private Long likeCount;
         private Long unLikeCount;
         private Long viewCount;
-        private Boolean isImportant;
-        private BoardType boardType;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
