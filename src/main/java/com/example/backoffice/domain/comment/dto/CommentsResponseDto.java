@@ -19,10 +19,10 @@ public class CommentsResponseDto {
         private Long commentId;
         private String commentWriter;
         private String commentContent;
+        private String commentWriterDepartment;
+        private String commentWriterPosition;
         private Long likeCount;
-        private Long unLikeCount;
         private LocalDateTime commentCreatedAt;
-        private LocalDateTime commentModifiedAt;
         private List<ReadCommentRepliesDto> replyList;
     }
 

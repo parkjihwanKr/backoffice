@@ -1,5 +1,7 @@
 package com.example.backoffice.domain.reaction.dto;
 
+import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.reaction.entity.Emoji;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +36,16 @@ public class ReactionsResponseDto {
         private Long viewCount;
         private String fromMemberName;
         private String emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneForBoardDto {
+        private Long reactionId;
+        private String reactorName;
+        private Emoji emoji;
     }
 
     @Getter

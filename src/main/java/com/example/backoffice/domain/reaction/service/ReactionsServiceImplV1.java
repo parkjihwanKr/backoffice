@@ -95,6 +95,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
 
         Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, null);
         board.addEmoji(reaction, emoji.toString());
+        reactionsRepository.save(reaction);
 
         NotificationData boardsNotification =
                 new NotificationData(board.getMember(), fromMember, board, null, null, null, null);

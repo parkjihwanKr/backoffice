@@ -14,6 +14,8 @@ import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
+import com.example.backoffice.domain.reaction.entity.Reactions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,15 +83,23 @@ public class BoardsConverter {
                 .build();
     }
 
-
-
-    public static BoardsResponseDto.ReadOneDto toReadOneDto(Boards board) {
+    public static BoardsResponseDto.ReadOneDto toReadOneDto(Boards board, String loginMemberName) {
         List<String> fileUrls = board.getFileList().stream()
                 .map(Files::getUrl)
                 .collect(Collectors.toList());
 
         List<CommentsResponseDto.ReadBoardCommentsDto> commentList = new ArrayList<>();
+        List<ReactionsResponseDto.ReadOneForBoardDto> reactionResponseDtoList = new ArrayList<>();
+        List<Reactions> reactionList = board.getReactionList();
 
+        for (Reactions reaction : reactionList){
+            reactionResponseDtoList.add(
+                    ReactionsResponseDto.ReadOneForBoardDto.builder()
+                            .reactorName(loginMemberName)
+                            .emoji(reaction.getEmoji())
+                            .reactionId(reaction.getId())
+                            .build());
+        }
         // 댓글 리스트를 순회하면서 최상위 댓글과 대댓글을 구분하여 처리
         for (Comments comment : board.getCommentList()) {
             Long parentId = comment.getParent().getId();  // parent는 null이 아님
@@ -123,15 +133,16 @@ public class BoardsConverter {
                         .commentWriter(comment.getMember().getMemberName())
                         .commentContent(comment.getContent())
                         .likeCount(comment.getLikeCount())
-                        .unLikeCount(comment.getUnLikeCount())
                         .commentCreatedAt(comment.getCreatedAt())
-                        .commentModifiedAt(comment.getModifiedAt())
                         .replyList(replyList)
+                        .commentWriterDepartment(comment.getMember().getDepartment().getDepartment())
+                        .commentWriterPosition(comment.getMember().getPosition().getPosition())
                         .build());
             }
         }
 
         Long commentCount = (long) commentList.size();
+
         return BoardsResponseDto.ReadOneDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
@@ -144,6 +155,7 @@ public class BoardsConverter {
                 .viewCount(board.getViewCount())
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
+                .reactionList(reactionResponseDtoList)
                 .fileList(fileUrls)
                 .category(board.getCategories().getLabel())
                 .commentList(commentList)
@@ -153,7 +165,6 @@ public class BoardsConverter {
                 .boardType(board.getBoardType())
                 .build();
     }
-
 
     public static BoardsResponseDto.CreateOneDto toCreateOneDto(
             Boards board, List<String> fileUrlList){
@@ -208,6 +219,7 @@ public class BoardsConverter {
     }
 
     public static BoardCategories toCategories(String categoryName){
+        System.out.println("categoryName : "+categoryName);
         for(BoardCategories categories : BoardCategories.values()){
             if(categories.getLabel().equalsIgnoreCase(categoryName)){
                 return categories;

@@ -15,6 +15,7 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.redis.ViewCountRedisProvider;
+import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -88,7 +89,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             throw new BoardsCustomException(BoardsExceptionCode.NOT_GENERAL_BOARD);
         }
         incrementViewCount(board);
-        return BoardsConverter.toReadOneDto(board);
+        return BoardsConverter.toReadOneDto(board, getLoginMember().getMemberName());
     }
 
     @Override
@@ -170,7 +171,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         // 2. 접근 가능한 게시글 필터링
         List<Boards> accessedBoards = boardList.stream()
                 .filter(board -> !board.getIsLocked() || board.getDepartment().equals(loginMember.getDepartment()))
-                .collect(Collectors.toList());
+                .toList();
 
         // 3. 각 게시글의 댓글 수를 계산하여 DTO로 변환
         List<BoardsResponseDto.ReadAllDto> boardDtoList = accessedBoards.stream()
@@ -178,13 +179,10 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
                     Long commentCount = (long) board.getCommentList().size();  // 댓글 수 계산
                     return BoardsConverter.toReadAllDto(board, commentCount);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         // 4. 필터링된 리스트를 Page로 변환
-        Page<BoardsResponseDto.ReadAllDto> accessedBoardListDto
-                = new PageImpl<>(boardDtoList, pageable, accessedBoards.size());
-
-        return accessedBoardListDto;
+        return new PageImpl<>(boardDtoList, pageable, accessedBoards.size());
     }
 
 
@@ -203,7 +201,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         }
 
         incrementViewCount(departmentBoard);
-        return BoardsConverter.toReadOneDto(departmentBoard);
+        return BoardsConverter.toReadOneDto(departmentBoard, getLoginMember().getMemberName());
     }
 
     @Override
@@ -293,7 +291,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new SecurityException("사용자가 인증되지 않았습니다.");
         }
-        return (Members) authentication.getPrincipal();
+        MemberDetailsImpl memberDetails = (MemberDetailsImpl) authentication.getPrincipal();
+        return memberDetails.getMembers();
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -327,7 +326,6 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         board.getFileList().clear();
         filesService.delete(board.getId(), beforeFileUrlList);
 
-        // 업로드 하는 파일이 없으면 에러가 남.
         if(files != null){
             for (MultipartFile file : files) {
                 // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
