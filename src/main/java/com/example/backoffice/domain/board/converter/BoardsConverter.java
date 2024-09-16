@@ -81,24 +81,13 @@ public class BoardsConverter {
     }
 
     public static BoardsResponseDto.ReadOneDto toReadOneDto(
-            Boards board, String loginMemberName, Long reactorId) {
+            Boards board, List<ReactionsResponseDto.ReadOneForBoardDto> reactionResponseDtoList) {
         List<String> fileUrls = board.getFileList().stream()
                 .map(Files::getUrl)
                 .collect(Collectors.toList());
 
         List<CommentsResponseDto.ReadBoardCommentsDto> commentList = new ArrayList<>();
-        List<ReactionsResponseDto.ReadOneForBoardDto> reactionResponseDtoList = new ArrayList<>();
-        List<Reactions> reactionList = board.getReactionList();
 
-        for (Reactions reaction : reactionList){
-            reactionResponseDtoList.add(
-                    ReactionsResponseDto.ReadOneForBoardDto.builder()
-                            .reactorName(loginMemberName)
-                            .reactorId(reactorId)
-                            .emoji(reaction.getEmoji())
-                            .reactionId(reaction.getId())
-                            .build());
-        }
         // 댓글 리스트를 순회하면서 최상위 댓글과 대댓글을 구분하여 처리
         for (Comments comment : board.getCommentList()) {
             Long parentId = comment.getParent().getId();  // parent는 null이 아님

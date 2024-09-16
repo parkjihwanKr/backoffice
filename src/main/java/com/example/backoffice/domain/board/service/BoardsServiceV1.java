@@ -1,53 +1,27 @@
 package com.example.backoffice.domain.board.service;
 
-import com.example.backoffice.domain.board.dto.BoardsRequestDto;
-import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.board.entity.Boards;
-import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface BoardsServiceV1 {
 
-    Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable);
+    List<Boards> findByIsImportantTrueOrderByModifiedAtDesc();
 
-    BoardsResponseDto.ReadOneDto readOne(Long boardId);
+    Page<Boards> findByIsImportantFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    BoardsResponseDto.CreateOneDto createOne(
-            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
-            List<MultipartFile> files);
+    Long getCommentListSize(Boards board);
 
-    BoardsResponseDto.UpdateOneDto updateOne(
-            Long boardId, Members loginMember,
-            BoardsRequestDto.UpdateOneDto requestDto,
-            List <MultipartFile> files);
+    Page<Boards> findAllByDepartment(Pageable pageable, MemberDepartment department);
 
-    void deleteOne(Long boardId, Members member);
+    Boards save(Boards board);
 
-    BoardsResponseDto.CreateOneDto createOneForDepartment(
-            String department, Members loginMember,
-            BoardsRequestDto.CreateOneDto requestDto, List<MultipartFile> files);
-
-    Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(
-            String departmentName, Pageable pageable);
-
-    BoardsResponseDto.ReadOneDto readOneForDepartment(
-            String departmentName, Long boardId);
-
-    BoardsResponseDto.UpdateOneDto updateOneForDepartment(
-            String department, Long boardId, Members loginMember,
-            BoardsRequestDto.UpdateOneDto requestDto,
-            List<MultipartFile> files);
-
-    void deleteOneForDepartment(
-            String department, Long boardId, Members loginMember);
-
-    void updateOneForMarkAsImportant(Long boardId, Members loginMember);
-
-    void updateOneForMarkAsLocked(Long boardId, Members LoginMember);
+    Boards findByIdAndDepartment(Long boardId, MemberDepartment department);
 
     Boards findById(Long boardId);
+
+    void deleteById(Long boardId);
 }

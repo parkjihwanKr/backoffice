@@ -2,7 +2,7 @@ package com.example.backoffice.domain.board.controller;
 
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
-import com.example.backoffice.domain.board.service.BoardsServiceV1;
+import com.example.backoffice.domain.board.service.BoardsServiceFacadeV1;
 import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;
@@ -25,20 +25,22 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class BoardsController {
 
-    private final BoardsServiceV1 boardsService;
+    private final BoardsServiceFacadeV1 boardsServiceFacade;
 
     // 게시글 전체 읽기
     @GetMapping("/boards")
     public ResponseEntity<Page<BoardsResponseDto.ReadAllDto>> readAll(
             @PageableDefault(size = 8) Pageable pageable) {
-        Page<BoardsResponseDto.ReadAllDto> responseDtoList = boardsService.readAll(pageable);
+        Page<BoardsResponseDto.ReadAllDto> responseDtoList
+                = boardsServiceFacade.readAll(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     // 게시글 하나 읽기
     @GetMapping("/boards/{boardId}")
     public ResponseEntity<BoardsResponseDto.ReadOneDto> readOne(@PathVariable long boardId) {
-        BoardsResponseDto.ReadOneDto responseDto = boardsService.readOne(boardId);
+        BoardsResponseDto.ReadOneDto responseDto
+                = boardsServiceFacade.readOne(boardId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -51,7 +53,8 @@ public class BoardsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") @Valid BoardsRequestDto.CreateOneDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        BoardsResponseDto.CreateOneDto responseDto = boardsService.createOne(memberDetails.getMembers(), requestDto, files);
+        BoardsResponseDto.CreateOneDto responseDto
+                = boardsServiceFacade.createOne(memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -65,7 +68,8 @@ public class BoardsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") BoardsRequestDto.UpdateOneDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        BoardsResponseDto.UpdateOneDto responseDto = boardsService.updateOne(boardId, memberDetails.getMembers(), requestDto, files);
+        BoardsResponseDto.UpdateOneDto responseDto
+                = boardsServiceFacade.updateOne(boardId, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -74,7 +78,7 @@ public class BoardsController {
     public ResponseEntity<CommonResponse<Void>> deleteOne(
             @PathVariable long boardId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boardsService.deleteOne(boardId, memberDetails.getMembers());
+        boardsServiceFacade.deleteOne(boardId, memberDetails.getMembers());
         return ResponseEntity.ok().body(new CommonResponse<>(HttpStatus.OK, "게시글 삭제 성공"));
     }
 
@@ -83,7 +87,8 @@ public class BoardsController {
     public ResponseEntity<Page<BoardsResponseDto.ReadAllDto>> readAllForDepartment(
             @PathVariable String department,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<BoardsResponseDto.ReadAllDto> responseDtoList = boardsService.readAllForDepartment(department, pageable);
+        Page<BoardsResponseDto.ReadAllDto> responseDtoList
+                = boardsServiceFacade.readAllForDepartment(department, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
@@ -92,7 +97,8 @@ public class BoardsController {
     public ResponseEntity<BoardsResponseDto.ReadOneDto> readOneForDepartment(
             @PathVariable String department,
             @PathVariable Long boardId) {
-        BoardsResponseDto.ReadOneDto responseDto = boardsService.readOneForDepartment(department, boardId);
+        BoardsResponseDto.ReadOneDto responseDto
+                = boardsServiceFacade.readOneForDepartment(department, boardId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -107,7 +113,7 @@ public class BoardsController {
             @RequestPart(value = "data") @Valid BoardsRequestDto.CreateOneDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         BoardsResponseDto.CreateOneDto responseDto
-                = boardsService.createOneForDepartment(
+                = boardsServiceFacade.createOneForDepartment(
                         department, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -121,7 +127,7 @@ public class BoardsController {
             @RequestPart(value = "data") @Valid BoardsRequestDto.UpdateOneDto requestDto,
             @RequestPart(value = "files") List<MultipartFile> files) {
         BoardsResponseDto.UpdateOneDto responseDto
-                = boardsService.updateOneForDepartment(
+                = boardsServiceFacade.updateOneForDepartment(
                         department, boardId, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -132,7 +138,7 @@ public class BoardsController {
             @PathVariable String department,
             @PathVariable Long boardId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boardsService.deleteOneForDepartment(department, boardId, memberDetails.getMembers());
+        boardsServiceFacade.deleteOneForDepartment(department, boardId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(
                         200, "부서 게시판 삭제 성공", null));
@@ -143,7 +149,7 @@ public class BoardsController {
     public ResponseEntity<CommonResponse<Void>> updateOneForMarkAsImportant(
             @PathVariable Long boardId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boardsService.updateOneForMarkAsImportant(boardId, memberDetails.getMembers());
+        boardsServiceFacade.updateOneForMarkAsImportant(boardId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(
                         200, "게시글 중요 체크 성공", null));
@@ -154,7 +160,7 @@ public class BoardsController {
     public ResponseEntity<CommonResponse<Void>> updateDepartmentForMarkAsLocked(
             @PathVariable Long boardId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boardsService.updateOneForMarkAsLocked(boardId, memberDetails.getMembers());
+        boardsServiceFacade.updateOneForMarkAsLocked(boardId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(
                         200, "부서 게시글을 부서원만 볼 수 있게 변경 성공", null));
