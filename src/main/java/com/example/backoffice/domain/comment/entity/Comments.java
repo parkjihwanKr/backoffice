@@ -27,8 +27,6 @@ public class Comments extends CommonEntity {
 
     private Long likeCount;
 
-    private Long unLikeCount;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Boards board;
@@ -65,17 +63,11 @@ public class Comments extends CommonEntity {
         if (emoji.equals("LIKE")) {
             this.likeCount++;
         }
-        if (emoji.equals("UNLIKE")) {
-            this.unLikeCount++;
-        }
     }
 
     public void deleteEmoji(String emoji) {
         if (emoji.equals("LIKE")) {
             this.likeCount--;
-        }
-        if (emoji.equals("UNLIKE")) {
-            this.unLikeCount--;
         }
     }
 }

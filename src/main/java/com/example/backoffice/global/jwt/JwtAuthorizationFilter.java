@@ -29,7 +29,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String requestUrl = request.getRequestURI();
+
+        if(requestUrl.equals("/api/v1/signup") || requestUrl.equals("/api/v1/login")){
+            log.info("requestUrl : "+requestUrl);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String accessToken = jwtProvider.getJwtFromHeader(request);
+
         log.info("doFilterInternal!!");
         log.info("accessToken : " + accessToken);
         if (StringUtils.hasText(accessToken)) {

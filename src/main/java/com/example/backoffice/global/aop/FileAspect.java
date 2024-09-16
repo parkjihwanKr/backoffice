@@ -23,12 +23,12 @@ public class FileAspect {
         String methodName = commonAspect.getCurrentMethodName(joinPoint);
         String message = "";
         String loginMemberName = commonAspect.getLoginMemberName();
-        if (methodName.equals("createFileForMemberRole")
-                || methodName.equals("createFileForBoard") || methodName.equals("createImage")) {
+        if (methodName.equals("createOneForMemberRole")
+                || methodName.equals("createOneForBoard") || methodName.equals("createImage")) {
             message = loginMemberName + "님이 파일을 생성하셨습니다.";
             auditLogService.save(
                     AuditLogType.CREATE_FILE, loginMemberName, message);
-        } else if (methodName.equals("deleteFile") || methodName.equals("deleteImage")) {
+        } else if (methodName.equals("deleteOne") || methodName.equals("deleteImage")) {
             message = loginMemberName + "님이 파일을 삭제하셨습니다.";
             auditLogService.save(
                     AuditLogType.DELETE_FILE, loginMemberName, message);

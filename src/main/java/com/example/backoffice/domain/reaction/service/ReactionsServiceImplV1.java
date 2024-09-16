@@ -21,9 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -80,6 +78,15 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
 
     @Override
     @Transactional
+    public List<ReactionsResponseDto.ReadOneForBoardDto> readAllForBoard(
+            Long boardId){
+        List<Reactions> reactionList = reactionsRepository.findByBoardId(boardId);
+
+        return ReactionsConverter.toReadOneForBoardDtoList(reactionList);
+    }
+
+    @Override
+    @Transactional
     public ReactionsResponseDto.CreateOneForBoardDto createOneForBoard(
             Long boardId, Members fromMember,
             ReactionsRequestDto requestDto) {
@@ -95,6 +102,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
 
         Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, null);
         board.addEmoji(reaction, emoji.toString());
+        reactionsRepository.save(reaction);
 
         NotificationData boardsNotification =
                 new NotificationData(board.getMember(), fromMember, board, null, null, null, null);

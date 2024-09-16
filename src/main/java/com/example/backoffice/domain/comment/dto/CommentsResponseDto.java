@@ -1,5 +1,7 @@
 package com.example.backoffice.domain.comment.dto;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,12 +19,13 @@ public class CommentsResponseDto {
     public static class ReadBoardCommentsDto{
         private Long boardId;
         private Long commentId;
-        private String commentWriter;
-        private String commentContent;
+        private String author;
+        private String content;
+        private String authorDepartment;
+        private String authorPosition;
+        private Boolean isLiked;
         private Long likeCount;
-        private Long unLikeCount;
-        private LocalDateTime commentCreatedAt;
-        private LocalDateTime commentModifiedAt;
+        private LocalDateTime createdAt;
         private List<ReadCommentRepliesDto> replyList;
     }
 
@@ -32,7 +35,9 @@ public class CommentsResponseDto {
     @AllArgsConstructor
     public static class CreateCommentDto{
         private Long commentId;
-        private String writer;
+        private String author;
+        private MemberDepartment authorDepartment;
+        private MemberPosition authorPosition;
         private String content;
         private LocalDateTime createdAt;
     }
@@ -43,10 +48,9 @@ public class CommentsResponseDto {
     @AllArgsConstructor
     public static class UpdateCommentDto{
         private Long commentId;
-        private String writer;
+        private String author;
         private String content;
         private Long likeCount;
-        private Long unLikeCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
     }
@@ -58,12 +62,13 @@ public class CommentsResponseDto {
     public static class ReadCommentRepliesDto {
         private Long commentId;
         private Long replyId;
-        private String replyWriter;
-        private String replyContent;
+        private String author;
+        private String content;
+        private MemberPosition authorPosition;
+        private MemberDepartment authorDepartment;
         private Long likeCount;
-        private Long unLikeCount;
-        private LocalDateTime replyCreatedAt;
-        private LocalDateTime replyModifiedAt;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
     }
 
     @Getter
@@ -71,14 +76,12 @@ public class CommentsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateReplyDto {
-        private Long commentId;
         private Long replyId;
-        private String toMemberName;
-        private String parentContent;
-        private LocalDateTime parentCreatedAt;
-        private String fromMemberName;
-        private String childContent;
-        private LocalDateTime childCreatedAt;
+        private String content;
+        private String author;
+        private LocalDateTime createdAt;
+        private MemberDepartment authorDepartment;
+        private MemberPosition authorPosition;
     }
 
     @Getter
@@ -88,17 +91,12 @@ public class CommentsResponseDto {
     public static class UpdateReplyDto {
         private Long commentId;
         private Long replyId;
-        private String toMemberName;
-        private String parentContent;
-        private LocalDateTime parentCreatedAt;
-        private LocalDateTime parentModifiedAt;
-        private Long parentLikeCount;
-        private Long parentUnLikeCount;
-        private String fromMemberName;
-        private String childContent;
-        private LocalDateTime childCreatedAt;
-        private LocalDateTime childModifiedAt;
-        private Long childLikeCount;
-        private Long childUnLikeCount;
+        private String author;
+        private String content;
+        private MemberDepartment authorDepartment;
+        private MemberPosition authorPosition;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+        private Long likeCount;
     }
 }
