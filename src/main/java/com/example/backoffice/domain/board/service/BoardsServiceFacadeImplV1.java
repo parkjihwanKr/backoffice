@@ -83,7 +83,6 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         return new PageImpl<>(boardDtoList, pageable, totalBoardCount);
     }
 
-
     @Override
     @Transactional
     public BoardsResponseDto.ReadOneDto readOne(Long boardId){
