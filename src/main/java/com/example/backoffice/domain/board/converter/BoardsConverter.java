@@ -36,7 +36,6 @@ public class BoardsConverter {
                 .categories(category)
                 .isLocked(false)
                 .likeCount(0L)
-                .unLikeCount(0L)
                 .viewCount(0L)
                 .build();
     }
@@ -53,7 +52,6 @@ public class BoardsConverter {
                 .boardType(BoardType.DEPARTMENT)
                 .department(department)
                 .likeCount(0L)
-                .unLikeCount(0L)
                 .viewCount(0L)
                 .build();
     }
@@ -68,12 +66,11 @@ public class BoardsConverter {
         return BoardsResponseDto.ReadAllDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
-                .writer(board.getMember().getMemberName())
+                .author(board.getMember().getName())
                 .content(board.getContent())
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
                 .likeCount(board.getLikeCount())
-                .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
                 .commentCount(commentCount)  // 댓글 수 추가
                 .fileList(fileResponseDtoList)
@@ -83,7 +80,8 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static BoardsResponseDto.ReadOneDto toReadOneDto(Boards board, String loginMemberName) {
+    public static BoardsResponseDto.ReadOneDto toReadOneDto(
+            Boards board, String loginMemberName, Long reactorId) {
         List<String> fileUrls = board.getFileList().stream()
                 .map(Files::getUrl)
                 .collect(Collectors.toList());
@@ -96,6 +94,7 @@ public class BoardsConverter {
             reactionResponseDtoList.add(
                     ReactionsResponseDto.ReadOneForBoardDto.builder()
                             .reactorName(loginMemberName)
+                            .reactorId(reactorId)
                             .emoji(reaction.getEmoji())
                             .reactionId(reaction.getId())
                             .build());
@@ -116,12 +115,13 @@ public class BoardsConverter {
                         replyList.add(CommentsResponseDto.ReadCommentRepliesDto.builder()
                                 .commentId(commentId)
                                 .replyId(commentReply.getId())
-                                .replyWriter(commentReply.getMember().getMemberName())
-                                .replyContent(commentReply.getContent())
+                                .author(commentReply.getMember().getName())
+                                .content(commentReply.getContent())
+                                .authorDepartment(commentReply.getMember().getDepartment())
+                                .authorPosition(commentReply.getMember().getPosition())
                                 .likeCount(commentReply.getLikeCount())
-                                .unLikeCount(commentReply.getUnLikeCount())
-                                .replyCreatedAt(commentReply.getCreatedAt())
-                                .replyModifiedAt(commentReply.getModifiedAt())
+                                .createdAt(commentReply.getCreatedAt())
+                                .modifiedAt(commentReply.getModifiedAt())
                                 .build());
                     }
                 }
@@ -130,13 +130,13 @@ public class BoardsConverter {
                 commentList.add(CommentsResponseDto.ReadBoardCommentsDto.builder()
                         .boardId(board.getId())
                         .commentId(commentId)
-                        .commentWriter(comment.getMember().getMemberName())
-                        .commentContent(comment.getContent())
+                        .author(comment.getMember().getName())
+                        .content(comment.getContent())
                         .likeCount(comment.getLikeCount())
-                        .commentCreatedAt(comment.getCreatedAt())
+                        .createdAt(comment.getCreatedAt())
                         .replyList(replyList)
-                        .commentWriterDepartment(comment.getMember().getDepartment().getDepartment())
-                        .commentWriterPosition(comment.getMember().getPosition().getPosition())
+                        .authorDepartment(comment.getMember().getDepartment().getDepartment())
+                        .authorPosition(comment.getMember().getPosition().getPosition())
                         .build());
             }
         }
@@ -146,12 +146,11 @@ public class BoardsConverter {
         return BoardsResponseDto.ReadOneDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
-                .writer(board.getMember().getMemberName())
+                .author(board.getMember().getName())
                 .department(board.getDepartment())
                 .position(board.getMember().getPosition())
                 .content(board.getContent())
                 .likeCount(board.getLikeCount())
-                .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
@@ -170,7 +169,7 @@ public class BoardsConverter {
             Boards board, List<String> fileUrlList){
         return BoardsResponseDto.CreateOneDto.builder()
                 .boardId(board.getId())
-                .writer(board.getMember().getMemberName())
+                .author(board.getMember().getName())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .fileList(fileUrlList)
@@ -189,10 +188,9 @@ public class BoardsConverter {
                                 .commentId(board.getCommentList().get(i).getId())
                                 .content(board.getCommentList().get(i).getContent())
                                 .createdAt(board.getCommentList().get(i).getCreatedAt())
-                                .writer(board.getCommentList().get(i).getMember().getMemberName())
+                                .author(board.getCommentList().get(i).getMember().getName())
                                 .modifiedAt(board.getCommentList().get(i).getModifiedAt())
                                 .likeCount(board.getCommentList().get(i).getLikeCount())
-                                .unLikeCount(board.getCommentList().get(i).getUnLikeCount())
                                 .build());
             }
         }
@@ -200,17 +198,16 @@ public class BoardsConverter {
         return BoardsResponseDto.UpdateOneDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
-                .writer(writerName)
+                .author(board.getMember().getName())
                 .content(board.getContent())
                 .fileList(fileUrlList)
                 .category(board.getCategories().getLabel())
                 .commentList(commentList)
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
-                .department(board.getDepartment())
-                .position(board.getMember().getPosition())
+                .authorDepartment(board.getDepartment())
+                .authorPosition(board.getMember().getPosition())
                 .likeCount(board.getLikeCount())
-                .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())

@@ -42,7 +42,8 @@ public class AuthController {
         Members loginMember = memberDetails.getMember();
 
         AuthDto authResponseDto = AuthDto.of(
-                loginMember.getMemberName(),
+                loginMember.getId(),
+                loginMember.getName(),
                 loginMember.getDepartment().getDepartment(),
                 loginMember.getPosition().getPosition());
 

@@ -39,9 +39,6 @@ public class Boards extends CommonEntity {
     @Column
     private Long likeCount;
 
-    @Column
-    private Long unLikeCount;
-
     private Boolean isImportant;
 
     private Boolean isLocked;
@@ -100,17 +97,12 @@ public class Boards extends CommonEntity {
         reactionList.add(reaction);
         if(emoji.equals("LIKE")){
             this.likeCount++;
-        }else if(emoji.equals("UNLIKE")){
-            this.unLikeCount++;
         }
     }
 
     public void deleteEmoji(String emoji){
         if(emoji.equals("LIKE")){
             this.likeCount--;
-        }
-        if(emoji.equals("UNLIKE")){
-            this.unLikeCount--;
         }
     }
 }

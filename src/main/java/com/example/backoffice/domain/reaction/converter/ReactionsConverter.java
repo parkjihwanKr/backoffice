@@ -7,6 +7,9 @@ import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 import com.example.backoffice.domain.reaction.entity.Emoji;
 import com.example.backoffice.domain.reaction.entity.Reactions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ReactionsConverter {
 
     public static Reactions toEntity(
@@ -25,8 +28,8 @@ public class ReactionsConverter {
             Reactions reaction, String emoji) {
         return ReactionsResponseDto.CreateOneForMemberDto.builder()
                 .reactionId(reaction.getId())
-                .fromMemberName(reaction.getReactor().getMemberName())
-                .toMemberName(reaction.getMember().getMemberName())
+                .reactorName(reaction.getReactor().getName())
+                .toMemberName(reaction.getMember().getName())
                 .emoji(emoji)
                 .createdAt(reaction.getCreatedAt())
                 .build();
@@ -39,21 +42,33 @@ public class ReactionsConverter {
                 .boardTitle(board.getTitle())
                 .boardContent(board.getContent())
                 .likeCount(board.getLikeCount())
-                .unLikeCount(board.getUnLikeCount())
                 .viewCount(board.getViewCount())
-                .fromMemberName(fromMember.getMemberName())
+                .reactorName(fromMember.getMemberName())
                 .emoji(emoji)
                 .build();
     }
 
+    public static List<ReactionsResponseDto.ReadOneForBoardDto> toReadOneForBoardDtoList(
+            List<Reactions> reactionList) {
+        List<ReactionsResponseDto.ReadOneForBoardDto> responeDtoList = new ArrayList<>();
+
+        for(Reactions reaction : reactionList){
+            responeDtoList.add(
+                    ReactionsResponseDto.ReadOneForBoardDto.builder()
+                            .reactionId(reaction.getId())
+                            .reactorName(reaction.getReactor().getName())
+                            .emoji(reaction.getEmoji())
+                            .build());
+        }
+        return responeDtoList;
+    }
     public static ReactionsResponseDto.CreateOneForCommentDto toCreateCommentReactionDto(
             Long reactionId, Comments comment, Members fromMember, String emoji) {
         return ReactionsResponseDto.CreateOneForCommentDto.builder()
                 .reactionId(reactionId)
-                .commentContent(comment.getContent())
+                .content(comment.getContent())
                 .likeCount(comment.getLikeCount())
-                .unLikeCount(comment.getUnLikeCount())
-                .fromMemberName(fromMember.getMemberName())
+                .reactorName(fromMember.getMemberName())
                 .emoji(emoji)
                 .build();
     }
@@ -62,10 +77,9 @@ public class ReactionsConverter {
             Long reactionId, Comments reply, Members fromMember, String emoji) {
         return ReactionsResponseDto.CreateOneForReplyDto.builder()
                 .reactionId(reactionId)
-                .replyContent(reply.getContent())
+                .content(reply.getContent())
                 .likeCount(reply.getLikeCount())
-                .unLikeCount(reply.getUnLikeCount())
-                .fromMemberName(fromMember.getMemberName())
+                .reactorName(fromMember.getMemberName())
                 .emoji(emoji)
                 .build();
     }

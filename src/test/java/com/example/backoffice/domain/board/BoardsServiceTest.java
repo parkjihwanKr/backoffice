@@ -15,7 +15,6 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.global.redis.ViewCountRedisProvider;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

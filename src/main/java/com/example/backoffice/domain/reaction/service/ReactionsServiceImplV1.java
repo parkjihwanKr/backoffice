@@ -21,9 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +74,15 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
         toMember.deleteLoveCount();
 
         reactionsRepository.deleteById(reactionId);
+    }
+
+    @Override
+    @Transactional
+    public List<ReactionsResponseDto.ReadOneForBoardDto> readAllForBoard(
+            Long boardId){
+        List<Reactions> reactionList = reactionsRepository.findByBoardId(boardId);
+
+        return ReactionsConverter.toReadOneForBoardDtoList(reactionList);
     }
 
     @Override

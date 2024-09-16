@@ -68,7 +68,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         // 6. 댓글 수를 가져와서 각 게시글에 댓글 수를 추가합니다.
         List<BoardsResponseDto.ReadAllDto> boardDtoList = combinedBoards.stream()
                 .map(board -> {
-                    Long commentCount = (long) board.getCommentList().size();  // 댓글 수 계산
+                    Long commentCount
+                            = (long) board.getCommentList().size();  // 댓글 수 계산
                     return BoardsConverter.toReadAllDto(board, commentCount);
                 })
                 .collect(Collectors.toList());
@@ -89,7 +90,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
             throw new BoardsCustomException(BoardsExceptionCode.NOT_GENERAL_BOARD);
         }
         incrementViewCount(board);
-        return BoardsConverter.toReadOneDto(board, getLoginMember().getMemberName());
+        return BoardsConverter.toReadOneDto(board, getLoginMember().getMemberName(), getLoginMember().getId());
     }
 
     @Override
@@ -201,7 +202,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
         }
 
         incrementViewCount(departmentBoard);
-        return BoardsConverter.toReadOneDto(departmentBoard, getLoginMember().getMemberName());
+        return BoardsConverter.toReadOneDto(departmentBoard, getLoginMember().getMemberName(), getLoginMember().getId());
     }
 
     @Override

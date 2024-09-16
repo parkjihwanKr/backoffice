@@ -17,7 +17,7 @@ public class ReactionsResponseDto {
     @AllArgsConstructor
     public static class CreateOneForMemberDto {
         private Long reactionId;
-        private String fromMemberName;
+        private String reactorName;
         private String toMemberName;
         private String emoji;
         private LocalDateTime createdAt;
@@ -34,7 +34,7 @@ public class ReactionsResponseDto {
         private Long likeCount;
         private Long unLikeCount;
         private Long viewCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
     }
 
@@ -44,6 +44,7 @@ public class ReactionsResponseDto {
     @AllArgsConstructor
     public static class ReadOneForBoardDto {
         private Long reactionId;
+        private Long reactorId;
         private String reactorName;
         private Emoji emoji;
     }
@@ -54,10 +55,9 @@ public class ReactionsResponseDto {
     @AllArgsConstructor
     public static class CreateOneForCommentDto {
         private Long reactionId;
-        private String commentContent;
+        private String content;
         private Long likeCount;
-        private Long unLikeCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
     }
 
@@ -67,10 +67,9 @@ public class ReactionsResponseDto {
     @AllArgsConstructor
     public static class CreateOneForReplyDto {
         private Long reactionId;
-        private String replyContent;
+        private String content;
         private Long likeCount;
-        private Long unLikeCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
     }
 }
