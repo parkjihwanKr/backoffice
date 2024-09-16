@@ -2,6 +2,7 @@ package com.example.backoffice.domain.comment.dto;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
+import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,6 +70,7 @@ public class CommentsResponseDto {
         private Long likeCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        private List<ReactionsResponseDto> reactionList;
     }
 
     @Getter

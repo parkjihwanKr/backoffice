@@ -175,7 +175,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
         sendUrgentEventForHRManager(requestDto.getUrgent(), loginMember, vacation);
 
-        String vacationTitle = loginMember.getMemberName()+ "님의 휴가 계획";
+        String vacationTitle = loginMember.getName()+ "님의 휴가 계획";
         vacation.update(vacationTitle, requestDto.getReason(), loginMember.getDepartment(),
                 eventDateRangeDto.getStartDate(), eventDateRangeDto.getEndDate(), EventType.MEMBER_VACATION);
 

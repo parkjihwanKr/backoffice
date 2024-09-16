@@ -53,7 +53,7 @@ public class MembersConverter {
                 .memberId(member.getId())
                 .email(member.getEmail())
                 .memberName(member.getMemberName())
-                .name(member.getMemberName())
+                .name(member.getName())
                 .contact(member.getContact())
                 .role(member.getRole())
                 .address(member.getAddress())
