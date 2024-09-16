@@ -43,7 +43,7 @@ public class ReactionsConverter {
                 .boardContent(board.getContent())
                 .likeCount(board.getLikeCount())
                 .viewCount(board.getViewCount())
-                .reactorName(fromMember.getMemberName())
+                .reactorName(fromMember.getName())
                 .emoji(emoji)
                 .build();
     }
@@ -68,7 +68,7 @@ public class ReactionsConverter {
                 .reactionId(reactionId)
                 .content(comment.getContent())
                 .likeCount(comment.getLikeCount())
-                .reactorName(fromMember.getMemberName())
+                .reactorName(fromMember.getName())
                 .emoji(emoji)
                 .build();
     }
@@ -79,7 +79,7 @@ public class ReactionsConverter {
                 .reactionId(reactionId)
                 .content(reply.getContent())
                 .likeCount(reply.getLikeCount())
-                .reactorName(fromMember.getMemberName())
+                .reactorName(fromMember.getName())
                 .emoji(emoji)
                 .build();
     }

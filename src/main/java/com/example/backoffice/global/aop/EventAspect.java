@@ -34,7 +34,7 @@ public class EventAspect {
         }
         commonAspect.getLogMessage(message);
         auditLogService.save(
-                AuditLogType.CREATE_MEMBER_VACATION, member.getMemberName(), message);
+                AuditLogType.CREATE_MEMBER_VACATION, member.getName(), message);
     }
 
     /*@Param Long vacationId, Members loginMember,
@@ -46,13 +46,13 @@ public class EventAspect {
                 = (EventsRequestDto.UpdateOneForVacationEventDto)joinPoint.getArgs()[2];
 
         String message
-                = "제목 : " + member.getMemberName() + "님의 휴가 수정"
+                = "제목 : " + member.getName() + "님의 휴가 수정"
                 + " / 이유 : "+ requestDto.getReason();
         if(requestDto.getUrgent()){
             message = "제목 : 긴급한 휴가 요청 / 이유 : "+ requestDto.getReason();
         }
         commonAspect.getLogMessage(message);
         auditLogService.save(
-                AuditLogType.UPDATE_MEMBER_VACATION, member.getMemberName(), message);
+                AuditLogType.UPDATE_MEMBER_VACATION, member.getName(), message);
     }
 }

@@ -23,7 +23,7 @@ public class CommentsConverter {
             Comments comment, Members member){
         return CommentsResponseDto.CreateCommentDto.builder()
                 .commentId(comment.getId())
-                .author(member.getMemberName())
+                .author(member.getName())
                 .authorDepartment(member.getDepartment())
                 .authorPosition(member.getPosition())
                 .content(comment.getContent())
@@ -35,7 +35,7 @@ public class CommentsConverter {
             Comments comment, Members member){
         return CommentsResponseDto.UpdateCommentDto.builder()
                 .commentId(comment.getId())
-                .author(member.getMemberName())
+                .author(member.getName())
                 .content(comment.getContent())
                 .likeCount(comment.getLikeCount())
                 .createdAt(comment.getCreatedAt())
@@ -59,7 +59,7 @@ public class CommentsConverter {
             Comments parentComment, Comments childComment, Members member){
         return CommentsResponseDto.CreateReplyDto.builder()
                 .replyId(childComment.getId())
-                .author(member.getMemberName())
+                .author(member.getName())
                 .authorDepartment(member.getDepartment())
                 .authorPosition(member.getPosition())
                 .content(childComment.getContent())
@@ -74,7 +74,7 @@ public class CommentsConverter {
         // 해당 부분은 성능이 중요하다면 필드 writerName을 만드는게 좋음
         return CommentsResponseDto.UpdateReplyDto.builder()
                 .commentId(parentComment.getId())
-                .author(member.getMemberName())
+                .author(member.getName())
                 .replyId(childComment.getId())
                 .content(childComment.getContent())
                 .createdAt(childComment.getCreatedAt())

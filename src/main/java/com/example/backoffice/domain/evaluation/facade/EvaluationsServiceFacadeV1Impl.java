@@ -183,7 +183,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         return EvaluationsConverter.toUpdateOneForDepartmentDto(
                 evaluationId, evaluation.getDepartment(), evaluation.getTitle(),
                 evaluation.getDescription(), evaluation.getYear(),
-                evaluation.getQuarter(), loginMember.getMemberName(),
+                evaluation.getQuarter(), loginMember.getName(),
                 evaluation.getStartDate(), evaluation.getEndDate());
     }
 

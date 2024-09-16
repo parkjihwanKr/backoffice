@@ -131,7 +131,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         // 해당 멤버가 게시판의 주인인지?
         isMatchedBoardOwner(loginMember.getId(), board.getMember().getId());
 
-        return updateBoardWithFiles(loginMember.getMemberName(), board, requestDto, files);
+        return updateBoardWithFiles(loginMember.getName(), board, requestDto, files);
     }
 
     @Override
@@ -230,7 +230,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         // 3. 게시글의 소유자 확인
         isMatchedBoardOwner(loginMember.getId(), departmentBoard.getMember().getId());
 
-        return updateBoardWithFiles(loginMember.getMemberName(), departmentBoard, requestDto, files);
+        return updateBoardWithFiles(loginMember.getName(), departmentBoard, requestDto, files);
     }
 
     @Override
