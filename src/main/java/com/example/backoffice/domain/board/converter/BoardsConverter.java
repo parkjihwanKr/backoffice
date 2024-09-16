@@ -76,7 +76,6 @@ public class BoardsConverter {
                 .fileList(fileResponseDtoList)
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
-                .boardType(board.getBoardType())
                 .build();
     }
 
@@ -150,7 +149,6 @@ public class BoardsConverter {
                 .commentCount(commentCount)
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
-                .boardType(board.getBoardType())
                 .build();
     }
 
@@ -163,7 +161,6 @@ public class BoardsConverter {
                 .content(board.getContent())
                 .fileList(fileUrlList)
                 .createdAt(board.getCreatedAt())
-                .boardType(board.getBoardType())
                 .build();
     }
 
@@ -200,7 +197,6 @@ public class BoardsConverter {
                 .viewCount(board.getViewCount())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
-                .boardType(board.getBoardType())
                 .build();
     }
 
