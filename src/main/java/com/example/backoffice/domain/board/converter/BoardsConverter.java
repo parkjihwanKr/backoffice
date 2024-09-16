@@ -107,6 +107,7 @@ public class BoardsConverter {
                                 .content(commentReply.getContent())
                                 .authorDepartment(commentReply.getMember().getDepartment())
                                 .authorPosition(commentReply.getMember().getPosition())
+                                .reactionList(null)
                                 .likeCount(commentReply.getLikeCount())
                                 .createdAt(commentReply.getCreatedAt())
                                 .modifiedAt(commentReply.getModifiedAt())

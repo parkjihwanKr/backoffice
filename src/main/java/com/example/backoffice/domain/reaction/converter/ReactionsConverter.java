@@ -56,6 +56,7 @@ public class ReactionsConverter {
             responeDtoList.add(
                     ReactionsResponseDto.ReadOneForBoardDto.builder()
                             .reactionId(reaction.getId())
+                            .reactorId(reaction.getReactor().getId())
                             .reactorName(reaction.getReactor().getName())
                             .emoji(reaction.getEmoji())
                             .build());

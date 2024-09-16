@@ -80,7 +80,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
     @Transactional
     public List<ReactionsResponseDto.ReadOneForBoardDto> readAllForBoard(
             Long boardId){
-        List<Reactions> reactionList = reactionsRepository.findByBoardId(boardId);
+        List<Reactions> reactionList = reactionsRepository.findByBoardIdAndCommentIsNull(boardId);
 
         return ReactionsConverter.toReadOneForBoardDtoList(reactionList);
     }
