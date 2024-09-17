@@ -8,6 +8,7 @@ import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
+import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.service.FilesServiceV1;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
@@ -90,12 +91,23 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         if(!board.getBoardType().equals(BoardType.GENERAL)){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_GENERAL_BOARD);
         }
-        List<ReactionsResponseDto.ReadOneForBoardDto> reactionResponseDtoList
+        List<ReactionsResponseDto.ReadOneForBoardDto> reactionBoardResponseDtoList
                 = reactionsService.readAllForBoard(boardId);
+        List<ReactionsResponseDto.ReadOneForCommentDto> reactionCommentResponseDtoList
+                = reactionsService.readAllForComment(boardId);
+        List<ReactionsResponseDto.ReadOneForReplyDto> reactionReplyResponseDtoList = new ArrayList<>();
 
+        // 댓글 리스트를 순회하며 각 댓글의 답글에 대한 리액션 리스트를 가져옴
+        for (Comments comment : board.getCommentList()) {
+            if (comment.getReplyList() != null && !comment.getReplyList().isEmpty()) {
+                reactionReplyResponseDtoList.addAll(
+                        reactionsService.readAllForReply(comment.getId()));
+            }
+        }
         incrementViewCount(board);
         return BoardsConverter.toReadOneDto(
-                board, reactionResponseDtoList);
+                board, reactionBoardResponseDtoList,
+                reactionCommentResponseDtoList, reactionReplyResponseDtoList);
     }
 
     @Override
@@ -209,7 +221,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         // 잠시 null로
         incrementViewCount(departmentBoard);
         return BoardsConverter.toReadOneDto(
-                departmentBoard, null);
+                departmentBoard, null, null, null);
     }
 
     @Override

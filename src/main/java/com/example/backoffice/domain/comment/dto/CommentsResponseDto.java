@@ -24,10 +24,10 @@ public class CommentsResponseDto {
         private String content;
         private String authorDepartment;
         private String authorPosition;
-        private Boolean isLiked;
         private Long likeCount;
         private LocalDateTime createdAt;
         private List<ReadCommentRepliesDto> replyList;
+        private List<ReactionsResponseDto.ReadOneForCommentDto> reactionList;
     }
 
     @Getter
@@ -70,7 +70,7 @@ public class CommentsResponseDto {
         private Long likeCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-        private List<ReactionsResponseDto> reactionList;
+        private List<ReactionsResponseDto.ReadOneForReplyDto> reactionList;
     }
 
     @Getter

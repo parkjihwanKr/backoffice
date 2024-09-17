@@ -15,8 +15,11 @@ public interface ReactionsServiceV1 {
     void deleteOneForMember(
             Long toMemberId, Long reactionId, Members fromMember);
 
-    List<ReactionsResponseDto.ReadOneForBoardDto> readAllForBoard(
-            Long boardId);
+    List<ReactionsResponseDto.ReadOneForBoardDto> readAllForBoard(Long boardId);
+
+    List<ReactionsResponseDto.ReadOneForCommentDto> readAllForComment(Long boardId);
+
+    List<ReactionsResponseDto.ReadOneForReplyDto> readAllForReply(Long commentId);
 
     ReactionsResponseDto.CreateOneForBoardDto createOneForBoard(
             Long boardId, Members fromMember,

@@ -21,7 +21,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +53,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
         Emoji emoji = validateEmoji(requestDto.getEmoji(), Collections.singleton(Emoji.LOVE));
 
         Reactions reaction
-                = ReactionsConverter.toEntity(toMember, fromMember, emoji, null, null);
+                = ReactionsConverter.toEntity(toMember, fromMember, emoji, null, null, null);
 
         toMember.addLoveCount();
         reactionsRepository.save(reaction);
@@ -78,11 +81,27 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
 
     @Override
     @Transactional
-    public List<ReactionsResponseDto.ReadOneForBoardDto> readAllForBoard(
-            Long boardId){
-        List<Reactions> reactionList = reactionsRepository.findByBoardIdAndCommentIsNull(boardId);
+    public List<ReactionsResponseDto.ReadOneForBoardDto> readAllForBoard(Long boardId){
+        List<Reactions> reactionList
+                = reactionsRepository.findByBoardIdAndCommentIsNull(boardId);
 
-        return ReactionsConverter.toReadOneForBoardDtoList(reactionList);
+        return ReactionsConverter.toReadAllForBoardDtoList(reactionList);
+    }
+
+    @Override
+    @Transactional
+    public List<ReactionsResponseDto.ReadOneForCommentDto> readAllForComment(Long boardId){
+        List<Reactions> reactionList
+                = reactionsRepository.findByBoardIdAndCommentIsNotNullAndReplyIsNull(boardId);
+        return ReactionsConverter.toReadAllForCommentDtoList(reactionList);
+    }
+
+    @Override
+    @Transactional
+    public List<ReactionsResponseDto.ReadOneForReplyDto> readAllForReply(Long commentId){
+        List<Reactions> reactionList
+                = reactionsRepository.findByCommentIdAndReplyIsNotNull(commentId);
+        return ReactionsConverter.toReadAllForReplyDtoList(reactionList);
     }
 
     @Override
@@ -100,7 +119,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
-        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, null);
+        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, null, null);
         board.addEmoji(reaction, emoji.toString());
         reactionsRepository.save(reaction);
 
@@ -145,12 +164,18 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
-        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, comment);
+        // 2. 엔티티 저장
+        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, emoji, board, comment, null);
         comment.addEmoji(reaction, emoji.toString());
+        reactionsRepository.save(reaction);
+
+        // 3. 알림 전달
         NotificationData commentsNotification =
                 new NotificationData(
                         comment.getMember(), fromMember, board, comment, null, null, null);
         notificationsServiceFacade.createOne(commentsNotification, NotificationType.COMMENT);
+
+        // 4. DTO 변환
         return ReactionsConverter.toCreateCommentReactionDto(
                 reaction.getId(), comment, fromMember, emoji.toString());
     }
@@ -167,6 +192,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
         String commentEmoji = reaction.getEmoji().toString();
+
         comment.deleteEmoji(commentEmoji);
 
         reactionsRepository.deleteById(reactionId);
@@ -187,7 +213,7 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
             throw new ReactionsCustomException(ReactionsExceptionCode.EMOJI_ALREADY_EXISTS);
         }
 
-        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, replyEmoji, null, reply);
+        Reactions reaction = ReactionsConverter.toEntity(null, fromMember, replyEmoji, null, comment, reply);
         reactionsRepository.save(reaction);
 
         reply.addEmoji(reaction, replyEmoji.toString());
@@ -207,8 +233,8 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
         Comments reply = commentsService.findById(replyId);
         Reactions reaction = findById(reactionId);
 
-        if (!reactionsRepository.existsByIdAndCommentAndReactor(
-                reactionId, reply, fromMember)) {
+        if (!reaction.getReply().getId().equals(replyId) ||
+                !reaction.getReactor().getId().equals(fromMember.getId())) {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_FOUND_REACTION);
         }
 
@@ -229,7 +255,6 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
             throw new ReactionsCustomException(ReactionsExceptionCode.NOT_MATCHED_EMOJI);
         }
     }
-
 
     public Reactions findById(Long reactionId) {
         return reactionsRepository.findById(reactionId).orElseThrow(
