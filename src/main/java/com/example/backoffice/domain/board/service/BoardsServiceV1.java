@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.board.service;
 
+import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import org.springframework.data.domain.Page;
@@ -9,13 +10,15 @@ import java.util.List;
 
 public interface BoardsServiceV1 {
 
-    List<Boards> findByIsImportantTrueOrderByModifiedAtDesc();
+    List<Boards> findByIsImportantTrueAndBoardTypeOrderByModifiedAtDesc(BoardType boardType);
 
-    Page<Boards> findByIsImportantFalseOrderByCreatedAtDesc(Pageable pageable);
+    Page<Boards> findByIsImportantFalseAndBoardTypeOrderByCreatedAtDesc(
+            Pageable pageable, BoardType boardType);
 
     Long getCommentListSize(Boards board);
 
-    Page<Boards> findAllByDepartment(Pageable pageable, MemberDepartment department);
+    Page<Boards> findAllByDepartmentAndBoardType(
+            Pageable pageable, MemberDepartment department, BoardType boardType);
 
     Boards save(Boards board);
 

@@ -14,10 +14,11 @@ public class ReactionsConverter {
 
     public static Reactions toEntity(
             Members toMember, Members fromMember,
-            Emoji emoji, Boards board, Comments comment) {
+            Emoji emoji, Boards board, Comments comment, Comments reply) {
         return Reactions.builder()
                 .board(board)
                 .comment(comment)
+                .reply(reply)
                 .member(toMember)
                 .reactor(fromMember)
                 .emoji(emoji)
@@ -48,12 +49,12 @@ public class ReactionsConverter {
                 .build();
     }
 
-    public static List<ReactionsResponseDto.ReadOneForBoardDto> toReadOneForBoardDtoList(
+    public static List<ReactionsResponseDto.ReadOneForBoardDto> toReadAllForBoardDtoList(
             List<Reactions> reactionList) {
-        List<ReactionsResponseDto.ReadOneForBoardDto> responeDtoList = new ArrayList<>();
+        List<ReactionsResponseDto.ReadOneForBoardDto> responseDtoList = new ArrayList<>();
 
         for(Reactions reaction : reactionList){
-            responeDtoList.add(
+            responseDtoList.add(
                     ReactionsResponseDto.ReadOneForBoardDto.builder()
                             .reactionId(reaction.getId())
                             .reactorId(reaction.getReactor().getId())
@@ -61,8 +62,43 @@ public class ReactionsConverter {
                             .emoji(reaction.getEmoji())
                             .build());
         }
-        return responeDtoList;
+        return responseDtoList;
     }
+
+    public static List<ReactionsResponseDto.ReadOneForCommentDto> toReadAllForCommentDtoList(
+            List<Reactions> reactionList){
+        List<ReactionsResponseDto.ReadOneForCommentDto> responseDtoList = new ArrayList<>();
+
+        for(Reactions reaction : reactionList){
+            responseDtoList.add(
+                    ReactionsResponseDto.ReadOneForCommentDto.builder()
+                            .reactionId(reaction.getId())
+                            .reactorId(reaction.getReactor().getId())
+                            .commentId(reaction.getComment().getId())
+                            .reactorName(reaction.getReactor().getName())
+                            .emoji(reaction.getEmoji())
+                            .build());
+        }
+        return responseDtoList;
+    }
+
+    public static List<ReactionsResponseDto.ReadOneForReplyDto> toReadAllForReplyDtoList(
+            List<Reactions> reactionList){
+        List<ReactionsResponseDto.ReadOneForReplyDto> responseDtoList = new ArrayList<>();
+        for(Reactions reaction : reactionList){
+            responseDtoList.add(
+                    ReactionsResponseDto.ReadOneForReplyDto.builder()
+                            .reactionId(reaction.getId())
+                            .reactorId(reaction.getReactor().getId())
+                            .commentId(reaction.getComment().getId())
+                            .replyId(reaction.getReply().getId())
+                            .reactorName(reaction.getReactor().getName())
+                            .emoji(reaction.getEmoji())
+                            .build());
+        }
+        return responseDtoList;
+    }
+
     public static ReactionsResponseDto.CreateOneForCommentDto toCreateCommentReactionDto(
             Long reactionId, Comments comment, Members fromMember, String emoji) {
         return ReactionsResponseDto.CreateOneForCommentDto.builder()

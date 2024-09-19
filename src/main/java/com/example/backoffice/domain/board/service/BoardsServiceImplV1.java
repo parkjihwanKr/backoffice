@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.board.service;
 
+import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
@@ -21,14 +22,15 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     @Override
     @Transactional
-    public List<Boards> findByIsImportantTrueOrderByModifiedAtDesc(){
-        return boardsRepository.findByIsImportantTrueOrderByModifiedAtDesc();
+    public List<Boards> findByIsImportantTrueAndBoardTypeOrderByModifiedAtDesc(BoardType boardType){
+        return boardsRepository.findByIsImportantTrueAndBoardTypeOrderByModifiedAtDesc(boardType);
     }
 
     @Override
     @Transactional
-    public Page<Boards> findByIsImportantFalseOrderByCreatedAtDesc(Pageable pageable){
-        return boardsRepository.findByIsImportantFalseOrderByCreatedAtDesc(pageable);
+    public Page<Boards> findByIsImportantFalseAndBoardTypeOrderByCreatedAtDesc(
+            Pageable pageable, BoardType boardType){
+        return boardsRepository.findByIsImportantFalseAndBoardTypeOrderByCreatedAtDesc(pageable, boardType);
     }
 
     @Override
@@ -39,8 +41,9 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     @Override
     @Transactional
-    public Page<Boards> findAllByDepartment(Pageable pageable, MemberDepartment department){
-        return boardsRepository.findAllByDepartment(pageable, department);
+    public Page<Boards> findAllByDepartmentAndBoardType(
+            Pageable pageable, MemberDepartment department, BoardType boardType){
+        return boardsRepository.findAllByDepartmentAndBoardType(pageable, department, boardType);
     }
 
     @Override

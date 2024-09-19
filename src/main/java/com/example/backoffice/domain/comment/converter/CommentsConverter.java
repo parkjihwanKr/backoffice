@@ -26,6 +26,7 @@ public class CommentsConverter {
                 .author(member.getName())
                 .authorDepartment(member.getDepartment())
                 .authorPosition(member.getPosition())
+                .likeCount(comment.getLikeCount())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();
@@ -60,6 +61,7 @@ public class CommentsConverter {
         return CommentsResponseDto.CreateReplyDto.builder()
                 .replyId(childComment.getId())
                 .author(member.getName())
+                .likeCount(childComment.getLikeCount())
                 .authorDepartment(member.getDepartment())
                 .authorPosition(member.getPosition())
                 .content(childComment.getContent())

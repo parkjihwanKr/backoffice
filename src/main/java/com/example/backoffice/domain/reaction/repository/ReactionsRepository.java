@@ -30,4 +30,8 @@ public interface ReactionsRepository extends JpaRepository<Reactions, Long> {
             Long reactionId, Comments commentOrReply, Members fromMember);
 
     List<Reactions> findByBoardIdAndCommentIsNull(Long boardId);
+
+    List<Reactions> findByBoardIdAndCommentIsNotNullAndReplyIsNull(Long boardId);
+
+    List<Reactions> findByCommentIdAndReplyIsNotNull(Long commentId);
 }

@@ -42,7 +42,7 @@ public class BoardsConverter {
 
     public static Boards toEntityForDepartment(
             BoardsRequestDto.CreateOneDto requestDto,
-            Members member, MemberDepartment department){
+            Members member, MemberDepartment department, BoardCategories category){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
@@ -51,6 +51,7 @@ public class BoardsConverter {
                 .isLocked(requestDto.getIsLocked())
                 .boardType(BoardType.DEPARTMENT)
                 .department(department)
+                .categories(category)
                 .likeCount(0L)
                 .viewCount(0L)
                 .build();
@@ -80,7 +81,10 @@ public class BoardsConverter {
     }
 
     public static BoardsResponseDto.ReadOneDto toReadOneDto(
-            Boards board, List<ReactionsResponseDto.ReadOneForBoardDto> reactionResponseDtoList) {
+            Boards board,
+            List<ReactionsResponseDto.ReadOneForBoardDto> reactionBoardResponseDtoList,
+            List<ReactionsResponseDto.ReadOneForCommentDto> reactionCommentResponseDtoList,
+            List<ReactionsResponseDto.ReadOneForReplyDto> reactionReplyResponseDtoList) {
         List<String> fileUrls = board.getFileList().stream()
                 .map(Files::getUrl)
                 .collect(Collectors.toList());
@@ -107,7 +111,10 @@ public class BoardsConverter {
                                 .content(commentReply.getContent())
                                 .authorDepartment(commentReply.getMember().getDepartment())
                                 .authorPosition(commentReply.getMember().getPosition())
-                                .reactionList(null)
+                                .reactionList(
+                                        reactionReplyResponseDtoList.stream()
+                                                .filter(reaction -> reaction.getReplyId().equals(commentReply.getId()))
+                                                .collect(Collectors.toList()))
                                 .likeCount(commentReply.getLikeCount())
                                 .createdAt(commentReply.getCreatedAt())
                                 .modifiedAt(commentReply.getModifiedAt())
@@ -123,6 +130,12 @@ public class BoardsConverter {
                         .content(comment.getContent())
                         .likeCount(comment.getLikeCount())
                         .createdAt(comment.getCreatedAt())
+                        .reactionList(
+                                // 댓글 ID에 맞는 reactionList를 필터링하여 적용
+                                reactionCommentResponseDtoList.stream()
+                                        .filter(reaction -> reaction.getCommentId().equals(commentId))  // 댓글 ID에 맞는 리액션 필터링
+                                        .collect(Collectors.toList())  // 필터링된 리액션 리스트로 변환
+                        )
                         .replyList(replyList)
                         .authorDepartment(comment.getMember().getDepartment().getDepartment())
                         .authorPosition(comment.getMember().getPosition().getPosition())
@@ -143,7 +156,7 @@ public class BoardsConverter {
                 .viewCount(board.getViewCount())
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
-                .reactionList(reactionResponseDtoList)
+                .reactionList(reactionBoardResponseDtoList)
                 .fileList(fileUrls)
                 .category(board.getCategories().getLabel())
                 .commentList(commentList)

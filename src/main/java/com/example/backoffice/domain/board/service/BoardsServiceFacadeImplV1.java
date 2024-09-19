@@ -8,6 +8,7 @@ import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
+import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.service.FilesServiceV1;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
@@ -27,10 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -47,7 +45,8 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
     public Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable) {
         // 1. 중요한 게시글(isImportant == true)을 ModifiedAt 기준으로 내림차순 정렬하여 가져옵니다.
         List<Boards> importantBoardsByModifiedAt
-                = boardsService.findByIsImportantTrueOrderByModifiedAtDesc();
+                = boardsService.findByIsImportantTrueAndBoardTypeOrderByModifiedAtDesc(
+                        BoardType.GENERAL);
 
         // 2. 상단에 고정할 중요한 게시글 3개를 추출합니다.
         List<Boards> topImportantBoards = importantBoardsByModifiedAt.stream()
@@ -61,7 +60,9 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
                 .toList();
 
         // 4. 중요한 게시글 외의 일반 게시글(isImportant == false)을 CreatedAt 기준으로 가져옵니다.
-        Page<Boards> otherBoardPage = boardsService.findByIsImportantFalseOrderByCreatedAtDesc(pageable);
+        Page<Boards> otherBoardPage
+                = boardsService.findByIsImportantFalseAndBoardTypeOrderByCreatedAtDesc(
+                        pageable, BoardType.GENERAL);
 
         // 5. 중요한 게시글과 일반 게시글을 합칩니다.
         List<Boards> combinedBoards = new ArrayList<>(topImportantBoards);
@@ -90,12 +91,24 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         if(!board.getBoardType().equals(BoardType.GENERAL)){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_GENERAL_BOARD);
         }
-        List<ReactionsResponseDto.ReadOneForBoardDto> reactionResponseDtoList
+        List<ReactionsResponseDto.ReadOneForBoardDto> reactionBoardResponseDtoList
                 = reactionsService.readAllForBoard(boardId);
+        List<ReactionsResponseDto.ReadOneForCommentDto> reactionCommentResponseDtoList
+                = reactionsService.readAllForComment(boardId);
+        List<ReactionsResponseDto.ReadOneForReplyDto> reactionReplyResponseDtoList = new ArrayList<>();
+
+        // 댓글 리스트를 순회하며 각 댓글의 답글에 대한 리액션 리스트를 가져옴
+        for (Comments comment : board.getCommentList()) {
+            if (comment.getReplyList() != null && !comment.getReplyList().isEmpty()) {
+                reactionReplyResponseDtoList.addAll(
+                        reactionsService.readAllForReply(comment.getId()));
+            }
+        }
 
         incrementViewCount(board);
         return BoardsConverter.toReadOneDto(
-                board, reactionResponseDtoList);
+                board, reactionBoardResponseDtoList,
+                reactionCommentResponseDtoList, reactionReplyResponseDtoList);
     }
 
     @Override
@@ -123,14 +136,15 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             List<MultipartFile> files){
         Boards board = boardsService.findById(boardId);
 
-        if(!board.getBoardType().equals(BoardType.GENERAL)){
+        BoardType boardType = BoardType.GENERAL;
+        if(!board.getBoardType().equals(boardType)){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_GENERAL_BOARD);
         }
 
         // 해당 멤버가 게시판의 주인인지?
         isMatchedBoardOwner(loginMember.getId(), board.getMember().getId());
 
-        return updateBoardWithFiles(loginMember.getName(), board, requestDto, files);
+        return updateBoardWithFiles(loginMember.getName(), board, requestDto, files, boardType);
     }
 
     @Override
@@ -146,6 +160,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
     public BoardsResponseDto.CreateOneDto createOneForDepartment(
             String department, Members loginMember,
             BoardsRequestDto.CreateOneDto requestDto, List<MultipartFile> files){
+
         // 1. 해당 멤버가 부서 게시판을 만들 자격이 있는지?
         MemberDepartment memberDepartment
                 = MembersConverter.toDepartment(department);
@@ -158,8 +173,10 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             }
         }
 
+        BoardCategories category = BoardsConverter.toCategories(requestDto.getCategory());
+
         Boards departmentBoard = BoardsConverter.toEntityForDepartment(
-                requestDto, loginMember, memberDepartment);
+                requestDto, loginMember, memberDepartment, category);
         return saveBoardWithFiles(files, departmentBoard);
     }
 
@@ -170,14 +187,20 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             String departmentName, Pageable pageable){
         // 1. 부서에 해당하는 게시글 모두 조회
         MemberDepartment department = MembersConverter.toDepartment(departmentName);
-        Page<Boards> boardList = boardsService.findAllByDepartment(pageable, department);
+
+        // 1-1. DB에 존재하는 부서인 것을 확인
+        BoardType departmentBoardType = BoardType.DEPARTMENT;
+        Page<Boards> boardList
+                = boardsService.findAllByDepartmentAndBoardType(
+                        pageable, department, departmentBoardType);
 
         Members loginMember = getLoginMember();
 
         // 2. 접근 가능한 게시글 필터링
         List<Boards> accessedBoards = boardList.stream()
-                .filter(board -> !board.getIsLocked() || board.getDepartment().equals(loginMember.getDepartment()))
-                .toList();
+                .filter(board ->
+                        !board.getIsLocked()
+                                || board.getDepartment().equals(loginMember.getDepartment())).toList();
 
         // 3. 각 게시글의 댓글 수를 계산하여 DTO로 변환
         List<BoardsResponseDto.ReadAllDto> boardDtoList = accessedBoards.stream()
@@ -198,7 +221,21 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             String departmentName, Long boardId){
         MemberDepartment department = MembersConverter.toDepartment(departmentName);
 
+        List<ReactionsResponseDto.ReadOneForBoardDto> reactionBoardResponseDtoList
+                = reactionsService.readAllForBoard(boardId);
+        List<ReactionsResponseDto.ReadOneForCommentDto> reactionCommentResponseDtoList
+                = reactionsService.readAllForComment(boardId);
+        List<ReactionsResponseDto.ReadOneForReplyDto> reactionReplyResponseDtoList = new ArrayList<>();
+
         Boards departmentBoard = boardsService.findByIdAndDepartment(boardId, department);
+
+        // 댓글 리스트를 순회하며 각 댓글의 답글에 대한 리액션 리스트를 가져옴
+        for (Comments comment : departmentBoard.getCommentList()) {
+            if (comment.getReplyList() != null && !comment.getReplyList().isEmpty()) {
+                reactionReplyResponseDtoList.addAll(
+                        reactionsService.readAllForReply(comment.getId()));
+            }
+        }
 
         if(departmentBoard.getIsLocked()
                 && !getLoginMember().getDepartment().equals(
@@ -206,10 +243,11 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             throw new BoardsCustomException(BoardsExceptionCode.UNAUTHORIZED_ACCESS);
         }
 
-        // 잠시 null로
         incrementViewCount(departmentBoard);
+
         return BoardsConverter.toReadOneDto(
-                departmentBoard, null);
+                departmentBoard, reactionBoardResponseDtoList,
+                reactionCommentResponseDtoList, reactionReplyResponseDtoList);
     }
 
     @Override
@@ -222,21 +260,16 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         Boards departmentBoard = boardsService.findById(boardId);
 
         // 2. 게시글의 타입 확인
-        if(!departmentBoard.getBoardType().equals(BoardType.DEPARTMENT)){
+        BoardType boardType = BoardType.DEPARTMENT;
+        if(!departmentBoard.getBoardType().equals(boardType)){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_DEPARTMENT_BOARD);
         }
 
         // 3. 게시글의 소유자 확인
         isMatchedBoardOwner(loginMember.getId(), departmentBoard.getMember().getId());
 
-        return updateBoardWithFiles(loginMember.getName(), departmentBoard, requestDto, files);
-    }
-
-    @Override
-    @Transactional
-    public void deleteOneForDepartment(
-            String department, Long boardId, Members loginMember){
-
+        return updateBoardWithFiles(
+                loginMember.getName(), departmentBoard, requestDto, files, boardType);
     }
 
     // RequestPart files required = false로 인하여 files가 null일 수 있는 경우의 수 발생
@@ -267,12 +300,18 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
     @Override
     @Transactional
     public void updateOneForMarkAsLocked(Long boardId, Members loginMember){
+        // 1. 부서 게시글 찾기
         Boards board = boardsService.findById(boardId);
+
+        // 2. 잠금 기능은 부서 게시판만 지원
         if(!board.getBoardType().equals(BoardType.DEPARTMENT)){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_DEPARTMENT_BOARD);
         }
+
+        // 3. board의 주인 찾기
         isMatchedBoardOwner(loginMember.getId(), board.getMember().getId());
 
+        // 4. 잠금 상태 업데이트
         board.updateIsLocked(!board.getIsLocked());
     }
 
@@ -295,23 +334,29 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
     public BoardsResponseDto.UpdateOneDto updateBoardWithFiles(
             String writerName, Boards board,
             BoardsRequestDto.UpdateOneDto requestDto,
-            List<MultipartFile> files){
+            List<MultipartFile> files, BoardType boardType){
         // Department board, General board 구분
         MemberDepartment department
                 = MembersConverter.toDepartment(requestDto.getDepartment());
-        if(requestDto.getCategory() == null){
-            // department
-            board.update(requestDto.getTitle(), requestDto.getContent(),
-                    requestDto.getIsImportant(), requestDto.getIsLocked(),
-                    department, null);
-        }else{
-            // general
-            BoardCategories categories
-                    = BoardsConverter.toCategories(requestDto.getCategory());
-            board.update(requestDto.getTitle(), requestDto.getContent(),
-                    requestDto.getIsImportant(), false,
-                    department, categories);
+
+        BoardCategories categories
+                = BoardsConverter.toCategories(requestDto.getCategory());
+
+        switch (boardType) {
+            case DEPARTMENT -> {
+                board.update(requestDto.getTitle(), requestDto.getContent(),
+                        requestDto.getIsImportant(), requestDto.getIsLocked(),
+                        department, categories);
+            }
+            case GENERAL -> {
+                // GENERAL_BOARD는 잠금이 필요없음.
+                board.update(requestDto.getTitle(), requestDto.getContent(),
+                        requestDto.getIsImportant(), false,
+                        department, categories);
+            }
+            default -> throw new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD_TYPE);
         }
+
         // 삭제 전 urlList, 삭제 후 urlList
         List<String> beforeFileUrlList = new ArrayList<>();
         List<String> afterFileUrlList = new ArrayList<>();

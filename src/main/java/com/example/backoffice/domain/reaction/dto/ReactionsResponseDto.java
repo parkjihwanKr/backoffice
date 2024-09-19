@@ -53,6 +53,33 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ReadOneForCommentDto {
+        private Long commentId;
+        private Long reactionId;
+        private Long reactorId;
+        private String reactorName;
+        private Emoji emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneForReplyDto {
+        // parent
+        private Long commentId;
+        // child
+        private Long replyId;
+        private Long reactionId;
+        private Long reactorId;
+        private String reactorName;
+        private Emoji emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CreateOneForCommentDto {
         private Long reactionId;
         private String content;
