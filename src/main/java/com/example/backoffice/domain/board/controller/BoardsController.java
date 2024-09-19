@@ -125,23 +125,11 @@ public class BoardsController {
             @PathVariable Long boardId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") @Valid BoardsRequestDto.UpdateOneDto requestDto,
-            @RequestPart(value = "files") List<MultipartFile> files) {
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         BoardsResponseDto.UpdateOneDto responseDto
                 = boardsServiceFacade.updateOneForDepartment(
                         department, boardId, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    // 부서별 게시글 삭제
-    @DeleteMapping("/departments/{department}/boards/{boardId}")
-    public ResponseEntity<CommonResponse<Void>> deleteOneForDepartment(
-            @PathVariable String department,
-            @PathVariable Long boardId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boardsServiceFacade.deleteOneForDepartment(department, boardId, memberDetails.getMembers());
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>(
-                        200, "부서 게시판 삭제 성공", null));
     }
 
     // 게시판의 중요도 수정
@@ -163,6 +151,6 @@ public class BoardsController {
         boardsServiceFacade.updateOneForMarkAsLocked(boardId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(
-                        200, "부서 게시글을 부서원만 볼 수 있게 변경 성공", null));
+                        200, "부서 게시글 잠금 상태 변경 성공", null));
     }
 }

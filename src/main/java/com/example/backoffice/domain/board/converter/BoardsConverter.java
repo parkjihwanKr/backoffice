@@ -42,7 +42,7 @@ public class BoardsConverter {
 
     public static Boards toEntityForDepartment(
             BoardsRequestDto.CreateOneDto requestDto,
-            Members member, MemberDepartment department){
+            Members member, MemberDepartment department, BoardCategories category){
         return Boards.builder()
                 .member(member)
                 .title(requestDto.getTitle())
@@ -51,6 +51,7 @@ public class BoardsConverter {
                 .isLocked(requestDto.getIsLocked())
                 .boardType(BoardType.DEPARTMENT)
                 .department(department)
+                .categories(category)
                 .likeCount(0L)
                 .viewCount(0L)
                 .build();

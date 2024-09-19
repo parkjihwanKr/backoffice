@@ -40,6 +40,7 @@ public class CommentsResponseDto {
         private MemberDepartment authorDepartment;
         private MemberPosition authorPosition;
         private String content;
+        private Long likeCount;
         private LocalDateTime createdAt;
     }
 
@@ -81,6 +82,7 @@ public class CommentsResponseDto {
         private Long replyId;
         private String content;
         private String author;
+        private Long likeCount;
         private LocalDateTime createdAt;
         private MemberDepartment authorDepartment;
         private MemberPosition authorPosition;

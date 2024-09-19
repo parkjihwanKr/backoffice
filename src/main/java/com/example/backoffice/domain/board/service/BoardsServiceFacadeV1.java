@@ -41,9 +41,6 @@ public interface BoardsServiceFacadeV1 {
             BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files);
 
-    void deleteOneForDepartment(
-            String department, Long boardId, Members loginMember);
-
     void updateOneForMarkAsImportant(Long boardId, Members loginMember);
 
     void updateOneForMarkAsLocked(Long boardId, Members LoginMember);
