@@ -55,6 +55,21 @@ public class EventsResponseDto {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadOneForDepartmentEventDto {
+        private Long eventId;
+        private String title;
+        private String description;
+        private MemberDepartment department;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+    }
+
+    @Getter
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateOneForDepartmentEventDto {

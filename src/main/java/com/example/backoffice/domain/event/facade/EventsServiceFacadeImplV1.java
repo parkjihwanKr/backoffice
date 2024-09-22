@@ -10,6 +10,8 @@ import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
 import com.example.backoffice.domain.event.exception.EventsExceptionCode;
 import com.example.backoffice.domain.event.service.EventsService;
+import com.example.backoffice.domain.file.service.FilesServiceV1;
+import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
@@ -20,6 +22,7 @@ import com.example.backoffice.domain.notification.facade.NotificationsServiceFac
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -32,11 +35,36 @@ import java.util.List;
 public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     private final MembersServiceV1 membersService;
+    private final FilesServiceV1 filesService;
     private final NotificationsServiceFacadeV1 notificationsServiceFacade;
     private final EventsService eventsService;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER
             = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+    @Override
+    @Transactional
+    public EventsResponseDto.CreateOneForCompanyEventDto createOneForCompany(
+            EventsRequestDto.CreateOneForCompanyEventDto requestDto ,Members loginMember){
+
+        String message = requestDto.getStartDate() + " / " +requestDto.getEndDate();
+        System.out.println(message);
+        // 1. 해당 멤버가 회사 일정을 만들 수 있는 권한이 있는지?
+        if (!loginMember.getPosition().equals(MemberPosition.CEO) &&
+                !loginMember.getPosition().equals(MemberPosition.MANAGER)) {
+            throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_CREATE_EVENT);
+        }
+
+        // 2. 요청 날짜 검증
+        EventDateRangeDto eventDateRangeDto
+                = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
+
+        Events event
+                = EventsConverter.toEntity(requestDto.getTitle(), requestDto.getDescription(),
+                eventDateRangeDto, loginMember, loginMember.getDepartment(), EventType.COMPANY);
+
+        return EventsConverter.toCreateOneForCompanyEventDto(event);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -53,7 +81,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         // 해당 날짜의 정보를 가지고 오는데
         // 만약 2024-05-31~06-02 또는 2024-06-23~07-02까지의 프로젝트라면?
         // 해당 이벤트를 가지고 오는지? 아닌지 확인해야함 -> 가져옴
-        List<Events> eventList = readMonthEvent(year, month, EventType.DEPARTMENT);
+        List<Events> eventList = readMonthEvent(year, month, EventType.COMPANY, null);
 
         return EventsConverter.toReadForCompanyMonthEventDto(eventList);
     }
@@ -73,32 +101,65 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Override
     @Transactional
     public EventsResponseDto.CreateOneForDepartmentEventDto createOneForDepartmentEvent(
-            Members loginMember, EventsRequestDto.CreateOneForDepartmentEventDto requestDto){
+            String department, Members loginMember,
+            EventsRequestDto.CreateOneForDepartmentEventDto requestDto,
+            List<MultipartFile> files){
         membersService.findById(loginMember.getId());
 
         // 바로 오늘 이전의 날짜가 아니라면 일정을 생성할 수 있게
-        validateMemberDepartment(loginMember, requestDto.getDepartment());
+        validateMemberDepartment(department, loginMember);
 
         EventDateRangeDto eventDateRangeDto
                 = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
 
+        // 메인 어드민이 부서 일정을 만들 때, HR부서인 메인 어드민이 FIANACE의 일정을 만드려 할 때가
+        // 다르게 적용될 가능성이 있기에
+        MemberDepartment memberDepartment = MembersConverter.toDepartment(department);
+
         Events event = EventsConverter.toEntity(
                 requestDto.getTitle(), requestDto.getDescription(),
-                eventDateRangeDto, loginMember, EventType.DEPARTMENT);
+                eventDateRangeDto, loginMember, memberDepartment,
+                EventType.DEPARTMENT);
+
+        // 파일 생성
+        if(files != null){
+            for (MultipartFile file : files){
+                filesService.createOneForEvent(file, event);
+            }
+        }
+
         eventsService.save(event);
+
         return EventsConverter.toCreateOneForDepartmentDto(event);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventsResponseDto.ReadOneForDepartmentEventDto> readForDepartmentMonthEvent(
+            String department, Long year, Long month, Members loginMember){
+        // 1. 로그인 멤버가 자기가 속하지 않은 부서에 들어오고자 하면 에러
+        if (!loginMember.getDepartment().getDepartment().equals(department)){
+            // 1-1. CEO라면 들어갈 수 있음
+            if(!loginMember.getPosition().equals(MemberPosition.CEO)){
+                throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_READ_EVENT);
+            }
+        }
+
+        // 2. 해당 조건에 맞는 이벤트들을 가지고 옴
+        List<Events> eventList = readMonthEvent(year, month, EventType.DEPARTMENT, department);
+        return EventsConverter.toReadForDepartmentMonthEventDto(eventList);
     }
 
     @Override
     @Transactional
     public EventsResponseDto.UpdateOneForDepartmentEventDto updateOneForDepartmentEvent(
-            Long eventId, Members loginMember,
+            String department, Long eventId, Members loginMember,
             EventsRequestDto.UpdateOneForDepartmentEventDto requestDto){
         Events event = eventsService.findById(eventId);
 
         // 로그인 멤버의 부서와 요청한 이벤트를 수행할 부서가 같은지?
         // 최고 경영자는 부서에 영향받지 않고 생성 가능
-        validateMemberDepartment(loginMember, requestDto.getDepartment());
+        validateMemberDepartment(department, loginMember);
 
         EventDateRangeDto eventDateRangeDto
                 = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
@@ -113,7 +174,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
-    public void deleteOneForDepartmentEvent(Long eventId, Members loginMember){
+    public void deleteOneForDepartmentEvent(String department, Long eventId, Members loginMember){
         // 검증
         membersService.findById(loginMember.getId());
         Events event = eventsService.findById(eventId);
@@ -139,7 +200,8 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
         Events event = EventsConverter.toEntity(
                 message, requestDto.getReason(),
-                eventDateRangeDto, loginMember, EventType.MEMBER_VACATION);
+                eventDateRangeDto, loginMember, loginMember.getDepartment(),
+                EventType.MEMBER_VACATION);
 
         sendUrgentEventForHRManager(requestDto.getUrgent(), loginMember, event);
 
@@ -153,7 +215,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     public List<EventsResponseDto.ReadOneForVacationEventDto> readForVacationMonthEvent(
             Long year, Long month, Members loginMember){
         membersService.findById(loginMember.getId());
-        List<Events> eventList = readMonthEvent(year, month, EventType.MEMBER_VACATION);
+        List<Events> eventList = readMonthEvent(year, month, EventType.MEMBER_VACATION, null);
         return EventsConverter.toReadForVacationMonthEventDto(eventList);
     }
 
@@ -217,8 +279,9 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     public EventDateRangeDto validateEventDate(String startDate, String endDate) {
         LocalDateTime now = LocalDateTime.now();
 
-        LocalDateTime startEventDate = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
-        LocalDateTime endEventDate = LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
+        // startDate와 endDate가 'yyyy-MM-dd'T'HH:mm:ss' 형식으로 들어오는 것을 가정
+        LocalDateTime startEventDate = LocalDateTime.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        LocalDateTime endEventDate = LocalDateTime.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         if (startEventDate.isBefore(now)) {
             throw new EventsCustomException(EventsExceptionCode.INVALID_START_DATE);
@@ -285,18 +348,24 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     }
 
     private void validateMemberDepartment(
-            Members loginMember, MemberDepartment department) {
-        if (!department.equals(loginMember.getDepartment())
+            String department, Members loginMember) {
+        if (!department.equals(loginMember.getDepartment().getDepartment())
                 && !loginMember.getPosition().equals(MemberPosition.CEO)) {
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_CREATE_EVENT);
         }
     }
 
-    private List<Events> readMonthEvent(Long year, Long month, EventType eventType){
+    private List<Events> readMonthEvent(
+            Long year, Long month, EventType eventType, String department){
         LocalDateTime start
                 = YearMonth.of(year.intValue(), month.intValue()).atDay(1).atStartOfDay();
         LocalDateTime end = start.plusMonths(1).minusNanos(1);
 
+        if(department != null){
+            MemberDepartment memberDepartment = MembersConverter.toDepartment(department);
+            return eventsService.findAllByEventTypeAndDepartmentAndStartDateBetween(
+                    eventType, memberDepartment, start, end);
+        }
         return eventsService.findAllByEventTypeAndStartDateBetween(eventType, start, end);
     }
 

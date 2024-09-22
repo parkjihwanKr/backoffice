@@ -4,6 +4,7 @@ import com.example.backoffice.domain.event.dto.EventDateRangeDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 
 import java.time.LocalDateTime;
@@ -23,14 +24,28 @@ public class EventsConverter {
 
     public static Events toEntity(
             String title, String description,
-            EventDateRangeDto eventDateRangeDto, Members member, EventType eventType){
+            EventDateRangeDto eventDateRangeDto, Members member,
+            MemberDepartment department, EventType eventType){
         return Events.builder()
                 .title(title)
                 .description(description)
                 .member(member)
                 .startDate(eventDateRangeDto.getStartDate())
                 .endDate(eventDateRangeDto.getEndDate())
+                .department(department)
                 .eventType(eventType)
+                .build();
+    }
+
+    public static EventsResponseDto.CreateOneForCompanyEventDto toCreateOneForCompanyEventDto(
+            Events event){
+        return EventsResponseDto.CreateOneForCompanyEventDto.builder()
+                .eventId(event.getId())
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .createdAt(event.getCreatedAt())
                 .build();
     }
 
@@ -99,6 +114,26 @@ public class EventsConverter {
                 .endDate(event.getEndDate())
                 .createdAt(event.getCreatedAt())
                 .build();
+    }
+
+    public static List<EventsResponseDto.ReadOneForDepartmentEventDto> toReadForDepartmentMonthEventDto(
+            List<Events> eventList){
+        List<EventsResponseDto.ReadOneForDepartmentEventDto> eventResponseDtoList = new ArrayList<>();
+        for (Events events : eventList) {
+            eventResponseDtoList.add(
+                    EventsResponseDto.ReadOneForDepartmentEventDto.builder()
+                            .eventId(events.getId())
+                            .title(events.getTitle())
+                            .description(events.getDescription())
+                            .department(events.getDepartment())
+                            .startDate(events.getStartDate())
+                            .endDate(events.getEndDate())
+                            .createdAt(events.getCreatedAt())
+                            .modifiedAt(events.getModifiedAt())
+                            .build()
+            );
+        }
+        return eventResponseDtoList;
     }
 
     public static EventsResponseDto.UpdateOneForDepartmentEventDto toUpdateOneForDepartmentEventDto(

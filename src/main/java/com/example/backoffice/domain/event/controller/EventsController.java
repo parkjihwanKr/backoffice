@@ -5,11 +5,14 @@ import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.facade.EventsServiceFacadeV1;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,6 +22,16 @@ import java.util.List;
 public class EventsController {
 
     private final EventsServiceFacadeV1 eventsServiceFacade;
+
+    // 회사 일정 한개 생성
+    @PostMapping("/events")
+    public ResponseEntity<EventsResponseDto.CreateOneForCompanyEventDto> createOneForCompany(
+            @RequestBody EventsRequestDto.CreateOneForCompanyEventDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        EventsResponseDto.CreateOneForCompanyEventDto responseDto
+                = eventsServiceFacade.createOneForCompany(requestDto, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
     // 회사 일정 한개 상세 조회
     @GetMapping("/events/{eventId}")
@@ -47,33 +60,49 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 부서 일정 부분 수정
-    @PatchMapping("/events/{eventId}")
-    public ResponseEntity<EventsResponseDto.UpdateOneForDepartmentEventDto> updateOneForDepartmentEvent(
-            @PathVariable Long eventId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody EventsRequestDto.UpdateOneForDepartmentEventDto requestDto){
-        EventsResponseDto.UpdateOneForDepartmentEventDto responseDto
-                = eventsServiceFacade.updateOneForDepartmentEvent(eventId, memberDetails.getMembers(), requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    // 부서 일정 1달 조회
+    @GetMapping("/departments/{department}/events/years/{year}/months/{month}")
+    public ResponseEntity<List<EventsResponseDto.ReadOneForDepartmentEventDto>> readForDepartmentMonthEvent(
+            @PathVariable String department, @PathVariable Long year,
+            @PathVariable Long month, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        List<EventsResponseDto.ReadOneForDepartmentEventDto> responseDtoList
+                = eventsServiceFacade.readForDepartmentMonthEvent(
+                        department, year, month, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     // 부서 일정 생성
-    @PostMapping("/events")
+    @PostMapping(
+            value = "/departments/{department}/events",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<EventsResponseDto.CreateOneForDepartmentEventDto> createOneForDepartmentEvent(
+            @PathVariable String department,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @ModelAttribute EventsRequestDto.CreateOneForDepartmentEventDto requestDto){
+            @RequestPart(value = "data") @Valid EventsRequestDto.CreateOneForDepartmentEventDto requestDto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files){
         EventsResponseDto.CreateOneForDepartmentEventDto responseDto
-                = eventsServiceFacade.createOneForDepartmentEvent(memberDetails.getMembers(), requestDto);
+                = eventsServiceFacade.createOneForDepartmentEvent(department, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    // 부서 일정 부분 수정
+    @PatchMapping("/departments/{department}/events/{eventId}")
+    public ResponseEntity<EventsResponseDto.UpdateOneForDepartmentEventDto> updateOneForDepartmentEvent(
+            @PathVariable String department, @PathVariable Long eventId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody EventsRequestDto.UpdateOneForDepartmentEventDto requestDto){
+        EventsResponseDto.UpdateOneForDepartmentEventDto responseDto
+                = eventsServiceFacade.updateOneForDepartmentEvent(department, eventId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+
     // 부서 일정 부분 삭제
-    @DeleteMapping("/events/{eventId}")
+    @DeleteMapping("/departments/{department}/events/{eventId}")
     public ResponseEntity<CommonResponseDto<Void>> deleteOneForDepartmentEvent(
-            @PathVariable Long eventId,
+            @PathVariable String department, @PathVariable Long eventId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        eventsServiceFacade.deleteOneForDepartmentEvent(eventId, memberDetails.getMembers());
+        eventsServiceFacade.deleteOneForDepartmentEvent(department, eventId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "부서 일정 삭제 성공", 200
@@ -99,6 +128,7 @@ public class EventsController {
                 eventsServiceFacade.readForVacationMonthEvent(year, month, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
+
     // 개인 휴가 일정 부분 수정
     @PatchMapping("/vacations/{eventId}")
     public ResponseEntity<EventsResponseDto.UpdateOneForVacationEventDto> updateOneForVacationEvent(

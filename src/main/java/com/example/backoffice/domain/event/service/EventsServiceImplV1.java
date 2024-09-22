@@ -5,6 +5,7 @@ import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
 import com.example.backoffice.domain.event.exception.EventsExceptionCode;
 import com.example.backoffice.domain.event.repository.EventsRepository;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,5 +63,14 @@ public class EventsServiceImplV1 implements EventsService {
     public List<Events> findAllByEventTypeAndStartDateBetween(
             EventType eventType, LocalDateTime startOfDay, LocalDateTime endOfDay) {
         return eventsRepository.findAllByEventTypeAndStartDateBetween(eventType, startOfDay, endOfDay);
+    }
+
+    @Override
+    @Transactional
+    public List<Events> findAllByEventTypeAndDepartmentAndStartDateBetween(
+            EventType eventType, MemberDepartment department,
+            LocalDateTime start, LocalDateTime end){
+        return eventsRepository.findAllByEventTypeAndDepartmentAndStartDateBetween(
+                eventType, department, start, end);
     }
 }
