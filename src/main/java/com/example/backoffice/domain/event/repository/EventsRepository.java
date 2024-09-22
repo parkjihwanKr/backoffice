@@ -17,8 +17,4 @@ public interface EventsRepository extends JpaRepository<Events, Long>, EventsRep
 
     List<Events> findAllByEventTypeAndEndDateBefore(
             EventType eventType, LocalDateTime endDate);
-
-    List<Events> findAllByEventTypeAndDepartmentAndStartDateBetween(
-            EventType eventType, MemberDepartment department,
-            LocalDateTime startDate, LocalDateTime endDate);
 }

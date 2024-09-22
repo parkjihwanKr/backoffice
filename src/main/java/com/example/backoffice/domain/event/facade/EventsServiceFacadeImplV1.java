@@ -145,6 +145,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
             }
         }
 
+        System.out.println(" client department : "+department);
         // 2. 해당 조건에 맞는 이벤트들을 가지고 옴
         List<Events> eventList = readMonthEvent(year, month, EventType.DEPARTMENT, department);
         return EventsConverter.toReadForDepartmentMonthEventDto(eventList);
@@ -355,18 +356,14 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         }
     }
 
-    private List<Events> readMonthEvent(
-            Long year, Long month, EventType eventType, String department){
-        LocalDateTime start
-                = YearMonth.of(year.intValue(), month.intValue()).atDay(1).atStartOfDay();
-        LocalDateTime end = start.plusMonths(1).minusNanos(1);
+    private List<Events> readMonthEvent(Long year, Long month, EventType eventType, String department) {
+        LocalDateTime start = YearMonth.of(year.intValue(), month.intValue()).atDay(1).atStartOfDay();
+        LocalDateTime end = YearMonth.of(year.intValue(), month.intValue()).atEndOfMonth().atTime(23, 59, 59);
 
-        if(department != null){
-            MemberDepartment memberDepartment = MembersConverter.toDepartment(department);
-            return eventsService.findAllByEventTypeAndDepartmentAndStartDateBetween(
-                    eventType, memberDepartment, start, end);
-        }
-        return eventsService.findAllByEventTypeAndStartDateBetween(eventType, start, end);
+        MemberDepartment memberDepartment = department != null ? MembersConverter.toDepartment(department) : null;
+
+        return eventsService.findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
+                eventType, memberDepartment, start, end);
     }
 
     private void validateMemberPermission(

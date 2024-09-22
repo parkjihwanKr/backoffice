@@ -24,7 +24,7 @@ public interface EventsService {
     List<Events> findAllByEventTypeAndStartDateBetween(
             EventType eventType, LocalDateTime startOfDay, LocalDateTime endOfDay);
 
-    List<Events> findAllByEventTypeAndDepartmentAndStartDateBetween(
-            EventType eventType, MemberDepartment department,
+    List<Events> findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
+            EventType eventType, MemberDepartment memberDepartment,
             LocalDateTime start, LocalDateTime end);
 }

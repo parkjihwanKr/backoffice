@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -67,10 +68,10 @@ public class EventsServiceImplV1 implements EventsService {
 
     @Override
     @Transactional
-    public List<Events> findAllByEventTypeAndDepartmentAndStartDateBetween(
-            EventType eventType, MemberDepartment department,
+    public List<Events> findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
+            EventType eventType, MemberDepartment memberDepartment,
             LocalDateTime start, LocalDateTime end){
-        return eventsRepository.findAllByEventTypeAndDepartmentAndStartDateBetween(
-                eventType, department, start, end);
+        return eventsRepository.findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
+                eventType, memberDepartment, start,end);
     }
 }
