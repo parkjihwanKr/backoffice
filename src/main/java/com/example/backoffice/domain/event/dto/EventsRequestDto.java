@@ -43,8 +43,7 @@ public class EventsRequestDto {
         private String description;
         private String startDate;
         private String endDate;
-        private MultipartFile file;
-        private MemberDepartment department;
+        private String department;
     }
 
     @Getter

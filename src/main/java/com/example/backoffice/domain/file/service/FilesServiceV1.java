@@ -2,6 +2,7 @@ package com.example.backoffice.domain.file.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.event.entity.Events;
+import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,7 +17,10 @@ public interface FilesServiceV1 {
 
     String createOneForEvent(MultipartFile file, Events event);
 
-    void delete(Long boardId, List<String> fileList);
+    void deleteForBoard(Long boardId, List<String> fileList);
+
+    void deleteForEvent(Long eventId, List<String> fileList);
 
     void deleteImage(String imageUrl);
+
 }

@@ -66,9 +66,19 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
 
     @Override
     @Transactional
-    public void delete(Long boardId, List<String> fileUrlList) {
+    public void deleteForBoard(Long boardId, List<String> fileUrlList) {
         List<Files> files = filesRepository.findByBoardId(boardId);
+        deleteForDomain(files, fileUrlList);
+    }
 
+    @Override
+    @Transactional
+    public void deleteForEvent(Long eventId, List<String> fileUrlList) {
+        List<Files> files = filesRepository.findByEventId(eventId);
+        deleteForDomain(files, fileUrlList);
+    }
+
+    private void deleteForDomain(List<Files> files, List<String> fileUrlList){
         for (String fileUrl : fileUrlList) {
             try {
                 s3Util.removeFile(fileUrl);

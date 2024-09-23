@@ -31,7 +31,8 @@ public interface EventsServiceFacadeV1 {
 
     EventsResponseDto.UpdateOneForDepartmentEventDto updateOneForDepartmentEvent(
             String department, Long eventId, Members loginMember,
-            EventsRequestDto.UpdateOneForDepartmentEventDto requestDto);
+            EventsRequestDto.UpdateOneForDepartmentEventDto requestDto,
+            List<MultipartFile> files);
 
     void deleteOneForDepartmentEvent(String department, Long eventId, Members loginMember);
 

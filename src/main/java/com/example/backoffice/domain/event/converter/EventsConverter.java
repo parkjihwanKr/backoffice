@@ -4,6 +4,9 @@ import com.example.backoffice.domain.event.dto.EventDateRangeDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
+import com.example.backoffice.domain.file.converter.FilesConverter;
+import com.example.backoffice.domain.file.dto.FilesResponseDto;
+import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 
@@ -39,10 +42,15 @@ public class EventsConverter {
 
     public static EventsResponseDto.CreateOneForCompanyEventDto toCreateOneForCompanyEventDto(
             Events event){
+        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+        for(Files file : event.getFileList()) {
+            fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+        }
         return EventsResponseDto.CreateOneForCompanyEventDto.builder()
                 .eventId(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
+                .fileUrlList(fileResponseDtoList)
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .createdAt(event.getCreatedAt())
@@ -51,10 +59,15 @@ public class EventsConverter {
 
     public static EventsResponseDto.ReadOneForCompanyEventDto toReadOneForCompanyEventDto(
             Events event) {
+        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+        for(Files file : event.getFileList()) {
+            fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+        }
         return EventsResponseDto.ReadOneForCompanyEventDto.builder()
                 .eventId(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
+                .fileUrlList(fileResponseDtoList)
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .createdAt(event.getCreatedAt())
@@ -65,14 +78,19 @@ public class EventsConverter {
     public static List<EventsResponseDto.ReadOneForCompanyEventDto> toReadForCompanyMonthEventDto(
             List<Events> eventList){
         List<EventsResponseDto.ReadOneForCompanyEventDto> eventResponseDtoList = new ArrayList<>();
-        for (Events events : eventList) {
+        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+        for (Events event : eventList) {
+            for(Files file : event.getFileList()) {
+                fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+            }
             eventResponseDtoList.add(
                     EventsResponseDto.ReadOneForCompanyEventDto.builder()
-                            .eventId(events.getId())
-                            .title(events.getTitle())
-                            .startDate(events.getStartDate())
-                            .endDate(events.getEndDate())
-                            .createdAt(events.getCreatedAt())
+                            .eventId(event.getId())
+                            .title(event.getTitle())
+                            .fileUrlList(fileResponseDtoList)
+                            .startDate(event.getStartDate())
+                            .endDate(event.getEndDate())
+                            .createdAt(event.getCreatedAt())
                             .build()
             );
         }
@@ -85,13 +103,20 @@ public class EventsConverter {
 
         for (Month month : Month.values()) {
             List<EventsResponseDto.ReadOneForCompanyEventDto> monthlyEvents = new ArrayList<>();
+            List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+
             for (Events event : eventList) {
+                for(Files file : event.getFileList()) {
+                    fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+                }
+
                 if (event.getStartDate().getMonth().equals(month)) {
                     monthlyEvents.add(
                             EventsResponseDto.ReadOneForCompanyEventDto.builder()
                                     .eventId(event.getId())
                                     .title(event.getTitle())
                                     .description(event.getDescription())
+                                    .fileUrlList(fileResponseDtoList)
                                     .startDate(event.getStartDate())
                                     .endDate(event.getEndDate())
                                     .createdAt(event.getCreatedAt())
@@ -106,30 +131,41 @@ public class EventsConverter {
     }
 
     public static EventsResponseDto.CreateOneForDepartmentEventDto toCreateOneForDepartmentDto(Events event){
+        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+        for(Files file : event.getFileList()) {
+            fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+        }
         return EventsResponseDto.CreateOneForDepartmentEventDto.builder()
-                .eventId(event.getId())
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .startDate(event.getStartDate())
-                .endDate(event.getEndDate())
-                .createdAt(event.getCreatedAt())
-                .build();
+            .eventId(event.getId())
+            .title(event.getTitle())
+            .description(event.getDescription())
+            .fileUrlList(fileResponseDtoList)
+            .startDate(event.getStartDate())
+            .endDate(event.getEndDate())
+            .createdAt(event.getCreatedAt())
+            .build();
     }
 
     public static List<EventsResponseDto.ReadOneForDepartmentEventDto> toReadForDepartmentMonthEventDto(
             List<Events> eventList){
         List<EventsResponseDto.ReadOneForDepartmentEventDto> eventResponseDtoList = new ArrayList<>();
-        for (Events events : eventList) {
+        for (Events event : eventList) {
+            List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+            for(Files file : event.getFileList()){
+                fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+            }
+
             eventResponseDtoList.add(
                     EventsResponseDto.ReadOneForDepartmentEventDto.builder()
-                            .eventId(events.getId())
-                            .title(events.getTitle())
-                            .description(events.getDescription())
-                            .department(events.getDepartment())
-                            .startDate(events.getStartDate())
-                            .endDate(events.getEndDate())
-                            .createdAt(events.getCreatedAt())
-                            .modifiedAt(events.getModifiedAt())
+                            .eventId(event.getId())
+                            .title(event.getTitle())
+                            .description(event.getDescription())
+                            .department(event.getDepartment())
+                            .fileUrlList(fileResponseDtoList)
+                            .startDate(event.getStartDate())
+                            .endDate(event.getEndDate())
+                            .createdAt(event.getCreatedAt())
+                            .modifiedAt(event.getModifiedAt())
                             .build()
             );
         }
@@ -138,11 +174,16 @@ public class EventsConverter {
 
     public static EventsResponseDto.UpdateOneForDepartmentEventDto toUpdateOneForDepartmentEventDto(
             Events event){
+        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+        for (Files file : event.getFileList()){
+            fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+        }
         return EventsResponseDto.UpdateOneForDepartmentEventDto.builder()
                 .eventId(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .department(event.getDepartment())
+                .fileUrlList(fileResponseDtoList)
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .createdAt(event.getCreatedAt())

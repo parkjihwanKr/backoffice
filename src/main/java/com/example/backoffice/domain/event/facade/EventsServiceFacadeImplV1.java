@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -145,7 +146,6 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
             }
         }
 
-        System.out.println(" client department : "+department);
         // 2. 해당 조건에 맞는 이벤트들을 가지고 옴
         List<Events> eventList = readMonthEvent(year, month, EventType.DEPARTMENT, department);
         return EventsConverter.toReadForDepartmentMonthEventDto(eventList);
@@ -155,19 +155,40 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Transactional
     public EventsResponseDto.UpdateOneForDepartmentEventDto updateOneForDepartmentEvent(
             String department, Long eventId, Members loginMember,
-            EventsRequestDto.UpdateOneForDepartmentEventDto requestDto){
+            EventsRequestDto.UpdateOneForDepartmentEventDto requestDto,
+            List<MultipartFile> files){
+        // 1. 일정 존재?
         Events event = eventsService.findById(eventId);
 
-        // 로그인 멤버의 부서와 요청한 이벤트를 수행할 부서가 같은지?
+        // 2. 로그인 멤버의 부서와 요청한 이벤트를 수행할 부서가 같은지?
         // 최고 경영자는 부서에 영향받지 않고 생성 가능
         validateMemberDepartment(department, loginMember);
 
+        // 3. 일정 기한이 적절한지?
         EventDateRangeDto eventDateRangeDto
                 = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
 
+        // 4. event에 fileList가 있었는지?
+        List<String> beforeFileUrlList = new ArrayList<>();
+        List<String> afterFileUrlList = new ArrayList<>();
+
+        for(int i = 0; i<event.getFileList().size(); i++){
+            beforeFileUrlList.add(event.getFileList().get(i).getUrl());
+        }
+        event.getFileList().clear();
+        filesService.deleteForEvent(event.getId(), beforeFileUrlList);
+
+        if(files != null){
+            for (MultipartFile file : files) {
+                // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
+                String fileUrl = filesService.createOneForEvent(file, event);
+                afterFileUrlList.add(fileUrl);
+            }
+        }
+
         event.update(
                 requestDto.getTitle(), requestDto.getDescription(),
-                requestDto.getDepartment(), eventDateRangeDto.getStartDate(),
+                event.getDepartment(), eventDateRangeDto.getStartDate(),
                 eventDateRangeDto.getEndDate(), EventType.DEPARTMENT);
 
         return EventsConverter.toUpdateOneForDepartmentEventDto(event);

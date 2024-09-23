@@ -86,16 +86,19 @@ public class EventsController {
     }
 
     // 부서 일정 부분 수정
-    @PatchMapping("/departments/{department}/events/{eventId}")
+    @PatchMapping(
+            value = "/departments/{department}/events/{eventId}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<EventsResponseDto.UpdateOneForDepartmentEventDto> updateOneForDepartmentEvent(
             @PathVariable String department, @PathVariable Long eventId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody EventsRequestDto.UpdateOneForDepartmentEventDto requestDto){
+            @RequestPart(value = "data") @Valid EventsRequestDto.UpdateOneForDepartmentEventDto requestDto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files){
         EventsResponseDto.UpdateOneForDepartmentEventDto responseDto
-                = eventsServiceFacade.updateOneForDepartmentEvent(department, eventId, memberDetails.getMembers(), requestDto);
+                = eventsServiceFacade.updateOneForDepartmentEvent(
+                        department, eventId, memberDetails.getMembers(), requestDto, files);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
-
 
     // 부서 일정 부분 삭제
     @DeleteMapping("/departments/{department}/events/{eventId}")
