@@ -38,6 +38,17 @@ public class EventsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class UpdateOneForCompanyEventDto {
+        private String title;
+        private String description;
+        private String startDate;
+        private String endDate;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UpdateOneForDepartmentEventDto {
         private String title;
         private String description;

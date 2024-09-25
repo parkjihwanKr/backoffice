@@ -60,6 +60,31 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    // 회사 일정 부분 수정
+    @PatchMapping("/events/{eventId}")
+    public ResponseEntity<EventsResponseDto.UpdateOneForCompanyEventDto> updateOneForCompany(
+            @PathVariable Long eventId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestPart(value = "data") EventsRequestDto.UpdateOneForCompanyEventDto requestDto,
+            @RequestPart(value = "files") List<MultipartFile> files){
+        EventsResponseDto.UpdateOneForCompanyEventDto responseDto
+                = eventsServiceFacade.updateOneForCompany(eventId, memberDetails.getMembers(), requestDto, files);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    // 회사 일정 부분 삭제
+    @DeleteMapping("/events/{eventId}")
+    public ResponseEntity<CommonResponseDto<Void>> deleteOneForCompany(
+            @PathVariable Long eventId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        eventsServiceFacade.deleteOneForCompany(eventId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponseDto<>(
+                        null, "회사 일정 삭제 성공", 200
+                )
+        );
+    }
+
     // 부서 일정 1달 조회
     @GetMapping("/departments/{department}/events/years/{year}/months/{month}")
     public ResponseEntity<List<EventsResponseDto.ReadOneForDepartmentEventDto>> readForDepartmentMonthEvent(
@@ -112,6 +137,7 @@ public class EventsController {
                 )
         );
     }
+
     // 멤버 개인 휴가 생성
     @PostMapping("/vacations")
     public ResponseEntity<EventsResponseDto.CreateOneForVacationEventDto> createOneForVacationEvent(

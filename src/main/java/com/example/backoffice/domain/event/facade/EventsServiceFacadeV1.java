@@ -21,6 +21,13 @@ public interface EventsServiceFacadeV1 {
     List<List<EventsResponseDto.ReadOneForCompanyEventDto>> readForCompanyYearEvent(
             Long year);
 
+    EventsResponseDto.UpdateOneForCompanyEventDto updateOneForCompany(
+            Long eventId, Members loginMember,
+            EventsRequestDto.UpdateOneForCompanyEventDto requestDto,
+            List<MultipartFile> files);
+
+    void deleteOneForCompany(Long eventId, Members loginMember)   ;
+
     EventsResponseDto.CreateOneForDepartmentEventDto createOneForDepartmentEvent(
             String department, Members loginMember,
             EventsRequestDto.CreateOneForDepartmentEventDto requestDto,

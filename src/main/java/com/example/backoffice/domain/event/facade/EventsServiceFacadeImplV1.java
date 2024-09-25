@@ -101,6 +101,67 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
+    public EventsResponseDto.UpdateOneForCompanyEventDto updateOneForCompany(
+            Long eventId, Members loginMember,
+            EventsRequestDto.UpdateOneForCompanyEventDto requestDto,
+            List<MultipartFile> files){
+        // 1. 일정 존재?
+        Events event = eventsService.findById(eventId);
+
+        // 2. 회사 일정인지?
+        if (!event.getEventType().equals(EventType.COMPANY)){
+            throw new EventsCustomException(EventsExceptionCode.NOT_MATCHED_EVENT_TYPE);
+        }
+
+        // 3. 일정 기한이 적절한지?
+        EventDateRangeDto eventDateRangeDto
+                = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
+
+        // 4. event에 fileList가 있었는지?
+        List<String> beforeFileUrlList = new ArrayList<>();
+        List<String> afterFileUrlList = new ArrayList<>();
+
+        for(int i = 0; i<event.getFileList().size(); i++){
+            beforeFileUrlList.add(event.getFileList().get(i).getUrl());
+        }
+        event.getFileList().clear();
+        filesService.deleteForEvent(event.getId(), beforeFileUrlList);
+
+        if(files != null){
+            for (MultipartFile file : files) {
+                // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
+                String fileUrl = filesService.createOneForEvent(file, event);
+                afterFileUrlList.add(fileUrl);
+            }
+        }
+
+        event.update(
+                requestDto.getTitle(), requestDto.getDescription(),
+                event.getDepartment(), eventDateRangeDto.getStartDate(),
+                eventDateRangeDto.getEndDate(), EventType.COMPANY);
+
+        return EventsConverter.toUpdateOneForCompanyEventDto(event);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOneForCompany(Long eventId, Members loginMember){
+        // 삭제하려는 이벤트를 조회
+        Events event = eventsService.findById(eventId);
+
+        // 회사 일정이고 이벤트의 소유자가 아니고, 로그인한 유저가 CEO도 아닌 경우 삭제 권한이 없음을 예외 처리
+        if (event.getEventType().equals(EventType.COMPANY)
+                && !event.getMember().getId().equals(loginMember.getId())
+                && !loginMember.getPosition().equals(MemberPosition.CEO)) {
+            throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
+        }
+
+        // 이벤트 삭제
+        eventsService.deleteById(eventId);
+    }
+
+    @Override
+    @Transactional
     public EventsResponseDto.CreateOneForDepartmentEventDto createOneForDepartmentEvent(
             String department, Members loginMember,
             EventsRequestDto.CreateOneForDepartmentEventDto requestDto,
@@ -197,13 +258,19 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     @Override
     @Transactional
     public void deleteOneForDepartmentEvent(String department, Long eventId, Members loginMember){
-        // 검증
+        // 로그인한 유저가 유효한지 검증
         membersService.findById(loginMember.getId());
+
+        // 삭제하려는 이벤트를 조회
         Events event = eventsService.findById(eventId);
-        if(!loginMember.getDepartment().equals(event.getDepartment())
-                || loginMember.getPosition().equals(MemberPosition.CEO)){
+
+        // 이벤트의 소유자가 아니고, 로그인한 유저가 CEO도 아닌 경우 삭제 권한이 없음을 예외 처리
+        if (!loginMember.getDepartment().equals(event.getDepartment())
+                && !loginMember.getPosition().equals(MemberPosition.CEO)) {
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
         }
+
+        // 이벤트 삭제
         eventsService.deleteById(eventId);
     }
 

@@ -62,6 +62,22 @@ public class EventsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    public static class UpdateOneForCompanyEventDto {
+        private Long eventId;
+        private String title;
+        private String description;
+        private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class ReadOneForDepartmentEventDto {
         private Long eventId;
         private String title;

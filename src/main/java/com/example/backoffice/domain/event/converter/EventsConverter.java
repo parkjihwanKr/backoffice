@@ -130,6 +130,25 @@ public class EventsConverter {
         return yearEvents;
     }
 
+    public static EventsResponseDto.UpdateOneForCompanyEventDto toUpdateOneForCompanyEventDto(
+            Events event){
+        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+        for (Files file : event.getFileList()){
+            fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+        }
+        return EventsResponseDto.UpdateOneForCompanyEventDto.builder()
+                .eventId(event.getId())
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .department(event.getDepartment())
+                .fileUrlList(fileResponseDtoList)
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .createdAt(event.getCreatedAt())
+                .modifiedAt(event.getModifiedAt())
+                .build();
+    }
+
     public static EventsResponseDto.CreateOneForDepartmentEventDto toCreateOneForDepartmentDto(Events event){
         List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
         for(Files file : event.getFileList()) {
@@ -139,10 +158,12 @@ public class EventsConverter {
             .eventId(event.getId())
             .title(event.getTitle())
             .description(event.getDescription())
+            .department(event.getDepartment())
             .fileUrlList(fileResponseDtoList)
             .startDate(event.getStartDate())
             .endDate(event.getEndDate())
             .createdAt(event.getCreatedAt())
+            .modifiedAt(event.getModifiedAt())
             .build();
     }
 
