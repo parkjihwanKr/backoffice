@@ -299,6 +299,32 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                 event, requestDto.getUrgent());
     }
 
+    public List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberSchedule(
+            Long memberId, Long year, Long month, Members loginMember) {
+        // 멤버 검증 로직
+        if (!memberId.equals(loginMember.getId())) {
+            throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_READ_EVENT);
+        }
+
+        // 해당하는 기간의 시작일과 종료일 계산
+        LocalDateTime startDate = LocalDateTime.of(year.intValue(), month.intValue(), 1, 0, 0);
+        YearMonth yearMonth = YearMonth.of(year.intValue(), month.intValue());
+        LocalDateTime endDate = LocalDateTime.of(year.intValue(), month.intValue(), yearMonth.lengthOfMonth(), 23, 59, 59);
+
+        // 해당 부서의 모든 일정 조회
+        List<Events> departmentEventList
+                = eventsService.findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
+                        EventType.DEPARTMENT, loginMember.getDepartment(), startDate, endDate);
+
+        // 3번에서 개인 휴가 등의 이벤트 추가 가능
+        List<Events> personalEvents = eventsService.findAllByMemberIdAndEventTypeAndDateRange(
+                loginMember.getId(), EventType.MEMBER_VACATION, startDate, endDate);
+        departmentEventList.addAll(personalEvents);
+
+        // Response DTO 생성
+        return EventsConverter.toReadForMemberScheduleDto(departmentEventList);
+    }
+
     @Override
     @Transactional
     public List<EventsResponseDto.ReadOneForVacationEventDto> readForVacationMonthEvent(

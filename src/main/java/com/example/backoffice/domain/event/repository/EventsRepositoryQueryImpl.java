@@ -64,4 +64,16 @@ public class EventsRepositoryQueryImpl extends QuerydslRepositorySupport impleme
                 )
                 .fetch();
     }
+
+    @Override
+    public List<Events> findAllByMemberIdAndEventTypeAndDateRange(
+            Long memberId, EventType eventType,
+            LocalDateTime start, LocalDateTime end){
+        return jpaQueryFactory
+                .selectFrom(qEvents)
+                .where(qEvents.member.id.eq(memberId)
+                        .and(qEvents.eventType.eq(eventType))
+                        .and(qEvents.startDate.between(start, end)))
+                .fetch();
+    }
 }

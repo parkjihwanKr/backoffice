@@ -83,7 +83,7 @@ public class EventsResponseDto {
         private String title;
         private String description;
         private MemberDepartment department;
-        private List<FilesResponseDto.ReadOneDto> fileUrlList;
+        private List<String> fileUrlList;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private LocalDateTime createdAt;
@@ -100,6 +100,21 @@ public class EventsResponseDto {
         private String description;
         private MemberDepartment department;
         private List<FilesResponseDto.ReadOneDto> fileUrlList;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneForMemberScheduleDto {
+        private Long eventId;
+        private String title;
+        private String description;
+        private MemberDepartment department;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private LocalDateTime createdAt;

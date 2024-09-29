@@ -13,4 +13,8 @@ public interface EventsRepositoryQuery {
 
     List<Events> findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
             EventType eventType, MemberDepartment department, LocalDateTime start, LocalDateTime end);
+
+    List<Events> findAllByMemberIdAndEventTypeAndDateRange(
+            Long memberId, EventType eventType,
+            LocalDateTime startDate, LocalDateTime endDate);
 }

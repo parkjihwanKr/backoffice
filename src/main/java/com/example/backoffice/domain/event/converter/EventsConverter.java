@@ -171,9 +171,9 @@ public class EventsConverter {
             List<Events> eventList){
         List<EventsResponseDto.ReadOneForDepartmentEventDto> eventResponseDtoList = new ArrayList<>();
         for (Events event : eventList) {
-            List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
+            List<String> fileResponseDtoList = new ArrayList<>();
             for(Files file : event.getFileList()){
-                fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
+                fileResponseDtoList.add(file.getUrl());
             }
 
             eventResponseDtoList.add(
@@ -222,6 +222,25 @@ public class EventsConverter {
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .build();
+    }
+
+    public static List<EventsResponseDto.ReadOneForMemberScheduleDto> toReadForMemberScheduleDto(
+            List<Events> filteredEventList){
+        List<EventsResponseDto.ReadOneForMemberScheduleDto> memberMonthScheduleResponseDto = new ArrayList<>();
+        for (Events filteredEvent : filteredEventList) {
+            memberMonthScheduleResponseDto.add(
+                    EventsResponseDto.ReadOneForMemberScheduleDto.builder()
+                            .eventId(filteredEvent.getId())
+                            .title(filteredEvent.getTitle())
+                            .description(filteredEvent.getDescription())
+                            .department(filteredEvent.getDepartment())
+                            .startDate(filteredEvent.getStartDate())
+                            .endDate(filteredEvent.getEndDate())
+                            .createdAt(filteredEvent.getCreatedAt())
+                            .modifiedAt(filteredEvent.getModifiedAt())
+                            .build());
+        }
+        return memberMonthScheduleResponseDto;
     }
 
     public static List<EventsResponseDto.ReadOneForVacationEventDto> toReadForVacationMonthEventDto(

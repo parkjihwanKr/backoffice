@@ -46,6 +46,9 @@ public interface EventsServiceFacadeV1 {
     EventsResponseDto.CreateOneForVacationEventDto createOneForVacationEvent(
             Members loginMember, EventsRequestDto.CreateOneForVacationEventDto requestDto);
 
+    List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberSchedule(
+            Long memberId, Long year, Long month, Members loginMember);
+
     List<EventsResponseDto.ReadOneForVacationEventDto> readForVacationMonthEvent(
             Long year, Long month, Members loginMember);
 

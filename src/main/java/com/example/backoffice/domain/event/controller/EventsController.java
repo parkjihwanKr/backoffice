@@ -138,6 +138,17 @@ public class EventsController {
         );
     }
 
+    // 멤버 개인 일정표 조회
+    @GetMapping("/members/{memberId}/events/years/{year}/month/{month}")
+    public ResponseEntity<List<EventsResponseDto.ReadOneForMemberScheduleDto>> readForMemberSchedule(
+            @PathVariable Long memberId, @PathVariable Long year,
+            @PathVariable Long month, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList
+                = eventsServiceFacade.readForMemberSchedule(
+                        memberId, year, month, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
+
     // 멤버 개인 휴가 생성
     @PostMapping("/vacations")
     public ResponseEntity<EventsResponseDto.CreateOneForVacationEventDto> createOneForVacationEvent(
