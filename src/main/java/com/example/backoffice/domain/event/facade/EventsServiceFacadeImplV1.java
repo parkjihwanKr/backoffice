@@ -327,6 +327,34 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
+    public List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberDaySchedule(
+            Long memberId, Long year, Long month, Long day, Members loginMember) {
+
+        if (memberId.equals(loginMember.getId())) {
+            throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_READ_EVENT);
+        }
+
+        LocalDateTime startDate = LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 23, 59, 59);
+
+        // 개인 일정 조회 (이벤트의 시작일이 범위에 있거나, 종료일이 범위에 있는 이벤트 조회)
+        List<Events> personalEvents = eventsService.findAllByMemberIdAndEventTypeAndDateRange(
+                memberId, EventType.MEMBER_VACATION, startDate, endDate);
+
+        // 부서 일정 조회 (이벤트의 시작일 또는 종료일이 범위에 있는 이벤트 조회)
+        List<Events> departmentEvents = eventsService.findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
+                EventType.DEPARTMENT, loginMember.getDepartment(), startDate, endDate);
+
+        // 결과 리스트 통합
+        List<Events> combinedEvents = new ArrayList<>();
+        combinedEvents.addAll(personalEvents);
+        combinedEvents.addAll(departmentEvents);
+
+        return EventsConverter.toReadForMemberScheduleDto(combinedEvents);
+    }
+
+    @Override
+    @Transactional
     public List<EventsResponseDto.ReadOneForVacationEventDto> readForVacationMonthEvent(
             Long year, Long month, Members loginMember){
         membersService.findById(loginMember.getId());

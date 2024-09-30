@@ -149,14 +149,31 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
+    // 개인 일정 1일 조회
+    @GetMapping("/members/{memberId}/events/years/{year}/months/{month}/days/{day}")
+    public ResponseEntity<List<EventsResponseDto.ReadOneForMemberScheduleDto>> readForMemberDaySchedule(
+            @PathVariable Long memberId, @PathVariable Long year,
+            @PathVariable Long month, @PathVariable Long day,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList
+                = eventsServiceFacade.readForMemberDaySchedule(
+                        memberId, year, month, day, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
+
     // 멤버 개인 휴가 생성
     @PostMapping("/vacations")
-    public ResponseEntity<EventsResponseDto.CreateOneForVacationEventDto> createOneForVacationEvent(
+    public ResponseEntity<CommonResponseDto<EventsResponseDto.CreateOneForVacationEventDto>> createOneForVacationEvent(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EventsRequestDto.CreateOneForVacationEventDto requestDto){
         EventsResponseDto.CreateOneForVacationEventDto responseDto =
                 eventsServiceFacade.createOneForVacationEvent(memberDetails.getMembers(), requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        String message = "해당 사항은 검토 후, 사내 알림으로 알려드리겠습니다.";
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponseDto<>(
+                        responseDto, message, 200
+                )
+        );
     }
 
     // 1달 휴가 일정 조회
