@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Component
@@ -13,8 +15,10 @@ public class VacationPeriodHolder {
     private VacationPeriod vacationPeriod;  // VacationPeriod를 저장하는 변수
 
     // 생성자 주입을 통한 VacationPeriod 설정
-    @Builder
-    public VacationPeriodHolder(VacationPeriod vacationPeriod) {
-        this.vacationPeriod = vacationPeriod;
+    public void setVacationPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        this.vacationPeriod = VacationPeriod.builder()
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
     }
 }

@@ -31,15 +31,6 @@ public class VacationsResponseDto {
         private LocalDateTime endDate;
     }
 
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ReadMonthForDepartmentDto {
-
-    }
-
     @Getter
     @Builder
     @AllArgsConstructor

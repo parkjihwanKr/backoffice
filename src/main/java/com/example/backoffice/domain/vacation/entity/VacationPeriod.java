@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-@Component
 public class VacationPeriod {
 
     private LocalDateTime startDate;
