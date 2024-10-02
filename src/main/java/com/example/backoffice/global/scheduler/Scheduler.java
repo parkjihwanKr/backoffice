@@ -2,7 +2,6 @@ package com.example.backoffice.global.scheduler;
 
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
-import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.facade.EventsServiceFacadeV1;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
@@ -11,14 +10,18 @@ import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluations
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
+import com.example.backoffice.domain.vacation.entity.VacationPeriod;
+import com.example.backoffice.domain.vacation.entity.VacationPeriodHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Component
@@ -31,9 +34,10 @@ public class Scheduler {
     private final EvaluationsServiceV1 evaluationsService;
     private final MembersEvaluationsServiceV1 membersEvaluationsService;
     private final NotificationsServiceFacadeV1 notificationsServiceFacade;
+    private final VacationPeriodHolder vacationPeriodHolder;
 
     // 매일 오전 00시마다 member 휴가 상태 체크
-    @Transactional
+    /*@Transactional
     // 초 분 시 일 월 요일
     @Scheduled(cron = "0 0 0 * * *")
     public void updateMemberOnVacation() {
@@ -54,7 +58,7 @@ public class Scheduler {
         for (Events event : startedVacationList) {
             membersServiceFacade.updateOneForOnVacationTrue(event.getMember().getMemberName());
         }
-    }
+    }*/
 
     // 매달 1일 자정 10분
     @Transactional
@@ -91,5 +95,19 @@ public class Scheduler {
                 );
             }
         }
+    }
+    @Scheduled(cron = "0 0 0 1 * ?")
+    public void configureVacationRequestPeriod() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime secondMonday = getSecondMondayOfMonth(now.getYear(), now.getMonthValue());
+        LocalDateTime secondFriday = secondMonday.plusDays(4);
+
+        // 해당 월의 두 번째 월요일부터 금요일까지를 설정
+        vacationPeriodHolder.setVacationPeriod(secondMonday, secondFriday);
+    }
+
+    private LocalDateTime getSecondMondayOfMonth(int year, int month) {
+        return LocalDateTime.of(year, month, 1, 0, 0)
+                .with(TemporalAdjusters.dayOfWeekInMonth(2, DayOfWeek.MONDAY));
     }
 }

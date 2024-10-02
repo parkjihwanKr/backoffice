@@ -365,7 +365,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             beforeFileUrlList.add(board.getFileList().get(i).getUrl());
         }
         board.getFileList().clear();
-        filesService.delete(board.getId(), beforeFileUrlList);
+        filesService.deleteForBoard(board.getId(), beforeFileUrlList);
 
         if(files != null){
             for (MultipartFile file : files) {

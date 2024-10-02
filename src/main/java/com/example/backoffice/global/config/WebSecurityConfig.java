@@ -75,7 +75,7 @@ public class WebSecurityConfig {
                             configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000"));
                             // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
                             // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
-                            configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
+                            configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
                             configuration.setAllowedHeaders(Arrays.asList("Authorization", "refreshToken", "Cache-Control", "Content-Type"));
                             configuration.setAllowCredentials(true);
                             return configuration;
