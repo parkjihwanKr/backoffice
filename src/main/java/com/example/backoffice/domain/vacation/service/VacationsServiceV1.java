@@ -3,7 +3,9 @@ package com.example.backoffice.domain.vacation.service;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.vacation.dto.VacationsRequestDto;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
+import com.example.backoffice.domain.vacation.entity.Vacations;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface VacationsServiceV1 {
@@ -29,4 +31,7 @@ public interface VacationsServiceV1 {
 
     void deleteOne(Long vacationId, Members loginMember);
 
+    List<Vacations> findAllByEndDateBefore(LocalDateTime now);
+
+    List<Vacations> findAllByStartDate(LocalDateTime now);
 }

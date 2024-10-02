@@ -301,8 +301,21 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         }
     }
 
+    @Transactional(readOnly = true)
     private Vacations findById(Long vacationId) {
         return vacationsRepository.findById(vacationId).orElseThrow(
                 () -> new VacationsCustomException(VacationsExceptionCode.NOT_FOUND_VACATIONS));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vacations> findAllByEndDateBefore(LocalDateTime now){
+        return vacationsRepository.findAllByEndDateBefore(now);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vacations> findAllByStartDate(LocalDateTime now){
+        return vacationsRepository.findAllByStartDate(now);
     }
 }
