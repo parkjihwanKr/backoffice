@@ -12,9 +12,9 @@ public interface EventsRepository extends JpaRepository<Events, Long>, EventsRep
 
     List<Events> findAllByStartDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    List<Events> findAllByEventTypeAndStartDateBetween(
+/*    List<Events> findAllByEventTypeAndStartDateBetween(
             EventType eventType, LocalDateTime startDate, LocalDateTime endDate);
 
     List<Events> findAllByEventTypeAndEndDateBefore(
-            EventType eventType, LocalDateTime endDate);
+            EventType eventType, LocalDateTime endDate);*/
 }

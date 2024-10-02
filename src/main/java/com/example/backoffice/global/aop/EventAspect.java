@@ -1,13 +1,8 @@
 package com.example.backoffice.global.aop;
 
-import com.example.backoffice.domain.event.dto.EventsRequestDto;
-import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.global.audit.entity.AuditLogType;
 import com.example.backoffice.global.audit.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +14,9 @@ public class EventAspect {
 
     private final AuditLogService auditLogService;
     private final CommonAspectImpl commonAspect;
-    // 개인 휴가에 대한 이벤트만 고려
-    /*@Param
-    Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto*/
+    /*// 개인 휴가에 대한 이벤트만 고려
+    *//*@Param
+    Members loginMember, EventsRequestDto.CreateVacationRequestDto requestDto*//*
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.event.facade.EventsServiceFacadeV1.createOneForVacationEvent(..))")
     public void logAfterCreateVacationEvent(JoinPoint joinPoint){
         Members member = (Members) joinPoint.getArgs()[0];
@@ -37,8 +32,8 @@ public class EventAspect {
                 AuditLogType.CREATE_MEMBER_VACATION, member.getName(), message);
     }
 
-    /*@Param Long vacationId, Members loginMember,
-            EventsRequestDto.UpdateVacationEventRequestDto requestDto*/
+    *//*@Param Long vacationId, Members loginMember,
+            EventsRequestDto.UpdateVacationEventRequestDto requestDto*//*
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.event.facade.EventsServiceFacadeV1.updateOneForVacationEvent(..))")
     public void logAfterUpdateVacationEvent(JoinPoint joinPoint){
         Members member = (Members) joinPoint.getArgs()[1];
@@ -54,5 +49,5 @@ public class EventAspect {
         commonAspect.getLogMessage(message);
         auditLogService.save(
                 AuditLogType.UPDATE_MEMBER_VACATION, member.getName(), message);
-    }
+    }*/
 }

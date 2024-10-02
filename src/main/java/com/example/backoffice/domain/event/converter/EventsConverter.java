@@ -9,6 +9,7 @@ import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.global.common.DateRange;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -20,8 +21,11 @@ public class EventsConverter {
     public static EventDateRangeDto toEventDateRangeDto(
             LocalDateTime startDate, LocalDateTime endDate) {
         return EventDateRangeDto.builder()
-                .startDate(startDate)
-                .endDate(endDate)
+                .dateRange(
+                        DateRange.builder()
+                                .startDate(startDate)
+                                .endDate(endDate)
+                                .build())
                 .build();
     }
 
@@ -33,8 +37,8 @@ public class EventsConverter {
                 .title(title)
                 .description(description)
                 .member(member)
-                .startDate(eventDateRangeDto.getStartDate())
-                .endDate(eventDateRangeDto.getEndDate())
+                .startDate(eventDateRangeDto.getDateRange().getStartDate())
+                .endDate(eventDateRangeDto.getDateRange().getEndDate())
                 .department(department)
                 .eventType(eventType)
                 .build();
@@ -212,18 +216,6 @@ public class EventsConverter {
                 .build();
     }
 
-    public static EventsResponseDto.CreateOneForVacationEventDto toCreateOneForVacationEventDto(
-            Events event, Boolean urgent){
-        return EventsResponseDto.CreateOneForVacationEventDto.builder()
-                .eventId(event.getId())
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .urgent(urgent)
-                .startDate(event.getStartDate())
-                .endDate(event.getEndDate())
-                .build();
-    }
-
     public static List<EventsResponseDto.ReadOneForMemberScheduleDto> toReadForMemberScheduleDto(
             List<Events> filteredEventList){
         List<EventsResponseDto.ReadOneForMemberScheduleDto> memberMonthScheduleResponseDto = new ArrayList<>();
@@ -241,47 +233,5 @@ public class EventsConverter {
                             .build());
         }
         return memberMonthScheduleResponseDto;
-    }
-
-    public static List<EventsResponseDto.ReadOneForVacationEventDto> toReadForVacationMonthEventDto(
-            List<Events> eventList){
-        List<EventsResponseDto.ReadOneForVacationEventDto> responseDtoList = new ArrayList<>();
-        for(Events event : eventList){
-            responseDtoList.add(
-                    EventsResponseDto.ReadOneForVacationEventDto.builder()
-                            .eventId(event.getId())
-                            .vacationMemberName(event.getMember().getMemberName())
-                            .startDate(event.getStartDate())
-                            .endDate(event.getEndDate())
-                            .build()
-            );
-        }
-        return responseDtoList;
-    }
-
-    public static EventsResponseDto.UpdateOneForVacationEventDto toUpdateOneForVacationEventDto(
-            Events vacation, String memberName){
-        return EventsResponseDto.UpdateOneForVacationEventDto.builder()
-                .eventId(vacation.getId())
-                .vacationMemberName(memberName)
-                .startDate(vacation.getStartDate())
-                .endDate(vacation.getEndDate())
-                .build();
-    }
-
-    public static List<EventsResponseDto.ReadMemberForVacationEventDto> toReadMemberListForVacationEventDto(
-            List<Events> eventList){
-        List<EventsResponseDto.ReadMemberForVacationEventDto> responseDtoList = new ArrayList<>();
-        for(Events event : eventList){
-            responseDtoList.add(
-                    EventsResponseDto.ReadMemberForVacationEventDto.builder()
-                            .eventId(event.getId())
-                            .vacationMemberName(event.getMember().getMemberName())
-                            .startDate(event.getStartDate())
-                            .endDate(event.getEndDate())
-                            .build()
-            );
-        }
-        return responseDtoList;
     }
 }

@@ -1,6 +1,6 @@
 package com.example.backoffice.domain.vacation.dto;
 
-import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.vacation.entity.VacationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,9 +14,19 @@ public class VacationsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    public static class UpdatePeriodDto {
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class CreateOneDto {
         private String title;
-        private String description;
+        private VacationType vacationType;
+        private String urgentReason;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
     }
@@ -35,11 +45,13 @@ public class VacationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ReadDayDto {
-        private Long eventId;
+        private Long vacationId;
+        private String onVacationMemberName;
         private String title;
-        private String reason;
+        private String urgentReason;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+        private VacationType vacationType;
     }
 
     @Getter
@@ -47,11 +59,13 @@ public class VacationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ReadMonthDto {
-        private Long eventId;
+        private Long vacationId;
+        private String onVacationMemberName;
         private String title;
-        private String reason;
+        private String urgentReason;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+        private VacationType vacationType;
     }
 
     @Getter
@@ -59,10 +73,11 @@ public class VacationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneDto {
-        private Long eventId;
+        private Long vacationId;
         private String title;
-        private String reason;
+        private String urgentReason;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+        private VacationType vacationType;
     }
 }

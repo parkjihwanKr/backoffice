@@ -252,7 +252,7 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                         + "에 대한 일정을 등록하셨습니다.";
                 yield toEntity(notificationData, eventMessage, domainType);
             }
-            case URGENT_VACATION_EVENT -> {
+            case URGENT_VACATION -> {
                 String urgentVacationMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 긴급하게 휴가를 요청하셨습니다.";
@@ -281,7 +281,13 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                         + notificationData.getMessage();
                 yield toEntity(notificationData, evaluationMessage, domainType);
             }
-
+            case UPDATE_VACATION_PERIOD -> {
+                String updateVacationPeriodMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 "
+                        + notificationData.getMessage();
+                yield toEntity(notificationData, updateVacationPeriodMessage, domainType);
+            }
             default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);
         };
     }

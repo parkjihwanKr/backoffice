@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface EventsRepositoryQuery {
 
-    Long countVacationingMembers(LocalDateTime customStartDate);
+//    Long countVacationingMembers(LocalDateTime customStartDate);
 
     List<Events> findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
             EventType eventType, MemberDepartment department, LocalDateTime start, LocalDateTime end);

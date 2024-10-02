@@ -8,13 +8,19 @@ import java.util.List;
 
 public interface VacationsServiceV1 {
 
+    VacationsResponseDto.UpdatePeriodDto updatePeriod(
+            Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto);
+
     VacationsResponseDto.CreateOneDto createOne(
             Members loginMember, VacationsRequestDto.CreateOneDto requestDto);
 
-    List<VacationsResponseDto.ReadDayDto> readDay(
+    VacationsResponseDto.ReadDayDto readDay(
+            Long vacationId, Members loginMember);
+
+    List<VacationsResponseDto.ReadDayDto> readDayForAdmin(
             String department, Long year, Long month, Long day, Members loginMember);
 
-    List<VacationsResponseDto.ReadMonthForDepartmentDto> readMonthForDepartment(
+    List<VacationsResponseDto.ReadMonthDto> readMonthForAdmin(
             String department, Long year, Long month, Members loginMember);
 
     VacationsResponseDto.UpdateOneDto updateOne(
@@ -22,4 +28,5 @@ public interface VacationsServiceV1 {
             VacationsRequestDto.UpdateOneDto requestDto);
 
     void deleteOne(Long vacationId, Members loginMember);
+
 }

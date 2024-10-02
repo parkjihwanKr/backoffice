@@ -18,12 +18,10 @@ public interface EventsService {
 
     List<Events> findAllByStartDateBetween(LocalDateTime start, LocalDateTime end);
 
-    List<Events> findAllByEventTypeAndEndDateBefore(EventType eventType, LocalDateTime endOfDay);
-
-    Long countVacationingMembers(LocalDateTime customStartDate);
+/*    List<Events> findAllByEventTypeAndEndDateBefore(EventType eventType, LocalDateTime endOfDay);
 
     List<Events> findAllByEventTypeAndStartDateBetween(
-            EventType eventType, LocalDateTime startOfDay, LocalDateTime endOfDay);
+            EventType eventType, LocalDateTime startOfDay, LocalDateTime endOfDay);*/
 
     List<Events> findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
             EventType eventType, MemberDepartment memberDepartment,

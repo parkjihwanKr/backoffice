@@ -11,14 +11,20 @@ import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluations
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
+import com.example.backoffice.domain.vacation.converter.VacationsConverter;
+import com.example.backoffice.domain.vacation.entity.VacationPeriod;
+import com.example.backoffice.domain.vacation.entity.VacationPeriodHolder;
+import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Component
@@ -31,6 +37,7 @@ public class Scheduler {
     private final EvaluationsServiceV1 evaluationsService;
     private final MembersEvaluationsServiceV1 membersEvaluationsService;
     private final NotificationsServiceFacadeV1 notificationsServiceFacade;
+    private final VacationPeriodHolder vacationPeriodHolder;
 
     // 매일 오전 00시마다 member 휴가 상태 체크
     @Transactional
@@ -91,5 +98,23 @@ public class Scheduler {
                 );
             }
         }
+    }
+    @Scheduled(cron = "0 0 0 1 * ?")
+    public void configureVacationRequestPeriod() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime secondMonday = getSecondMondayOfMonth(now.getYear(), now.getMonthValue());
+        LocalDateTime secondFriday = secondMonday.plusDays(4);
+
+        // 해당 월의 두 번째 월요일부터 금요일까지를 설정
+        vacationPeriodHolder.setVacationPeriod(
+                VacationPeriod.builder()
+                        .startDate(secondMonday)
+                        .endDate(secondFriday)
+                        .build());
+    }
+
+    private LocalDateTime getSecondMondayOfMonth(int year, int month) {
+        return LocalDateTime.of(year, month, 1, 0, 0)
+                .with(TemporalAdjusters.dayOfWeekInMonth(2, DayOfWeek.MONDAY));
     }
 }

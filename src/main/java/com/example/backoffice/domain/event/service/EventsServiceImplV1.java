@@ -45,25 +45,22 @@ public class EventsServiceImplV1 implements EventsService {
         return eventsRepository.findAllByStartDateBetween(start, end);
     }
 
+/*
     @Override
     @Transactional(readOnly = true)
     public List<Events> findAllByEventTypeAndEndDateBefore(
             EventType eventType, LocalDateTime endOfDay) {
         return eventsRepository.findAllByEventTypeAndEndDateBefore(eventType, endOfDay);
     }
+*/
 
-    @Override
-    @Transactional
-    public Long countVacationingMembers(LocalDateTime customStartDate) {
-        return eventsRepository.countVacationingMembers(customStartDate);
-    }
 
-    @Override
+/*    @Override
     @Transactional(readOnly = true)
     public List<Events> findAllByEventTypeAndStartDateBetween(
             EventType eventType, LocalDateTime startOfDay, LocalDateTime endOfDay) {
         return eventsRepository.findAllByEventTypeAndStartDateBetween(eventType, startOfDay, endOfDay);
-    }
+    }*/
 
     @Override
     @Transactional

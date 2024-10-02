@@ -43,28 +43,13 @@ public interface EventsServiceFacadeV1 {
 
     void deleteOneForDepartmentEvent(String department, Long eventId, Members loginMember);
 
-    EventsResponseDto.CreateOneForVacationEventDto createOneForVacationEvent(
-            Members loginMember, EventsRequestDto.CreateOneForVacationEventDto requestDto);
-
     List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberSchedule(
             Long memberId, Long year, Long month, Members loginMember);
 
     List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberDaySchedule(
             Long memberId, Long year, Long month, Long day, Members loginMember);
 
-    List<EventsResponseDto.ReadOneForVacationEventDto> readForVacationMonthEvent(
-            Long year, Long month, Members loginMember);
+    /*List<Events> findAllByEventTypeAndEndDateBefore(Long year, Long month, Long day);
 
-    EventsResponseDto.UpdateOneForVacationEventDto updateOneForVacationEvent(
-            Long vacationId, Members loginMember,
-            EventsRequestDto.UpdateOneForVacationEventDto requestDto);
-
-    void deleteOneForVacationEvent(Long vacationId, Members loginMember);
-
-    List<EventsResponseDto.ReadMemberForVacationEventDto> readMemberListForVacationEvent(
-            Long year, Long month, Long day, Members loginMember);
-
-    List<Events> findAllByEventTypeAndEndDateBefore(Long year, Long month, Long day);
-
-    List<Events> findAllByEventTypeAndStartDateBetween(Long year, Long month, Long day);
+    List<Events> findAllByEventTypeAndStartDateBetween(Long year, Long month, Long day);*/
 }

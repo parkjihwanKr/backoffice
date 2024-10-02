@@ -1,4 +1,4 @@
-package com.example.backoffice.domain.event.dto;
+package com.example.backoffice.domain.vacation.dto;
 
 import com.example.backoffice.global.common.DateRange;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventDateRangeDto {
+public class VacationDateRangeDto {
     private DateRange dateRange;
 }

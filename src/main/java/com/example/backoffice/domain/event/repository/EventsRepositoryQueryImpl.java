@@ -24,18 +24,6 @@ public class EventsRepositoryQueryImpl extends QuerydslRepositorySupport impleme
         this.jpaQueryFactory = jpaQueryFactory;
     }
 
-    @Override
-    public Long countVacationingMembers(LocalDateTime currentDate) {
-        // currentDate보다 작거나 같을 때 && currentDate보다 크거나 같을 때 && EventType.MEMBER_VACATION 일 때
-        return jpaQueryFactory.selectFrom(qEvents)
-                .where(qEvents.eventType.eq(EventType.MEMBER_VACATION)
-                        // loe : less than or equals to
-                        .and(qEvents.startDate.loe(currentDate))
-                        // goe : greater than or equals to
-                        .and(qEvents.endDate.goe(currentDate)))
-                .fetchCount();
-    }
-
     // EventType 필터링
     private BooleanExpression eventTypeEq(EventType eventType) {
         return eventType != null ? qEvents.eventType.eq(eventType) : null;
