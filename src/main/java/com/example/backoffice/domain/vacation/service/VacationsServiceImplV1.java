@@ -16,7 +16,6 @@ import com.example.backoffice.domain.vacation.entity.*;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsExceptionCode;
 import com.example.backoffice.domain.vacation.repository.VacationsRepository;
-import com.example.backoffice.global.common.DateRange;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,12 +38,7 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
     @Override
     public VacationsResponseDto.UpdatePeriodDto updatePeriod(
             Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto){
-        Members hrManager = membersService.findHRManager();
-
-        if (!hrManager.getId().equals(loginMember.getId())
-                && !loginMember.getPosition().equals(MemberPosition.CEO)) {
-            throw new VacationsCustomException(VacationsExceptionCode.NO_PERMISSION_TO_UPDATE_VACATION);
-        }
+        validateUpdatePermission(loginMember);
 
         LocalDateTime newStartDate = LocalDateTime.parse(requestDto.getStartDate(), DATE_TIME_FORMATTER);
         LocalDateTime newEndDate = LocalDateTime.parse(requestDto.getEndDate(), DATE_TIME_FORMATTER);
@@ -164,9 +158,36 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         String vacationTitle = loginMember.getName() + "님의 휴가 계획";
         vacation.update(vacationTitle, requestDto.getUrgentReason(),
                 vacationDateRangeDto.getDateRange().getStartDate(),
-                vacationDateRangeDto.getDateRange().getEndDate(), vacationType);
+                vacationDateRangeDto.getDateRange().getEndDate(), vacationType,
+                false);
 
         return VacationsConverter.toUpdateOneDto(vacation);
+    }
+
+    // 승인 요청만 받는 형태이기에 Admin이 RequestDto를 받을 필요가 없다.
+    @Override
+    @Transactional
+    public VacationsResponseDto.UpdateOneForAdminDto updateOneForAdmin(
+            Long vacationId, Members loginMember){
+        // 1. 로그인 멤버가 CEO || HR_MANAGER인지 확인
+        validateUpdatePermission(loginMember);
+
+        // 2. 바꾸려는 휴가가 있는지?
+        Vacations vacation = findById(vacationId);
+
+        // 3. isAccepted 변경
+        vacation.updateIsAccepted(true);
+
+        // 4. 알림
+        notificationsServiceFacade.createOne(
+                NotificationsConverter.toNotificationData(
+                        loginMember, vacation.getOnVacationMember(),
+                        null, null, null, null,
+                        vacation.getOnVacationMember().getMemberName()+"님의 휴가가 승인되었습니다."),
+                NotificationType.IS_ACCEPTED_VACATION);
+
+        // 5. DTO 전송
+        return VacationsConverter.toUpdateOneForAdminDto(vacation);
     }
 
     @Override
@@ -301,8 +322,30 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         }
     }
 
-    private Vacations findById(Long vacationId) {
+    @Transactional(readOnly = true)
+    public Vacations findById(Long vacationId) {
         return vacationsRepository.findById(vacationId).orElseThrow(
                 () -> new VacationsCustomException(VacationsExceptionCode.NOT_FOUND_VACATIONS));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vacations> findAllByEndDateBefore(LocalDateTime now){
+        return vacationsRepository.findAllByEndDateBefore(now);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vacations> findAllByStartDate(LocalDateTime now){
+        return vacationsRepository.findAllByStartDate(now);
+    }
+
+    public void validateUpdatePermission(Members loginMember){
+        if(!loginMember.getPosition().equals(MemberPosition.CEO)
+                && !(loginMember.getDepartment().equals(MemberDepartment.HR)
+                && loginMember.getPosition().equals(MemberPosition.MANAGER))){
+            throw new VacationsCustomException(VacationsExceptionCode.NO_PERMISSION_TO_UPDATE_VACATION);
+        }
+    }
+
 }

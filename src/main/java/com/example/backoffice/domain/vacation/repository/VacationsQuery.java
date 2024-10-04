@@ -12,4 +12,8 @@ public interface VacationsQuery {
     List<Vacations> findVacationsOnDate(LocalDateTime startDate);
 
     List<Vacations> findVacationsOnMonth(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Vacations> findAllByEndDateBefore(LocalDateTime now);
+
+    List<Vacations> findAllByStartDate(LocalDateTime now);
 }

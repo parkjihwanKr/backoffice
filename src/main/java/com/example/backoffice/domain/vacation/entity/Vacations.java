@@ -41,12 +41,19 @@ public class Vacations extends CommonEntity {
     @JoinColumn(name = "member_id")
     private Members onVacationMember;
 
-    public void update(String vacationTitle, String urgentReason,
-                LocalDateTime startDate, LocalDateTime endDate, VacationType vacationType){
+    public void update(
+            String vacationTitle, String urgentReason,
+            LocalDateTime startDate, LocalDateTime endDate,
+            VacationType vacationType, Boolean isAccepted){
         this.title = vacationTitle;
         this.urgentReason = urgentReason;
         this.startDate = startDate;
         this.endDate = endDate;
         this.vacationType = vacationType;
+        this.isAccepted = isAccepted;
+    }
+
+    public void updateIsAccepted(Boolean isAccepted){
+        this.isAccepted = isAccepted;
     }
 }

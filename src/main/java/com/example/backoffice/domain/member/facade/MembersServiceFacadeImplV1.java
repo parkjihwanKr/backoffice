@@ -294,15 +294,15 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public void updateOneForOnVacationFalse(String memberName){
-        Members member = membersService.findByMemberName(memberName);
+    public void updateOneForOnVacationFalse(Long onVacationMemberId){
+        Members member = membersService.findById(onVacationMemberId);
         member.updateOnVacation(false);
     }
 
     @Override
     @Transactional
-    public void updateOneForOnVacationTrue(String memberName){
-        Members member = membersService.findByMemberName(memberName);
+    public void updateOneForOnVacationTrue(Long onVacationMemberId){
+        Members member = membersService.findById(onVacationMemberId);
         member.updateOnVacation(true);
     }
 

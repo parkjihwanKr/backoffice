@@ -45,9 +45,9 @@ public interface MembersServiceFacadeV1 {
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForSalaryDto requestDto);
 
-    void updateOneForOnVacationFalse(String memberName);
+    void updateOneForOnVacationFalse(Long onVacationMemberId);
 
-    void updateOneForOnVacationTrue(String memberName);
+    void updateOneForOnVacationTrue(Long onVacationMemberId);
 
     void updateOneForRemainingVacationDays(ScheduledEventType scheduledEventType);
 

@@ -14,6 +14,7 @@ public enum NotificationType {
     EVALUATION(Domain.EVALUATION),
     UPDATE_EVALUATION(Domain.UPDATE_EVALUATION),
     UPDATE_VACATION_PERIOD(Domain.UPDATE_VACATION_PERIOD),
+    IS_ACCEPTED_VACATION(Domain.IS_ACCEPTED_VACATION),
     ;
 
     private final String domain;
@@ -34,5 +35,6 @@ public enum NotificationType {
         public static final String EVALUATION = "EVALUATION";
         public static final String UPDATE_EVALUATION = "UPDATE_EVALUATION";
         public static final String UPDATE_VACATION_PERIOD = "UPDATE_VACATION_PERIOD";
+        public static final String IS_ACCEPTED_VACATION = "IS_ACCEPTED_VACATION";
     }
 }

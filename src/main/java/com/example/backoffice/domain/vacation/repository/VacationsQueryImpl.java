@@ -49,4 +49,27 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
                         .and(qVacations.endDate.goe(startDate)))
                 .fetch();
     }
+
+    @Override
+    public List<Vacations> findAllByEndDateBefore(LocalDateTime now){
+        LocalDateTime endOfYesterday
+                = now.minusDays(1).withHour(23).withMinute(59).withSecond(59);
+
+        return jpaQueryFactory
+                .selectFrom(qVacations)
+                .where(qVacations.endDate.before(endOfYesterday))
+                .fetch();
+    }
+
+    @Override
+    public List<Vacations> findAllByStartDate(LocalDateTime now) {
+        // 하루 날짜를 여기서 설정
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = now.toLocalDate().atTime(23, 59, 59);
+
+        return jpaQueryFactory
+                .selectFrom(qVacations)
+                .where(qVacations.startDate.between(startOfDay, endOfDay))
+                .fetch();
+    }
 }

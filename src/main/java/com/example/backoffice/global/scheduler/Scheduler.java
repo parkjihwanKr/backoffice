@@ -12,6 +12,8 @@ import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import com.example.backoffice.domain.vacation.entity.VacationPeriod;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodHolder;
+import com.example.backoffice.domain.vacation.entity.Vacations;
+import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,33 +34,10 @@ public class Scheduler {
     private final MembersServiceFacadeV1 membersServiceFacade;
     private final EventsServiceFacadeV1 eventsServiceFacade;
     private final EvaluationsServiceV1 evaluationsService;
+    private final VacationsServiceV1 vacationsService;
     private final MembersEvaluationsServiceV1 membersEvaluationsService;
     private final NotificationsServiceFacadeV1 notificationsServiceFacade;
     private final VacationPeriodHolder vacationPeriodHolder;
-
-    // 매일 오전 00시마다 member 휴가 상태 체크
-    /*@Transactional
-    // 초 분 시 일 월 요일
-    @Scheduled(cron = "0 0 0 * * *")
-    public void updateMemberOnVacation() {
-        long year = LocalDateTime.now().getYear();
-        long month = LocalDateTime.now().getMonthValue();
-        long day = LocalDateTime.now().getDayOfMonth();
-
-        // 휴가가 끝난 멤버들의 상태를 false로 설정
-        List<Events> endedVacationList
-                = eventsServiceFacade.findAllByEventTypeAndEndDateBefore(year, month, day);
-        for (Events event : endedVacationList) {
-            membersServiceFacade.updateOneForOnVacationFalse(event.getMember().getMemberName());
-        }
-
-        // 휴가가 시작된 멤버들의 상태를 true로 설정
-        List<Events> startedVacationList
-                = eventsServiceFacade.findAllByEventTypeAndStartDateBetween(year, month, day);
-        for (Events event : startedVacationList) {
-            membersServiceFacade.updateOneForOnVacationTrue(event.getMember().getMemberName());
-        }
-    }*/
 
     // 매달 1일 자정 10분
     @Transactional
@@ -67,7 +46,7 @@ public class Scheduler {
         membersServiceFacade.updateOneForRemainingVacationDays(ScheduledEventType.MONTHLY_UPDATE);
     }
 
-    // 매년 1월 1일 00시 10분
+    // 매년 1월 1일 00시 20분
     @Transactional
     // 초 분 시 일 월 요일
     @Scheduled(cron = "0 20 0 1 1 *")
@@ -96,7 +75,9 @@ public class Scheduler {
             }
         }
     }
-    @Scheduled(cron = "0 0 0 1 * ?")
+
+    // 휴가 신청 기간을 매달 자정 40분에 매달 두번째 월요일부터 금요일까지 자동 설정
+    @Scheduled(cron = "0 40 0 1 * ?")
     public void configureVacationRequestPeriod() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime secondMonday = getSecondMondayOfMonth(now.getYear(), now.getMonthValue());
@@ -104,6 +85,28 @@ public class Scheduler {
 
         // 해당 월의 두 번째 월요일부터 금요일까지를 설정
         vacationPeriodHolder.setVacationPeriod(secondMonday, secondFriday);
+    }
+
+    // 매일 오전 00시마다 member 휴가 상태 체크
+    @Transactional
+    // 초 분 시 일 월 요일
+    @Scheduled(cron = "0 0 0 * * *")
+    public void updateMemberOnVacation() {
+        LocalDateTime now = LocalDateTime.now();
+
+        // 휴가가 끝난 멤버들의 상태를 false로 설정
+        List<Vacations> endedVacationList
+                = vacationsService.findAllByEndDateBefore(now);
+        for (Vacations vacation : endedVacationList) {
+            membersServiceFacade.updateOneForOnVacationFalse(vacation.getOnVacationMember().getId());
+        }
+
+        // 휴가가 시작된 멤버들의 상태를 true로 설정
+        List<Vacations> startedVacationList
+                = vacationsService.findAllByStartDate(now);
+        for (Vacations vacation : startedVacationList) {
+            membersServiceFacade.updateOneForOnVacationTrue(vacation.getOnVacationMember().getId());
+        }
     }
 
     private LocalDateTime getSecondMondayOfMonth(int year, int month) {
