@@ -30,8 +30,7 @@ public class VacationsController {
                 = vacationsService.updatePeriod(memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
-                        responseDto, "성공적으로 휴가 신청 기간이 변경되었습니다.", 200
-                ));
+                        responseDto, "성공적으로 휴가 신청 기간이 변경되었습니다.", 200));
     }
 
     // 멤버 개인 휴가 생성
@@ -89,6 +88,22 @@ public class VacationsController {
         VacationsResponseDto.UpdateOneDto responseDto
                 = vacationsService.updateOne(vacationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    // 회사원들의 휴가를 적용 여부를 변경
+    @PatchMapping("/admin/vacations/{vacationId}")
+    public ResponseEntity<CommonResponseDto<VacationsResponseDto.UpdateOneForAdminDto>> updateOneForAdmin(
+            @PathVariable Long vacationId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+
+        VacationsResponseDto.UpdateOneForAdminDto responseDto
+                = vacationsService.updateOneForAdmin(vacationId, memberDetails.getMembers());
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponseDto<>(
+                        responseDto, "승인 요청이 되었습니다.", 200
+                )
+        );
     }
 
     // 개인 휴가 일정 부분 삭제

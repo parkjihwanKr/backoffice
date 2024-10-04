@@ -104,4 +104,13 @@ public class VacationsConverter {
                 .endDate(vacation.getEndDate())
                 .build();
     }
+
+    public static VacationsResponseDto.UpdateOneForAdminDto toUpdateOneForAdminDto(
+            Vacations vacation){
+        return VacationsResponseDto.UpdateOneForAdminDto.builder()
+                .acceptedVacationMemberName(vacation.getOnVacationMember().getMemberName())
+                .vacationId(vacation.getId())
+                .isAccepted(vacation.getIsAccepted())
+                .build();
+    }
 }

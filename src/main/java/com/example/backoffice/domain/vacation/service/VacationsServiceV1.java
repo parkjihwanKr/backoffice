@@ -29,6 +29,9 @@ public interface VacationsServiceV1 {
             Long vacationId, Members loginMember,
             VacationsRequestDto.UpdateOneDto requestDto);
 
+    VacationsResponseDto.UpdateOneForAdminDto updateOneForAdmin(
+            Long vacationId, Members loginMember);
+
     void deleteOne(Long vacationId, Members loginMember);
 
     List<Vacations> findAllByEndDateBefore(LocalDateTime now);

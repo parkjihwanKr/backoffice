@@ -71,4 +71,14 @@ public class VacationsResponseDto {
         private LocalDateTime endDate;
         private VacationType vacationType;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForAdminDto {
+        private Long vacationId;
+        private String acceptedVacationMemberName;
+        private Boolean isAccepted;
+    }
 }
