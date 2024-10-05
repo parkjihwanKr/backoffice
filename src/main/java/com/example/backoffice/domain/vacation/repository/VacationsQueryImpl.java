@@ -72,4 +72,15 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
                 .where(qVacations.startDate.between(startOfDay, endOfDay))
                 .fetch();
     }
+
+    @Override
+    public List<Vacations> findByMemberIdVacationOnDate(
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate){
+        return jpaQueryFactory
+                .selectFrom(qVacations)
+                .where(qVacations.onVacationMember.id.eq(memberId)
+                        .and(qVacations.startDate.loe(endDate)
+                                .and(qVacations.endDate.goe(startDate))))
+                .fetch();
+    }
 }

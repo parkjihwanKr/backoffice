@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.event.dto;
 
+import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import lombok.AllArgsConstructor;
@@ -112,8 +113,45 @@ public class EventsResponseDto {
     @AllArgsConstructor
     public static class ReadOneForMemberScheduleDto {
         private Long eventId;
+        private Long vacationId;
         private String title;
         private String description;
+        private EventType eventType;
+        private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneForEventDto{
+        private Long eventId;
+        private Long vacationId;
+        private String title;
+        private String description;
+        private EventType eventType;
+        private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneForVacationDto{
+        private Long vacationId;
+        private String title;
+        private String description;
+        private EventType eventType;
         private MemberDepartment department;
         private LocalDateTime startDate;
         private LocalDateTime endDate;

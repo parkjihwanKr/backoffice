@@ -9,12 +9,15 @@ import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.vacation.converter.VacationsConverter;
+import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.global.common.DateRange;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EventsConverter {
 
@@ -233,5 +236,79 @@ public class EventsConverter {
                             .build());
         }
         return memberMonthScheduleResponseDto;
+    }
+
+    public static List<EventsResponseDto.ReadOneForMemberScheduleDto> toReadOneForMemberScheduleDto(
+            List<EventsResponseDto.ReadOneForEventDto> departmentEventList){
+        List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList = new ArrayList<>();
+        for (int i =0; i<departmentEventList.size(); i++){
+            EventsResponseDto.ReadOneForEventDto eventResponseDto = departmentEventList.get(i);
+           if(departmentEventList.get(i).getEventType() == EventType.DEPARTMENT){
+               responseDtoList.add(
+                       EventsResponseDto.ReadOneForMemberScheduleDto.builder()
+                               .eventId(eventResponseDto.getEventId())
+                               .vacationId(null)
+                               .department(eventResponseDto.getDepartment())
+                               .title(eventResponseDto.getTitle())
+                               .description(eventResponseDto.getDescription())
+                               .startDate(eventResponseDto.getStartDate())
+                               .endDate(eventResponseDto.getEndDate())
+                               .createdAt(eventResponseDto.getCreatedAt())
+                               .modifiedAt(eventResponseDto.getModifiedAt())
+                               .fileUrlList(eventResponseDto.getFileUrlList())
+                               .build());
+           }else if(departmentEventList.get(i).getEventType() == EventType.VACATION){
+               responseDtoList.add(
+                       EventsResponseDto.ReadOneForMemberScheduleDto.builder()
+                               .vacationId(eventResponseDto.getVacationId())
+                               .department(eventResponseDto.getDepartment())
+                               .title(eventResponseDto.getTitle())
+                               .description(eventResponseDto.getDescription())
+                               .startDate(eventResponseDto.getStartDate())
+                               .endDate(eventResponseDto.getEndDate())
+                               .createdAt(eventResponseDto.getCreatedAt())
+                               .modifiedAt(eventResponseDto.getModifiedAt())
+                               .build());
+           }
+        }
+        return responseDtoList;
+    }
+
+    public static List<EventsResponseDto.ReadOneForEventDto> toEventResponseDtoListForEvent(List<Events> eventList){
+        return eventList.stream().map(
+                (event ->
+                        EventsResponseDto.ReadOneForEventDto.builder()
+                                .eventId(event.getId())
+                                .title(event.getTitle())
+                                .eventType(EventType.DEPARTMENT)
+                                .description(event.getDescription())
+                                .startDate(event.getStartDate())
+                                .endDate(event.getEndDate())
+                                .department(event.getMember().getDepartment())
+                                .fileUrlList(
+                                        event.getFileList().stream().map(
+                                                file -> FilesResponseDto.ReadOneDto.builder()
+                                                        .id(file.getId())
+                                                        .url(file.getUrl())
+                                                        .build()
+                                        ).collect(Collectors.toList())
+                                )
+                                .build())
+        ).collect(Collectors.toList());
+    }
+
+    public static List<EventsResponseDto.ReadOneForEventDto> toEventResponseDtoListForVacation(List<Vacations> vacationList){
+        return vacationList.stream().map(
+                (vacation ->
+                        EventsResponseDto.ReadOneForEventDto.builder()
+                                .vacationId(vacation.getId())
+                                .title(vacation.getTitle())
+                                .eventType(EventType.VACATION)
+                                .description(vacation.getUrgentReason())
+                                .startDate(vacation.getStartDate())
+                                .endDate(vacation.getEndDate())
+                                .department(vacation.getOnVacationMember().getDepartment())
+                                .build())
+        ).collect(Collectors.toList());
     }
 }

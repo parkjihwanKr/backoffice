@@ -2,7 +2,7 @@ package com.example.backoffice.domain.favorite.service;
 
 import com.example.backoffice.domain.board.service.BoardsServiceV1;
 import com.example.backoffice.domain.comment.service.CommentsServiceV1;
-import com.example.backoffice.domain.event.service.EventsService;
+import com.example.backoffice.domain.event.service.EventsServiceV1;
 import com.example.backoffice.domain.favorite.converter.FavoritesConverter;
 import com.example.backoffice.domain.favorite.dto.FavoritesRequestDto;
 import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
@@ -23,7 +23,7 @@ import java.util.List;
 public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
 
     private final BoardsServiceV1 boardsService;
-    private final EventsService eventsService;
+    private final EventsServiceV1 eventsService;
     private final CommentsServiceV1 commentsService;
     private final FavoritesRepository favoritesRepository;
 
