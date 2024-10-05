@@ -4,27 +4,24 @@ import com.example.backoffice.domain.event.converter.EventsConverter;
 import com.example.backoffice.domain.event.dto.EventDateRangeDto;
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
-import com.example.backoffice.domain.event.entity.EventCrudType;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
 import com.example.backoffice.domain.event.exception.EventsExceptionCode;
-import com.example.backoffice.domain.event.service.EventsService;
+import com.example.backoffice.domain.event.service.EventsServiceV1;
 import com.example.backoffice.domain.file.service.FilesServiceV1;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
-import com.example.backoffice.domain.notification.converter.NotificationsConverter;
-import com.example.backoffice.domain.notification.entity.NotificationType;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
+import com.example.backoffice.domain.vacation.entity.Vacations;
+import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +34,8 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     private final MembersServiceV1 membersService;
     private final FilesServiceV1 filesService;
-    private final EventsService eventsService;
+    private final EventsServiceV1 eventsService;
+    private final VacationsServiceV1 vacationsService;
 
     @Override
     @Transactional
@@ -282,19 +280,27 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         YearMonth yearMonth = YearMonth.of(year.intValue(), month.intValue());
         LocalDateTime endDate = LocalDateTime.of(year.intValue(), month.intValue(), yearMonth.lengthOfMonth(), 23, 59, 59);
 
+        List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList = new ArrayList<>();
+
         // 해당 부서의 모든 일정 조회
         List<Events> departmentEventList
                 = eventsService.findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
                         EventType.DEPARTMENT, loginMember.getDepartment(), startDate, endDate);
 
+        responseDtoList.addAll(
+                EventsConverter.toReadOneForMemberScheduleDto(
+                        EventsConverter.toEventResponseDtoListForEvent(departmentEventList)));
         // 3번에서 개인 휴가 등의 이벤트 추가 가능
-        List<Events> personalEvents = null;
-        /*eventsService.findAllByMemberIdAndEventTypeAndDateRange(
-                loginMember.getId(), EventType.MEMBER_VACATION, startDate, endDate);*/
-        departmentEventList.addAll(personalEvents);
+        List<Vacations> personalVacationList
+                = vacationsService.findByMemberIdVacationOnDate(
+                        loginMember.getId(), startDate, endDate);
+
+        responseDtoList.addAll(
+                EventsConverter.toReadOneForMemberScheduleDto(
+                        EventsConverter.toEventResponseDtoListForVacation(personalVacationList)));
 
         // Response DTO 생성
-        return EventsConverter.toReadForMemberScheduleDto(departmentEventList);
+        return responseDtoList;
     }
 
     @Override
@@ -302,38 +308,38 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     public List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberDaySchedule(
             Long memberId, Long year, Long month, Long day, Members loginMember) {
 
+        // 로그인한 사용자가 다른 멤버의 일정을 조회할 때만 허용
         if (memberId.equals(loginMember.getId())) {
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_READ_EVENT);
         }
 
+        // 조회할 날짜의 시작과 끝을 설정
         LocalDateTime startDate = LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 0, 0);
         LocalDateTime endDate = LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 23, 59, 59);
 
-        // 개인 일정 조회 (이벤트의 시작일이 범위에 있거나, 종료일이 범위에 있는 이벤트 조회)
-        List<Events> personalEvents = null;
-        /* feedback : eventsService.findAllByMemberIdAndEventTypeAndDateRange(
-                memberId, EventType.MEMBER_VACATION, startDate, endDate);*/
-
-        // 부서 일정 조회 (이벤트의 시작일 또는 종료일이 범위에 있는 이벤트 조회)
-        List<Events> departmentEvents = eventsService.findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
+        // 1. 부서 일정 조회
+        // 부서의 일정 중에서 이벤트의 시작일 또는 종료일이 지정된 범위(startDate, endDate)에 포함되는 이벤트를 조회
+        List<Events> eventList = eventsService.findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
                 EventType.DEPARTMENT, loginMember.getDepartment(), startDate, endDate);
 
-        // 결과 리스트 통합
-        List<Events> combinedEvents = new ArrayList<>();
-        combinedEvents.addAll(personalEvents);
-        combinedEvents.addAll(departmentEvents);
+        // 2. 개인 일정 조회
+        // 이벤트의 시작일 또는 종료일이 지정된 범위(startDate, endDate)에 포함되는 개인 일정을 조회
+        List<Vacations> vacationList
+                = vacationsService.findByMemberIdVacationOnDate(memberId, startDate, endDate);
 
-        return EventsConverter.toReadForMemberScheduleDto(combinedEvents);
+        // 3. 결과 리스트 통합
+        List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList = new ArrayList<>();
+
+        responseDtoList.addAll(
+                EventsConverter.toReadOneForMemberScheduleDto(
+                        EventsConverter.toEventResponseDtoListForEvent(eventList)));
+
+        responseDtoList.addAll(
+                EventsConverter.toReadOneForMemberScheduleDto(
+                        EventsConverter.toEventResponseDtoListForVacation(vacationList)));
+        // 통합된 결과를 DTO로 변환하여 반환
+        return responseDtoList;
     }
-
-    /*@Override
-    @Transactional(readOnly = true)
-    public List<Events> findAllByEventTypeAndEndDateBefore(Long year, Long month, Long day) {
-        LocalDateTime endOfDay = LocalDateTime.of(
-                year.intValue(), month.intValue(), day.intValue(), 23, 59, 59);
-
-        return eventsService.findAllByEventTypeAndEndDateBefore(EventType.MEMBER_VACATION, endOfDay);
-    }*/
 
     public EventDateRangeDto validateEventDate(String startDate, String endDate) {
         LocalDateTime now = LocalDateTime.now();
@@ -371,16 +377,4 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         return eventsService.findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
                 eventType, memberDepartment, start, end);
     }
-
-    /*@Override
-    @Transactional(readOnly = true)
-    public List<Events> findAllByEventTypeAndStartDateBetween(
-            Long year, Long month, Long day) {
-        LocalDateTime startOfDay = LocalDateTime.of(
-                year.intValue(), month.intValue(), day.intValue(), 0, 0, 0);
-        LocalDateTime endOfDay = startOfDay.withHour(23).withMinute(59).withSecond(59);
-
-        return eventsService.findAllByEventTypeAndStartDateBetween(
-                EventType.MEMBER_VACATION, startOfDay, endOfDay);
-    }*/
 }

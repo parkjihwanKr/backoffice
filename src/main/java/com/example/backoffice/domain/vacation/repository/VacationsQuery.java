@@ -16,4 +16,7 @@ public interface VacationsQuery {
     List<Vacations> findAllByEndDateBefore(LocalDateTime now);
 
     List<Vacations> findAllByStartDate(LocalDateTime now);
+
+    List<Vacations> findByMemberIdVacationOnDate(
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate);
 }

@@ -11,10 +11,4 @@ import java.util.List;
 public interface EventsRepository extends JpaRepository<Events, Long>, EventsRepositoryQuery {
 
     List<Events> findAllByStartDateBetween(LocalDateTime startDate, LocalDateTime endDate);
-
-/*    List<Events> findAllByEventTypeAndStartDateBetween(
-            EventType eventType, LocalDateTime startDate, LocalDateTime endDate);
-
-    List<Events> findAllByEventTypeAndEndDateBefore(
-            EventType eventType, LocalDateTime endDate);*/
 }

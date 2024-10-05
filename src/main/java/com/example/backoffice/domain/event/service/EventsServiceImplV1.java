@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class EventsServiceImplV1 implements EventsService {
+public class EventsServiceImplV1 implements EventsServiceV1 {
 
     private final EventsRepository eventsRepository;
 
@@ -44,23 +44,6 @@ public class EventsServiceImplV1 implements EventsService {
     public List<Events> findAllByStartDateBetween(LocalDateTime start, LocalDateTime end) {
         return eventsRepository.findAllByStartDateBetween(start, end);
     }
-
-/*
-    @Override
-    @Transactional(readOnly = true)
-    public List<Events> findAllByEventTypeAndEndDateBefore(
-            EventType eventType, LocalDateTime endOfDay) {
-        return eventsRepository.findAllByEventTypeAndEndDateBefore(eventType, endOfDay);
-    }
-*/
-
-
-/*    @Override
-    @Transactional(readOnly = true)
-    public List<Events> findAllByEventTypeAndStartDateBetween(
-            EventType eventType, LocalDateTime startOfDay, LocalDateTime endOfDay) {
-        return eventsRepository.findAllByEventTypeAndStartDateBetween(eventType, startOfDay, endOfDay);
-    }*/
 
     @Override
     @Transactional

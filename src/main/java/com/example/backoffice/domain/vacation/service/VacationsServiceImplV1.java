@@ -78,7 +78,9 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         Vacations vacation = VacationsConverter.toEntity(
                 requestDto.getTitle(), requestDto.getUrgentReason(), vacationDateRangeDto, loginMember);
 
-        sendUrgentOneForHRManager(requestDto.getUrgent(), loginMember);
+        if(requestDto.getUrgent()){
+            sendUrgentOneForHRManager(loginMember);
+        }
 
         vacationsRepository.save(vacation);
 
@@ -153,7 +155,9 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
 
         VacationType vacationType = VacationsConverter.toVacationType(requestDto.getVacationType());
 
-        sendUrgentOneForHRManager(requestDto.getUrgent(), loginMember);
+        if(requestDto.getUrgent()){
+            sendUrgentOneForHRManager(loginMember);
+        }
 
         String vacationTitle = loginMember.getName() + "님의 휴가 계획";
         vacation.update(vacationTitle, requestDto.getUrgentReason(),
@@ -201,6 +205,12 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         vacationsRepository.deleteById(vacationId);
     }
 
+    @Override
+    public List<Vacations> findByMemberIdVacationOnDate(Long memberId, LocalDateTime startDate, LocalDateTime endDate){
+        return vacationsRepository.findByMemberIdVacationOnDate(
+                memberId, startDate, endDate);
+    }
+
     private void validateMemberOnVacation(Long loginMemberId) {
         Boolean isOnVacation = vacationsRepository.existsByOnVacationMemberId(loginMemberId);
 
@@ -219,18 +229,22 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         validateVacationRequestPeriod(VacationsConverter.toVacationDateRangeDto(startVacationDate, endVacationDate), urgent);
 
         long vacationDays = Duration.between(startVacationDate, endVacationDate).toDays();
+        // 1. 멤버가 가지고 있는 잔여 휴가일을 초과하면 안됨
         if (loginMember.getRemainingVacationDays() < vacationDays) {
             throw new VacationsCustomException(VacationsExceptionCode.INSUFFICIENT_VACATION_DAYS);
         }
 
+        // 2. 30일 이상의 휴가를 쓰면 안됨.
         if (vacationDays >= 30) {
             throw new VacationsCustomException(VacationsExceptionCode.INVALID_VACATION_DAYS);
         }
 
+        // 3. 시작일이 마지막날보다 느리면 안됨.
         if (!startVacationDate.isBefore(endVacationDate)) {
             throw new VacationsCustomException(VacationsExceptionCode.END_DATE_BEFORE_START_DATE);
         }
 
+        // 4. 긴급 요청 대응
         if (!urgent) {
             validateVacationRateLimit(startVacationDate, vacationDays);
         }
@@ -238,9 +252,11 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         return VacationsConverter.toVacationDateRangeDto(startVacationDate, endVacationDate);
     }
 
+    // 긴급하지 않을 때 휴가율을 따로 두어 제한
     private void validateVacationRateLimit(LocalDateTime startDate, long vacationDays) {
         Long memberTotalCount = membersService.findMemberTotalCount();
 
+        // 1. 모든 멤버의 수에 비례에서 휴가 사용
         if (memberTotalCount > 10) {
             for (long i = 0; i < vacationDays; i++) {
                 LocalDateTime customStartDate = startDate.plusDays(i);
@@ -248,6 +264,7 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
 
                 double vacationRate = (double) vacationingMembersCount / memberTotalCount;
 
+                // 비율이 0.3이상이면 휴가 사용이 안됨.
                 if (vacationRate > 0.3) {
                     throw new VacationsCustomException(VacationsExceptionCode.EXCEEDS_VACATION_RATE_LIMIT);
                 }
@@ -281,14 +298,12 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         }
     }
 
-    private void sendUrgentOneForHRManager(Boolean urgent, Members loginMember) {
-        if (urgent) {
-            Members hrManager = membersService.findHRManager();
-            notificationsServiceFacade.createOne(
-                    NotificationsConverter.toNotificationData(
-                            hrManager, loginMember, null, null, null, null, null),
-                    NotificationType.URGENT_VACATION);
-        }
+    private void sendUrgentOneForHRManager(Members loginMember) {
+        Members hrManager = membersService.findHRManager();
+        notificationsServiceFacade.createOne(
+                NotificationsConverter.toNotificationData(
+                        hrManager, loginMember, null, null, null, null, null),
+                NotificationType.URGENT_VACATION);
     }
 
     private void validateMemberPermission(
