@@ -62,13 +62,4 @@ public class EventsServiceImplV1 implements EventsServiceV1 {
         return eventsRepository.findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
                 eventType, department, start, end);
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Events> findAllByMemberIdAndEventTypeAndDateRange(
-            Long memberId, EventType eventType,
-            LocalDateTime startDate, LocalDateTime endDate){
-        return eventsRepository.findAllByMemberIdAndEventTypeAndDateRange(
-                memberId, eventType, startDate, endDate);
-    }
 }
