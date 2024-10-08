@@ -49,7 +49,4 @@ public interface EventsServiceFacadeV1 {
     List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberDaySchedule(
             Long memberId, Long year, Long month, Long day, Members loginMember);
 
-    /*List<Events> findAllByEventTypeAndEndDateBefore(Long year, Long month, Long day);
-
-    List<Events> findAllByEventTypeAndStartDateBetween(Long year, Long month, Long day);*/
 }

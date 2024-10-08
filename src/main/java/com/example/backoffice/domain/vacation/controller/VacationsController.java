@@ -2,8 +2,7 @@ package com.example.backoffice.domain.vacation.controller;
 
 import com.example.backoffice.domain.vacation.dto.VacationsRequestDto;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
-import com.example.backoffice.domain.vacation.entity.Vacations;
-import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
+import com.example.backoffice.domain.vacation.facade.VacationsServiceFacadeV1;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class VacationsController {
 
-    private final VacationsServiceV1 vacationsService;
+    private final VacationsServiceFacadeV1 vacationsServiceFacade;
 
     // 이례적인 휴가 신청 날짜 추가 (= 회사 내부의 사정이 생겼을 때 / 기존에 신청하던 날짜가 추석 일때)
     @PatchMapping("/vacations/updatePeriod")
@@ -27,7 +26,7 @@ public class VacationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody VacationsRequestDto.UpdatePeriodDto requestDto){
         VacationsResponseDto.UpdatePeriodDto responseDto
-                = vacationsService.updatePeriod(memberDetails.getMembers(), requestDto);
+                = vacationsServiceFacade.updatePeriod(memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         responseDto, "성공적으로 휴가 신청 기간이 변경되었습니다.", 200));
@@ -39,7 +38,7 @@ public class VacationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody VacationsRequestDto.CreateOneDto requestDto){
         VacationsResponseDto.CreateOneDto responseDto =
-                vacationsService.createOne(memberDetails.getMembers(), requestDto);
+                vacationsServiceFacade.createOne(memberDetails.getMembers(), requestDto);
         String message = "해당 사항은 검토 후, 사내 알림으로 알려드리겠습니다.";
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
@@ -52,7 +51,7 @@ public class VacationsController {
             @PathVariable Long vacationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         VacationsResponseDto.ReadDayDto responseDto
-                = vacationsService.readDay(vacationId, memberDetails.getMembers());
+                = vacationsServiceFacade.readDay(vacationId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -63,10 +62,10 @@ public class VacationsController {
             @PathVariable Long month, @PathVariable Long day,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<VacationsResponseDto.ReadDayDto> responseDtoList
-                = vacationsService.readDayForAdmin(department, year, month, day, memberDetails.getMembers());
+                = vacationsServiceFacade.readDayForAdmin(department, year, month, day, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
-
+    
     // 부서 휴가 조회
     @GetMapping("/vacations/departments/{department}/years/{year}/months/{month}")
     public ResponseEntity<List<VacationsResponseDto.ReadMonthDto>> readMonthForAdmin(
@@ -74,7 +73,7 @@ public class VacationsController {
             @PathVariable Long year, @PathVariable Long month,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<VacationsResponseDto.ReadMonthDto> responseDtoList =
-                vacationsService.readMonthForAdmin(
+                vacationsServiceFacade.readMonthForAdmin(
                         department, year, month, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
@@ -86,7 +85,7 @@ public class VacationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody VacationsRequestDto.UpdateOneDto requestDto){
         VacationsResponseDto.UpdateOneDto responseDto
-                = vacationsService.updateOne(vacationId, memberDetails.getMembers(), requestDto);
+                = vacationsServiceFacade.updateOne(vacationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -97,7 +96,7 @@ public class VacationsController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
 
         VacationsResponseDto.UpdateOneForAdminDto responseDto
-                = vacationsService.updateOneForAdmin(vacationId, memberDetails.getMembers());
+                = vacationsServiceFacade.updateOneForAdmin(vacationId, memberDetails.getMembers());
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
@@ -111,7 +110,7 @@ public class VacationsController {
     public ResponseEntity<CommonResponseDto<Void>> deleteOne(
             @PathVariable Long vacationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        vacationsService.deleteOne(vacationId, memberDetails.getMembers());
+        vacationsServiceFacade.deleteOne(vacationId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "휴가 등록 취소 성공", 200

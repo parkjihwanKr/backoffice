@@ -251,6 +251,7 @@ public class EventsConverter {
                                .department(eventResponseDto.getDepartment())
                                .title(eventResponseDto.getTitle())
                                .description(eventResponseDto.getDescription())
+                               .eventType(eventResponseDto.getEventType())
                                .startDate(eventResponseDto.getStartDate())
                                .endDate(eventResponseDto.getEndDate())
                                .createdAt(eventResponseDto.getCreatedAt())
@@ -264,6 +265,8 @@ public class EventsConverter {
                                .department(eventResponseDto.getDepartment())
                                .title(eventResponseDto.getTitle())
                                .description(eventResponseDto.getDescription())
+                               .eventType(eventResponseDto.getEventType())
+                               .vacationType(eventResponseDto.getVacationType())
                                .startDate(eventResponseDto.getStartDate())
                                .endDate(eventResponseDto.getEndDate())
                                .createdAt(eventResponseDto.getCreatedAt())
@@ -293,6 +296,8 @@ public class EventsConverter {
                                                         .build()
                                         ).collect(Collectors.toList())
                                 )
+                                .createdAt(event.getCreatedAt())
+                                .modifiedAt(event.getModifiedAt())
                                 .build())
         ).collect(Collectors.toList());
     }
@@ -304,10 +309,13 @@ public class EventsConverter {
                                 .vacationId(vacation.getId())
                                 .title(vacation.getTitle())
                                 .eventType(EventType.VACATION)
+                                .vacationType(vacation.getVacationType())
                                 .description(vacation.getUrgentReason())
                                 .startDate(vacation.getStartDate())
                                 .endDate(vacation.getEndDate())
                                 .department(vacation.getOnVacationMember().getDepartment())
+                                .createdAt(vacation.getCreatedAt())
+                                .modifiedAt(vacation.getModifiedAt())
                                 .build())
         ).collect(Collectors.toList());
     }

@@ -108,4 +108,13 @@ public class MembersController {
                 new CommonResponse<>(HttpStatus.OK, "회원 삭제")
         );
     }
+
+    @GetMapping("/members/{memberId}/vacations")
+    public ResponseEntity<MembersResponseDto.ReadOneForVacationListDto> readOneForVacationList(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        MembersResponseDto.ReadOneForVacationListDto responseDto
+                = membersServiceFacade.readOneForVacationList(memberId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

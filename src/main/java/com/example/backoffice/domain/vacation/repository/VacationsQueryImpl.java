@@ -83,4 +83,14 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
                                 .and(qVacations.endDate.goe(startDate))))
                 .fetch();
     }
+
+    @Override
+    public List<Vacations> findAllByMemberIdAndStartDate(
+            Long memberId, LocalDateTime startDate){
+        return jpaQueryFactory
+                .selectFrom(qVacations)
+                .where(qVacations.onVacationMember.id.eq(memberId)
+                        .and(qVacations.startDate.goe(startDate)))
+                .fetch();
+    }
 }

@@ -3,12 +3,14 @@ package com.example.backoffice.domain.member.dto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MembersResponseDto {
 
@@ -118,5 +120,15 @@ public class MembersResponseDto {
         private Long memberId;
         // 잔여 휴가 일 수
         private Integer vacationDays;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadOneForVacationListDto {
+        private MemberPosition position;
+        private Integer remainingVacationDays;
+        private List<VacationsResponseDto.ReadDayDto> vacationList;
     }
 }

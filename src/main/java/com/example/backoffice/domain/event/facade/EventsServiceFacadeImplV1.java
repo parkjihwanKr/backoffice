@@ -308,8 +308,8 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     public List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberDaySchedule(
             Long memberId, Long year, Long month, Long day, Members loginMember) {
 
-        // 로그인한 사용자가 다른 멤버의 일정을 조회할 때만 허용
-        if (memberId.equals(loginMember.getId())) {
+        // 로그인한 사용자가 자신의 일정을 확인하는 것만 허용
+        if (!memberId.equals(loginMember.getId())) {
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_READ_EVENT);
         }
 

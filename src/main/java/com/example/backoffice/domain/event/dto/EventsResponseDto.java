@@ -3,6 +3,7 @@ package com.example.backoffice.domain.event.dto;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.vacation.entity.VacationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -118,6 +119,7 @@ public class EventsResponseDto {
         private String description;
         private EventType eventType;
         private MemberDepartment department;
+        private VacationType vacationType;
         private List<FilesResponseDto.ReadOneDto> fileUrlList;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
@@ -135,6 +137,7 @@ public class EventsResponseDto {
         private String title;
         private String description;
         private EventType eventType;
+        private VacationType vacationType;
         private MemberDepartment department;
         private List<FilesResponseDto.ReadOneDto> fileUrlList;
         private LocalDateTime startDate;

@@ -19,4 +19,7 @@ public interface VacationsQuery {
 
     List<Vacations> findByMemberIdVacationOnDate(
             Long memberId, LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Vacations> findAllByMemberIdAndStartDate(
+            Long memberId, LocalDateTime startDate);
 }

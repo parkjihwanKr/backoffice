@@ -13,6 +13,10 @@ import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
+import com.example.backoffice.domain.vacation.entity.Vacations;
+import com.example.backoffice.domain.vacation.facade.VacationsServiceFacadeV1;
+import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.SchedulerCustomException;
 import com.example.backoffice.global.scheduler.ScheduledEventType;
@@ -24,6 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +42,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     private final FilesServiceV1 filesService;
     private final MembersServiceV1 membersService;
     private final NotificationsServiceV1 notificationsService;
+    private final VacationsServiceV1 vacationsService;
     private final PasswordEncoder passwordEncoder;
 
     // 해당 부분 지워야함
@@ -254,6 +260,19 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     public void deleteOne(Long memberId, Members loginMember){
         matchLoginMember(loginMember, memberId);
         membersService.deleteById(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MembersResponseDto.ReadOneForVacationListDto readOneForVacationList(
+            Long memberId, Members loginMember){
+        matchLoginMember(loginMember, memberId);
+
+        LocalDateTime today = LocalDateTime.now();
+        List<Vacations> memberVacationList
+                = vacationsService.findAllByMemberIdAndStartDate(memberId, today);
+
+        return MembersConverter.toReadOneForVacationList(loginMember, memberVacationList);
     }
 
     @Override
