@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.vacation.repository;
 
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 
 import java.time.LocalDateTime;
@@ -17,9 +18,19 @@ public interface VacationsQuery {
 
     List<Vacations> findAllByStartDate(LocalDateTime now);
 
-    List<Vacations> findByMemberIdVacationOnDate(
-            Long memberId, LocalDateTime startDate, LocalDateTime endDate);
+    List<Vacations> findAcceptedVacationByMemberIdAndDateRange(
+            Long memberId, Boolean isAccepted,
+            LocalDateTime startDate, LocalDateTime endDate);
 
     List<Vacations> findAllByMemberIdAndStartDate(
             Long memberId, LocalDateTime startDate);
+
+    Boolean existsVacationForMemberInDateRange(
+            Long vacationId, Long memberId, LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Vacations> findAllByIsAccepted(Boolean isAccepted, LocalDateTime startDate);
+
+    List<Vacations> findFilteredVacationsOnMonth(
+            LocalDateTime startDate, LocalDateTime endDate,
+            Boolean isAccepted, Boolean urgent, MemberDepartment memberDepartment);
 }

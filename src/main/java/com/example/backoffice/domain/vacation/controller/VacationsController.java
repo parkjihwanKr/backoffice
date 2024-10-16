@@ -8,6 +8,7 @@ import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,7 @@ public class VacationsController {
                         responseDto, message, 200));
     }
 
+    // readDay, readDayForAdmin 없음.
     // 관리자가 아닌 자기 자신의 휴가 일정을 조회
     @GetMapping("/vacations/{vacationId}")
     public ResponseEntity<VacationsResponseDto.ReadDayDto> readDay(
@@ -55,7 +57,7 @@ public class VacationsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 해당 날짜 달력 클릭 시, 휴가 나가 있는 인원 조회
+    // 해당 날짜 달력 클릭 시, 부서 휴가 나가 있는 인원 조회
     @GetMapping("/vacations/departments/{department}/years/{year}/month/{month}/days/{day}")
     public ResponseEntity<List<VacationsResponseDto.ReadDayDto>> readDayForAdmin(
             @PathVariable String department, @PathVariable Long year,
@@ -68,12 +70,12 @@ public class VacationsController {
     
     // 부서 휴가 조회
     @GetMapping("/vacations/departments/{department}/years/{year}/months/{month}")
-    public ResponseEntity<List<VacationsResponseDto.ReadMonthDto>> readMonthForAdmin(
+    public ResponseEntity<List<VacationsResponseDto.ReadMonthDto>> readMonthForDepartmentAdmin(
             @PathVariable String department,
             @PathVariable Long year, @PathVariable Long month,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<VacationsResponseDto.ReadMonthDto> responseDtoList =
-                vacationsServiceFacade.readMonthForAdmin(
+                vacationsServiceFacade.readMonthForDepartmentAdmin(
                         department, year, month, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
@@ -114,6 +116,49 @@ public class VacationsController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "휴가 등록 취소 성공", 200
+                )
+        );
+    }
+
+    // isAccepted true 상태의 휴가 상황 조회
+    // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+    @GetMapping("/vacations/isAccepted/{isAccepted}")
+    public ResponseEntity<List<VacationsResponseDto.ReadOneIsAcceptedDto>> readIsAccepted(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @PathVariable("isAccepted") Boolean isAccepted) {
+
+        // 파라미터로 전달받은 month와 isAccepted에 따른 데이터를 서비스에서 가져옴
+        List<VacationsResponseDto.ReadOneIsAcceptedDto> responseDtoList
+                = vacationsServiceFacade.readIsAccepted(memberDetails.getMembers(), isAccepted);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
+
+    // 특정 달의 필터링된 휴가 상황 모두 조회
+    // readForHrManager
+    @GetMapping("/vacations/years/{year}/months/{month}/filtered")
+    public ResponseEntity<List<VacationsResponseDto.ReadMonthDto>> readForHrManager(
+            @PathVariable Long year, @PathVariable Long month,
+            @RequestParam(required = false) Boolean isAccepted,
+            @RequestParam(required = false) Boolean urgent,
+            @RequestParam(required = false) String department,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        List<VacationsResponseDto.ReadMonthDto> responseDtoList
+                = vacationsServiceFacade.readForHrManager(
+                        year, month, isAccepted, urgent, department, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
+
+    @DeleteMapping("/admin/vacations/{vacationId}")
+    public ResponseEntity<CommonResponseDto<Void>> deleteOneForHrManager(
+            @PathVariable Long vacationId,
+            @RequestBody VacationsRequestDto.DeleteOneForAdminDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        vacationsServiceFacade.deleteOneForHrManager(
+                vacationId, requestDto, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponseDto<>(
+                        null, "성공적으로 휴가 요청이 삭제되었습니다.", 200
                 )
         );
     }

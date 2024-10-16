@@ -6,6 +6,7 @@ import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
+import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import com.example.backoffice.domain.vacation.converter.VacationsConverter;
@@ -16,11 +17,14 @@ import com.example.backoffice.domain.vacation.entity.*;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsExceptionCode;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
+import com.example.backoffice.global.date.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,6 +38,8 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     private final VacationsServiceV1 vacationsService;
     private final VacationPeriodHolder vacationPeriodHolder;
 
+    // 휴가 관련 피드백 : 생성할 때, 승인이 될 시에, 잔여 휴가 일 변경
+    // 날짜가 시작 날이 토요일/ 일요일은 안됨, 마지막일 또한 토요일/ 일요일은 안됨.
     @Override
     public VacationsResponseDto.UpdatePeriodDto updatePeriod(
             Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto){
@@ -42,11 +48,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         LocalDateTime newStartDate = LocalDateTime.parse(requestDto.getStartDate(), DATE_TIME_FORMATTER);
         LocalDateTime newEndDate = LocalDateTime.parse(requestDto.getEndDate(), DATE_TIME_FORMATTER);
 
-        vacationPeriodHolder.setVacationPeriod(
-                VacationPeriod.builder()
-                        .startDate(newStartDate)
-                        .endDate(newEndDate)
-                        .build());
+        vacationPeriodHolder.setVacationPeriod(newStartDate, newEndDate);
 
         List<Members> memberList = membersService.findAll();
 
@@ -68,20 +70,27 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     public VacationsResponseDto.CreateOneDto createOne(
             Members loginMember, VacationsRequestDto.CreateOneDto requestDto) {
 
+        // 1. 기간 범위 검증
         VacationDateRangeDto vacationDateRangeDto = validateVacationDate(
-                loginMember, requestDto.getStartDate(), requestDto.getEndDate(),
+                null, loginMember, requestDto.getStartDate(), requestDto.getEndDate(),
                 requestDto.getUrgent());
 
-        validateMemberOnVacation(loginMember.getId());
+        VacationType vacationType = VacationsConverter.toVacationType(requestDto.getVacationType());
+        validateVacationType(vacationType, requestDto.getUrgent());
 
         Vacations vacation = VacationsConverter.toEntity(
-                requestDto.getTitle(), requestDto.getUrgentReason(), vacationDateRangeDto, loginMember);
+                requestDto.getTitle(), requestDto.getUrgentReason(),
+                vacationDateRangeDto, vacationType,
+                requestDto.getUrgent(), loginMember);
+
+        vacationsService.save(vacation);
 
         if(requestDto.getUrgent()){
             sendUrgentOneForHRManager(loginMember);
+            if(vacationType.equals(VacationType.ANNUAL_LEAVE)){
+                throw new VacationsCustomException(VacationsExceptionCode.DO_NOT_NEED_URGENT);
+            }
         }
-
-        vacationsService.save(vacation);
 
         return VacationsConverter.toCreateOneDto(vacation);
     }
@@ -101,7 +110,8 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     public List<VacationsResponseDto.ReadDayDto> readDayForAdmin(
             String department, Long year, Long month, Long day, Members loginMember) {
         // 1. 읽을 권한이 있는지 확인
-        MemberDepartment onVacationMemberDepartment = MembersConverter.toDepartment(department);
+        MemberDepartment onVacationMemberDepartment
+                = membersService.findDepartment(department);
         validateMemberPermission(loginMember, null, onVacationMemberDepartment, VacationCrudType.READ_VACATION);
 
         // 2. startDate, endDate 설정
@@ -116,17 +126,17 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
 
     @Override
     @Transactional(readOnly = true)
-    public List<VacationsResponseDto.ReadMonthDto> readMonthForAdmin(
+    public List<VacationsResponseDto.ReadMonthDto> readMonthForDepartmentAdmin(
             String department, Long year, Long month, Members loginMember) {
         // 1. 권한 검증
-        MemberDepartment onVacationMemberDepartment = MembersConverter.toDepartment(department);
+        MemberDepartment onVacationMemberDepartment = membersService.findDepartment(department);
         validateMemberPermission(
                 loginMember, null,
                 onVacationMemberDepartment, VacationCrudType.READ_VACATION);
 
         // 2. 해당 년, 월의 시작 날짜와 끝 날짜 설정
-        LocalDateTime startDate = LocalDateTime.of(year.intValue(), month.intValue(), 1, 0, 0);
-        LocalDateTime endDate = startDate.plusMonths(1).minusSeconds(1); // 다음 달 1일 바로 전
+        LocalDateTime startDate = DateTimeUtils.getStartDayOfMonth(year, month);
+        LocalDateTime endDate = DateTimeUtils.getEndDayOfMonth(year, month); // 다음 달 1일 바로 전
 
         List<Vacations> vacationList = vacationsService.findVacationsOnMonth(startDate, endDate);
 
@@ -134,14 +144,15 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         return VacationsConverter.toReadMonthDtoList(vacationList);
     }
 
-
     @Override
     @Transactional
     public VacationsResponseDto.UpdateOneDto updateOne(
             Long vacationId, Members loginMember, VacationsRequestDto.UpdateOneDto requestDto) {
 
         Vacations vacation = vacationsService.findById(vacationId);
-        validateMemberOnVacation(loginMember.getId());
+
+        VacationType vacationType = VacationsConverter.toVacationType(requestDto.getVacationType());
+        validateVacationType(vacationType, requestDto.getUrgent());
 
         // 해당 이벤트의 주인이 로그인한 사람인지?
         validateMemberPermission(
@@ -149,17 +160,17 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 null, VacationCrudType.UPDATE_VACATION);
 
         VacationDateRangeDto vacationDateRangeDto = validateVacationDate(
-                loginMember, requestDto.getStartDate(),
+                vacationId, loginMember, requestDto.getStartDate(),
                 requestDto.getEndDate(), requestDto.getUrgent());
-
-        VacationType vacationType = VacationsConverter.toVacationType(requestDto.getVacationType());
 
         if(requestDto.getUrgent()){
             sendUrgentOneForHRManager(loginMember);
+            if(vacationType.equals(VacationType.ANNUAL_LEAVE)){
+                throw new VacationsCustomException(VacationsExceptionCode.DO_NOT_NEED_URGENT);
+            }
         }
 
-        String vacationTitle = loginMember.getName() + "님의 휴가 계획";
-        vacation.update(vacationTitle, requestDto.getUrgentReason(),
+        vacation.update(requestDto.getTitle(), requestDto.getUrgentReason(),
                 vacationDateRangeDto.getDateRange().getStartDate(),
                 vacationDateRangeDto.getDateRange().getEndDate(), vacationType,
                 false);
@@ -179,17 +190,48 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         Vacations vacation = vacationsService.findById(vacationId);
 
         // 3. isAccepted 변경
-        vacation.updateIsAccepted(true);
+        Boolean initialIsAccepted = vacation.getIsAccepted();
+        vacation.updateIsAccepted(!initialIsAccepted);
 
-        // 4. 알림
+        // 4. 알림 메시지를 isAccepted 상태에 따라 변경
+        String notificationMessage = initialIsAccepted
+                ? vacation.getOnVacationMember().getMemberName() + "님의 휴가가 승인되었습니다."
+                : vacation.getOnVacationMember().getMemberName() + "님의 휴가가 미승인되었습니다.";
+
         notificationsServiceFacade.createOne(
                 NotificationsConverter.toNotificationData(
                         loginMember, vacation.getOnVacationMember(),
                         null, null, null, null,
-                        vacation.getOnVacationMember().getMemberName()+"님의 휴가가 승인되었습니다."),
+                        notificationMessage),
                 NotificationType.IS_ACCEPTED_VACATION);
 
-        // 5. DTO 전송
+        // 5. 휴가 가는 사람의 잔여 휴가 일 수 차감
+        LocalDateTime currentDate = vacation.getStartDate();
+        int vacationDays = 0;
+
+        // 시작일부터 종료일까지 모든 날짜 확인
+        while (!currentDate.isAfter(vacation.getEndDate())) {
+            DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+
+            // 토요일이나 일요일이 아니면 휴가 일수에 추가
+            if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+                vacationDays++;
+            }
+
+            // 다음 날짜로 이동
+            currentDate = currentDate.plusDays(1);
+        }
+
+        // 휴가가 승인되면 잔여 휴가 일 수에서 차감, 미승인되면 다시 증가
+        if (!initialIsAccepted) {
+            // 승인된 경우, 잔여 휴가 일 수에서 차감
+            membersService.minusVacationDays(vacation.getOnVacationMember(), vacationDays);
+        } else {
+            // 미승인된 경우, 휴가 일 수 복원 (즉, 다시 추가)
+            membersService.addVacationDays(vacation.getOnVacationMember(), vacationDays);
+        }
+
+        // 6. DTO 전송
         return VacationsConverter.toUpdateOneForAdminDto(vacation);
     }
 
@@ -204,42 +246,133 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         vacationsService.deleteById(vacationId);
     }
 
-    private void validateMemberOnVacation(Long loginMemberId) {
-        Boolean isOnVacation = vacationsService.existsByOnVacationMemberId(loginMemberId);
+    @Override
+    @Transactional(readOnly = true)
+    public List<VacationsResponseDto.ReadOneIsAcceptedDto> readIsAccepted(
+            Members loginMember, Boolean isAccepted) {
+        membersService.findHRManagerOrCEO(loginMember);
 
-        if (isOnVacation) {
-            throw new VacationsCustomException(VacationsExceptionCode.NO_PERMISSION_TO_CREATE_VACATION);
-        }
+        LocalDateTime tomorrow = DateTimeUtils.getTomorrow();
+
+        List<Vacations> isAcceptedVacationList
+                = vacationsService.findAllByIsAcceptedAndEndDay(isAccepted, tomorrow);
+
+        return VacationsConverter.toReadOneIsAcceptedDto(isAcceptedVacationList);
     }
 
+    // 필터링된 휴가 관리 시스템 입장 시, 보이는 휴가 리스트
+    @Override
+    @Transactional(readOnly = true)
+    public List<VacationsResponseDto.ReadMonthDto> readForHrManager(
+            Long year, Long month, Boolean isAccepted, Boolean urgent,
+            String department, Members loginMember){
+
+        // 1. 휴가 관리 시스템을 읽을 권한이 있는지?
+        membersService.findHRManagerOrCEO(loginMember);
+
+        // 2. 시작일과 마감일을 DateTimeUtils에서 가져오기
+        LocalDateTime startDate = DateTimeUtils.getStartDayOfMonth(year, month);
+        LocalDateTime endDate = DateTimeUtils.getEndDayOfMonth(year, month); // 다음 달 1일 바로 전
+
+        // 3. 초기 상태와 필터링 상태에 따른 리턴 형태 변경
+        MemberDepartment memberDepartment = null;
+
+        // 3-1. 초기 상태 리턴
+        if (department == null && urgent == null && isAccepted == null){
+            List<Vacations> vacationList
+                    = vacationsService.findVacationsOnMonth(startDate, endDate);
+            return VacationsConverter.toReadMonthForHrManager(vacationList);
+        }
+
+        // 3-2 department가 null이 아닐 때 필터링 상태 리턴
+        if(department != null){
+            memberDepartment = membersService.findDepartment(department);
+        }
+
+        // 3-3 department가 null이면 모든 부서의 값을 가져온 상태로 리턴
+        List<Vacations> vacationList
+                = vacationsService.findFilteredVacationsOnMonth(
+                        startDate, endDate, isAccepted, urgent, memberDepartment);
+
+        return VacationsConverter.toReadMonthForHrManager(vacationList);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOneForHrManager(
+            Long vacationId, VacationsRequestDto.DeleteOneForAdminDto requestDto,
+            Members loginMember){
+        membersService.findHRManagerOrCEO(loginMember);
+        Vacations vacation = vacationsService.findById(vacationId);
+        notificationsServiceFacade.createOne(
+                NotificationsConverter.toNotificationData(
+                        loginMember, vacation.getOnVacationMember(),
+                        null, null, null, null,
+                        requestDto.getReason()),
+                NotificationType.DELETE_VACATION_FOR_ADMIN);
+
+        vacationsService.deleteById(vacationId);
+    }
     private VacationDateRangeDto validateVacationDate(
-            Members loginMember, String startDate, String endDate, Boolean urgent) {
+            Long vacationId, Members loginMember, String startDate, String endDate, Boolean urgent) {
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startVacationDate = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
-        LocalDateTime endVacationDate = LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
+        LocalDateTime now = DateTimeUtils.getCurrentDateTime();
+        LocalDateTime startVacationDate = DateTimeUtils.parse(startDate);
+        LocalDateTime endVacationDate = DateTimeUtils.parse(endDate);
 
-        validateVacationRequestPeriod(VacationsConverter.toVacationDateRangeDto(startVacationDate, endVacationDate), urgent);
+        // 1. 휴가 시작일과 종료일의 유효성 확인 (시작일이 종료일보다 빠른지)
+        if (!startVacationDate.isBefore(endVacationDate)) {
+            throw new VacationsCustomException(VacationsExceptionCode.END_DATE_BEFORE_START_DATE);
+        }
+        if (startVacationDate.isBefore(now)) {
+            throw new VacationsCustomException(VacationsExceptionCode.INVALID_START_DATE);
+        }
+        // 휴가 시작일이 토요일/일요일이면 안되고 종료일 또한 토요일/일요일이면 안됨.
+        if (startVacationDate.getDayOfWeek() == DayOfWeek.SATURDAY ||
+                startVacationDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            throw new VacationsCustomException(VacationsExceptionCode.INVALID_START_DATE_WEEKEND);
+        }
 
+        if (endVacationDate.getDayOfWeek() == DayOfWeek.SATURDAY ||
+                endVacationDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            throw new VacationsCustomException(VacationsExceptionCode.INVALID_END_DATE_WEEKEND);
+        }
+
+        // 2. 잔여 휴가 일수 확인
         long vacationDays = Duration.between(startVacationDate, endVacationDate).toDays();
-        // 1. 멤버가 가지고 있는 잔여 휴가일을 초과하면 안됨
         if (loginMember.getRemainingVacationDays() < vacationDays) {
             throw new VacationsCustomException(VacationsExceptionCode.INSUFFICIENT_VACATION_DAYS);
         }
 
-        // 2. 30일 이상의 휴가를 쓰면 안됨.
+        // 3. 휴가 기간이 다른 휴가와 겹치는지 확인
+        validateVacationOverlap(vacationId, loginMember.getId(), startVacationDate, endVacationDate);
+
+        // 4. 긴급 요청 검증
+        if(!urgent){
+            validateVacationRateLimit(startVacationDate, vacationDays);
+        }else{
+            // 긴급한 요청이면 밑의 휴가 제한, 신청 기간 검증, 다음 달의 휴가 신청 가능한 로직 무시
+            return VacationsConverter.toVacationDateRangeDto(startVacationDate, endVacationDate);
+        }
+
+        // 5. 30일 이상 휴가 제한
         if (vacationDays >= 30) {
             throw new VacationsCustomException(VacationsExceptionCode.INVALID_VACATION_DAYS);
         }
 
-        // 3. 시작일이 마지막날보다 느리면 안됨.
-        if (!startVacationDate.isBefore(endVacationDate)) {
-            throw new VacationsCustomException(VacationsExceptionCode.END_DATE_BEFORE_START_DATE);
+        // 6. 휴가 신청 가능 기간 검증 (validateVacationRequestPeriod 내용 통합)
+        VacationPeriod allowedVacationPeriod = vacationPeriodHolder.getVacationPeriod();
+        if (!allowedVacationPeriod.isWithinAllowedPeriod(now)) {
+            throw new VacationsCustomException(VacationsExceptionCode.OUT_OF_VACATION_REQUEST_PERIOD);
         }
 
-        // 4. 긴급 요청 대응
-        if (!urgent) {
-            validateVacationRateLimit(startVacationDate, vacationDays);
+        // 7. 다음 달의 휴가만 신청 가능
+        LocalDateTime nextMonthStart
+                = LocalDate.now().plusMonths(1).withDayOfMonth(1).atStartOfDay();
+        LocalDateTime nextMonthEnd
+                = nextMonthStart.withDayOfMonth(30);
+        if (startVacationDate.isBefore(nextMonthStart) || startVacationDate.isAfter(nextMonthEnd)) {
+            throw new VacationsCustomException(VacationsExceptionCode.RESTRICTED_DATE_RANGE);
         }
 
         return VacationsConverter.toVacationDateRangeDto(startVacationDate, endVacationDate);
@@ -263,31 +396,24 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 }
             }
         }
-    }
 
-    private void validateVacationRequestPeriod(VacationDateRangeDto vacationDateRangeDto, Boolean urgent) {
-        LocalDateTime startDate = vacationDateRangeDto.getDateRange().getStartDate();
-        LocalDateTime endDate = vacationDateRangeDto.getDateRange().getEndDate();
-        LocalDateTime now = LocalDateTime.now();
-
-        if (urgent) {
-            if (startDate.isBefore(now)) {
-                throw new VacationsCustomException(VacationsExceptionCode.INVALID_START_DATE);
-            }
-            return;
+        // 2. 긴급하지 않을 때, 신청 날짜에 맞춰서 신청해야하는 로직 추가
+        LocalDateTime nextMonth = null;
+        if(vacationPeriodHolder.getVacationPeriod().getStartDate().getMonthValue() == 12){
+            nextMonth = LocalDateTime.of(
+                    vacationPeriodHolder.getVacationPeriod().getStartDate().getYear() + 1, 1,
+                    1, 0, 0, 0);
+        }else{
+            nextMonth = LocalDateTime.of(
+                    vacationPeriodHolder.getVacationPeriod().getStartDate().getYear(),
+                    vacationPeriodHolder.getVacationPeriod().getStartDate().getMonthValue() + 1,
+                    1, 0, 0, 0);
         }
+        LocalDateTime nextMonthStart = nextMonth;
+        LocalDateTime nextMonthEnd = nextMonth.plusMonths(1).minusSeconds(1);
 
-        VacationPeriod allowedVacationPeriod = vacationPeriodHolder.getVacationPeriod();
-
-        if (!allowedVacationPeriod.isWithinAllowedPeriod(startDate, endDate)) {
-            throw new VacationsCustomException(VacationsExceptionCode.OUT_OF_VACATION_REQUEST_PERIOD);
-        }
-
-        // 다음 달의 휴가만 신청 가능
-        LocalDateTime nextMonthStart = now.plusMonths(1).withDayOfMonth(1);
-        LocalDateTime nextMonthEnd = nextMonthStart.withDayOfMonth(30);
         if (startDate.isBefore(nextMonthStart) || startDate.isAfter(nextMonthEnd)) {
-            throw new VacationsCustomException(VacationsExceptionCode.RESTRICTED_DATE_RANGE);
+            throw new VacationsCustomException(VacationsExceptionCode.OUT_OF_VACATION_REQUEST_PERIOD);
         }
     }
 
@@ -335,6 +461,38 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 && !(loginMember.getDepartment().equals(MemberDepartment.HR)
                 && loginMember.getPosition().equals(MemberPosition.MANAGER))){
             throw new VacationsCustomException(VacationsExceptionCode.NO_PERMISSION_TO_UPDATE_VACATION);
+        }
+    }
+
+    private void validateVacationOverlap(Long vacationId, Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
+        boolean isOverlapping;
+
+        if(vacationId == null){
+            // Create type
+            isOverlapping = vacationsService.existsVacationForMemberInDateRange(null, memberId, startDate, endDate);
+        }else{
+            // Update type
+            // 현재 변경하려는 휴가를 제외한 멤버 아이디의 휴가를 탐색해서 해당 날짜가 겹치는지 아닌지 확인
+            isOverlapping = vacationsService.existsVacationForMemberInDateRange(vacationId, memberId, startDate, endDate);
+        }
+
+        if (isOverlapping) {
+            throw new VacationsCustomException(VacationsExceptionCode.OVERLAPPING_VACATION_DATES);
+        }
+    }
+
+    private void validateVacationType(VacationType vacationType, Boolean urgent){
+        switch(vacationType) {
+            case ANNUAL_LEAVE -> {
+                if(urgent){
+                    throw new VacationsCustomException(VacationsExceptionCode.DO_NOT_NEED_URGENT);
+                }
+            }
+            case SICK_LEAVE , URGENT_LEAVE -> {
+                if(!urgent){
+                    throw new VacationsCustomException(VacationsExceptionCode.NEED_URGENT);
+                }
+            }
         }
     }
 }

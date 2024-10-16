@@ -44,9 +44,16 @@ public class VacationsRequestDto {
         private String startDate;
         @NotNull
         private String endDate;
-        @NotNull
         private Boolean urgent;
         private String urgentReason;
         private String vacationType;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeleteOneForAdminDto {
+        private String reason;
     }
 }

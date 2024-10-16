@@ -46,7 +46,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
             Members loginMember, EvaluationsRequestDto.CreateOneForDepartmentDto requestDto){
 
         // 1. 적절한 부서에서 설문 조사를 만들었는지?
-        MemberDepartment department = MembersConverter.toDepartment(requestDto.getDepartment());
+        MemberDepartment department = membersService.findDepartment(requestDto.getDepartment());
         matchDepartmentManager(department, loginMember.getDepartment(), loginMember.getPosition());
 
         // 2. 요청한 날짜가 시작, 마감 날짜가 분기에 따라 잘 나뉘었는지?

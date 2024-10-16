@@ -248,6 +248,8 @@ public class EventsConverter {
                        EventsResponseDto.ReadOneForMemberScheduleDto.builder()
                                .eventId(eventResponseDto.getEventId())
                                .vacationId(null)
+                               .vacationType(null)
+                               .isAccepted(null)
                                .department(eventResponseDto.getDepartment())
                                .title(eventResponseDto.getTitle())
                                .description(eventResponseDto.getDescription())
@@ -261,10 +263,12 @@ public class EventsConverter {
            }else if(departmentEventList.get(i).getEventType() == EventType.VACATION){
                responseDtoList.add(
                        EventsResponseDto.ReadOneForMemberScheduleDto.builder()
+                               .eventId(null)
                                .vacationId(eventResponseDto.getVacationId())
                                .department(eventResponseDto.getDepartment())
                                .title(eventResponseDto.getTitle())
                                .description(eventResponseDto.getDescription())
+                               .isAccepted(eventResponseDto.getIsAccepted())
                                .eventType(eventResponseDto.getEventType())
                                .vacationType(eventResponseDto.getVacationType())
                                .startDate(eventResponseDto.getStartDate())
@@ -284,6 +288,9 @@ public class EventsConverter {
                                 .eventId(event.getId())
                                 .title(event.getTitle())
                                 .eventType(EventType.DEPARTMENT)
+                                .vacationType(null)
+                                .isAccepted(null)
+                                .vacationId(null)
                                 .description(event.getDescription())
                                 .startDate(event.getStartDate())
                                 .endDate(event.getEndDate())
@@ -302,7 +309,8 @@ public class EventsConverter {
         ).collect(Collectors.toList());
     }
 
-    public static List<EventsResponseDto.ReadOneForEventDto> toEventResponseDtoListForVacation(List<Vacations> vacationList){
+    public static List<EventsResponseDto.ReadOneForEventDto> toEventResponseDtoListForVacation(
+            List<Vacations> vacationList){
         return vacationList.stream().map(
                 (vacation ->
                         EventsResponseDto.ReadOneForEventDto.builder()
@@ -311,6 +319,7 @@ public class EventsConverter {
                                 .eventType(EventType.VACATION)
                                 .vacationType(vacation.getVacationType())
                                 .description(vacation.getUrgentReason())
+                                .isAccepted(vacation.getIsAccepted())
                                 .startDate(vacation.getStartDate())
                                 .endDate(vacation.getEndDate())
                                 .department(vacation.getOnVacationMember().getDepartment())

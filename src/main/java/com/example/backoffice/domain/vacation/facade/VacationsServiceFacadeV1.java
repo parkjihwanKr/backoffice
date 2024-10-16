@@ -19,7 +19,7 @@ public interface VacationsServiceFacadeV1 {
     List<VacationsResponseDto.ReadDayDto> readDayForAdmin(
             String department, Long year, Long month, Long day, Members loginMember);
 
-    List<VacationsResponseDto.ReadMonthDto> readMonthForAdmin(
+    List<VacationsResponseDto.ReadMonthDto> readMonthForDepartmentAdmin(
             String department, Long year, Long month, Members loginMember);
 
     VacationsResponseDto.UpdateOneDto updateOne(
@@ -30,4 +30,15 @@ public interface VacationsServiceFacadeV1 {
             Long vacationId, Members loginMember);
 
     void deleteOne(Long vacationId, Members loginMember);
+
+    List<VacationsResponseDto.ReadOneIsAcceptedDto> readIsAccepted(
+            Members loginMember, Boolean isAccepted);
+
+    List<VacationsResponseDto.ReadMonthDto> readForHrManager(
+            Long year, Long month, Boolean isAccepted, Boolean urgent,
+            String department, Members loginMember);
+
+    void deleteOneForHrManager(
+            Long vacationId, VacationsRequestDto.DeleteOneForAdminDto requestDto,
+            Members loginMember);
 }

@@ -27,20 +27,33 @@ public class VacationsConverter {
 
     public static VacationType toVacationType(String vacationType){
         return switch (vacationType) {
-            case "ANNUAL_LEAVE" -> VacationType.ANNUAL_LEAVE;
-            case "SICK_LEAVE" -> VacationType.SICK_LEAVE;
-            case "URGENT_LEAVE" -> VacationType.URGENT_LEAVE;
+            case "연가" -> VacationType.ANNUAL_LEAVE;
+            case "병가" -> VacationType.SICK_LEAVE;
+            case "긴급한 휴가" -> VacationType.URGENT_LEAVE;
             default -> throw new VacationsCustomException(VacationsExceptionCode.NOT_FOUND_VACATION_TYPE);
+        };
+    }
+
+    public static Boolean toIsAccepted(String isAcceptedType){
+        return switch (isAcceptedType) {
+            case "all" -> null;
+            case "false" -> false;
+            case "true" -> true;
+            default -> throw new VacationsCustomException(
+                    VacationsExceptionCode.NOT_FOUND_VACATION_IS_ACCEPTED_TYPE);
         };
     }
 
     public static Vacations toEntity(
             String title, String reason, VacationDateRangeDto vacationDateRangeDto,
-            Members loginMember){
+            VacationType vacationType ,Boolean urgent, Members loginMember){
         return Vacations.builder()
                 .title(title)
                 .urgentReason(reason)
+                .vacationType(vacationType)
+                .urgent(urgent)
                 .onVacationMember(loginMember)
+                .isAccepted(false)
                 .startDate(vacationDateRangeDto.getDateRange().getStartDate())
                 .endDate(vacationDateRangeDto.getDateRange().getEndDate())
                 .build();
@@ -54,7 +67,8 @@ public class VacationsConverter {
                 .build();
     }
 
-    public static VacationsResponseDto.CreateOneDto toCreateOneDto(Vacations vacation){
+    public static VacationsResponseDto.CreateOneDto toCreateOneDto(
+            Vacations vacation){
         return VacationsResponseDto.CreateOneDto.builder()
                 .vacationType(vacation.getVacationType())
                 .title(vacation.getTitle())
@@ -68,6 +82,8 @@ public class VacationsConverter {
         return VacationsResponseDto.ReadDayDto.builder()
                 .vacationId(vacation.getId())
                 .onVacationMemberName(vacation.getOnVacationMember().getMemberName())
+                .vacationType(vacation.getVacationType())
+                .isAccepted(vacation.getIsAccepted())
                 .title(vacation.getTitle())
                 .urgentReason(vacation.getUrgentReason())
                 .startDate(vacation.getStartDate())
@@ -97,6 +113,7 @@ public class VacationsConverter {
 
     public static VacationsResponseDto.UpdateOneDto toUpdateOneDto(Vacations vacation){
         return VacationsResponseDto.UpdateOneDto.builder()
+                .vacationId(vacation.getId())
                 .vacationType(vacation.getVacationType())
                 .title(vacation.getTitle())
                 .urgentReason(vacation.getUrgentReason())
@@ -112,5 +129,37 @@ public class VacationsConverter {
                 .vacationId(vacation.getId())
                 .isAccepted(vacation.getIsAccepted())
                 .build();
+    }
+
+    public static List<VacationsResponseDto.ReadOneIsAcceptedDto> toReadOneIsAcceptedDto(
+            List<Vacations> isAcceptedVacationList){
+        return isAcceptedVacationList.stream().map(
+                vacation -> VacationsResponseDto.ReadOneIsAcceptedDto.builder()
+                        .vacationId(vacation.getId())
+                        .onVacationMemberName(vacation.getOnVacationMember().getMemberName())
+                        .startDate(vacation.getStartDate())
+                        .endDate(vacation.getEndDate())
+                        .isAccepted(vacation.getIsAccepted())
+                        .build()
+        ).collect(Collectors.toList());
+    }
+
+    public static List<VacationsResponseDto.ReadMonthDto> toReadMonthForHrManager(
+            List<Vacations> vacationList){
+        return vacationList.stream().map(
+            vacation -> VacationsResponseDto.ReadMonthDto.builder()
+                    .vacationId(vacation.getId())
+                    .vacationType(vacation.getVacationType())
+                    .department(vacation.getOnVacationMember().getDepartment())
+                    .onVacationMemberName(vacation.getOnVacationMember().getMemberName())
+                    .title(vacation.getTitle())
+                    .isAccepted(vacation.getIsAccepted())
+                    .urgentReason(vacation.getUrgentReason())
+                    .startDate(vacation.getStartDate())
+                    .endDate(vacation.getEndDate())
+                    .createdAt(vacation.getCreatedAt())
+                    .modifiedAt(vacation.getModifiedAt())
+                    .build()
+        ).collect(Collectors.toList());
     }
 }

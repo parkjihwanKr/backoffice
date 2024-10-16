@@ -117,6 +117,7 @@ public class EventsResponseDto {
         private Long vacationId;
         private String title;
         private String description;
+        private Boolean isAccepted;
         private EventType eventType;
         private MemberDepartment department;
         private VacationType vacationType;
@@ -136,6 +137,7 @@ public class EventsResponseDto {
         private Long vacationId;
         private String title;
         private String description;
+        private Boolean isAccepted;
         private EventType eventType;
         private VacationType vacationType;
         private MemberDepartment department;

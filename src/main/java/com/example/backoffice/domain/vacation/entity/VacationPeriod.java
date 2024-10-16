@@ -13,11 +13,11 @@ public class VacationPeriod {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
-    public boolean isWithinAllowedPeriod(LocalDateTime allowedStartDate, LocalDateTime allowedEndDate) {
+    public boolean isWithinAllowedPeriod(LocalDateTime today) {
         LocalDateTime startDate = this.startDate;
         LocalDateTime endDate = this.endDate;
 
-        return (startDate.isAfter(allowedStartDate) || startDate.isEqual(allowedStartDate)) &&
-                (endDate.isBefore(allowedEndDate) || endDate.isEqual(allowedEndDate));
+        return (today.isEqual(startDate) || today.isAfter(startDate)) &&
+                (today.isEqual(endDate) || today.isBefore(endDate));
     }
 }

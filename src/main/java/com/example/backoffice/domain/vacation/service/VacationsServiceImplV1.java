@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.vacation.service;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsExceptionCode;
@@ -43,9 +44,11 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
 
     @Override
     @Transactional
-    public List<Vacations> findByMemberIdVacationOnDate(
-            Long memberId, LocalDateTime startDate, LocalDateTime endDate){
-        return vacationsRepository.findByMemberIdVacationOnDate(memberId, startDate, endDate);
+    public List<Vacations> findAcceptedVacationByMemberIdAndDateRange(
+            Long memberId, Boolean isAccepted,
+            LocalDateTime startDate, LocalDateTime endDate){
+        return vacationsRepository.findAcceptedVacationByMemberIdAndDateRange(
+                memberId, true, startDate, endDate);
     }
 
     @Override
@@ -58,12 +61,6 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
     @Transactional
     public void deleteById(Long vacationId){
         vacationsRepository.deleteById(vacationId);
-    }
-
-    @Override
-    @Transactional
-    public Boolean existsByOnVacationMemberId(Long loginMemberId){
-        return vacationsRepository.existsByOnVacationMemberId(loginMemberId);
     }
 
     @Override
@@ -82,5 +79,29 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
     @Transactional(readOnly = true)
     public List<Vacations> findAllByStartDate(LocalDateTime now){
         return vacationsRepository.findAllByStartDate(now);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean existsVacationForMemberInDateRange(
+            Long vacationId, Long memberId, LocalDateTime startDate, LocalDateTime endDate){
+        return vacationsRepository.existsVacationForMemberInDateRange(
+                vacationId, memberId, startDate, endDate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vacations> findAllByIsAcceptedAndEndDay(
+            Boolean isAccepted, LocalDateTime startDate) {
+        return vacationsRepository.findAllByIsAccepted(isAccepted, startDate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vacations> findFilteredVacationsOnMonth(
+            LocalDateTime startDate, LocalDateTime endDate,
+            Boolean isAccepted, Boolean urgent, MemberDepartment memberDepartment){
+        return vacationsRepository.findFilteredVacationsOnMonth(
+                startDate, endDate, isAccepted, urgent, memberDepartment);
     }
 }
