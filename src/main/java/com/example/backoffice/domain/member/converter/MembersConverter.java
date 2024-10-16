@@ -8,6 +8,12 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
+import com.example.backoffice.domain.vacation.converter.VacationsConverter;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
+import com.example.backoffice.domain.vacation.entity.Vacations;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MembersConverter {
 
@@ -129,6 +135,18 @@ public class MembersConverter {
         return MembersResponseDto.DeleteOneForProfileImageDto.builder()
                 .memberId(member.getId())
                 .fromMemberName(member.getMemberName())
+                .build();
+    }
+
+    public static MembersResponseDto.ReadOneForVacationListDto toReadOneForVacationList(
+            Members member, List<Vacations> memberVacationList){
+        List<VacationsResponseDto.ReadDayDto> vacationResponseDtoList
+                = memberVacationList.stream().map(
+                        VacationsConverter::toReadDayDto).collect(Collectors.toList());
+        return MembersResponseDto.ReadOneForVacationListDto.builder()
+                .position(member.getPosition())
+                .remainingVacationDays(member.getRemainingVacationDays())
+                .vacationList(vacationResponseDtoList)
                 .build();
     }
 

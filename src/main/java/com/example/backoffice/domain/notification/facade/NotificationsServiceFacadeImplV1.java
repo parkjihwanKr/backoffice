@@ -93,7 +93,7 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
             NotificationsRequestDto.CreateForAdminDto requestDto){
         // 0. adminName으로 해당 멤버의 객체 정보를 가져옴
         Members admin = membersServiceFacade.findByMemberName(adminName);
-        System.out.println(admin.getMemberName());
+
         // 1. 해당 어드민 계정이 맞는지 -> 멤버 검증까지 같이 됨
         if(!admin.getPosition().equals(MemberPosition.CEO)){
             throw new NotificationsCustomException(NotificationsExceptionCode.NOT_ACCESS_POSITION);
@@ -287,6 +287,20 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                         + "님께서 "
                         + notificationData.getMessage();
                 yield toEntity(notificationData, updateVacationPeriodMessage, domainType);
+            }
+            case IS_ACCEPTED_VACATION -> {
+                String updateIsAcceptedMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 "
+                        + notificationData.getMessage();
+                yield toEntity(notificationData, updateIsAcceptedMessage, domainType);
+            }
+            case DELETE_VACATION_FOR_ADMIN -> {
+                String deleteVacationMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님께서 밑과 같은 사유로 휴가를 삭제하셨습니다."
+                        + notificationData.getMessage();
+                yield toEntity(notificationData, deleteVacationMessage, domainType);
             }
             default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);
         };

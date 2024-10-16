@@ -170,7 +170,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
         // 메인 어드민이 부서 일정을 만들 때, HR부서인 메인 어드민이 FIANACE의 일정을 만드려 할 때가
         // 다르게 적용될 가능성이 있기에
-        MemberDepartment memberDepartment = MembersConverter.toDepartment(department);
+        MemberDepartment memberDepartment = membersService.findDepartment(department);
 
         Events event = EventsConverter.toEntity(
                 requestDto.getTitle(), requestDto.getDescription(),
@@ -276,9 +276,15 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         }
 
         // 해당하는 기간의 시작일과 종료일 계산
-        LocalDateTime startDate = LocalDateTime.of(year.intValue(), month.intValue(), 1, 0, 0);
-        YearMonth yearMonth = YearMonth.of(year.intValue(), month.intValue());
-        LocalDateTime endDate = LocalDateTime.of(year.intValue(), month.intValue(), yearMonth.lengthOfMonth(), 23, 59, 59);
+        LocalDateTime startDate
+                = LocalDateTime.of(
+                        year.intValue(), month.intValue(), 1, 0, 0);
+        YearMonth yearMonth
+                = YearMonth.of(year.intValue(), month.intValue());
+        LocalDateTime endDate
+                = LocalDateTime.of(
+                        year.intValue(), month.intValue(),
+                yearMonth.lengthOfMonth(), 23, 59, 59);
 
         List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList = new ArrayList<>();
 
@@ -292,9 +298,8 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                         EventsConverter.toEventResponseDtoListForEvent(departmentEventList)));
         // 3번에서 개인 휴가 등의 이벤트 추가 가능
         List<Vacations> personalVacationList
-                = vacationsService.findByMemberIdVacationOnDate(
-                        loginMember.getId(), startDate, endDate);
-
+                = vacationsService.findAcceptedVacationByMemberIdAndDateRange(
+                memberId, true, startDate, endDate);
         responseDtoList.addAll(
                 EventsConverter.toReadOneForMemberScheduleDto(
                         EventsConverter.toEventResponseDtoListForVacation(personalVacationList)));
@@ -308,8 +313,8 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     public List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberDaySchedule(
             Long memberId, Long year, Long month, Long day, Members loginMember) {
 
-        // 로그인한 사용자가 다른 멤버의 일정을 조회할 때만 허용
-        if (memberId.equals(loginMember.getId())) {
+        // 로그인한 사용자가 자신의 일정을 확인하는 것만 허용
+        if (!memberId.equals(loginMember.getId())) {
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_READ_EVENT);
         }
 
@@ -325,7 +330,8 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         // 2. 개인 일정 조회
         // 이벤트의 시작일 또는 종료일이 지정된 범위(startDate, endDate)에 포함되는 개인 일정을 조회
         List<Vacations> vacationList
-                = vacationsService.findByMemberIdVacationOnDate(memberId, startDate, endDate);
+                = vacationsService.findAcceptedVacationByMemberIdAndDateRange(
+                        memberId, true, startDate, endDate);
 
         // 3. 결과 리스트 통합
         List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList = new ArrayList<>();
@@ -372,7 +378,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         LocalDateTime start = YearMonth.of(year.intValue(), month.intValue()).atDay(1).atStartOfDay();
         LocalDateTime end = YearMonth.of(year.intValue(), month.intValue()).atEndOfMonth().atTime(23, 59, 59);
 
-        MemberDepartment memberDepartment = department != null ? MembersConverter.toDepartment(department) : null;
+        MemberDepartment memberDepartment = department != null ? membersService.findDepartment(department) : null;
 
         return eventsService.findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
                 eventType, memberDepartment, start, end);

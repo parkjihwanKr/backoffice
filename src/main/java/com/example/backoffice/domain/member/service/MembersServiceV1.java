@@ -46,4 +46,12 @@ public interface MembersServiceV1 {
     List<Members> findAllByPosition(MemberPosition position);
 
     List<Members> findAllExceptLoginMember(Long exceptMemberId);
+
+    void addVacationDays(Members onVacationMember, int plusVacationDays);
+
+    void minusVacationDays(Members onVacationMember, int minusVacationDays);
+
+    Members findHRManagerOrCEO(Members member);
+
+    MemberDepartment findDepartment(String department);
 }

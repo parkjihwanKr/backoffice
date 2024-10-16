@@ -34,12 +34,6 @@ public class EventsRepositoryQueryImpl extends QuerydslRepositorySupport impleme
         return department != null ? qEvents.department.eq(department) : null;
     }
 
-    // 시작 또는 끝 날짜가 범위에 있는지 확인
-    private BooleanExpression startOrEndDateBetween(LocalDateTime start, LocalDateTime end) {
-        return qEvents.startDate.between(start, end)
-                .or(qEvents.endDate.between(start, end));
-    }
-
     @Override
     public List<Events> findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
             EventType eventType, MemberDepartment department, LocalDateTime start, LocalDateTime end) {
@@ -48,20 +42,8 @@ public class EventsRepositoryQueryImpl extends QuerydslRepositorySupport impleme
                 .where(
                         eventTypeEq(eventType), // EventType 필터링
                         departmentEq(department), // 부서 필터링
-                        startOrEndDateBetween(start, end) // 시작 또는 끝 날짜가 해당 범위에 있는지 확인
-                )
-                .fetch();
-    }
-
-    @Override
-    public List<Events> findAllByMemberIdAndEventTypeAndDateRange(
-            Long memberId, EventType eventType,
-            LocalDateTime start, LocalDateTime end){
-        return jpaQueryFactory
-                .selectFrom(qEvents)
-                .where(qEvents.member.id.eq(memberId)
-                        .and(qEvents.eventType.eq(eventType))
-                        .and(qEvents.startDate.between(start, end)))
-                .fetch();
+                        qEvents.startDate.loe(end),  // 시작일이 endDate보다 작거나 같음
+                        qEvents.endDate.goe(start)   // 종료일이 startDate보다 크거나 같음확인
+                ).fetch();
     }
 }

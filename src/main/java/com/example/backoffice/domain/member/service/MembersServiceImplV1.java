@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.member.service;
 
+import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
@@ -141,5 +142,30 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Transactional(readOnly = true)
     public List<Members> findAllExceptLoginMember(Long exceptMemberId){
         return membersRepository.findAllByIdNotIn(Collections.singletonList(exceptMemberId));
+    }
+
+    @Override
+    public void addVacationDays(Members onVacationMember, int plusVacationDays){
+        onVacationMember.plusRemainingVacation(plusVacationDays);
+    }
+
+    @Override
+    public void minusVacationDays(Members onVacationMember, int minusVacationDays){
+        onVacationMember.minusRemainingVacation(minusVacationDays);
+    }
+
+    @Override
+    public Members findHRManagerOrCEO(Members member){
+        if ((member.getDepartment().equals(MemberDepartment.HR)
+                && member.getPosition().equals(MemberPosition.MANAGER))
+                || member.getPosition().equals(MemberPosition.CEO)){
+            return member;
+        }
+        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+    }
+
+    @Override
+    public MemberDepartment findDepartment(String department){
+        return MembersConverter.toDepartment(department);
     }
 }

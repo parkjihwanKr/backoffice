@@ -1,8 +1,6 @@
 package com.example.backoffice.domain.vacation.service;
 
-import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.vacation.dto.VacationsRequestDto;
-import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 
 import java.time.LocalDateTime;
@@ -10,34 +8,30 @@ import java.util.List;
 
 public interface VacationsServiceV1 {
 
-    VacationsResponseDto.UpdatePeriodDto updatePeriod(
-            Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto);
+    Vacations save(Vacations vacation);
 
-    VacationsResponseDto.CreateOneDto createOne(
-            Members loginMember, VacationsRequestDto.CreateOneDto requestDto);
+    List<Vacations> findVacationsOnMonth(LocalDateTime startDate, LocalDateTime endDate);
 
-    VacationsResponseDto.ReadDayDto readDay(
-            Long vacationId, Members loginMember);
+    List<Vacations> findAcceptedVacationByMemberIdAndDateRange(
+            Long memberId, Boolean isAccepted,
+            LocalDateTime startDate, LocalDateTime endDate);
 
-    List<VacationsResponseDto.ReadDayDto> readDayForAdmin(
-            String department, Long year, Long month, Long day, Members loginMember);
+    List<Vacations> findAllByMemberIdAndStartDate(Long memberId, LocalDateTime startDate);
 
-    List<VacationsResponseDto.ReadMonthDto> readMonthForAdmin(
-            String department, Long year, Long month, Members loginMember);
+    void deleteById(Long vacationId);
 
-    VacationsResponseDto.UpdateOneDto updateOne(
-            Long vacationId, Members loginMember,
-            VacationsRequestDto.UpdateOneDto requestDto);
+    Long countVacationingMembers(LocalDateTime customStartDate);
 
-    VacationsResponseDto.UpdateOneForAdminDto updateOneForAdmin(
-            Long vacationId, Members loginMember);
-
-    void deleteOne(Long vacationId, Members loginMember);
+    Vacations findById(Long vacationId);
 
     List<Vacations> findAllByEndDateBefore(LocalDateTime now);
 
     List<Vacations> findAllByStartDate(LocalDateTime now);
 
-    List<Vacations> findByMemberIdVacationOnDate(
-            Long memberId, LocalDateTime startDate, LocalDateTime endDate);
+    Boolean existsVacationForMemberInDateRange(
+            Long vacationId, Long memberId, LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Vacations> findFilteredVacationsOnMonth(
+            LocalDateTime startDate, LocalDateTime endDate,
+            Boolean isAccepted, Boolean urgent, MemberDepartment memberDepartment);
 }
