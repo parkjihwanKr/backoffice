@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum VacationsExceptionCode {
     NOT_FOUND_VACATIONS(HttpStatus.BAD_REQUEST, "VACATION-001", "해당 휴가를 찾을 수 없습니다."),
-    INVALID_START_DATE(HttpStatus.BAD_REQUEST, "VACATIONS-002", "시작 날짜가 잘못되었습니다."),
+    INVALID_START_DATE(HttpStatus.BAD_REQUEST, "VACATIONS-002", "휴가 시작일이 내일 이후여야 합니다."),
     END_DATE_BEFORE_START_DATE(HttpStatus.BAD_REQUEST, "VACATIONS-003", "종료 날짜는 시작 날짜보다 이전일 수 없습니다."),
     RESTRICTED_DATE_RANGE(HttpStatus.BAD_REQUEST, "VACATIONS-004", "해당 날짜에는 휴가를 신청할 수 없습니다."),
     NO_PERMISSION_TO_CREATE_VACATION(HttpStatus.BAD_REQUEST, "VACATIONS-005",
@@ -32,7 +32,8 @@ public enum VacationsExceptionCode {
     NEED_URGENT(HttpStatus.BAD_REQUEST, "VACATIONS-019", "연가를 제외한 휴가는 '긴급함' 표시가 필요합니다."),
     INVALID_START_DATE_WEEKEND(HttpStatus.BAD_REQUEST, "VACATIONS-020", "휴가 시작날은 토요일/일요일은 불가능합니다."),
     INVALID_END_DATE_WEEKEND(HttpStatus.BAD_REQUEST, "VACATIONS-021", "휴가 마지막날은 토요일/일요일은 불가능합니다."),
-    NOT_FOUND_VACATION_IS_ACCEPTED_TYPE(HttpStatus.BAD_REQUEST, "VACATIONS-022", "잘못된 휴가 필터 요청입니다.")
+    NOT_FOUND_VACATION_IS_ACCEPTED_TYPE(HttpStatus.BAD_REQUEST, "VACATIONS-022", "잘못된 휴가 필터 요청입니다."),
+    INVALID_VACATION_PERIOD(HttpStatus.BAD_REQUEST, "VACATIONS-023","적절한 휴가 신청 기간으로 설정해주세요."),
     ;
 
     private final HttpStatus httpStatus;

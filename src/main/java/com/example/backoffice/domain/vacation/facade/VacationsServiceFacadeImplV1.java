@@ -1,12 +1,10 @@
 package com.example.backoffice.domain.vacation.facade;
 
-import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
-import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import com.example.backoffice.domain.vacation.converter.VacationsConverter;
@@ -28,8 +26,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.backoffice.global.common.DateTimeFormatters.DATE_TIME_FORMATTER;
-
 @Component
 @RequiredArgsConstructor
 public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
@@ -45,8 +41,23 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
             Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto){
         validateUpdatePermission(loginMember);
 
-        LocalDateTime newStartDate = LocalDateTime.parse(requestDto.getStartDate(), DATE_TIME_FORMATTER);
-        LocalDateTime newEndDate = LocalDateTime.parse(requestDto.getEndDate(), DATE_TIME_FORMATTER);
+        LocalDateTime newStartDate = DateTimeUtils.parse(requestDto.getStartDate());
+        LocalDateTime newEndDate = DateTimeUtils.parse(requestDto.getEndDate());
+
+        // 현재 월을 기준으로 검증
+        LocalDateTime now = DateTimeUtils.getCurrentDateTime();
+        if (newStartDate.getMonth() != now.getMonth() || newEndDate.getMonth() != now.getMonth()) {
+            throw new VacationsCustomException(VacationsExceptionCode.INVALID_VACATION_PERIOD);
+        }
+
+        LocalDateTime tomorrow = DateTimeUtils.getTomorrow();
+        if(newStartDate.isBefore(tomorrow)){
+            throw new VacationsCustomException(VacationsExceptionCode.INVALID_START_DATE);
+        }
+
+        if(newStartDate.isAfter(newEndDate)){
+            throw new VacationsCustomException(VacationsExceptionCode.END_DATE_BEFORE_START_DATE);
+        }
 
         vacationPeriodHolder.setVacationPeriod(newStartDate, newEndDate);
 
