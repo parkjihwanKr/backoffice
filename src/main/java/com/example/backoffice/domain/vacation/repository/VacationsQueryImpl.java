@@ -52,14 +52,6 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
     }
 
     @Override
-    public List<Vacations> findVacationsOnDate(LocalDateTime startDate) {
-        return jpaQueryFactory
-                .selectFrom(qVacations)
-                .where(vacationDateOverlap(startDate, startDate)) // 특정 날짜에 휴가 중인 멤버를 찾음
-                .fetch();
-    }
-
-    @Override
     public List<Vacations> findVacationsOnMonth(LocalDateTime startDate, LocalDateTime endDate) {
         return jpaQueryFactory
                 .selectFrom(qVacations)
@@ -130,15 +122,6 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
                             .and(vacationDateOverlap(startDate, endDate))
                     ).fetchFirst() != null;
         }
-    }
-
-    @Override
-    public List<Vacations> findAllByIsAccepted(
-            Boolean isAccepted, LocalDateTime startDate){
-        return jpaQueryFactory.selectFrom(qVacations)
-                .where(qVacations.isAccepted.eq(isAccepted)
-                        .and(qVacations.startDate.goe(startDate)))
-                .fetch();
     }
 
     @Override

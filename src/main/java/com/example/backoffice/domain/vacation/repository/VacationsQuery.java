@@ -10,8 +10,6 @@ import java.util.List;
 public interface VacationsQuery {
     long countVacationingMembers(LocalDateTime customStartDate);
 
-    List<Vacations> findVacationsOnDate(LocalDateTime startDate);
-
     List<Vacations> findVacationsOnMonth(LocalDateTime startDate, LocalDateTime endDate);
 
     List<Vacations> findAllByEndDateBefore(LocalDateTime now);
@@ -27,8 +25,6 @@ public interface VacationsQuery {
 
     Boolean existsVacationForMemberInDateRange(
             Long vacationId, Long memberId, LocalDateTime startDate, LocalDateTime endDate);
-
-    List<Vacations> findAllByIsAccepted(Boolean isAccepted, LocalDateTime startDate);
 
     List<Vacations> findFilteredVacationsOnMonth(
             LocalDateTime startDate, LocalDateTime endDate,

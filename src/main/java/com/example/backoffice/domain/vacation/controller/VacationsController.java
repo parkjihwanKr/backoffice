@@ -57,29 +57,6 @@ public class VacationsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 해당 날짜 달력 클릭 시, 부서 휴가 나가 있는 인원 조회
-    @GetMapping("/vacations/departments/{department}/years/{year}/month/{month}/days/{day}")
-    public ResponseEntity<List<VacationsResponseDto.ReadDayDto>> readDayForAdmin(
-            @PathVariable String department, @PathVariable Long year,
-            @PathVariable Long month, @PathVariable Long day,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        List<VacationsResponseDto.ReadDayDto> responseDtoList
-                = vacationsServiceFacade.readDayForAdmin(department, year, month, day, memberDetails.getMembers());
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
-    }
-    
-    // 부서 휴가 조회
-    @GetMapping("/vacations/departments/{department}/years/{year}/months/{month}")
-    public ResponseEntity<List<VacationsResponseDto.ReadMonthDto>> readMonthForDepartmentAdmin(
-            @PathVariable String department,
-            @PathVariable Long year, @PathVariable Long month,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        List<VacationsResponseDto.ReadMonthDto> responseDtoList =
-                vacationsServiceFacade.readMonthForDepartmentAdmin(
-                        department, year, month, memberDetails.getMembers());
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
-    }
-
     // 개인 휴가 일정 부분 수정
     @PatchMapping("/vacations/{vacationId}")
     public ResponseEntity<VacationsResponseDto.UpdateOneDto> updateOne(
@@ -118,20 +95,6 @@ public class VacationsController {
                         null, "휴가 등록 취소 성공", 200
                 )
         );
-    }
-
-    // isAccepted true 상태의 휴가 상황 조회
-    // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-    @GetMapping("/vacations/isAccepted/{isAccepted}")
-    public ResponseEntity<List<VacationsResponseDto.ReadOneIsAcceptedDto>> readIsAccepted(
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @PathVariable("isAccepted") Boolean isAccepted) {
-
-        // 파라미터로 전달받은 month와 isAccepted에 따른 데이터를 서비스에서 가져옴
-        List<VacationsResponseDto.ReadOneIsAcceptedDto> responseDtoList
-                = vacationsServiceFacade.readIsAccepted(memberDetails.getMembers(), isAccepted);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     // 특정 달의 필터링된 휴가 상황 모두 조회

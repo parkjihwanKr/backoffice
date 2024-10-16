@@ -106,45 +106,6 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<VacationsResponseDto.ReadDayDto> readDayForAdmin(
-            String department, Long year, Long month, Long day, Members loginMember) {
-        // 1. 읽을 권한이 있는지 확인
-        MemberDepartment onVacationMemberDepartment
-                = membersService.findDepartment(department);
-        validateMemberPermission(loginMember, null, onVacationMemberDepartment, VacationCrudType.READ_VACATION);
-
-        // 2. startDate, endDate 설정
-        LocalDateTime startDate = LocalDateTime.of(year.intValue(), month.intValue(), day.intValue(), 0, 0);
-
-        // 3. 휴가 중인 멤버 리스트 조회
-        List<Vacations> vacationList = vacationsService.findVacationsOnDate(startDate);
-
-        // 4. 결과를 DTO로 변환하여 반환
-        return VacationsConverter.toReadDayDtoList(vacationList);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<VacationsResponseDto.ReadMonthDto> readMonthForDepartmentAdmin(
-            String department, Long year, Long month, Members loginMember) {
-        // 1. 권한 검증
-        MemberDepartment onVacationMemberDepartment = membersService.findDepartment(department);
-        validateMemberPermission(
-                loginMember, null,
-                onVacationMemberDepartment, VacationCrudType.READ_VACATION);
-
-        // 2. 해당 년, 월의 시작 날짜와 끝 날짜 설정
-        LocalDateTime startDate = DateTimeUtils.getStartDayOfMonth(year, month);
-        LocalDateTime endDate = DateTimeUtils.getEndDayOfMonth(year, month); // 다음 달 1일 바로 전
-
-        List<Vacations> vacationList = vacationsService.findVacationsOnMonth(startDate, endDate);
-
-        // 4. 결과를 DTO로 변환하여 반환
-        return VacationsConverter.toReadMonthDtoList(vacationList);
-    }
-
-    @Override
     @Transactional
     public VacationsResponseDto.UpdateOneDto updateOne(
             Long vacationId, Members loginMember, VacationsRequestDto.UpdateOneDto requestDto) {
@@ -244,20 +205,6 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 null, VacationCrudType.DELETE_VACATION);
 
         vacationsService.deleteById(vacationId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<VacationsResponseDto.ReadOneIsAcceptedDto> readIsAccepted(
-            Members loginMember, Boolean isAccepted) {
-        membersService.findHRManagerOrCEO(loginMember);
-
-        LocalDateTime tomorrow = DateTimeUtils.getTomorrow();
-
-        List<Vacations> isAcceptedVacationList
-                = vacationsService.findAllByIsAcceptedAndEndDay(isAccepted, tomorrow);
-
-        return VacationsConverter.toReadOneIsAcceptedDto(isAcceptedVacationList);
     }
 
     // 필터링된 휴가 관리 시스템 입장 시, 보이는 휴가 리스트

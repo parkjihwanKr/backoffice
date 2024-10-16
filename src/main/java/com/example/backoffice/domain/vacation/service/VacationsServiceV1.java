@@ -10,8 +10,6 @@ public interface VacationsServiceV1 {
 
     Vacations save(Vacations vacation);
 
-    List<Vacations> findVacationsOnDate(LocalDateTime startDate);
-
     List<Vacations> findVacationsOnMonth(LocalDateTime startDate, LocalDateTime endDate);
 
     List<Vacations> findAcceptedVacationByMemberIdAndDateRange(
@@ -32,9 +30,6 @@ public interface VacationsServiceV1 {
 
     Boolean existsVacationForMemberInDateRange(
             Long vacationId, Long memberId, LocalDateTime startDate, LocalDateTime endDate);
-
-    List<Vacations> findAllByIsAcceptedAndEndDay(
-            Boolean isAccepted, LocalDateTime startDate);
 
     List<Vacations> findFilteredVacationsOnMonth(
             LocalDateTime startDate, LocalDateTime endDate,

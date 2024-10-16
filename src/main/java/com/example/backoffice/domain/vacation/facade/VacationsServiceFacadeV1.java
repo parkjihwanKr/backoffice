@@ -16,12 +16,6 @@ public interface VacationsServiceFacadeV1 {
     VacationsResponseDto.ReadDayDto readDay(
             Long vacationId, Members loginMember);
 
-    List<VacationsResponseDto.ReadDayDto> readDayForAdmin(
-            String department, Long year, Long month, Long day, Members loginMember);
-
-    List<VacationsResponseDto.ReadMonthDto> readMonthForDepartmentAdmin(
-            String department, Long year, Long month, Members loginMember);
-
     VacationsResponseDto.UpdateOneDto updateOne(
             Long vacationId, Members loginMember,
             VacationsRequestDto.UpdateOneDto requestDto);
@@ -30,9 +24,6 @@ public interface VacationsServiceFacadeV1 {
             Long vacationId, Members loginMember);
 
     void deleteOne(Long vacationId, Members loginMember);
-
-    List<VacationsResponseDto.ReadOneIsAcceptedDto> readIsAccepted(
-            Members loginMember, Boolean isAccepted);
 
     List<VacationsResponseDto.ReadMonthDto> readForHrManager(
             Long year, Long month, Boolean isAccepted, Boolean urgent,

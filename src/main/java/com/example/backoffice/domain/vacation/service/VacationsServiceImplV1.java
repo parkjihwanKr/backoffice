@@ -32,12 +32,6 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
 
     @Override
     @Transactional
-    public List<Vacations> findVacationsOnDate(LocalDateTime startDate){
-        return vacationsRepository.findVacationsOnDate(startDate);
-    }
-
-    @Override
-    @Transactional
     public List<Vacations> findVacationsOnMonth(LocalDateTime startDate, LocalDateTime endDate){
         return vacationsRepository.findVacationsOnMonth(startDate, endDate);
     }
@@ -87,13 +81,6 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
             Long vacationId, Long memberId, LocalDateTime startDate, LocalDateTime endDate){
         return vacationsRepository.existsVacationForMemberInDateRange(
                 vacationId, memberId, startDate, endDate);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Vacations> findAllByIsAcceptedAndEndDay(
-            Boolean isAccepted, LocalDateTime startDate) {
-        return vacationsRepository.findAllByIsAccepted(isAccepted, startDate);
     }
 
     @Override
