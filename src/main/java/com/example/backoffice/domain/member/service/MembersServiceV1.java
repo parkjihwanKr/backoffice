@@ -4,6 +4,8 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -54,4 +56,14 @@ public interface MembersServiceV1 {
     Members findHRManagerOrCEO(Members member);
 
     MemberDepartment findDepartment(String department);
+
+    Page<Members> findAll(Pageable pageable);
+
+    Page<Members> findAllByDepartment(Pageable pageable, MemberDepartment department);
+
+    Page<Members> findAllByPosition(Pageable pageable, MemberPosition position);
+
+    Page<Members> findAllByDepartmentAndPosition(
+            MemberDepartment memberDepartment, MemberPosition position,
+            Pageable pageable);
 }

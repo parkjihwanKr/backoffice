@@ -11,6 +11,7 @@ import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.vacation.converter.VacationsConverter;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.Vacations;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,13 +73,29 @@ public class MembersConverter {
                 .email(member.getEmail())
                 .address(member.getAddress())
                 .memberName(member.getMemberName())
-                .role(member.getRole())
                 .position(member.getPosition())
                 .department(member.getDepartment())
+                .createdAt(member.getCreatedAt())
+                .modifiedAt(member.getModifiedAt())
+                .build();
+    }
+
+    public static MembersResponseDto.ReadOneDetailsDto toReadOneForDetailsDto(Members member){
+        return MembersResponseDto.ReadOneDetailsDto.builder()
+                .memberId(member.getId())
+                .email(member.getEmail())
+                .address(member.getAddress())
+                .memberName(member.getMemberName())
+                .salary(member.getSalary())
+                .position(member.getPosition())
+                .department(member.getDepartment())
+                .role(member.getRole())
                 .loveCount(member.getLoveCount())
                 .createdAt(member.getCreatedAt())
                 .modifiedAt(member.getModifiedAt())
                 .onVacation(member.getOnVacation())
+                .profileImageUrl(member.getProfileImageUrl())
+                .introduction(member.getIntroduction())
                 .remainingVacationDays(member.getRemainingVacationDays())
                 .build();
     }
@@ -147,6 +164,20 @@ public class MembersConverter {
                 .position(member.getPosition())
                 .remainingVacationDays(member.getRemainingVacationDays())
                 .vacationList(vacationResponseDtoList)
+                .build();
+    }
+
+    public static Page<MembersResponseDto.ReadOneDto> toReadDtoForHrManager(
+            Page<Members> memberPage){
+        return memberPage.map(MembersConverter::toReadOneDto);
+    }
+
+    public static MembersResponseDto.UpdateOneForVacationDto toUpdateOneForVacationDto(
+            Long toMemberId, String toMemberName, Integer toMemberVacationDays){
+        return MembersResponseDto.UpdateOneForVacationDto.builder()
+                .toMemberId(toMemberId)
+                .changeMemberVacationDays(toMemberVacationDays)
+                .toMemberName(toMemberName)
                 .build();
     }
 

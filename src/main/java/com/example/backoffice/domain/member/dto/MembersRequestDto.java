@@ -64,7 +64,6 @@ public class MembersRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateOneForAttributeDto {
-        @NotNull
         private String memberName;
         private String role;
         private String department;
@@ -94,8 +93,7 @@ public class MembersRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UpdateOneForVacationDaysDto {
-        // 잔여 휴가 일 수
+    public static class UpdateOneForVacationDto{
         private Integer vacationDays;
     }
 }

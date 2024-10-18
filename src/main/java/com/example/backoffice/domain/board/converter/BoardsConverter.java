@@ -15,7 +15,6 @@ import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
-import com.example.backoffice.domain.reaction.entity.Reactions;
 
 import java.util.ArrayList;
 import java.util.List;

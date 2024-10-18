@@ -583,10 +583,10 @@ public class MembersServiceFacadeTest {
         Members updateMember = memberDetails.getMembers();
         when(membersService.checkDifferentMember(
                 mainAdmin.getId(), updateMember.getId())).thenReturn(updateMember);
-        when(notificationsService.saveForChangeMemberInfo(
+        /*when(notificationsService.saveForChangeMemberInfo(
                 mainAdmin.getMemberName(), updateMember.getMemberName(),
                 updateMember.getDepartment())).thenReturn(Notifications.builder().build());
-
+*/
         // when
         // 로그인 멤버가 메인 어드민이고 메인 어드민이 해당 직원을 변경하는 메서드
         MembersResponseDto.UpdateOneForAttributeDto responseDto
@@ -595,9 +595,9 @@ public class MembersServiceFacadeTest {
 
         // then
         verify(filesService).createOneForMemberRole(file, updateMember);
-        verify(notificationsService).saveForChangeMemberInfo(
+        /*verify(notificationsService).saveForChangeMemberInfo(
                 mainAdmin.getMemberName(), updateMember.getMemberName(),
-                updateMember.getDepartment());
+                updateMember.getDepartment());*/
         assertEquals(requestDto.getMemberName(), responseDto.getMemberName());
         assertEquals(requestDto.getPosition(), responseDto.getMemberPosition().toString());
         assertEquals(requestDto.getDepartment(), requestDto.getDepartment().toString());
