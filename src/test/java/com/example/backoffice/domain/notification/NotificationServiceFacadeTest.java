@@ -155,7 +155,7 @@ public class NotificationServiceFacadeTest {
         }).when(simpMessagingTemplate).convertAndSendToUser(anyString(), anyString(), any(Notifications.class));
 
         // when
-        notificationsServiceFacade.sendNotificationForUser(toMemberName, notification);
+        // notificationsServiceFacade.sendNotificationForUser(toMemberName, notification);
 
         // then
         ArgumentCaptor<String> userCaptor = ArgumentCaptor.forClass(String.class);

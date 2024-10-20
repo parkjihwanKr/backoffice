@@ -77,6 +77,7 @@ public class MemberAspect {
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForAttribute(..))")
     public void logAfterUpdateMemberAttribute(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
+
         MembersRequestDto.UpdateOneForAttributeDto requestDto =
                 (MembersRequestDto.UpdateOneForAttributeDto) joinPoint.getArgs()[2];
 

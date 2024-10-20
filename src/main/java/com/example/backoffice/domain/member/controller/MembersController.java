@@ -7,11 +7,17 @@ import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -28,14 +34,26 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/members/{memberId}/profile")
-    public ResponseEntity<MembersResponseDto.ReadOneDto> readOne(
+    @GetMapping("/members/{memberId}")
+    public ResponseEntity<MembersResponseDto.ReadOneDetailsDto> readOne(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        MembersResponseDto.ReadOneDto responseDto
+        MembersResponseDto.ReadOneDetailsDto responseDto
                 = membersServiceFacade.readOne(
                         memberId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/admin/members/filtered")
+    public ResponseEntity<Page<MembersResponseDto.ReadOneDto>> readForHrManager(
+            @RequestParam(required = false) String department,
+            @RequestParam(required = false) String position,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 10) Pageable pageable){
+        Page<MembersResponseDto.ReadOneDto> responseDtoList
+                = membersServiceFacade.readForHrManager(
+                        department, position, memberDetails.getMembers(), pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     @PatchMapping("/members/{memberId}/profile")
@@ -50,14 +68,12 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 부서, 권한, 직위를 전부 다 바꿀 수 있게 하는건? -> null이여도 상관없게
-    // @ModelAttribute 사용하기
     @PatchMapping("/members/{memberId}/attribute")
     public ResponseEntity<CommonResponse<MembersResponseDto.UpdateOneForAttributeDto>> updateOneForAttribute(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") MembersRequestDto.UpdateOneForAttributeDto requestDto,
-            @RequestPart(value = "file") MultipartFile multipartFile){
+            @RequestPart(value = "file", required = false) MultipartFile multipartFile){
         MembersResponseDto.UpdateOneForAttributeDto responseDto =
                 membersServiceFacade.updateOneForAttribute(
                         memberId, memberDetails.getMembers(), requestDto, multipartFile);
@@ -115,6 +131,17 @@ public class MembersController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         MembersResponseDto.ReadOneForVacationListDto responseDto
                 = membersServiceFacade.readOneForVacationList(memberId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @PatchMapping("/members/{memberId}/vacations")
+    public ResponseEntity<MembersResponseDto.UpdateOneForVacationDto> updateOneForVacation(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody MembersRequestDto.UpdateOneForVacationDto requestDto){
+        MembersResponseDto.UpdateOneForVacationDto responseDto
+                = membersServiceFacade.updateOneForVacation(
+                        memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }

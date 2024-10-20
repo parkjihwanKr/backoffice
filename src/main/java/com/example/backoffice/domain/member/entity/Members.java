@@ -50,6 +50,7 @@ public class Members extends CommonEntity {
 
     private String profileImageUrl;
 
+    @Column(length = 500)
     private String introduction;
 
     private Long loveCount;
@@ -135,6 +136,10 @@ public class Members extends CommonEntity {
 
     public void minusRemainingVacation(int vacationDay){
         this.remainingVacationDays -= vacationDay;
+    }
+
+    public void updateRemainingVacationDays (int vacationDay){
+        this.remainingVacationDays = vacationDay;
     }
 
     public void updateRemainingVacationYearly(){

@@ -1,6 +1,8 @@
 package com.example.backoffice.domain.notification.service;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.notification.entity.NotificationData;
+import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.entity.Notifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,5 +27,11 @@ public interface NotificationsServiceV1 {
     Notifications findById(String notificationId);
 
     Notifications saveForChangeMemberInfo(
-            String fromMemberName, String toMemberName, MemberDepartment fromMemberDepartment);
+            String fromMemberName, String toMemberName,
+            MemberDepartment fromMemberDepartment, String message);
+
+    void sendNotificationForUser(String toMemberName, Notifications notification);
+
+    Notifications generateMessageAndEntity(
+            NotificationData notificationData, NotificationType domainType);
 }

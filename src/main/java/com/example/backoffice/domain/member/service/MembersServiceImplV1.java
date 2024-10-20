@@ -10,6 +10,8 @@ import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.repository.MembersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -167,5 +169,27 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     public MemberDepartment findDepartment(String department){
         return MembersConverter.toDepartment(department);
+    }
+
+    @Override
+    public Page<Members> findAllByDepartmentAndPosition(
+            MemberDepartment department, MemberPosition position,
+            Pageable pageable){
+        return membersRepository.findAllByDepartmentAndPosition(department, position, pageable);
+    }
+
+    @Override
+    public Page<Members> findAll(Pageable pageable){
+        return membersRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Members> findAllByDepartment(Pageable pageable, MemberDepartment department){
+        return membersRepository.findAllByDepartment(pageable, department);
+    }
+
+    @Override
+    public Page<Members> findAllByPosition(Pageable pageable, MemberPosition position){
+        return membersRepository.findAllByPosition(pageable, position);
     }
 }

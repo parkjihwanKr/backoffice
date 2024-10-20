@@ -39,14 +39,32 @@ public class MembersResponseDto {
         private String memberName;
         private String email;
         private String address;
-        private MemberRole role;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+        private MemberDepartment department;
+        private MemberPosition position;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneDetailsDto {
+        private Long memberId;
+        private String memberName;
+        private String email;
+        private String address;
         private Long loveCount;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
         private Boolean onVacation;
         private Integer remainingVacationDays;
+        private Long salary;
+        private String profileImageUrl;
+        private String introduction;
         private MemberDepartment department;
         private MemberPosition position;
+        private MemberRole role;
     }
 
     @Getter
@@ -130,5 +148,15 @@ public class MembersResponseDto {
         private MemberPosition position;
         private Integer remainingVacationDays;
         private List<VacationsResponseDto.ReadDayDto> vacationList;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForVacationDto {
+        private Long toMemberId;
+        private String toMemberName;
+        private Integer changeMemberVacationDays;
     }
 }

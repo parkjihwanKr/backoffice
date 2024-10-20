@@ -21,6 +21,8 @@ import com.example.backoffice.global.scheduler.ScheduledEventType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,11 +94,54 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public MembersResponseDto.ReadOneDto readOne(
+    public MembersResponseDto.ReadOneDetailsDto readOne(
             Long memberId, Members loginMember){
-        Members matchedMember = matchLoginMember(loginMember, memberId);
-        return MembersConverter.toReadOneDto(matchedMember);
+        // 1. 멤버가 자기 자신인 경우
+        if(memberId.equals(loginMember.getId())){
+            return MembersConverter.toReadOneForDetailsDto(loginMember);
+        }
+        // 2. 멤버가 자기 자신이 아닌데, 인사 관리를 위해 조회하는 경우
+        membersService.findHRManagerOrCEO(loginMember);
+        Members foundMember = membersService.findById(memberId);
+        return MembersConverter.toReadOneForDetailsDto(foundMember);
     }
+
+    @Override
+    @Transactional
+    public Page<MembersResponseDto.ReadOneDto> readForHrManager(
+            String department, String position,
+            Members loginMember, Pageable pageable) {
+        System.out.println(department + " "+ position);
+
+        // 1. 로그인 멤버가 HR MANAGER 또는 CEO인지 확인
+        membersService.findHRManagerOrCEO(loginMember);
+
+        // 2. 부서와 직위에 따른 필터링 준비
+        // ** null -> all과 같은 개념으로 선택되지 않으면 모든 department, position의 값을 부르기 위해
+        MemberDepartment memberDepartment = department != null ? MembersConverter.toDepartment(department) : null;
+        MemberPosition memberPosition = position != null ? MembersConverter.toPosition(position) : null;
+
+        // 3. 필터링된 멤버 리스트를 pageable 적용하여 가져오기
+        Page<Members> pagedMemberList;
+
+        if (memberDepartment == null && memberPosition == null) {
+            // 부서와 직위가 모두 없을 경우, 모든 멤버를 조회
+            pagedMemberList = membersService.findAll(pageable);
+        } else if (memberDepartment == null) {
+            // 직위만 있을 경우, 직위로 필터링된 멤버 조회
+            pagedMemberList = membersService.findAllByPosition(pageable, memberPosition);
+        } else if (memberPosition == null) {
+            // 부서만 있을 경우, 부서로 필터링된 멤버 조회
+            pagedMemberList = membersService.findAllByDepartment(pageable, memberDepartment);
+        } else {
+            // 부서와 직위가 모두 있을 경우, 둘 다로 필터링된 멤버 조회
+            pagedMemberList = membersService.findAllByDepartmentAndPosition(memberDepartment, memberPosition, pageable);
+        }
+
+        // 4. 페이지화된 멤버 리스트를 DTO로 변환하여 반환
+        return MembersConverter.toReadDtoForHrManager(pagedMemberList);
+    }
+
 
     @Override
     @Transactional
@@ -156,6 +201,10 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
                 && loginMember.getDepartment().equals(MemberDepartment.HR);
         boolean isMainAdmin = loginMember.getPosition().equals(MemberPosition.CEO);
 
+        System.out.println("requestDto : "+requestDto.getRole());
+        System.out.println("requestDto : "+requestDto.getDepartment());
+        System.out.println("requestDto : "+requestDto.getMemberName());
+        System.out.println("requestDto : "+requestDto.getPosition());
         // 메인 어드민이 아닌 경우에 대한 처리
         if (!isMainAdmin) {
             // HR Manager일 경우의 권한 제한
@@ -186,9 +235,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         updateMember.updateAttribute(
                 role, department, position);
 
+        String message = loginMember.getMemberName()+"님이 "
+                + updateMember.getMemberName()+"님의 직책을 변경하셨습니다.";
         notificationsService.saveForChangeMemberInfo(
                 loginMember.getMemberName(), updateMember.getMemberName(),
-                updateMember.getDepartment());
+                updateMember.getDepartment(), message);
 
         return MembersConverter.toUpdateOneForAttributeDto(updateMember, document);
     }
@@ -211,9 +262,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
             updateMember.updateSalary(requestDto.getSalary());
 
+            String message = loginMember.getMemberName() + "님이 "
+                    + updateMember.getMemberName() + "님의 급여를 변경하셨습니다.";
             notificationsService.saveForChangeMemberInfo(
                     loginMember.getMemberName(), updateMember.getMemberName(),
-                    updateMember.getDepartment());
+                    updateMember.getDepartment(), message);
 
             return MembersConverter.toUpdateOneForSalaryDto(updateMember);
         }else{
@@ -270,6 +323,32 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
                 = vacationsService.findAllByMemberIdAndStartDate(memberId, today);
 
         return MembersConverter.toReadOneForVacationList(loginMember, memberVacationList);
+    }
+
+    @Override
+    @Transactional
+    public MembersResponseDto.UpdateOneForVacationDto updateOneForVacation(
+            Long memberId, Members loginMember,
+            MembersRequestDto.UpdateOneForVacationDto requestDto){
+        Members hrManager = membersService.findHRManagerOrCEO(loginMember);
+        Members toMember = membersService.findById(memberId);
+
+        if(requestDto.getVacationDays() > 15){
+            throw new MembersCustomException(MembersExceptionCode.VACATION_EXCEEDS_LIMIT);
+        }else if(requestDto.getVacationDays() > 0){
+            toMember.updateRemainingVacationDays(requestDto.getVacationDays());
+        }else {
+            throw new MembersCustomException(MembersExceptionCode.VACATION_UNDER_ZERO);
+        }
+
+        String message = hrManager.getMemberName() + "님이 "
+                + toMember.getMemberName() + "님의 휴가 정보를 변경하셨습니다.";
+        notificationsService.saveForChangeMemberInfo(
+                hrManager.getMemberName(), toMember.getMemberName(),
+                toMember.getDepartment(), message);
+
+        return MembersConverter.toUpdateOneForVacationDto(
+                toMember.getId(), toMember.getMemberName(), toMember.getRemainingVacationDays());
     }
 
     @Override

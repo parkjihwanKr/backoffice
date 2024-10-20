@@ -17,7 +17,6 @@ import com.example.backoffice.domain.notification.service.NotificationsServiceV1
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,27 +28,22 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
 
     private final NotificationsServiceV1 notificationsService;
     private final MembersServiceFacadeV1 membersServiceFacade;
-    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
     @Transactional
     public void createOne(
             NotificationData notificationData, NotificationType domainType){
-        // 자기 자신에게 '사랑해요' -> 이미 ReactionException으로 막혀 있음.
-        // 자기 자신의 게시글, 댓글, 대댓글의 '좋아요'는 할 수 있되
-        // 알림은 저장하지 않고 자기 자신의 알림에 뜨지 않기에 return null
         if(notificationData.getToMember().getMemberName()
                 .equals(notificationData.getFromMember().getMemberName())){
             return;
         }
 
         Notifications notification
-                = generateMessageAndEntity(notificationData, domainType);
+                = notificationsService.generateMessageAndEntity(notificationData, domainType);
         notificationsService.save(notification);
 
-        sendNotificationForUser(
+        notificationsService.sendNotificationForUser(
                 notificationData.getToMember().getMemberName(), notification);
-        //System.out.println("sendNotificationForUser method executed..");
     }
 
     @Override
@@ -136,10 +130,10 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                 notificationsService.save(notification);
                 memberDepartmentSet.add(memberDepartment);
                 notificationList.add(notification);
-                sendNotificationForUser(memberName, notification);
+                notificationsService.sendNotificationForUser(memberName, notification);
             }
         });
-        System.out.println("code end!");
+
         // 해당 memberRoleList 테스트 후, 설정 예정
         /*NotificationsResponseDto.CreateForAdminDto responseDto
                 = NotificationsConverter.toCreateForAdminDto(
@@ -211,109 +205,5 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
         notificationsService.saveAll(notificationList);
 
         return NotificationsConverter.toReadAllDto(notificationList);
-    }
-
-    private Notifications generateMessageAndEntity(
-            NotificationData notificationData, NotificationType domainType){
-        return switch (domainType) {
-            case MEMBER -> {
-                String memberMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 '사랑해요' 이모티콘을 사용하셨습니다.";
-                yield toEntity(notificationData, memberMessage, domainType);
-            }
-            case BOARD -> {
-                String boardMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 게시글 " + notificationData.getBoard().getTitle()
-                        + "에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield toEntity(notificationData, boardMessage, domainType);
-            }
-            case COMMENT -> {
-                String commentMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 게시글 " + notificationData.getBoard().getTitle()
-                        + "의 댓글 '" + notificationData.getComment().getContent()
-                        + "'에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield toEntity(notificationData, commentMessage, domainType);
-            }
-            case REPLY -> {
-                String replyMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 게시글 " + notificationData.getComment().getBoard().getTitle()
-                        + "의 댓글 '" + notificationData.getReply().getContent()
-                        + "'에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield toEntity(notificationData, replyMessage, domainType);
-            }
-            case EVENT -> {
-                String eventMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 "+ notificationData.getEvent().getTitle()
-                        + "에 대한 일정을 등록하셨습니다.";
-                yield toEntity(notificationData, eventMessage, domainType);
-            }
-            case URGENT_VACATION -> {
-                String urgentVacationMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 긴급하게 휴가를 요청하셨습니다.";
-                yield toEntity(notificationData, urgentVacationMessage, domainType);
-            }
-            case URGENT_SERVER_ERROR -> {
-                String urgentServerIssueMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 긴급하게 서버 이슈 메세지를 전달하셨습니다. //"
-                        + notificationData.getMessage();
-                yield toEntity(notificationData, urgentServerIssueMessage, domainType);
-            }
-            case EVALUATION -> {
-                String evaluationMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 "
-                        + notificationData.getMessage()
-                        + " 작성 요청 알림입니다.";
-                yield toEntity(notificationData, evaluationMessage, domainType);
-            }
-            case UPDATE_EVALUATION -> {
-                // "설문 조사 마감 7일 전입니다. 신속히 마무리 해주시길 바랍니다."
-                String evaluationMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 "
-                        + notificationData.getMessage();
-                yield toEntity(notificationData, evaluationMessage, domainType);
-            }
-            case UPDATE_VACATION_PERIOD -> {
-                String updateVacationPeriodMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 "
-                        + notificationData.getMessage();
-                yield toEntity(notificationData, updateVacationPeriodMessage, domainType);
-            }
-            case IS_ACCEPTED_VACATION -> {
-                String updateIsAcceptedMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 "
-                        + notificationData.getMessage();
-                yield toEntity(notificationData, updateIsAcceptedMessage, domainType);
-            }
-            case DELETE_VACATION_FOR_ADMIN -> {
-                String deleteVacationMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님께서 밑과 같은 사유로 휴가를 삭제하셨습니다."
-                        + notificationData.getMessage();
-                yield toEntity(notificationData, deleteVacationMessage, domainType);
-            }
-            default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);
-        };
-    }
-
-    public void sendNotificationForUser(String toMemberName, Notifications notification){
-        simpMessagingTemplate.convertAndSendToUser(toMemberName, "/queue/notifications", notification);
-    }
-
-    private Notifications toEntity(NotificationData notificationData, String message, NotificationType domainType){
-        return NotificationsConverter.toEntity(
-                notificationData.getFromMember().getMemberName(),
-                notificationData.getToMember().getMemberName(),
-                message, domainType, notificationData.getFromMember().getDepartment());
     }
 }
