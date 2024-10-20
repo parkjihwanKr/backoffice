@@ -68,8 +68,6 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 부서, 권한, 직위를 전부 다 바꿀 수 있게 하는건? -> null이여도 상관없게
-    // @ModelAttribute 사용하기
     @PatchMapping("/members/{memberId}/attribute")
     public ResponseEntity<CommonResponse<MembersResponseDto.UpdateOneForAttributeDto>> updateOneForAttribute(
             @PathVariable Long memberId,
