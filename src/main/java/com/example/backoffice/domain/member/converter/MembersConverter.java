@@ -33,7 +33,7 @@ public class MembersConverter {
                 .position(MemberPosition.CEO)
                 .remainingVacationDays(4)
                 .onVacation(false)
-                .salary(20000000L)
+                .salary(200000000L)
                 .build();
     }
     public static Members toEntity(
@@ -73,6 +73,7 @@ public class MembersConverter {
                 .email(member.getEmail())
                 .address(member.getAddress())
                 .memberName(member.getMemberName())
+                .salary(member.getSalary())
                 .position(member.getPosition())
                 .department(member.getDepartment())
                 .createdAt(member.getCreatedAt())

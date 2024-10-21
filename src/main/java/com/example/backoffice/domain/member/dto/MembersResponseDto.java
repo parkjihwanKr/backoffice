@@ -39,6 +39,7 @@ public class MembersResponseDto {
         private String memberName;
         private String email;
         private String address;
+        private Long salary;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
         private MemberDepartment department;
