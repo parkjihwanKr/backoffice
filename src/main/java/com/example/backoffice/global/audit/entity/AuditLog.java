@@ -22,6 +22,7 @@ public class AuditLog{
     @Id
     private String id;
 
+    @Field("audit_log_type")
     private AuditLogType auditLogType;
 
     @Field("member_name")

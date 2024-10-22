@@ -28,13 +28,13 @@ public class AuditLogCustomRepositoryImpl implements AuditLogCustomRepository {
         Query query = new Query();
 
         if (memberName != null) {
-            query.addCriteria(Criteria.where("memberName").is(memberName));
+            query.addCriteria(Criteria.where("member_name").is(memberName));
         }
         if (auditType != null) {
-            query.addCriteria(Criteria.where("auditType").is(auditType));
+            query.addCriteria(Criteria.where("audit_log_type").is(auditType));
         }
         if (startDate != null && endDate != null) {
-            query.addCriteria(Criteria.where("date").gte(startDate).lte(endDate));
+            query.addCriteria(Criteria.where("created_at").gte(startDate).lte(endDate));
         }
 
         // Pageable 처리
