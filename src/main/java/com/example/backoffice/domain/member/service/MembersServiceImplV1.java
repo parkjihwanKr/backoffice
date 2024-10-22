@@ -198,12 +198,23 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Transactional(readOnly = true)
     public Members findAuditManagerOrCeo(Long memberId){
         Members foundMember = findById(memberId);
-        if(foundMember.getPosition().equals(MemberPosition.CEO)){
-            return foundMember;
-        }else if(foundMember.getPosition().equals(MemberPosition.MANAGER)
-                && foundMember.getDepartment().equals(MemberDepartment.AUDIT)){
+        if(foundMember.getPosition().equals(MemberPosition.CEO)
+                || foundMember.getPosition().equals(MemberPosition.MANAGER)
+                && foundMember.getDepartment().equals(MemberDepartment.AUDIT)) {
             return foundMember;
         }
-        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+        throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByFinanceManagerOrCeo(Long memberId) {
+        Members foundMember = findById(memberId);
+        if(foundMember.getPosition().equals(MemberPosition.CEO)
+                || foundMember.getPosition().equals(MemberPosition.MANAGER)
+                && foundMember.getDepartment().equals(MemberDepartment.FINANCE)){
+            return foundMember;
+        }
+        throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
     }
 }
