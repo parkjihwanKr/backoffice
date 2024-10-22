@@ -1,11 +1,12 @@
+package com.example.backoffice.global.audit.repository;
+
 import com.example.backoffice.global.audit.entity.AuditLog;
 import com.example.backoffice.global.audit.entity.AuditLogType;
-import com.example.backoffice.global.audit.repository.AuditLogCustomRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.time.LocalDateTime;
