@@ -37,6 +37,7 @@ public enum GlobalExceptionCode {
 
     // AuditLog
     NOT_FOUND_AUDIT_LOG(HttpStatus.BAD_REQUEST, "AUDIT_LOG-001", "해당 감사 로그를 찾을 수 없습니다."),
+    NOT_MATCHED_AUDIT_LOG_TYPE(HttpStatus.BAD_REQUEST, "AUDIT-LOG-002", "해당 감사 로그 타입을 찾을 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

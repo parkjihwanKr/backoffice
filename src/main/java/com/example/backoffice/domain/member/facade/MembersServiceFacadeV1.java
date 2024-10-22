@@ -67,8 +67,6 @@ public interface MembersServiceFacadeV1 {
 
     List<Members> findAllByDepartment(String department);
 
-    List<Members> findAllByPosition(String position);
-
     Members findHRManager();
 
     Members findByMemberName(String memberName);

@@ -431,13 +431,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Members> findAllByPosition(String position){
-        MemberPosition memberPosition = MembersConverter.toPosition(position);
-        return membersService.findAllByPosition(memberPosition);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Members findByMemberName(String memberName){
         return membersService.findByMemberName(memberName);
     }

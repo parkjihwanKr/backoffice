@@ -136,8 +136,9 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Members> findAllByPosition(MemberPosition position){
-        return membersRepository.findAllByPosition(position);
+    public List<Members> findAllByPosition(String position){
+        MemberPosition memberPosition = MembersConverter.toPosition(position);
+        return membersRepository.findAllByPosition(memberPosition);
     }
 
     @Override
@@ -191,5 +192,18 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     public Page<Members> findAllByPosition(Pageable pageable, MemberPosition position){
         return membersRepository.findAllByPosition(pageable, position);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findAuditManagerOrCeo(Long memberId){
+        Members foundMember = findById(memberId);
+        if(foundMember.getPosition().equals(MemberPosition.CEO)){
+            return foundMember;
+        }else if(foundMember.getPosition().equals(MemberPosition.MANAGER)
+                && foundMember.getDepartment().equals(MemberDepartment.AUDIT)){
+            return foundMember;
+        }
+        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
     }
 }
