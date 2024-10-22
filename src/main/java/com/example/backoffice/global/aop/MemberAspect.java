@@ -30,10 +30,6 @@ public class MemberAspect {
     @AfterThrowing : 메서드가 예외 처리가 된 후
     */
 
-    // 로그인, 로그아웃 로직은 직접 로깅 -> private, protected 메서드이기에
-    // 해당 방법이 일관성, 가독성을 떨어트리고 유지 보수까지 엉망으로 한다는 것 앎.
-    // AOP를 지울 지 고민 중.
-
     // JoinPoint @Param MembersRequestDto.CreateMembersRequestDto requestDto
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.createOneForSignup(..))")
     public void logAfterSignup(JoinPoint joinPoint) {

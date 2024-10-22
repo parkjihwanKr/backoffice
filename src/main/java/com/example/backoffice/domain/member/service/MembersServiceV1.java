@@ -45,7 +45,7 @@ public interface MembersServiceV1 {
 
     List<Members> findAllByDepartment(MemberDepartment department);
 
-    List<Members> findAllByPosition(MemberPosition position);
+    List<Members> findAllByPosition(String position);
 
     List<Members> findAllExceptLoginMember(Long exceptMemberId);
 
@@ -66,4 +66,6 @@ public interface MembersServiceV1 {
     Page<Members> findAllByDepartmentAndPosition(
             MemberDepartment memberDepartment, MemberPosition position,
             Pageable pageable);
+
+    Members findAuditManagerOrCeo(Long memberId);
 }

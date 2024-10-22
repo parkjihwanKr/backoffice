@@ -445,8 +445,8 @@ public class MembersServiceTest {
         when(membersRepository.findAllByPosition(MemberPosition.INTERN))
                 .thenReturn(List.of(memberThree, memberFour));
         // when
-        List<Members> samePositionMemberList
-                = membersService.findAllByPosition(MemberPosition.INTERN);
+        List<Members> samePositionMemberList = null;
+                /*= membersService.findAllByPosition(MemberPosition.INTERN);*/
 
         // then
         assertEquals(samePositionMemberList.size(), 2);
