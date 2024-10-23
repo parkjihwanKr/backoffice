@@ -64,7 +64,7 @@ public class ExpenseServiceImplV1 implements ExpenseServiceV1{
 
         // financeManger가 없으면 null을 출력
         Members financeManger = membersService.findByFinanceManager();
-        NotificationData notificationData = null;
+        NotificationData notificationData;
         String message
                 = loginMember.getDepartment().getDepartment()
                 +"부서의 지출 내역서 승인 요청";
