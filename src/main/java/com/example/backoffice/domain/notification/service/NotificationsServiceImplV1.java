@@ -1,6 +1,10 @@
 package com.example.backoffice.domain.notification.service;
 
+import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.comment.entity.Comments;
+import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
@@ -92,21 +96,23 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
     }
 
     @Override
-    public Notifications generateMessageAndEntity(
+    public void generateEntityAndSendMessage(
             NotificationData notificationData, NotificationType domainType){
-        return switch (domainType) {
+        Notifications notification = switch (domainType) {
             case MEMBER -> {
                 String memberMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 '사랑해요' 이모티콘을 사용하셨습니다.";
-                yield toEntity(notificationData, memberMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, memberMessage, domainType));
             }
             case BOARD -> {
                 String boardMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 게시글 " + notificationData.getBoard().getTitle()
                         + "에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield toEntity(notificationData, boardMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, boardMessage, domainType));
             }
             case COMMENT -> {
                 String commentMessage
@@ -114,7 +120,8 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                         + "님께서 게시글 " + notificationData.getBoard().getTitle()
                         + "의 댓글 '" + notificationData.getComment().getContent()
                         + "'에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield toEntity(notificationData, commentMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, commentMessage, domainType));
             }
             case REPLY -> {
                 String replyMessage
@@ -122,27 +129,31 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                         + "님께서 게시글 " + notificationData.getComment().getBoard().getTitle()
                         + "의 댓글 '" + notificationData.getReply().getContent()
                         + "'에 '좋아요' 이모티콘을 사용하셨습니다.";
-                yield toEntity(notificationData, replyMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, replyMessage, domainType));
             }
             case EVENT -> {
                 String eventMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 "+ notificationData.getEvent().getTitle()
                         + "에 대한 일정을 등록하셨습니다.";
-                yield toEntity(notificationData, eventMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, eventMessage, domainType));
             }
             case URGENT_VACATION -> {
                 String urgentVacationMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 긴급하게 휴가를 요청하셨습니다.";
-                yield toEntity(notificationData, urgentVacationMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, urgentVacationMessage, domainType));
             }
             case URGENT_SERVER_ERROR -> {
                 String urgentServerIssueMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 긴급하게 서버 이슈 메세지를 전달하셨습니다. //"
                         + notificationData.getMessage();
-                yield toEntity(notificationData, urgentServerIssueMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, urgentServerIssueMessage, domainType));
             }
             case EVALUATION -> {
                 String evaluationMessage
@@ -150,7 +161,8 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                         + "님께서 "
                         + notificationData.getMessage()
                         + " 작성 요청 알림입니다.";
-                yield toEntity(notificationData, evaluationMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, evaluationMessage, domainType));
             }
             case UPDATE_EVALUATION -> {
                 // "설문 조사 마감 7일 전입니다. 신속히 마무리 해주시길 바랍니다."
@@ -158,32 +170,54 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 "
                         + notificationData.getMessage();
-                yield toEntity(notificationData, evaluationMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, evaluationMessage, domainType));
             }
             case UPDATE_VACATION_PERIOD -> {
                 String updateVacationPeriodMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 "
                         + notificationData.getMessage();
-                yield toEntity(notificationData, updateVacationPeriodMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, updateVacationPeriodMessage, domainType));
             }
             case IS_ACCEPTED_VACATION -> {
                 String updateIsAcceptedMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 "
                         + notificationData.getMessage();
-                yield toEntity(notificationData, updateIsAcceptedMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, updateIsAcceptedMessage, domainType));
             }
             case DELETE_VACATION_FOR_ADMIN -> {
                 String deleteVacationMessage
                         = notificationData.getFromMember().getMemberName()
                         + "님께서 밑과 같은 사유로 휴가를 삭제하셨습니다."
                         + notificationData.getMessage();
-                yield toEntity(notificationData, deleteVacationMessage, domainType);
+                yield notificationRepository.save(
+                        toEntity(notificationData, deleteVacationMessage, domainType));
             }
-            default -> throw new NotificationsCustomException(NotificationsExceptionCode.NOT_MATCHED_REACTION_TYPE);
+            case CREATE_EXPENSE_REPORT, UPDATE_EXPENSE_REPORT_STATUS-> {
+                String expenseReportMessage
+                        = notificationData.getMessage();
+                yield notificationRepository.save(
+                        toEntity(notificationData, expenseReportMessage, domainType));
+            }
+            default -> throw new NotificationsCustomException(
+                    NotificationsExceptionCode.NOT_MATCHED_NOTIFICATION_TYPE);
         };
+        sendNotificationForUser(
+                notificationData.getToMember().getMemberName(), notification);
     }
+
+    @Override
+    public NotificationData toNotificationData(
+            Members toMember, Members fromMember, Boards board,
+            Comments comment, Comments reply, Events event, String message){
+        return NotificationsConverter.toNotificationData(
+                toMember, fromMember, board, comment, reply, event, message);
+    }
+
 
     private Notifications toEntity(NotificationData notificationData, String message, NotificationType domainType){
         return NotificationsConverter.toEntity(

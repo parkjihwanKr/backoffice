@@ -70,4 +70,8 @@ public interface MembersServiceV1 {
     Members findAuditManagerOrCeo(Long memberId);
 
     Members findByFinanceManagerOrCeo(Long memberId);
+
+    Members findByFinanceManager();
+
+    Members findDepartmentManager(MemberDepartment department);
 }

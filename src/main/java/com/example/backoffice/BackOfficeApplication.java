@@ -25,7 +25,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 				"com.example.backoffice.domain.file.repository",
 				"com.example.backoffice.domain.member.repository",
 				"com.example.backoffice.domain.reaction.repository",
-				"com.example.backoffice.domain.vacation.repository"
+				"com.example.backoffice.domain.vacation.repository",
+				"com.example.backoffice.domain.expense.repository"
 		})
 @EnableMongoRepositories(
 		basePackages = {
