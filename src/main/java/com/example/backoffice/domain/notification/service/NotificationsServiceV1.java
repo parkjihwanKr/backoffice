@@ -1,6 +1,10 @@
 package com.example.backoffice.domain.notification.service;
 
+import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.comment.entity.Comments;
+import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.entity.Notifications;
@@ -32,6 +36,10 @@ public interface NotificationsServiceV1 {
 
     void sendNotificationForUser(String toMemberName, Notifications notification);
 
-    Notifications generateMessageAndEntity(
+    void generateEntityAndSendMessage(
             NotificationData notificationData, NotificationType domainType);
+
+    NotificationData toNotificationData(
+            Members toMember, Members fromMember, Boards board,
+            Comments comment, Comments reply, Events event, String message);
 }

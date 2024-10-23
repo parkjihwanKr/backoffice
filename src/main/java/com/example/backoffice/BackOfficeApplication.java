@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 		basePackages = {
 				"com.example.backoffice.domain.memberAnswer.repository",
 				"com.example.backoffice.domain.answer.repository",
+				"com.example.backoffice.domain.asset.repository",
 				"com.example.backoffice.domain.question.repository",
 				"com.example.backoffice.domain.memberEvaluation.repository",
 				"com.example.backoffice.domain.evaluation.repository",
@@ -23,8 +25,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 				"com.example.backoffice.domain.file.repository",
 				"com.example.backoffice.domain.member.repository",
 				"com.example.backoffice.domain.reaction.repository",
-				"com.example.backoffice.domain.vacation.repository"
+				"com.example.backoffice.domain.vacation.repository",
+				"com.example.backoffice.domain.expense.repository"
 		})
+@EnableMongoRepositories(
+		basePackages = {
+				"com.example.backoffice.global.audit.repository",
+				"com.example.backoffice.domain.notification.repository"
+		}, mongoTemplateRef = "mongoTemplate")
+
 public class BackOfficeApplication {
 
 	public static void main(String[] args) {

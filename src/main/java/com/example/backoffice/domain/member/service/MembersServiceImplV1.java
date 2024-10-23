@@ -104,9 +104,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     @Transactional(readOnly = true)
     public Members findHRManager(){
-        return membersRepository.findByPositionAndDepartment(
-                MemberPosition.MANAGER, MemberDepartment.HR).orElseThrow(
-                        () -> new MembersCustomException(MembersExceptionCode.NOT_FOUND_HR_MANAGER));
+        return findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.HR);
     }
 
     @Override
@@ -198,12 +196,44 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Transactional(readOnly = true)
     public Members findAuditManagerOrCeo(Long memberId){
         Members foundMember = findById(memberId);
-        if(foundMember.getPosition().equals(MemberPosition.CEO)){
-            return foundMember;
-        }else if(foundMember.getPosition().equals(MemberPosition.MANAGER)
-                && foundMember.getDepartment().equals(MemberDepartment.AUDIT)){
+        if(foundMember.getPosition().equals(MemberPosition.CEO)
+                || foundMember.getPosition().equals(MemberPosition.MANAGER)
+                && foundMember.getDepartment().equals(MemberDepartment.AUDIT)) {
             return foundMember;
         }
-        throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+        throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByFinanceManagerOrCeo(Long memberId) {
+        Members foundMember = findById(memberId);
+        if(foundMember.getPosition().equals(MemberPosition.CEO)
+                || foundMember.getPosition().equals(MemberPosition.MANAGER)
+                && foundMember.getDepartment().equals(MemberDepartment.FINANCE)){
+            return foundMember;
+        }
+        return null;
+    }
+
+    // 존재하지 않다면 ceo를 찾아야함
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByFinanceManager(){
+        return membersRepository.findByPositionAndDepartment(
+                MemberPosition.MANAGER, MemberDepartment.FINANCE).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findDepartmentManager(MemberDepartment department){
+        return findByPositionAndDepartment(MemberPosition.MANAGER, department);
+    }
+
+    private Members findByPositionAndDepartment(
+            MemberPosition position, MemberDepartment department){
+        return membersRepository.findByPositionAndDepartment(
+                position, department).orElseThrow(
+                        ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 }

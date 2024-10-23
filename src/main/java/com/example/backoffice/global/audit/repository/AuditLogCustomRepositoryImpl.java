@@ -1,11 +1,12 @@
+package com.example.backoffice.global.audit.repository;
+
 import com.example.backoffice.global.audit.entity.AuditLog;
 import com.example.backoffice.global.audit.entity.AuditLogType;
-import com.example.backoffice.global.audit.repository.AuditLogCustomRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.time.LocalDateTime;
@@ -27,13 +28,13 @@ public class AuditLogCustomRepositoryImpl implements AuditLogCustomRepository {
         Query query = new Query();
 
         if (memberName != null) {
-            query.addCriteria(Criteria.where("memberName").is(memberName));
+            query.addCriteria(Criteria.where("member_name").is(memberName));
         }
         if (auditType != null) {
-            query.addCriteria(Criteria.where("auditType").is(auditType));
+            query.addCriteria(Criteria.where("audit_log_type").is(auditType));
         }
         if (startDate != null && endDate != null) {
-            query.addCriteria(Criteria.where("date").gte(startDate).lte(endDate));
+            query.addCriteria(Criteria.where("created_at").gte(startDate).lte(endDate));
         }
 
         // Pageable 처리

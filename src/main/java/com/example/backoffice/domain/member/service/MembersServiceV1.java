@@ -68,4 +68,10 @@ public interface MembersServiceV1 {
             Pageable pageable);
 
     Members findAuditManagerOrCeo(Long memberId);
+
+    Members findByFinanceManagerOrCeo(Long memberId);
+
+    Members findByFinanceManager();
+
+    Members findDepartmentManager(MemberDepartment department);
 }

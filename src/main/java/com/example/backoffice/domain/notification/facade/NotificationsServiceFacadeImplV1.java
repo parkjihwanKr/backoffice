@@ -38,12 +38,7 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
             return;
         }
 
-        Notifications notification
-                = notificationsService.generateMessageAndEntity(notificationData, domainType);
-        notificationsService.save(notification);
-
-        notificationsService.sendNotificationForUser(
-                notificationData.getToMember().getMemberName(), notification);
+        notificationsService.generateEntityAndSendMessage(notificationData, domainType);
     }
 
     @Override
