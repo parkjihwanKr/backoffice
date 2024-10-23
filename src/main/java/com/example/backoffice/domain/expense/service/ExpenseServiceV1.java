@@ -26,4 +26,10 @@ public interface ExpenseServiceV1 {
     Page<ExpenseResponseDto.ReadOneDto> readFiltered(
             ExpenseRequestDto.ReadFilteredDto requestDto,
             Members loginMember, Pageable pageable);
+
+    ExpenseResponseDto.UpdateOneDto updateOne(
+            Long expenseId, List<MultipartFile> fileList,
+            Members loginMember, ExpenseRequestDto.UpdateOneDto requestDto);
+
+    void deleteOne(Long expenseId, Members loginMember);
 }

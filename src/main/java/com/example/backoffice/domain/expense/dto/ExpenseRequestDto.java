@@ -28,4 +28,14 @@ public class ExpenseRequestDto {
         private String createdAtStart;
         private String createdAtEnd;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateOneDto {
+        private String title;
+        private String details;
+        private BigDecimal money;
+    }
 }

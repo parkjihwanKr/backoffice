@@ -76,6 +76,22 @@ public class ExpenseConverter {
         return filteredExpensePage.map(ExpenseConverter::toReadOneDto);
     }
 
+    public static ExpenseResponseDto.UpdateOneDto toUpdateOneDto(Expense expense){
+        return ExpenseResponseDto.UpdateOneDto.builder()
+                .title(expense.getTitle())
+                .money(expense.getMoney())
+                .expenseId(expense.getId())
+                .process(expense.getExpenseProcess())
+                .department(expense.getDepartment())
+                .memberName(expense.getMemberName())
+                .fileList(expense.getFileList().stream().map(
+                        FilesConverter::toReadOneDto).collect(Collectors.toList()))
+                .details(expense.getDetails())
+                .createdAt(expense.getCreatedAt())
+                .modifiedAt(expense.getModifiedAt())
+                .build();
+    }
+
     public static ExpenseProcess toProcess(String process){
         return switch(process) {
             case "APPROVED" -> ExpenseProcess.APPROVED;

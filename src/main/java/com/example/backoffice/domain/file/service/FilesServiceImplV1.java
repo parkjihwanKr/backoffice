@@ -90,6 +90,14 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
         deleteForDomain(files, fileUrlList);
     }
 
+    @Override
+    @Transactional
+    public void deleteForExpense(Long expenseId, List<String> fileUrlList) {
+        List<Files> files = filesRepository.findByExpenseId(expenseId);
+        deleteForDomain(files, fileUrlList);
+    }
+
+
     private void deleteForDomain(List<Files> files, List<String> fileUrlList){
         for (String fileUrl : fileUrlList) {
             try {

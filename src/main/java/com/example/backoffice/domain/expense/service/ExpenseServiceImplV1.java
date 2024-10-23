@@ -11,12 +11,10 @@ import com.example.backoffice.domain.expense.repository.ExpenseRepository;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.file.service.FilesServiceV1;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
-import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
-import com.example.backoffice.domain.notification.entity.Notifications;
 import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.global.date.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -185,6 +184,57 @@ public class ExpenseServiceImplV1 implements ExpenseServiceV1{
 
         // 3. 필터링된 지출 내역을 DTO로 변환
         return ExpenseConverter.toReadFilteredPageDto(filteredExpensePage);
+    }
+
+    @Override
+    @Transactional
+    public ExpenseResponseDto.UpdateOneDto updateOne(
+            Long expenseId, List<MultipartFile> multipartFileList,
+            Members loginMember, ExpenseRequestDto.UpdateOneDto requestDto){
+        Expense expense = findById(expenseId);
+
+        List<String> fileUrlList
+                = expense.getFileList().stream().map(Files::getUrl)
+                .collect(Collectors.toList());
+        filesService.deleteForExpense(expenseId, fileUrlList);
+
+        if(multipartFileList != null){
+            for(MultipartFile multipartFile : multipartFileList){
+                filesService.createOneForExpense(
+                        multipartFile, expense, loginMember);
+            }
+        }
+
+        expense.update(
+                requestDto.getTitle(), requestDto.getDetails(), requestDto.getMoney());
+        expense.updateProcess(ExpenseProcess.PENDING);
+
+        String message
+                = loginMember.getMemberName()
+                +"님이 비용 지출 내역서를 수정하셨습니다.";
+
+        Members financeManager = membersService.findByFinanceManager();
+        NotificationData notificationData = notificationsService.toNotificationData(
+                financeManager, loginMember, null, null,
+                null, null, message);
+        notificationsService.generateEntityAndSendMessage(
+                notificationData, NotificationType.UPDATE_EXPENSE_REPORT);
+
+        return ExpenseConverter.toUpdateOneDto(expense);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOne(Long expenseId, Members loginMember) {
+        Expense expense = findById(expenseId);
+        Members financeManagerOrCeo
+                = membersService.findByFinanceManagerOrCeo(loginMember.getId());
+        if(financeManagerOrCeo == null
+                && !loginMember.getMemberName().equals(expense.getMemberName())){
+            throw new ExpenseCustomException(
+                    ExpenseExceptionCode.DO_NOT_DELETE_EXPENSE_DEPARTMENT);
+        }
+        expenseRepository.deleteById(expenseId);
     }
 
     public Expense findById(Long expenseId){

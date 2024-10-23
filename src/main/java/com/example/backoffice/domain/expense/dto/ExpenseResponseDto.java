@@ -57,4 +57,20 @@ public class ExpenseResponseDto {
         private LocalDateTime modifiedAt;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateOneDto {
+        private Long expenseId;
+        private String title;
+        private String memberName;
+        private String details;
+        private BigDecimal money;
+        private ExpenseProcess process;
+        private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileList;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+    }
 }

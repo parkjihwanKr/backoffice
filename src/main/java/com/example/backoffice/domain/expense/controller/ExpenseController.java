@@ -73,8 +73,26 @@ public class ExpenseController {
     }
 
     // 부서 지출 내역서 수정
+    @PatchMapping("/expense/{expenseId}")
+    public ResponseEntity<ExpenseResponseDto.UpdateOneDto> updateOne(
+            @PathVariable Long expenseId,
+            @RequestPart(value = "files",required = false) List<MultipartFile> fileList,
+            @RequestPart(value = "data") ExpenseRequestDto.UpdateOneDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        ExpenseResponseDto.UpdateOneDto responseDto
+                = expenseService.updateOne(expenseId, fileList, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
     // 부서 지출 내역서 삭제
-
+    @DeleteMapping("/expense/{expenseId}")
+    public ResponseEntity<CommonResponseDto<Void>> deleteOne(
+            @PathVariable Long expenseId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        expenseService.deleteOne(expenseId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponseDto<>(
+                        null, "성공적으로 지출 내역서를 삭제하셨습니다", 200));
+    }
 
 }

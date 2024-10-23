@@ -46,4 +46,10 @@ public class Expense extends CommonEntity {
     public void updateProcess(ExpenseProcess expenseProcess){
         this.expenseProcess = expenseProcess;
     }
+
+    public void update(String details, String title, BigDecimal money){
+        this.title = title;
+        this.details = details;
+        this.money = money;
+    }
 }

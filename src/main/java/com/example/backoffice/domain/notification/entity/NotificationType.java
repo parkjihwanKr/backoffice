@@ -18,6 +18,7 @@ public enum NotificationType {
     DELETE_VACATION_FOR_ADMIN(Domain.DELETE_VACATION_FOR_ADMIN),
     CREATE_EXPENSE_REPORT(Domain.CREATE_EXPENSE_REPORT),
     UPDATE_EXPENSE_REPORT_STATUS(Domain.UPDATE_EXPENSE_REPORT_STATUS),
+    UPDATE_EXPENSE_REPORT(Domain.UPDATE_EXPENSE_REPORT),
     ;
 
     private final String domain;
@@ -42,5 +43,6 @@ public enum NotificationType {
         public static final String DELETE_VACATION_FOR_ADMIN = "DELETE_VACATION_FOR_ADMIN";
         public static final String CREATE_EXPENSE_REPORT = "CREATE_EXPENSE_REPORT";
         public static final String UPDATE_EXPENSE_REPORT_STATUS = "UPDATE_EXPENSE_REPORT_STATUS";
+        public static final String UPDATE_EXPENSE_REPORT = "UPDATE_EXPENSE_REPORT";
     }
 }

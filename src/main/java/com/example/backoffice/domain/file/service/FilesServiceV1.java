@@ -18,13 +18,14 @@ public interface FilesServiceV1 {
 
     String createOneForEvent(MultipartFile file, Events event);
 
-     Files createOneForExpense(
+    Files createOneForExpense(
             MultipartFile file, Expense expense, Members loginMember);
 
     void deleteForBoard(Long boardId, List<String> fileList);
 
     void deleteForEvent(Long eventId, List<String> fileList);
 
-    void deleteImage(String imageUrl);
+    void deleteForExpense(Long expensId, List<String> fileList);
 
+    void deleteImage(String imageUrl);
 }
