@@ -25,7 +25,7 @@ public interface FilesServiceV1 {
 
     void deleteForEvent(Long eventId, List<String> fileList);
 
-    void deleteForExpense(Long expensId, List<String> fileList);
+    void deleteForExpense(Long expenseId, List<String> fileList);
 
     void deleteImage(String imageUrl);
 }
