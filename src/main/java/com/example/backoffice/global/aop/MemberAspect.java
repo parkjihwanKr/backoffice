@@ -1,6 +1,8 @@
 package com.example.backoffice.global.aop;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.audit.entity.AuditLogType;
 import com.example.backoffice.global.audit.service.AuditLogService;
@@ -40,7 +42,8 @@ public class MemberAspect {
         commonAspect.getLogMessage(message);
 
         auditLogServiceSave(
-                AuditLogType.SIGNUP, requestDto.getMemberName(), message);
+                AuditLogType.SIGNUP, requestDto.getMemberName(), message,
+                MemberDepartment.HR, MemberPosition.INTERN);
     }
 
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForSalary(..))")
@@ -56,7 +59,8 @@ public class MemberAspect {
         commonAspect.getLogMessage(message);
 
         auditLogServiceSave(
-                AuditLogType.CHANGE_MEMBER_SALARY, requestDto.getMemberName(), message);
+                AuditLogType.CHANGE_MEMBER_SALARY, loginMember.getMemberName(), message,
+                loginMember.getDepartment(), loginMember.getPosition());
     }
 
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.deleteOne(..))")
@@ -67,7 +71,8 @@ public class MemberAspect {
         commonAspect.getLogMessage(message);
 
         auditLogService.save(
-                AuditLogType.DELETE_MEMBER, loginMember.getMemberName(), message);
+                AuditLogType.DELETE_MEMBER, loginMember.getMemberName(), message,
+                loginMember.getDepartment(), loginMember.getPosition());
     }
 
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForAttribute(..))")
@@ -89,7 +94,8 @@ public class MemberAspect {
             commonAspect.getLogMessage(message);
 
             auditLogServiceSave(
-                    AuditLogType.CHANGE_MEMBER_ATTRIBUTE, requestDto.getMemberName(), message);
+                    AuditLogType.CHANGE_MEMBER_ATTRIBUTE, loginMember.getMemberName(), message,
+                    loginMember.getDepartment(), loginMember.getPosition());
         }
     }
 
@@ -102,11 +108,13 @@ public class MemberAspect {
         commonAspect.getLogMessage(message);
 
         auditLogServiceSave(
-                AuditLogType.UPLOAD_MEMBER_FILE, loginMember.getMemberName(), message);
+                AuditLogType.UPLOAD_MEMBER_FILE, loginMember.getMemberName(), message,
+                loginMember.getDepartment(), loginMember.getPosition());
     }
 
     private void auditLogServiceSave(
-            AuditLogType auditLogType, String memberName, String message){
-        auditLogService.save(auditLogType, memberName, message);
+            AuditLogType auditLogType, String memberName, String message,
+            MemberDepartment department, MemberPosition position){
+        auditLogService.save(auditLogType, memberName, message, department, position);
     }
 }

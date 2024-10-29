@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -141,5 +143,13 @@ public class MembersController {
                 = membersServiceFacade.updateOneForVacation(
                         memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/members/nameList")
+    public ResponseEntity<List<MembersResponseDto.ReadNameDto>> readNameList(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        List<MembersResponseDto.ReadNameDto> responseList
+                = membersServiceFacade.readNameList(memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 }

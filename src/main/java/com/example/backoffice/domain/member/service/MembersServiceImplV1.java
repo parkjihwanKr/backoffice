@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -197,8 +198,8 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     public Members findAuditManagerOrCeo(Long memberId){
         Members foundMember = findById(memberId);
         if(foundMember.getPosition().equals(MemberPosition.CEO)
-                || foundMember.getPosition().equals(MemberPosition.MANAGER)
-                && foundMember.getDepartment().equals(MemberDepartment.AUDIT)) {
+                || (foundMember.getPosition().equals(MemberPosition.MANAGER)
+                && foundMember.getDepartment().equals(MemberDepartment.AUDIT))) {
             return foundMember;
         }
         throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);

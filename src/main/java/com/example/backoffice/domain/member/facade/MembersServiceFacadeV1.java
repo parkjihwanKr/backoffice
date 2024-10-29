@@ -59,6 +59,8 @@ public interface MembersServiceFacadeV1 {
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForVacationDto requestDto);
 
+    List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember);
+
     void updateOneForOnVacationFalse(Long onVacationMemberId);
 
     void updateOneForOnVacationTrue(Long onVacationMemberId);

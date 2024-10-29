@@ -1,5 +1,7 @@
 package com.example.backoffice.global.audit.service;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.global.audit.converter.AuditLogConverter;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +31,12 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Override
     @Transactional
     public void save(
-            AuditLogType auditLogType, String username, String details){
+            AuditLogType auditLogType, String username, String details,
+            MemberDepartment department, MemberPosition position){
         AuditLog auditLog
-                = AuditLogConverter.toEntity(auditLogType, username, details);
+                = AuditLogConverter.toEntity(
+                        auditLogType, username, details,
+                department, position);
         auditLogRepository.save(auditLog);
     }
 
@@ -51,12 +57,19 @@ public class AuditLogServiceImpl implements AuditLogService {
         membersService.findAuditManagerOrCeo(loginMember.getId());
 
         // 2. 해당 멤버가 존재하는 사람인지?
-        membersService.findByMemberName(memberName);
+        if(memberName != null){
+            membersService.findByMemberName(memberName);
+        }
 
         // 3. 해당하는 조건에 맞춰진 AuditLog Page 구성
         AuditLogType auditLogType = (auditType != null) ? AuditLogConverter.toAuditType(auditType) : null;
         LocalDateTime customStartDate = (startDate != null) ? DateTimeUtils.parse(startDate) : null;
         LocalDateTime customEndDate = (endDate != null) ? DateTimeUtils.parse(endDate) : null;
+
+        // 초 단위까지 포함하여 시간 정보 출력
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        System.out.println("Start DateTime: " + (customStartDate != null ? customStartDate.format(formatter) : "null"));
+        System.out.println("End DateTime: " + (customEndDate != null ? customEndDate.format(formatter) : "null"));
 
         Page<AuditLog> auditLogPage
                 = auditLogRepository.findFilteredAuditLogs(

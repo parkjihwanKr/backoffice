@@ -160,4 +160,13 @@ public class MembersResponseDto {
         private String toMemberName;
         private Integer changeMemberVacationDays;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadNameDto{
+        private Long memberId;
+        private String memberName;
+    }
 }
