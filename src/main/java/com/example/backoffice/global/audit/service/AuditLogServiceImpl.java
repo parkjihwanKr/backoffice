@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -65,11 +64,6 @@ public class AuditLogServiceImpl implements AuditLogService {
         AuditLogType auditLogType = (auditType != null) ? AuditLogConverter.toAuditType(auditType) : null;
         LocalDateTime customStartDate = (startDate != null) ? DateTimeUtils.parse(startDate) : null;
         LocalDateTime customEndDate = (endDate != null) ? DateTimeUtils.parse(endDate) : null;
-
-        // 초 단위까지 포함하여 시간 정보 출력
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        System.out.println("Start DateTime: " + (customStartDate != null ? customStartDate.format(formatter) : "null"));
-        System.out.println("End DateTime: " + (customEndDate != null ? customEndDate.format(formatter) : "null"));
 
         Page<AuditLog> auditLogPage
                 = auditLogRepository.findFilteredAuditLogs(

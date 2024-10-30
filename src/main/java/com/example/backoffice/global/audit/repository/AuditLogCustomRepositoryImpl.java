@@ -34,7 +34,14 @@ public class AuditLogCustomRepositoryImpl implements AuditLogCustomRepository {
             query.addCriteria(Criteria.where("audit_log_type").is(auditType));
         }
         if (startDate != null && endDate != null) {
+            // startDate와 endDate가 모두 있을 때
             query.addCriteria(Criteria.where("created_at").gte(startDate).lte(endDate));
+        } else if (startDate != null) {
+            // startDate만 있을 때
+            query.addCriteria(Criteria.where("created_at").gte(startDate));
+        } else if (endDate != null) {
+            // endDate만 있을 때
+            query.addCriteria(Criteria.where("created_at").lte(endDate));
         }
 
         // Pageable 처리
