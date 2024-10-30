@@ -26,7 +26,6 @@ public class AuditLogConverter {
     public static AuditLogType toAuditType(String auditType) {
         return switch (auditType) {
             case AuditLogType.eventLabel.LOGIN -> AuditLogType.LOGIN;
-            case AuditLogType.eventLabel.LOGOUT -> AuditLogType.LOGOUT;
             case AuditLogType.eventLabel.SIGNUP -> AuditLogType.SIGNUP;
             case AuditLogType.eventLabel.DELETE_MEMBER -> AuditLogType.DELETE_MEMBER;
             case AuditLogType.eventLabel.CHANGE_MEMBER_ATTRIBUTE -> AuditLogType.CHANGE_MEMBER_ATTRIBUTE;

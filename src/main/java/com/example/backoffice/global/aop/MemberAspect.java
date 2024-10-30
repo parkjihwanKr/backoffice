@@ -41,7 +41,7 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogServiceSave(
+        commonAspect.auditLogServiceSave(
                 AuditLogType.SIGNUP, requestDto.getMemberName(), message,
                 MemberDepartment.HR, MemberPosition.INTERN);
     }
@@ -58,7 +58,7 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogServiceSave(
+        commonAspect.auditLogServiceSave(
                 AuditLogType.CHANGE_MEMBER_SALARY, loginMember.getMemberName(), message,
                 loginMember.getDepartment(), loginMember.getPosition());
     }
@@ -93,7 +93,7 @@ public class MemberAspect {
 
             commonAspect.getLogMessage(message);
 
-            auditLogServiceSave(
+            commonAspect.auditLogServiceSave(
                     AuditLogType.CHANGE_MEMBER_ATTRIBUTE, loginMember.getMemberName(), message,
                     loginMember.getDepartment(), loginMember.getPosition());
         }
@@ -107,14 +107,8 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogServiceSave(
+        commonAspect.auditLogServiceSave(
                 AuditLogType.UPLOAD_MEMBER_FILE, loginMember.getMemberName(), message,
                 loginMember.getDepartment(), loginMember.getPosition());
-    }
-
-    private void auditLogServiceSave(
-            AuditLogType auditLogType, String memberName, String message,
-            MemberDepartment department, MemberPosition position){
-        auditLogService.save(auditLogType, memberName, message, department, position);
     }
 }

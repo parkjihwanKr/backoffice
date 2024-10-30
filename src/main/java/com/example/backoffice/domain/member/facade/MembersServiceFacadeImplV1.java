@@ -390,54 +390,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members findHRManager(){
-        return membersService.findHRManager();
-    }
-
-    @Override
-    @Transactional
-    public void updateOneForOnVacationFalse(Long onVacationMemberId){
-        Members member = membersService.findById(onVacationMemberId);
-        member.updateOnVacation(false);
-    }
-
-    @Override
-    @Transactional
-    public void updateOneForOnVacationTrue(Long onVacationMemberId){
-        Members member = membersService.findById(onVacationMemberId);
-        member.updateOnVacation(true);
-    }
-
-    @Override
-    @Transactional
-    public void updateOneForRemainingVacationDays(
-            ScheduledEventType scheduledEventType){
-        List<Members> memberList = membersService.findAll();
-        switch (scheduledEventType) {
-            case MONTHLY_UPDATE -> {
-                for(Members member : memberList){
-                    member.updateRemainingVacation();
-                }
-            }
-            case YEARLY_UPDATE -> {
-                for(Members member : memberList){
-                    member.updateRemainingVacationYearly();
-                }
-            }
-            default ->
-                    throw new SchedulerCustomException(GlobalExceptionCode.NOT_FOUND_SCHEDULER_EVENT_TYPE);
-        }
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Members> findAllByDepartment(String department){
-        MemberDepartment memberDepartment = MembersConverter.toDepartment(department);
-        return membersService.findAllByDepartment(memberDepartment);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Members findByMemberName(String memberName){
         return membersService.findByMemberName(memberName);
     }

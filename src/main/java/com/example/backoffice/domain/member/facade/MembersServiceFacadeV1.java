@@ -20,7 +20,6 @@ public interface MembersServiceFacadeV1 {
     MembersResponseDto.ReadOneDetailsDto readOne(
             Long memberId, Members member);
 
-
     Page<MembersResponseDto.ReadOneDto> readForHrManager(
             String department, String position,
             Members loginMember, Pageable pageable);
@@ -60,16 +59,6 @@ public interface MembersServiceFacadeV1 {
             MembersRequestDto.UpdateOneForVacationDto requestDto);
 
     List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember);
-
-    void updateOneForOnVacationFalse(Long onVacationMemberId);
-
-    void updateOneForOnVacationTrue(Long onVacationMemberId);
-
-    void updateOneForRemainingVacationDays(ScheduledEventType scheduledEventType);
-
-    List<Members> findAllByDepartment(String department);
-
-    Members findHRManager();
 
     Members findByMemberName(String memberName);
 }

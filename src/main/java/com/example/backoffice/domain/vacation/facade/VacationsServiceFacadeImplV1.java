@@ -7,6 +7,7 @@ import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
+import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.domain.vacation.converter.VacationsConverter;
 import com.example.backoffice.domain.vacation.dto.VacationDateRangeDto;
 import com.example.backoffice.domain.vacation.dto.VacationsRequestDto;
@@ -30,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     private final MembersServiceV1 membersService;
-    private final NotificationsServiceFacadeV1 notificationsServiceFacade;
+    private final NotificationsServiceV1 notificationsService;
     private final VacationsServiceV1 vacationsService;
     private final VacationPeriodHolder vacationPeriodHolder;
 
@@ -64,7 +65,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         List<Members> memberList = membersService.findAll();
 
         for(Members member : memberList){
-            notificationsServiceFacade.createOne(
+            notificationsService.generateEntityAndSendMessage(
                     NotificationsConverter.toNotificationData(
                             member, loginMember, null, null, null, null,
                             "변경된 휴가 신청 기간 안내입니다 : "
@@ -150,7 +151,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         return VacationsConverter.toUpdateOneDto(vacation);
     }
 
-    // 승인 요청만 받는 형태이기에 Admin이 RequestDto를 받을 필요가 없다.
+    // 승인 요청만 받는 형태이기에 Admin의 RequestDto를 받을 필요가 없다.
     @Override
     @Transactional
     public VacationsResponseDto.UpdateOneForAdminDto updateOneForAdmin(
@@ -170,7 +171,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 ? vacation.getOnVacationMember().getMemberName() + "님의 휴가가 승인되었습니다."
                 : vacation.getOnVacationMember().getMemberName() + "님의 휴가가 미승인되었습니다.";
 
-        notificationsServiceFacade.createOne(
+        notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
                         loginMember, vacation.getOnVacationMember(),
                         null, null, null, null,
@@ -200,7 +201,9 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
             membersService.minusVacationDays(vacation.getOnVacationMember(), vacationDays);
         } else {
             // 미승인된 경우, 휴가 일 수 복원 (즉, 다시 추가)
+            // 휴가 db에서 삭제
             membersService.addVacationDays(vacation.getOnVacationMember(), vacationDays);
+            vacationsService.deleteById(vacationId);
         }
 
         // 6. DTO 전송
@@ -262,7 +265,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
             Members loginMember){
         membersService.findHRManagerOrCEO(loginMember);
         Vacations vacation = vacationsService.findById(vacationId);
-        notificationsServiceFacade.createOne(
+        notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
                         loginMember, vacation.getOnVacationMember(),
                         null, null, null, null,
@@ -376,10 +379,13 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     }
 
     private void sendUrgentOneForHRManager(Members loginMember) {
-        Members hrManager = membersService.findHRManager();
-        notificationsServiceFacade.createOne(
+        Members admin = membersService.findHRManager();
+        if(admin == null){
+            admin = membersService.findCeo();
+        }
+        notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
-                        hrManager, loginMember, null, null, null, null, null),
+                        admin, loginMember, null, null, null, null, null),
                 NotificationType.URGENT_VACATION);
     }
 

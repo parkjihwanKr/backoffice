@@ -1,5 +1,8 @@
 package com.example.backoffice.global.date;
 
+import com.example.backoffice.global.exception.DateCustomException;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,8 +22,17 @@ public class DateTimeUtils {
         try {
             return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("잘못된 날짜 형식입니다: " + dateTimeStr);
+            throw new DateCustomException(GlobalExceptionCode.INVALID_DATE_FORMAT);
         }
+    }
+
+    public static LocalDateTime withDayOfMonth(int day){
+        return getCurrentDateTime().withDayOfMonth(day);
+    }
+
+    public static LocalDateTime findFirstMonday(LocalDateTime firstDayOfMonth){
+        return firstDayOfMonth.plusDays(
+                (8 - firstDayOfMonth.getDayOfWeek().getValue()) % 7);
     }
 
     // 하루의 끝 시각을 반환 (23:59:59)
