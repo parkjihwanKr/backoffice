@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.expense.entity;
 
 import com.example.backoffice.domain.file.entity.Files;
+import com.example.backoffice.domain.finance.entity.Finance;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -38,6 +39,10 @@ public class Expense extends CommonEntity {
 
     @Enumerated(EnumType.STRING)
     private MemberDepartment department;
+
+    // relations
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Finance finance;
 
     @Builder.Default
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)

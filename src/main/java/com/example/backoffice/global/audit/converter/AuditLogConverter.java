@@ -1,5 +1,7 @@
 package com.example.backoffice.global.audit.converter;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.global.audit.dto.AuditLogResponseDto;
 import com.example.backoffice.global.audit.entity.AuditLog;
 import com.example.backoffice.global.audit.entity.AuditLogType;
@@ -10,11 +12,14 @@ import org.springframework.data.domain.Page;
 public class AuditLogConverter {
 
     public static AuditLog toEntity(
-            AuditLogType auditLogType, String memberName, String details){
+            AuditLogType auditLogType, String memberName, String details,
+            MemberDepartment department, MemberPosition position){
         return AuditLog.builder()
                 .auditLogType(auditLogType)
                 .memberName(memberName)
                 .details(details)
+                .department(department)
+                .position(position)
                 .build();
     }
 
@@ -38,9 +43,13 @@ public class AuditLogConverter {
             case AuditLogType.eventLabel.CHANGE_BOARD_FILE -> AuditLogType.CHANGE_BOARD_FILE;
             case AuditLogType.eventLabel.CHANGE_EVENT -> AuditLogType.CHANGE_EVENT;
             case AuditLogType.eventLabel.CHANGE_SECURITY_SETTINGS -> AuditLogType.CHANGE_SECURITY_SETTINGS;
-            default -> {
-                throw new AuditLogCustomException(GlobalExceptionCode.INVALID_VALUE);
-            }
+            case AuditLogType.eventLabel.CREATE_EXPENSE_REPORT -> AuditLogType.CREATE_EXPENSE_REPORT;
+            case AuditLogType.eventLabel.UPDATE_EXPENSE_REPORT -> AuditLogType.UPDATE_EXPENSE_REPORT;
+            case AuditLogType.eventLabel.UPDATE_EXPENSE_REPORT_STATUS -> AuditLogType.UPDATE_EXPENSE_REPORT_STATUS;
+            case AuditLogType.eventLabel.DELETE_EXPENSE_REPORT -> AuditLogType.DELETE_EXPENSE_REPORT;
+            case AuditLogType.eventLabel.READ_EXPENSE_REPORT -> AuditLogType.READ_EXPENSE_REPORT;
+            case AuditLogType.eventLabel.EXPENSE_REPORT_ERROR -> AuditLogType.EXPENSE_REPORT_ERROR;
+            default -> throw new AuditLogCustomException(GlobalExceptionCode.INVALID_VALUE);
         };
     }
 
@@ -55,6 +64,8 @@ public class AuditLogConverter {
                 .auditLogType(auditLog.getAuditLogType())
                 .createdAt(auditLog.getCreatedAt())
                 .details(auditLog.getDetails())
+                .department(auditLog.getDepartment())
+                .position(auditLog.getPosition())
                 .memberName(auditLog.getMemberName())
                 .build();
     }

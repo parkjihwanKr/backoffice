@@ -353,6 +353,13 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional(readOnly = true)
+    public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
+        List<Members> memberList = membersService.findAll();
+        return MembersConverter.toReadNameListDto(memberList);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Members matchLoginMember(Members member, Long memberId){
         if(!member.getId().equals(memberId)){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);

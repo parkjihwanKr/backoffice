@@ -1,5 +1,7 @@
 package com.example.backoffice.global.audit.entity;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collation = "audit_logs")
+@Document(collection = "audit_logs")
 public class AuditLog{
 
     @Id
@@ -29,6 +31,12 @@ public class AuditLog{
     private String memberName;
 
     private String details;
+
+    @Field("department")
+    private MemberDepartment department;
+
+    @Field("position")
+    private MemberPosition position;
 
     @CreatedDate
     @Field("created_at")

@@ -14,11 +14,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 		basePackages = {
 				"com.example.backoffice.domain.memberAnswer.repository",
 				"com.example.backoffice.domain.answer.repository",
-				"com.example.backoffice.domain.asset.repository",
 				"com.example.backoffice.domain.question.repository",
 				"com.example.backoffice.domain.memberEvaluation.repository",
 				"com.example.backoffice.domain.evaluation.repository",
 				"com.example.backoffice.domain.favorite.repository",
+				"com.example.backoffice.domain.finance.repository",
 				"com.example.backoffice.domain.event.repository",
 				"com.example.backoffice.domain.board.repository",
 				"com.example.backoffice.domain.comment.repository",
