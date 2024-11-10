@@ -6,7 +6,6 @@ import com.example.backoffice.domain.notification.facade.NotificationsServiceFac
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,18 +16,17 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class NotificationsController {
 
     private final NotificationsServiceFacadeV1 notificationsServiceFacade;
 
     // 알림 단건 조회
-    @GetMapping("/api/v1/members/{memberId}/notifications/{notificationId}")
+    @GetMapping("/members/{memberId}/notifications/{notificationId}")
     public ResponseEntity<CommonResponseDto<NotificationsResponseDto.ReadOneDto>> readOne(
             @PathVariable Long memberId, @PathVariable String notificationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
@@ -55,16 +53,17 @@ public class NotificationsController {
 
     // 실시간 알림 요청
     // 관리자 전용 단체 메세지 전달
-    @MessageMapping("/admins/notifications")
+    /*@MessageMapping("/admins/notifications")
     public void createForAdmin(
             @Payload NotificationsRequestDto.CreateForAdminDto requestDto,
-            Principal principal){
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         // userDetails.getUsername(); = member.getMemberName();
-        notificationsServiceFacade.createForAdmin(principal.getName(), requestDto);
-    }
+        notificationsServiceFacade.createForAdmin(
+                memberDetails.getMembers().getName(), requestDto);
+    }*/
 
     // 알림 리스트 조회
-    @GetMapping("/api/v1/members/{memberId}/notifications")
+    @GetMapping("/members/{memberId}/notifications")
     public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> read(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -75,7 +74,8 @@ public class NotificationsController {
     }
 
     // 읽지 않은 알림 리스트 조회
-    @GetMapping("/api/v1/members/{memberId}/notifications/unread")
+    // 필요 없을듯 -> client에서 받아 놓은 알림 리스트를 isRead의 상태를 보고 변경하기만 하면 됨
+    @GetMapping("/members/{memberId}/notifications/unread")
     public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> readUnRead(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -87,7 +87,8 @@ public class NotificationsController {
     }
 
     // 읽은 알림 리스트 조회
-    @GetMapping("/api/v1/members/{memberId}/notifications/read")
+    // 위의 readUnRead 메서드와 마찬가지의 이유로 필요없음
+    @GetMapping("/members/{memberId}/notifications/read")
     public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> readRead(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -99,7 +100,7 @@ public class NotificationsController {
     }
 
     // 모든 알림 리스트를 '읽음' 버튼으로 모두 읽음으로 변경
-    @PostMapping("/api/v1/members/{memberId}/notifications/changeIsReadTrue")
+    @PostMapping("/members/{memberId}/notifications/changeIsReadTrue")
     public ResponseEntity<CommonResponseDto<List<NotificationsResponseDto.ReadAllDto>>> readAll(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {

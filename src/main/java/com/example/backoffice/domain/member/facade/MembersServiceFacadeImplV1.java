@@ -150,7 +150,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             MembersRequestDto.UpdateOneDto requestDto){
         // 엔티티가 영속성 컨택스트에 넣어야하기에
         // 수정을 하기 위해선 어떤 엔티티가 변경 되어야 하는지 알아야함
-        Members matchedMember = matchLoginMember(loginMember, memberId);
+        Members matchedMember = membersService.matchLoginMember(loginMember, memberId);
 
         // 1. 요청dto의 멤버 네임과 db에 존재하는 memberName이 다르면 안됨
         if(!requestDto.getMemberName().equals(matchedMember.getMemberName())){
@@ -280,7 +280,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional
     public MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
             Long memberId, Members loginMember, MultipartFile image){
-        matchLoginMember(loginMember, memberId);
+        membersService.matchLoginMember(loginMember, memberId);
 
         String profileImageUrl = filesService.createImage(image);
 
@@ -293,7 +293,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional
     public MembersResponseDto.DeleteOneForProfileImageDto deleteOneForProfileImage(
             Long memberId, Members loginMember){
-        Members existMember = matchLoginMember(loginMember, memberId);
+        Members existMember = membersService.matchLoginMember(loginMember, memberId);
         String existMemberProfileImageUrl = existMember.getProfileImageUrl();
         // 문자열이 비어 있거나, 빈 공백으로만 이루어져 있으면, true를 리턴
         if(existMemberProfileImageUrl.isBlank()){
@@ -308,7 +308,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @Transactional
     public void deleteOne(Long memberId, Members loginMember){
-        matchLoginMember(loginMember, memberId);
+        membersService.matchLoginMember(loginMember, memberId);
         membersService.deleteById(memberId);
     }
 
@@ -316,7 +316,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional(readOnly = true)
     public MembersResponseDto.ReadOneForVacationListDto readOneForVacationList(
             Long memberId, Members loginMember){
-        matchLoginMember(loginMember, memberId);
+        membersService.matchLoginMember(loginMember, memberId);
 
         LocalDateTime today = LocalDateTime.now();
         List<Vacations> memberVacationList
@@ -356,36 +356,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
         List<Members> memberList = membersService.findAll();
         return MembersConverter.toReadNameListDto(memberList);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members matchLoginMember(Members member, Long memberId){
-        if(!member.getId().equals(memberId)){
-            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
-        }
-        return membersService.findById(memberId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
-            List<MemberDepartment> excludedDepartmentList,
-            List<Long> excludedIdList){
-        List<Members> memberList = membersService.findAllById(excludedIdList);
-        if(memberList.size() != excludedIdList.size()){
-            throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
-        }
-
-        List<Members> memberListExcludingDepartmentAndId
-                = membersService.findByDepartmentNotInAndIdNotIn(
-                excludedDepartmentList, excludedIdList);
-        Map<String, MemberDepartment> memberNameMap = new HashMap<>();
-
-        for(Members member : memberListExcludingDepartmentAndId){
-            memberNameMap.put(member.getMemberName(), member.getDepartment());
-        }
-        return memberNameMap;
     }
 
     @Override

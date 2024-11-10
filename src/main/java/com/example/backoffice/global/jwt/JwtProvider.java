@@ -95,6 +95,7 @@ public class JwtProvider {
         return cookie;
     }
 
+    // removed Perfix(Bearer) accessToken || refreshToken
     public JwtStatus validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -141,6 +142,7 @@ public class JwtProvider {
 
     // getAccessTokenFromHeader
     public String getJwtFromHeader(HttpServletRequest req) {
+        log.info("httpServletRequest header : "+req.getHeader(AUTHORIZATION_HEADER));
         String accessToken = req.getHeader(AUTHORIZATION_HEADER);
         if (accessToken == null){
             String refreshToken = getRefreshTokenFromHeader(req);

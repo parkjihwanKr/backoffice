@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @EnableScheduling
 @EnableJpaAuditing
@@ -37,7 +38,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BackOfficeApplication {
 
 	public static void main(String[] args) {
+		SecurityContextHolder.setStrategyName(
+				SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
 		SpringApplication.run(BackOfficeApplication.class, args);
 	}
-
 }

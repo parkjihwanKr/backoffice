@@ -90,9 +90,20 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
         return notificationRepository.save(notifications);
     }
 
+    private void sendBoardCastNotificationForAdmin(Long senderId, Notifications notification){
+        simpMessagingTemplate.convertAndSend(
+                "/topic/notifications", notification);
+    }
+
     @Override
-    public void sendNotificationForUser(String toMemberName, Notifications notification){
-        simpMessagingTemplate.convertAndSendToUser(toMemberName, "/queue/notifications", notification);
+    public void sendNotificationForUser(String toMemberName, Notifications notification) {
+        log.info("Attempting to send notification to user: {} with notification: {}", toMemberName, notification);
+        try {
+            log.info("Sending notification to user: {} at destination: /user/{}/queue/notifications", toMemberName, toMemberName);
+            simpMessagingTemplate.convertAndSendToUser(toMemberName, "/queue/notifications", notification);
+        } catch (Exception e) {
+            log.error("Failed to send notification to user: {}. Error: {}", toMemberName, e.getMessage());
+        }
     }
 
     @Override
@@ -203,9 +214,21 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                 yield notificationRepository.save(
                         toEntity(notificationData, expenseReportMessage, domainType));
             }
+            case ALL_NOTIFICATIONS-> {
+                String allNotificationMessage
+                        = notificationData.getFromMember().getMemberName()
+                        + "님의 전체 알림 : "
+                        +notificationData.getMessage();
+                yield notificationRepository.save(
+                        toEntity(notificationData, allNotificationMessage, domainType));
+            }
             default -> throw new NotificationsCustomException(
                     NotificationsExceptionCode.NOT_MATCHED_NOTIFICATION_TYPE);
         };
+        if(domainType.equals(NotificationType.ALL_NOTIFICATIONS)){
+            sendBoardCastNotificationForAdmin(
+                    notificationData.getToMember().getId(), notification);
+        }
         sendNotificationForUser(
                 notificationData.getToMember().getMemberName(), notification);
     }
@@ -221,8 +244,8 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
 
     private Notifications toEntity(NotificationData notificationData, String message, NotificationType domainType){
         return NotificationsConverter.toEntity(
-                notificationData.getFromMember().getMemberName(),
                 notificationData.getToMember().getMemberName(),
+                notificationData.getFromMember().getMemberName(),
                 message, domainType, notificationData.getFromMember().getDepartment());
     }
 }
