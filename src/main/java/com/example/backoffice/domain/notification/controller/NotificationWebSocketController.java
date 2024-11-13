@@ -24,10 +24,10 @@ public class NotificationWebSocketController {
 
     @MessageMapping("/admins/notifications/filtered")
     public void createFilteredForAdmin(
-            @Payload NotificationsRequestDto.CreateFilteredForAdminDto requestDto) {
-        System.out.println("여기 오는지 확인해봅시다.");
+            @Payload NotificationsRequestDto.CreateFilteredForAdminDto requestDto,
+            Principal principal) {
 
-        notificationsServiceFacade.createFilteredForAdmin("admin", requestDto);
+        notificationsServiceFacade.createFilteredForAdmin(principal.getName(), requestDto);
     }
 }
 

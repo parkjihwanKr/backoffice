@@ -208,19 +208,11 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                 yield notificationRepository.save(
                         toEntity(notificationData, deleteVacationMessage, domainType));
             }
-            case CREATE_EXPENSE_REPORT, UPDATE_EXPENSE_REPORT_STATUS-> {
-                String expenseReportMessage
+            case CREATE_EXPENSE_REPORT, UPDATE_EXPENSE_REPORT_STATUS, ALL_NOTIFICATIONS-> {
+                String notificationMessage
                         = notificationData.getMessage();
                 yield notificationRepository.save(
-                        toEntity(notificationData, expenseReportMessage, domainType));
-            }
-            case ALL_NOTIFICATIONS-> {
-                String allNotificationMessage
-                        = notificationData.getFromMember().getMemberName()
-                        + "님의 전체 알림 : "
-                        +notificationData.getMessage();
-                yield notificationRepository.save(
-                        toEntity(notificationData, allNotificationMessage, domainType));
+                        toEntity(notificationData, notificationMessage, domainType));
             }
             default -> throw new NotificationsCustomException(
                     NotificationsExceptionCode.NOT_MATCHED_NOTIFICATION_TYPE);

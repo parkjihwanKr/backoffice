@@ -189,6 +189,8 @@ public class MembersConverter {
                 .map(member -> MembersResponseDto.ReadNameDto.builder()
                         .memberName(member.getMemberName())
                         .memberId(member.getId())
+                        .department(member.getDepartment())
+                        .position(member.getPosition())
                         .build())
                 .collect(Collectors.toList());
     }

@@ -248,6 +248,10 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList){
         List<Members> memberList = findAllById(excludedIdList);
+
+        for(Members member : memberList){
+            System.out.println("excludedMemberName : "+member.getMemberName());
+        }
         if(memberList.size() != excludedIdList.size()){
             throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
         }
