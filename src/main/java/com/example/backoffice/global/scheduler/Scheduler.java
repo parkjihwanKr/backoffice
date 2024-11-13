@@ -9,7 +9,6 @@ import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluations
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
-import com.example.backoffice.domain.vacation.entity.VacationPeriod;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodHolder;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
@@ -20,10 +19,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Slf4j

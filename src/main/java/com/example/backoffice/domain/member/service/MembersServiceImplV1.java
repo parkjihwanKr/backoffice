@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -229,6 +231,57 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Transactional(readOnly = true)
     public Members findDepartmentManager(MemberDepartment department){
         return findByPositionAndDepartment(MemberPosition.MANAGER, department);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members matchLoginMember(Members member, Long memberId){
+        if(!member.getId().equals(memberId)){
+            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
+        }
+        return findById(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
+            List<MemberDepartment> excludedDepartmentList,
+            List<Long> excludedIdList){
+        List<Members> memberList = findAllById(excludedIdList);
+
+        for(Members member : memberList){
+            System.out.println("excludedMemberName : "+member.getMemberName());
+        }
+        if(memberList.size() != excludedIdList.size()){
+            throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
+        }
+
+        List<Members> memberListExcludingDepartmentAndId
+                = findByDepartmentNotInAndIdNotIn(excludedDepartmentList, excludedIdList);
+        Map<String, MemberDepartment> memberNameMap = new HashMap<>();
+
+        for(Members member : memberListExcludingDepartmentAndId){
+            memberNameMap.put(member.getMemberName(), member.getDepartment());
+        }
+        return memberNameMap;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findCeoByMemberName(String memberName){
+        Members ceo = membersRepository.findByMemberName(memberName).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_MEMBER_NAME));
+        if(!ceo.getPosition().equals(MemberPosition.CEO)){
+            throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+        }
+        return ceo;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByPosition(MemberPosition position) {
+        return membersRepository.findByPosition(position).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
     private Members findByPositionAndDepartment(

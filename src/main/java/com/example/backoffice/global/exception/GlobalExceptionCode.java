@@ -24,6 +24,7 @@ public enum GlobalExceptionCode {
     INVALID_SIGNATURE(HttpStatus.BAD_REQUEST, "JWT-003", "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다."),
     EXPIRED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "JWT-004", "Expired JWT token, 만료된 JWT token 입니다."),
     UNSUPPORTED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "JWT-005", "Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다."),
+    MISSING_TOKEN(HttpStatus.BAD_REQUEST, "JWT-006", "요청에 JWT token이 포함되지 않습니다."),
 
     // Authentcation
     NOT_MATCHED_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "AUTH-001", "해당 인증 정보가 일치하지 않습니다."),
@@ -38,6 +39,9 @@ public enum GlobalExceptionCode {
     // AuditLog
     NOT_FOUND_AUDIT_LOG(HttpStatus.BAD_REQUEST, "AUDIT_LOG-001", "해당 감사 로그를 찾을 수 없습니다."),
     NOT_MATCHED_AUDIT_LOG_TYPE(HttpStatus.BAD_REQUEST, "AUDIT-LOG-002", "해당 감사 로그 타입을 찾을 수 없습니다."),
+
+    // UNAUTHORIZED
+    UNAUTHORIZED(HttpStatus.BAD_REQUEST, "WEB-SOCKET-001", "해당 유저는 웹소캣 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

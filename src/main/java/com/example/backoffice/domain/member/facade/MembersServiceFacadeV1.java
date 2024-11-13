@@ -42,12 +42,6 @@ public interface MembersServiceFacadeV1 {
 
     void deleteOne(Long memberId, Members member);
 
-    Members matchLoginMember(Members member, Long memberId);
-
-    Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
-            List<MemberDepartment> excludedDepartmentList,
-            List<Long> excludedIdList);
-
     MembersResponseDto.UpdateOneForSalaryDto updateOneForSalary(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForSalaryDto requestDto);

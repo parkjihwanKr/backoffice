@@ -168,5 +168,7 @@ public class MembersResponseDto {
     public static class ReadNameDto{
         private Long memberId;
         private String memberName;
+        private MemberDepartment department;
+        private MemberPosition position;
     }
 }

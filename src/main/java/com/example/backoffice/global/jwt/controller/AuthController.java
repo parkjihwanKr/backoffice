@@ -36,7 +36,7 @@ public class AuthController {
         log.info("isAuthenticated : " + auth.isAuthenticated());
 
         MemberDetailsImpl memberDetails = (MemberDetailsImpl) auth.getPrincipal();
-        Members loginMember = memberDetails.getMember();
+        Members loginMember = memberDetails.getMembers();
 
         AuthDto authResponseDto = AuthDto.of(
                 loginMember.getId(),

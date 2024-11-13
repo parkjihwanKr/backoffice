@@ -1,7 +1,9 @@
 package com.example.backoffice.domain.notification.dto;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.domain.notification.entity.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,7 +53,9 @@ public class NotificationsResponseDto {
         private String notificationId;
         private String toMemberName;
         private String fromMemberName;
+        private NotificationType notificationType;
         private MemberDepartment fromMemberDepartment;
+        private MemberPosition fromMemberPosition;
         private LocalDateTime createdAt;
         private Boolean isRead;
         private String message;
@@ -65,8 +69,10 @@ public class NotificationsResponseDto {
         private String notificationId;
         private String toMemberName;
         private String fromMemberName;
+        private String message;
         private LocalDateTime createdAt;
         private Boolean isRead;
+        private NotificationType notificationType;
     }
 
     @Getter

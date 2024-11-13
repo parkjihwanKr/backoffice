@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MembersServiceV1 {
 
@@ -74,4 +75,14 @@ public interface MembersServiceV1 {
     Members findByFinanceManager();
 
     Members findDepartmentManager(MemberDepartment department);
+
+    Members matchLoginMember(Members member, Long memberId);
+
+    Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
+            List<MemberDepartment> excludedDepartmentList,
+            List<Long> excludedIdList);
+
+    Members findCeoByMemberName(String memberName);
+
+    Members findByPosition(MemberPosition position);
 }
