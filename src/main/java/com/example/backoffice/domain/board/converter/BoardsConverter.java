@@ -70,6 +70,8 @@ public class BoardsConverter {
                 .content(board.getContent())
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
+                .categories(board.getCategories().getLabel())
+                .boardType(board.getBoardType())
                 .likeCount(board.getLikeCount())
                 .viewCount(board.getViewCount())
                 .commentCount(commentCount)  // 댓글 수 추가
