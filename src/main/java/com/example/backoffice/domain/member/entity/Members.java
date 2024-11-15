@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.member.entity;
 
+import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.favorite.entity.Favorites;
 import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
@@ -85,6 +86,9 @@ public class Members extends CommonEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MembersEvaluations> membersEvaluations;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Attendances> attendanceList;
 
     // entity method
     public void updateMemberInfo(
