@@ -1,13 +1,29 @@
 package com.example.backoffice.global.date;
 
+import com.example.backoffice.global.exception.DateUtilException;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import lombok.Getter;
+
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class DateTimeUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+    @Getter
+    private static final LocalDateTime todayCheckInTime =
+            LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0));
+    @Getter
+    private static final LocalDateTime todayCheckOutTime =
+            LocalDateTime.of(LocalDate.now(), LocalTime.of(18, 0));
+
+    // 캐싱 데이터
+    private static LocalDateTime tomorrow;
 
     // 현재 시점(LocalDateTime) 반환
     public static LocalDateTime getCurrentDateTime() {
@@ -19,21 +35,21 @@ public class DateTimeUtils {
         try {
             return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("잘못된 날짜 형식입니다: " + dateTimeStr);
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
         }
     }
 
-    // 하루의 끝 시각을 반환 (23:59:59)
-    public static LocalDateTime getEndOfDay() {
-        return LocalDate.now()
-                .plusDays(1)
-                .atStartOfDay()
-                .minusSeconds(1);
+    public static LocalDateTime getToday(){
+        return LocalDate.now().atStartOfDay();
     }
 
     // 내일의 시작 시각을 반환
     public static LocalDateTime getTomorrow() {
-        return LocalDate.now().plusDays(1).atStartOfDay();
+        LocalDateTime today = getToday();
+        if (tomorrow == null || !tomorrow.toLocalDate().isEqual(today.toLocalDate())) {
+            tomorrow = today.plusDays(1);
+        }
+        return tomorrow;
     }
 
     // 특정 년도와 월의 시작일을 반환
@@ -50,7 +66,8 @@ public class DateTimeUtils {
     public static void validateStartAndEndDate(LocalDateTime startDate, LocalDateTime endDate) {
         if (startDate != null && endDate != null) {
             if (startDate.isAfter(endDate)) {
-                throw new IllegalArgumentException("시작일이 종료일보다 이후일 수 없습니다.");
+                throw new DateUtilException(
+                        GlobalExceptionCode.START_DATE_AFTER_END_DATE);
             }
         }
     }
@@ -62,5 +79,21 @@ public class DateTimeUtils {
 
         // 시작일과 종료일 검증
         validateStartAndEndDate(startDate, endDate);
+    }
+
+    public static Boolean isWithinHours(LocalDateTime checkInTime, LocalDateTime checkOutTime, Integer hours){
+        if (Duration.between(checkInTime, checkOutTime).toHours() <= hours) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isBeforeTodayCheckOutTime(LocalDateTime time) {
+        return time.isBefore(getTodayCheckOutTime());
+    }
+
+    public static boolean isWeekday() {
+        LocalDate today = getToday().toLocalDate();
+        return today.getDayOfWeek().getValue() >= 1 && today.getDayOfWeek().getValue() <= 5;
     }
 }

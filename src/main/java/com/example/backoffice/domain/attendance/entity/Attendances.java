@@ -5,6 +5,7 @@ import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Table
 @Entity
 @Builder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Attendances extends CommonEntity {
@@ -38,4 +40,19 @@ public class Attendances extends CommonEntity {
     private Members member;
 
     // entity method
+    public void updateCheckIn(
+            LocalDateTime checkinTime,
+            AttendanceStatus attendanceStatus){
+        this.checkinTime = checkinTime;
+        this.description = null;
+        this.attendanceStatus = attendanceStatus;
+    }
+
+    public void updateCheckOut(
+            LocalDateTime checkoutTime, String description,
+            AttendanceStatus attendanceStatus){
+        this.checkinTime = checkoutTime;
+        this.description = description;
+        this.attendanceStatus = attendanceStatus;
+    }
 }
