@@ -181,7 +181,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional
-    public AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatus(
+    public AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusForAdmin(
             Long memberId, Long attendanceId, Members loginMember,
             AttendancesRequestDto.UpdateAttendanceStatusDto requestDto){
         // 1. 변경하려는 대상과 근태 기록이 존재하는지

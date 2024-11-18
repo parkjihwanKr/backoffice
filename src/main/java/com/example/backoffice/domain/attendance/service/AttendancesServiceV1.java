@@ -86,7 +86,7 @@ public interface AttendancesServiceV1 {
      * @param requestDto : 입력받은 근태 상태, 변경하는 이유
      * @return 변경 상황 적용
      */
-    AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatus(
+    AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusForAdmin(
             Long memberId, Long attendanceId, Members loginMember,
             AttendancesRequestDto.UpdateAttendanceStatusDto requestDto);
 }

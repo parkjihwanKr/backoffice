@@ -85,12 +85,12 @@ public class AttendancesController {
     }
 
     @PatchMapping("/members/{memberId}/attendances/{attendanceId}/status")
-    public ResponseEntity<AttendancesResponseDto.UpdateAttendancesStatusDto> updateOneStatus(
+    public ResponseEntity<AttendancesResponseDto.UpdateAttendancesStatusDto> updateOneStatusForAdmin(
             @PathVariable Long memberId, @PathVariable Long attendanceId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody AttendancesRequestDto.UpdateAttendanceStatusDto requestDto){
         AttendancesResponseDto.UpdateAttendancesStatusDto responseDto
-                = attendancesService.updateOneStatus(memberId, attendanceId, memberDetails.getMembers(), requestDto);
+                = attendancesService.updateOneStatusForAdmin(memberId, attendanceId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }
