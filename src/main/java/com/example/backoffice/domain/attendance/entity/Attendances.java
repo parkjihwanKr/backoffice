@@ -55,4 +55,11 @@ public class Attendances extends CommonEntity {
         this.description = description;
         this.attendanceStatus = attendanceStatus;
     }
+
+    public void updateStatusAndDescription(
+            AttendanceStatus requestedAttendanceStatus,
+            String description){
+        this.attendanceStatus = requestedAttendanceStatus;
+        this.description = description;
+    }
 }

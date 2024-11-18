@@ -23,4 +23,13 @@ public class AttendancesRequestDto {
         private String checkOutTime;
         private String description;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class UpdateAttendanceStatusDto {
+        private String attendanceStatus; // 변경하려는 근태 상태 (e.g., "ON_TIME", "LATE")
+        private String description; // 근태 상태 변경 사유
+    }
 }

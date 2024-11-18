@@ -83,4 +83,14 @@ public class AttendancesController {
                 checkOutRange, memberDetails.getMembers(), pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }
+
+    @PatchMapping("/members/{memberId}/attendances/{attendanceId}/status")
+    public ResponseEntity<AttendancesResponseDto.UpdateAttendancesStatusDto> updateOneStatus(
+            @PathVariable Long memberId, @PathVariable Long attendanceId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestBody AttendancesRequestDto.UpdateAttendanceStatusDto requestDto){
+        AttendancesResponseDto.UpdateAttendancesStatusDto responseDto
+                = attendancesService.updateOneStatus(memberId, attendanceId, memberDetails.getMembers(), requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

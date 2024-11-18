@@ -57,6 +57,16 @@ public class AttendancesConverter {
                 .build();
     }
 
+    public static AttendancesResponseDto.UpdateAttendancesStatusDto toUpdateOneStatus(
+            Attendances attendance){
+        return AttendancesResponseDto.UpdateAttendancesStatusDto.builder()
+                .attendanceId(attendance.getId())
+                .attendanceStatus(attendance.getAttendanceStatus())
+                .description(attendance.getDescription())
+                .memberName(attendance.getMember().getMemberName())
+                .build();
+    }
+
     public static AttendanceStatus toAttendanceStatus(String attdStatus) {
         for (AttendanceStatus attendanceStatus : AttendanceStatus.values()) {
             if (attendanceStatus.getLabel().equalsIgnoreCase(attdStatus)) {

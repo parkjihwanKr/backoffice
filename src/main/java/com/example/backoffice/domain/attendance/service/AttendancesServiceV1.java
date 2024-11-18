@@ -77,4 +77,16 @@ public interface AttendancesServiceV1 {
             String memberName, String attendanceStatus,
             DateRange checkInRange, DateRange checkOutRange,
             Members loginMember, Pageable pageable);
+
+    /**
+     *
+     * @param memberId : 변경하려는 멤버 아이디
+     * @param attendanceId : 변경하려는 멤버의 근태 아이디
+     * @param loginMember : 로그인 멤버
+     * @param requestDto : 입력받은 근태 상태, 변경하는 이유
+     * @return 변경 상황 적용
+     */
+    AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatus(
+            Long memberId, Long attendanceId, Members loginMember,
+            AttendancesRequestDto.UpdateAttendanceStatusDto requestDto);
 }

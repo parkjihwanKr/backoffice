@@ -146,7 +146,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             DateRange checkInRange, DateRange checkOutRange,
             Members loginMember, Pageable pageable){
         // 1. 접근할 수 있는 권한을 가지는지?
-        Members hrManagerOrCeo = membersService.findHRManagerOrCEO(loginMember);
+        membersService.findHRManagerOrCEO(loginMember);
 
         // 2. memberName 확인
         Members foundMember = null;
@@ -177,6 +177,41 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 pageable);
 
         return memberAttendancePage.map(AttendancesConverter::toReadOneDto);
+    }
+
+    @Override
+    @Transactional
+    public AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatus(
+            Long memberId, Long attendanceId, Members loginMember,
+            AttendancesRequestDto.UpdateAttendanceStatusDto requestDto){
+        // 1. 변경하려는 대상과 근태 기록이 존재하는지
+        membersService.findById(memberId);
+        Attendances attendance
+                = attendancesRepository.findByMemberId(memberId).orElseThrow(
+                ()-> new AttendancesCustomException(AttendancesExceptionCode.NOT_FOUND_ATTENDANCES));
+
+        // 2. 근태 기록 변경 권한이 있는지
+        Members hrManagerOrCeo = membersService.findHRManagerOrCEO(loginMember);
+        if(hrManagerOrCeo == null){
+            throw new AttendancesCustomException(AttendancesExceptionCode.RESTRICTED_ACCESS);
+        }
+
+        // 3. 변경하려는 근태 상태가 적절하게 요청되었는지
+        AttendanceStatus requestedAttendanceStatus
+                = AttendancesConverter.toAttendanceStatus(
+                        requestDto.getAttendanceStatus());
+
+        // 4. 요청하려는 근태 상태와 변경하려는 근태 상태가 같진 않은지
+        if(attendance.getAttendanceStatus().equals(requestedAttendanceStatus)){
+            throw new AttendancesCustomException(AttendancesExceptionCode.EQUALS_TO_ATTENDANCES_STATUS);
+        }
+
+        // 5. 해당 근태 상태 변경
+        attendance.updateStatusAndDescription(
+                requestedAttendanceStatus, requestDto.getDescription());
+
+        // 6. DTO 반환
+        return AttendancesConverter.toUpdateOneStatus(attendance);
     }
 
     @Transactional(readOnly = true)

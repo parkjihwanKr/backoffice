@@ -54,4 +54,15 @@ public class AttendancesResponseDto {
         private AttendanceStatus attendanceStatus;
         private String description;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateAttendancesStatusDto {
+        private Long attendanceId;
+        private String memberName;
+        private AttendanceStatus attendanceStatus;
+        private String description;
+    }
 }
