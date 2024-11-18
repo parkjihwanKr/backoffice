@@ -29,10 +29,10 @@ public class Attendances extends CommonEntity {
     private String description;
 
     // 출근 시간 기록
-    private LocalDateTime checkinTime;
+    private LocalDateTime checkInTime;
 
     // 퇴근 시간 기록
-    private LocalDateTime checkoutTime;
+    private LocalDateTime checkOutTime;
 
     // relations
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,7 +43,7 @@ public class Attendances extends CommonEntity {
     public void updateCheckIn(
             LocalDateTime checkinTime,
             AttendanceStatus attendanceStatus){
-        this.checkinTime = checkinTime;
+        this.checkInTime = checkinTime;
         this.description = null;
         this.attendanceStatus = attendanceStatus;
     }
@@ -51,7 +51,7 @@ public class Attendances extends CommonEntity {
     public void updateCheckOut(
             LocalDateTime checkoutTime, String description,
             AttendanceStatus attendanceStatus){
-        this.checkinTime = checkoutTime;
+        this.checkInTime = checkoutTime;
         this.description = description;
         this.attendanceStatus = attendanceStatus;
     }

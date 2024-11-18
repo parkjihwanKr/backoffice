@@ -23,6 +23,7 @@ public class DateTimeUtils {
             LocalDateTime.of(LocalDate.now(), LocalTime.of(18, 0));
 
     // 캐싱 데이터
+    private static LocalDateTime today;
     private static LocalDateTime tomorrow;
 
     // 현재 시점(LocalDateTime) 반환
@@ -40,7 +41,10 @@ public class DateTimeUtils {
     }
 
     public static LocalDateTime getToday(){
-        return LocalDate.now().atStartOfDay();
+        if(today == null){
+            today = LocalDate.now().atStartOfDay();
+        }
+        return today;
     }
 
     // 내일의 시작 시각을 반환
@@ -95,5 +99,18 @@ public class DateTimeUtils {
     public static boolean isWeekday() {
         LocalDate today = getToday().toLocalDate();
         return today.getDayOfWeek().getValue() >= 1 && today.getDayOfWeek().getValue() <= 5;
+    }
+
+    // 작년과
+    public static void matchedBeforeOneYearOrThisYear(Long year){
+        if(!(year > today.getYear() -1 && year == today.getYear())){
+            throw new DateUtilException(GlobalExceptionCode.NOT_RETRIEVE_DATA);
+        }
+    }
+
+    public static void validateMonth(Long month){
+        if(month <= 0 || month >= 13){
+            throw new DateUtilException(GlobalExceptionCode.NOT_EXIST_MONTH);
+        }
     }
 }

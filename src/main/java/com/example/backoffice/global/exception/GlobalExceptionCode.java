@@ -47,6 +47,8 @@ public enum GlobalExceptionCode {
     // DateUtil
     NOT_PARSE_DATE(HttpStatus.BAD_REQUEST, "DATE-001", "잘못된 날짜 형식입니다. "),
     START_DATE_AFTER_END_DATE(HttpStatus.BAD_REQUEST, "DATE-002", "시작일이 종료일 이후 일 수 없습니다. "),
+    NOT_RETRIEVE_DATA(HttpStatus.BAD_REQUEST,"DATE-003", "일정을 조회할 수 없는 년 또는 달입니다."),
+    NOT_EXIST_MONTH(HttpStatus.BAD_REQUEST,"DATE-004", "존재하지 않은 달입니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -10,8 +10,11 @@ import com.example.backoffice.domain.attendance.exception.AttendancesExceptionCo
 import com.example.backoffice.domain.attendance.repository.AttendancesRepository;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
+import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.date.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +30,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     private final MembersServiceV1 membersService;
     private final AttendancesRepository attendancesRepository;
 
-    /**
-     * @param isWeekDay : 평일 : 휴일 = true : false
-     * 스케줄러를 통한 모든 멤버의 출석 기록을 자동 생성
-     */
     @Override
     @Transactional
     public void create(Boolean isWeekDay){
@@ -45,13 +44,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         attendancesRepository.saveAll(attendancesList);
     }
 
-    /**
-     *
-     * @param attendanceId : 근태 고유 아이디
-     * @param requestDto : 요청 출근 시간
-     * @param loginMember : 로그인 사용자
-     * @return 출근한 사용자 이름, 출근 시간, 근태 상태
-     */
     @Override
     @Transactional
     public AttendancesResponseDto.UpdateCheckInTimeDto updateCheckInTime(
@@ -72,13 +64,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         return AttendancesConverter.toUpdateCheckInTimeDto(attendance);
     }
 
-    /**
-     * 상태 : ON_DATE, ABSENT,
-     * @param attendanceId : 근태 고유 아이디
-     * @param requestDto : 퇴근 시간, 상태, 설명,
-     * @param loginMember : 로그인 사용자
-     * @return 퇴근자 이름, 출근 시간, 퇴근 시간, 근태 상태
-     */
     @Override
     @Transactional
     public AttendancesResponseDto.UpdateCheckOutTimeDto updateCheckOutTime(
@@ -95,20 +80,105 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         AttendanceStatus beforeCheckOutStatus = attendance.getAttendanceStatus();
         AttendanceStatus afterCheckOutStatus
                 = validateAndDetermineCheckOutStatus(
-                        attendance.getCheckoutTime(),
+                        attendance.getCheckOutTime(),
                 checkOutTime, beforeCheckOutStatus);
 
         attendance.updateCheckOut(
-                attendance.getCheckoutTime(), requestDto.getDescription(),
+                attendance.getCheckOutTime(), requestDto.getDescription(),
                 afterCheckOutStatus);
         return null;
     }
 
-    /**
-     *
-     * @param attendancesId : 근태 고유 아이디
-     * @return 근태 정보
-     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<AttendancesResponseDto.ReadOneDto> readFiltered(
+            Long memberId, Long year, Long month,
+            String attendanceStatus, Members loginMember){
+        // 1. 로그인 멤버와 조회하려는 아이디가 일치하는지?
+        membersService.matchLoginMember(loginMember, memberId);
+
+        // 2. 날짜 범위 설정
+        LocalDateTime startDate = (year != null && month != null)
+                ? DateTimeUtils.getStartDayOfMonth(year, month)
+                : null;
+
+        LocalDateTime endDate = (year != null && month != null)
+                ? DateTimeUtils.getEndDayOfMonth(year, month)
+                : null;
+
+        // 3. AttendanceStatus 변환
+        AttendanceStatus attdStatus = (attendanceStatus != null)
+                ? AttendancesConverter.toAttendanceStatus(attendanceStatus)
+                : null;
+
+        // 4. 동적 필터링된 데이터 조회
+        List<Attendances> memberAttendanceList
+                = attendancesRepository.findFiltered(
+                        memberId, startDate, endDate, attdStatus);
+
+        // 5. DTO 반환
+        return AttendancesConverter.toReadFilteredDto(memberAttendanceList);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AttendancesResponseDto.ReadOneDto readOne(
+            Long attendanceId, Members loginMember){
+        // 1. 출결 기록의 소유자인지 확인
+        Attendances attendance = findById(attendanceId);
+
+        // 1-1. 소유자의 아이디와 로그인 사용자의 아이디와 같을 때
+        if(!attendance.getMember().getId().equals(loginMember.getId())){
+            // 1-2. 로그인 사용자와 hrManager 또는 사장의 아이디가 같을 때
+            Members hrManagerOrCeo = membersService.findHRManager();
+            if(!hrManagerOrCeo.getId().equals(loginMember.getId())){
+                throw new AttendancesCustomException(AttendancesExceptionCode.RESTRICTED_ACCESS);
+            }
+        }
+
+        return AttendancesConverter.toReadOneDto(attendance);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AttendancesResponseDto.ReadOneDto> readForAdmin(
+            String memberName, String attendanceStatus,
+            DateRange checkInRange, DateRange checkOutRange,
+            Members loginMember, Pageable pageable){
+        // 1. 접근할 수 있는 권한을 가지는지?
+        Members hrManagerOrCeo = membersService.findHRManagerOrCEO(loginMember);
+
+        // 2. memberName 확인
+        Members foundMember = null;
+        if(memberName != null){
+            foundMember = membersService.findByMemberName(memberName);
+        }
+
+        // 3. 유효한 체크인, 체크아웃 시간 설정인지 확인
+        // 해당 날짜가 종료일보다 시작일이 빠른지
+        DateTimeUtils.validateStartAndEndDate(
+                checkInRange.getStartDate(), checkInRange.getEndDate());
+        DateTimeUtils.validateStartAndEndDate(
+                checkOutRange.getStartDate(), checkOutRange.getEndDate());
+
+        // 4. AttendanceStatus 변환
+        AttendanceStatus attdStatus = (attendanceStatus != null)
+                ? AttendancesConverter.toAttendanceStatus(attendanceStatus)
+                : null;
+
+        // 5. 필터링된 데이터 조회
+        Page<Attendances> memberAttendancePage = attendancesRepository.findFilteredForAdmin(
+                foundMember.getId(),
+                attdStatus,
+                checkInRange != null ? checkInRange.getStartDate() : null,
+                checkInRange != null ? checkInRange.getEndDate() : null,
+                checkOutRange != null ? checkOutRange.getStartDate() : null,
+                checkOutRange != null ? checkOutRange.getEndDate() : null,
+                pageable);
+
+        return memberAttendancePage.map(AttendancesConverter::toReadOneDto);
+    }
+
     @Transactional(readOnly = true)
     public Attendances findById(Long attendancesId){
         return attendancesRepository.findById(attendancesId).orElseThrow(
@@ -116,11 +186,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         );
     }
 
-    /**
-     *
-     * @param checkInTime : 출근 시간
-     * @return 근태 상태
-     */
     private AttendanceStatus validateAndDetermineCheckInStatus(LocalDateTime checkInTime){
         // 1. 출근 시간 유효한지?
         validateTime(checkInTime);
@@ -141,13 +206,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         return AttendanceStatus.ON_TIME;
     }
 
-    /**
-     *
-     * @param checkInTime : 출근 시간
-     * @param checkOutTime : 퇴근 시간
-     * @param beforeCheckOutStatus : 퇴근 전 근태 상태
-     * @return 퇴근 후 근태 상태
-     */
     private AttendanceStatus validateAndDetermineCheckOutStatus(
             LocalDateTime checkInTime, LocalDateTime checkOutTime, AttendanceStatus beforeCheckOutStatus){
         validateTime(checkOutTime);
@@ -171,9 +229,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         return AttendanceStatus.ON_TIME;
     }
 
-    /**
-     * @param time : 출근 시간, 퇴근 시간
-     */
     private void validateTime(LocalDateTime time){
         LocalDate tomorrow = DateTimeUtils.getTomorrow().toLocalDate();
         LocalDate today = DateTimeUtils.getToday().toLocalDate();

@@ -161,8 +161,10 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     public Members findHRManagerOrCEO(Members member){
         if ((member.getDepartment().equals(MemberDepartment.HR)
-                && member.getPosition().equals(MemberPosition.MANAGER))
-                || member.getPosition().equals(MemberPosition.CEO)){
+                && member.getPosition().equals(MemberPosition.MANAGER))){
+            return member;
+        }
+        if(member.getPosition().equals(MemberPosition.CEO)){
             return member;
         }
         throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
