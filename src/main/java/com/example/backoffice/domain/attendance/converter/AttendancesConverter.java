@@ -89,4 +89,14 @@ public class AttendancesConverter {
                 .map(AttendancesConverter::toReadOneDto)
                 .toList();
     }
+
+    public static AttendancesResponseDto.CreateOneDto toCreateOneForAdminDto(
+            String memberName, AttendanceStatus attendanceStatus, List<Long> attendanceIdList, String description){
+        return AttendancesResponseDto.CreateOneDto.builder()
+                .memberName(memberName)
+                .attendanceIdList(attendanceIdList)
+                .attendanceStatus(attendanceStatus)
+                .description(description)
+                .build();
+    }
 }

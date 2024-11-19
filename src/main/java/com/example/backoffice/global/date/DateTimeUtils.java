@@ -56,6 +56,12 @@ public class DateTimeUtils {
         return tomorrow;
     }
 
+    // 오늘이 지나서 오늘, 내일을 변경해야함
+    public static void refreshCached() {
+        today = LocalDate.now().atStartOfDay();
+        tomorrow = today.plusDays(1);
+    }
+
     // 특정 년도와 월의 시작일을 반환
     public static LocalDateTime getStartDayOfMonth(Long year, Long month) {
         return LocalDateTime.of(year.intValue(), month.intValue(), 1, 0, 0);
@@ -112,5 +118,10 @@ public class DateTimeUtils {
         if(month <= 0 || month >= 13){
             throw new DateUtilException(GlobalExceptionCode.NOT_EXIST_MONTH);
         }
+    }
+
+    public static Long calculateDaysBetween(LocalDateTime startDate, LocalDateTime endDate){
+        Duration duration = Duration.between(startDate, endDate);
+        return duration.toDays();
     }
 }

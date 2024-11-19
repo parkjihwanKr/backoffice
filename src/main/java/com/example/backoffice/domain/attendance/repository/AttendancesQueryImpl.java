@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,7 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Attendances> findFiltered(
             Long memberId, LocalDateTime startDate,
             LocalDateTime endDate, AttendanceStatus attdStatus) {
@@ -35,6 +37,7 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Attendances> findFilteredForAdmin(
             Long foundMemberId, AttendanceStatus attendanceStatus,
             LocalDateTime checkInStartTime, LocalDateTime checkInEndTime,
@@ -48,6 +51,20 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
         List<Attendances> content = query.fetch();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBeforeTwoYear(
+            List<Long> allMemberIdList,
+            LocalDateTime startOfDeletion, LocalDateTime endOfDeletion){
+        jpaQueryFactory
+                .delete(qAttendance)
+                .where(
+                        qAttendance.member.id.in(allMemberIdList)
+                                .and(qAttendance.createdAt.between(startOfDeletion, endOfDeletion))
+                )
+                .execute();
     }
 
     private BooleanBuilder buildFilters(

@@ -4,6 +4,7 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.global.scheduler.ScheduledEventType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -85,4 +86,11 @@ public interface MembersServiceV1 {
     Members findCeoByMemberName(String memberName);
 
     Members findByPosition(MemberPosition position);
+
+    void updateOneForRemainingVacationDays(
+            ScheduledEventType scheduledEventType);
+
+    void updateOneForOnVacationFalse(Long onVacationMemberId);
+
+    void updateOneForOnVacationTrue(Long onVacationMemberId);
 }

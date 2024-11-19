@@ -93,4 +93,14 @@ public class AttendancesController {
                 = attendancesService.updateOneStatusForAdmin(memberId, attendanceId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    @PostMapping("/attendances")
+    public ResponseEntity<AttendancesResponseDto.CreateOneDto> createOneForAdmin(
+            @RequestBody AttendancesRequestDto.CreateOneDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        AttendancesResponseDto.CreateOneDto responseDto
+                = attendancesService.createOneForAdmin(
+                        requestDto, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

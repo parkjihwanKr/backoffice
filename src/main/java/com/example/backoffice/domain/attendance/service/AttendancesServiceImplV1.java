@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +31,19 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     private final MembersServiceV1 membersService;
     private final AttendancesRepository attendancesRepository;
+    private final Map<Long, DateRange> cachedMemberAttendanceMap = new HashMap<>();
 
     @Override
     @Transactional
     public void create(Boolean isWeekDay){
         List<Members> memberList = membersService.findAll();
         List<Attendances> attendancesList = new ArrayList<>();
+
+        LocalDateTime today = DateTimeUtils.getToday();
+
+        if(cachedMemberAttendanceMap.containsValue(today)){
+
+        }
         for (Members member : memberList) {
             AttendanceStatus status = member.getOnVacation()
                     ? AttendanceStatus.VACATION
@@ -86,7 +95,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         attendance.updateCheckOut(
                 attendance.getCheckOutTime(), requestDto.getDescription(),
                 afterCheckOutStatus);
-        return null;
+        return AttendancesConverter.toUpdateCheckOutTimeDto(attendance);
     }
 
     @Override
@@ -212,6 +221,66 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         // 6. DTO 반환
         return AttendancesConverter.toUpdateOneStatus(attendance);
+    }
+
+    @Override
+    @Transactional
+    public AttendancesResponseDto.CreateOneDto createOneForAdmin(
+            AttendancesRequestDto.CreateOneDto requestDto, Members loginMember){
+        // 1. 근태 기록을 만들 수 있는 사람인지?
+        Members hrManagerOrCeo
+                = membersService.findHRManagerOrCEO(loginMember);
+        if(hrManagerOrCeo == null){
+            throw new AttendancesCustomException(AttendancesExceptionCode.RESTRICTED_ACCESS);
+        }
+        // 2. 만드려는 인원이 존재하는지?
+        Members foundMember
+                = membersService.findByMemberName(requestDto.getMemberName());
+
+        LocalDateTime specialStatusStartTime
+                = DateTimeUtils.parse(requestDto.getStartDate());
+        LocalDateTime specialStatusEndTime
+                = DateTimeUtils.parse(requestDto.getEndDate());
+        LocalDateTime customStartDate
+                = DateTimeUtils.getStartDayOfMonth(
+                        (long) specialStatusStartTime.getYear(),
+                (long) specialStatusStartTime.getMonthValue());
+        LocalDateTime customEndDate
+                = DateTimeUtils.getStartDayOfMonth(
+                        (long) specialStatusEndTime.getYear(),
+                (long) specialStatusEndTime.getMonthValue());
+        Long durationDays
+                = DateTimeUtils.calculateDaysBetween(customStartDate, customEndDate);
+
+        AttendanceStatus attdStatus
+                = AttendancesConverter.toAttendanceStatus(
+                        requestDto.getAttendanceStatus());
+        List<Attendances> attendanceList = new ArrayList<>();
+        for(long i = 1L; i< durationDays; i++){
+            attendanceList.add(
+                    AttendancesConverter.toEntity(
+                            foundMember, attdStatus));
+        }
+
+        attendancesRepository.saveAll(attendanceList);
+        cachedMemberAttendanceMap.put(foundMember.getId(),
+                new DateRange(customStartDate, customEndDate));
+
+        return AttendancesConverter.toCreateOneForAdminDto(
+                foundMember.getMemberName(), attdStatus,
+                attendanceList.stream().map(Attendances::getId).toList(),
+                attendanceList.get(0).getDescription());
+    }
+
+    @Override
+    @Transactional
+    public void delete(List<Long> allMemberIdList){
+        LocalDateTime startOfDeletion
+                = DateTimeUtils.getToday().minusYears(2);
+        LocalDateTime endOfDeletion
+                = DateTimeUtils.getToday().minusYears(1).minusSeconds(1);
+        attendancesRepository.deleteBeforeTwoYear(
+                allMemberIdList, startOfDeletion, endOfDeletion);
     }
 
     @Transactional(readOnly = true)

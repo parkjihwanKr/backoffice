@@ -19,4 +19,9 @@ public interface AttendancesQuery {
             LocalDateTime checkInStartTime, LocalDateTime checkInEndTime,
             LocalDateTime checkOutStartTime, LocalDateTime checkOutEndTime,
             Pageable pageable);
+
+    void deleteBeforeTwoYear(
+            List<Long> allMemberIdList,
+            LocalDateTime startOfDeletion,
+            LocalDateTime endOfDeletion);
 }

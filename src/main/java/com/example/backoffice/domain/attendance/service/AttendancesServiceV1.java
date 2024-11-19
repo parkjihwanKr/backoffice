@@ -89,4 +89,19 @@ public interface AttendancesServiceV1 {
     AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusForAdmin(
             Long memberId, Long attendanceId, Members loginMember,
             AttendancesRequestDto.UpdateAttendanceStatusDto requestDto);
+
+    /**
+     *
+     * @param loginMember : 로그인 멤버
+     * @param requestDto : 특정한 날에 특정한 사유(외근, 긴급한 휴가)로 근태 기록을 생성하는 DTO
+     * @return 관리자가 생성한 특별한 근태 기록
+     */
+    AttendancesResponseDto.CreateOneDto createOneForAdmin(
+            AttendancesRequestDto.CreateOneDto requestDto, Members loginMember);
+
+    /**
+     *
+     * @param allMemberIdList : 모든 멤버의 id 리스트
+     */
+    void delete(List<Long> allMemberIdList);
 }

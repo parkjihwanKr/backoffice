@@ -1,6 +1,6 @@
 package com.example.backoffice.global.scheduler;
 
-import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
+import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class MonthlyScheduler implements SchedulerTask{
 
-    private final MembersServiceFacadeV1 membersServiceFacade;
+    private final MembersServiceV1 membersService;
     private final VacationPeriodHolder vacationPeriodHolder;
 
     @Override
@@ -21,7 +21,7 @@ public class MonthlyScheduler implements SchedulerTask{
     }
 
     private void updateRemainingVacationDays() {
-        membersServiceFacade.updateOneForRemainingVacationDays(
+        membersService.updateOneForRemainingVacationDays(
                 ScheduledEventType.MONTHLY_UPDATE);
     }
 
