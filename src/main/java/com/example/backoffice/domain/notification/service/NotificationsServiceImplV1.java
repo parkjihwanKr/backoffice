@@ -214,6 +214,13 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                 yield notificationRepository.save(
                         toEntity(notificationData, notificationMessage, domainType));
             }
+            case CREATE_ATTENDANCES_MANUALLY -> {
+                String notificationMessage
+                        = notificationData.getFromMember()+"님이 "
+                        +notificationData.getMessage();
+                yield notificationRepository.save(
+                        toEntity(notificationData, notificationMessage, domainType));
+            }
             default -> throw new NotificationsCustomException(
                     NotificationsExceptionCode.NOT_MATCHED_NOTIFICATION_TYPE);
         };

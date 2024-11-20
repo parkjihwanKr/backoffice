@@ -14,6 +14,9 @@ public enum AttendancesExceptionCode {
     RESTRICTED_ACCESS(HttpStatus.BAD_REQUEST, "ATTENDANCES-005", "해당 출결 기록을 접근할 수 없습니다."),
     NOT_FOUND_ATTENDANCE_STATUS(HttpStatus.BAD_REQUEST, "ATTENDANCES-006", "해당하는 출결 상태는 존재하지 않습니다"),
     EQUALS_TO_ATTENDANCES_STATUS(HttpStatus.BAD_REQUEST, "ATTENDANCES-007", "요청하신 출결 상태는 적용하시려는 출결의 상태와 같습니다."),
+    DUPLICATED_ATTENDANCE(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-008",
+            "요청하신 날짜에 멤버의 근태 기록이 있습니다. 해당 부분을 삭제한 뒤, 수동 작성해주세요."),
     ;
     private final HttpStatus httpStatus;
     private final String errorCode;

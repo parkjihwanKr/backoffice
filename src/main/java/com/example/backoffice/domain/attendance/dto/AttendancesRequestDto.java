@@ -51,6 +51,18 @@ public class AttendancesRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class CreateOneManuallyForAdminDto {
+        private String memberName;
+        private String attendanceStatus;
+        private String checkInTime;
+        private String checkOutTime;
+        private String description;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DeleteForAdminDto{
         private List<Long> deleteAttendanceIdList;
     }

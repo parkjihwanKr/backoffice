@@ -12,6 +12,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import static com.example.backoffice.global.common.DateTimeFormatters.DATE_FORMATTER;
+
 public class DateTimeUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -32,6 +34,14 @@ public class DateTimeUtils {
         return LocalDateTime.now();
     }
 
+    public static LocalTime getCheckInTime(){
+        return todayCheckInTime.toLocalTime();
+    }
+
+    public static LocalTime getCheckOutTime(){
+        return todayCheckOutTime.toLocalTime();
+    }
+
     // 특정 문자열을 LocalDateTime으로 파싱
     public static LocalDateTime parse(String dateTimeStr) {
         try {
@@ -41,6 +51,13 @@ public class DateTimeUtils {
         }
     }
 
+    public static LocalDate parseToLocalDate(String dateTimeStr){
+        try {
+            return LocalDate.parse(dateTimeStr, DATE_FORMATTER); // DATE_FORMATTER는 "yyyy-MM-dd" 형식
+        } catch (DateTimeParseException e) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+    }
     public static LocalDateTime getToday(){
         if(today == null){
             today = LocalDate.now().atStartOfDay();

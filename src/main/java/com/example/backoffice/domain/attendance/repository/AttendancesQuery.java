@@ -5,6 +5,7 @@ import com.example.backoffice.domain.attendance.entity.Attendances;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,4 +25,11 @@ public interface AttendancesQuery {
             List<Long> allMemberIdList,
             LocalDateTime startOfDeletion,
             LocalDateTime endOfDeletion);
+
+    Attendances findByMemberIdAndCreatedDate(
+            Long memberId, LocalDate createdDate);
+
+    void saveManually(
+            Long memberId, LocalDateTime customCreatedAt,
+            Attendances attendance);
 }

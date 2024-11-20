@@ -10,6 +10,9 @@ import com.example.backoffice.domain.attendance.exception.AttendancesExceptionCo
 import com.example.backoffice.domain.attendance.repository.AttendancesRepository;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
+import com.example.backoffice.domain.notification.converter.NotificationsConverter;
+import com.example.backoffice.domain.notification.entity.NotificationType;
+import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.date.DateTimeUtils;
 import com.example.backoffice.global.redis.CachedMemberAttendanceRedisProvider;
@@ -29,6 +32,7 @@ import java.util.List;
 public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     private final MembersServiceV1 membersService;
+    private final NotificationsServiceV1 notificationsService;
     private final AttendancesRepository attendancesRepository;
     private final CachedMemberAttendanceRedisProvider cachedMemberAttendanceRedisProvider;
 
@@ -218,11 +222,54 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             throw new AttendancesCustomException(AttendancesExceptionCode.EQUALS_TO_ATTENDANCES_STATUS);
         }
 
-        // 5. 해당 근태 상태 변경
-        attendance.updateStatusAndDescription(
-                requestedAttendanceStatus, requestDto.getDescription());
+        switch (requestedAttendanceStatus) {
+            case ON_TIME -> {
+                LocalDate checkInDate
+                        = attendance.getCheckInTime().toLocalDate();
+                // 오늘 근태 기록을 변경하는 경우
+                if(checkInDate.equals(DateTimeUtils.getToday().toLocalDate())){
+                    attendance.updateOneForToday(
+                            requestedAttendanceStatus, requestDto.getDescription(),
+                            DateTimeUtils.getTodayCheckOutTime());
+                }else{
+                    // 오늘 이전의 근태 기록을 변경하는 경우
+                   attendance.updateOneForBeforeToday(
+                           requestedAttendanceStatus, requestDto.getDescription(),
+                           LocalDateTime.of(checkInDate, DateTimeUtils.getCheckInTime()),
+                           LocalDateTime.of(checkInDate, DateTimeUtils.getCheckOutTime()));
+                }
+            }
 
-        // 6. DTO 반환
+            case VACATION, OUT_OF_OFFICE, HOLIDAY, ABSENT ->
+                    attendance.updateOneForOutside(
+                            requestedAttendanceStatus, requestDto.getDescription());
+            case LATE -> {
+                LocalDate checkInDate
+                        = attendance.getCheckInTime().toLocalDate();
+                if(checkInDate.equals(DateTimeUtils.getToday().toLocalDate())){
+                    attendance.updateOneForToday(
+                            requestedAttendanceStatus, requestDto.getDescription(),
+                            LocalDateTime.of(checkInDate, DateTimeUtils.getCheckInTime()).plusMinutes(1));
+                }else{
+                    // 오늘 이전의 근태 기록을 변경하는 경우
+                    attendance.updateOneForBeforeToday(
+                            requestedAttendanceStatus, requestDto.getDescription(),
+                            LocalDateTime.of(checkInDate, DateTimeUtils.getCheckInTime()).plusMinutes(1),
+                            LocalDateTime.of(checkInDate, DateTimeUtils.getCheckOutTime()));
+                }
+            }
+            case HALF_DAY -> {
+                LocalDate checkInDate
+                        = attendance.getCheckInTime().toLocalDate();
+                attendance.updateOneForHalfDay(
+                        requestedAttendanceStatus, requestDto.getDescription(),
+                        LocalDateTime.of(checkInDate, DateTimeUtils.getCheckInTime()),
+                        LocalDateTime.of(checkInDate, DateTimeUtils.getCheckInTime().plusHours(4)));
+            }
+            default -> throw new AttendancesCustomException(AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
+        }
+
+        // 5. DTO 반환
         return AttendancesConverter.toUpdateOneStatus(attendance);
     }
 
@@ -285,6 +332,52 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         if(!existingIdList.isEmpty()){
             attendancesRepository.deleteAllById(existingIdList);
         }
+    }
+
+    @Override
+    @Transactional
+    public AttendancesResponseDto.CreateOneDto createOneManuallyForAdmin(
+            AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto, Members loginMember) {
+        // 1. 해당 근태 기록을 읽을 수 있는 권한인지?
+        validateAccess(loginMember);
+
+        // 2. 근태 기록을 생성하려는 인원이 존재하는지?
+        Members foundMember
+                = membersService.findByMemberName(requestDto.getMemberName());
+
+        // 3. 해당하는 날짜에 해당 멤버의 근태 기록이 존재하는지?
+        LocalDate createdDate
+                = DateTimeUtils.parseToLocalDate(requestDto.getCheckInTime());
+        Attendances duplicatedAttendance
+                = attendancesRepository.findByMemberIdAndCreatedDate(
+                        foundMember.getId(), createdDate);
+        if(duplicatedAttendance != null){
+            throw new AttendancesCustomException(AttendancesExceptionCode.DUPLICATED_ATTENDANCE);
+        }
+
+        AttendanceStatus attdStatus
+                = AttendancesConverter.toAttendanceStatus(requestDto.getCheckOutTime());
+        // 4. 새로운 근태 기록 생성
+        Attendances newAttendance = AttendancesConverter.toEntityForAdmin(
+                foundMember, DateTimeUtils.parse(requestDto.getCheckInTime()),
+                DateTimeUtils.parse(requestDto.getCheckOutTime()),
+                attdStatus, requestDto.getDescription());
+
+        // 5. QueryDSL로 createdAt 값을 수동 설정하여 저장
+        LocalDateTime customCreatedAt = DateTimeUtils.parse(requestDto.getCheckInTime());
+        attendancesRepository.saveManually(foundMember.getId(), customCreatedAt, newAttendance);
+
+        // 6. 알림 생성 및 반환
+        Members auditManagerOrCeo = membersService.findAuditManagerOrCeo();
+        notificationsService.generateEntityAndSendMessage(
+                NotificationsConverter.toNotificationData(
+                        auditManagerOrCeo, loginMember, null,
+                        null, null, null,
+                        "새로운 근태 기록을 수동으로 작성하셨습니다."),
+                NotificationType.CREATE_ATTENDANCES_MANUALLY);
+
+        return AttendancesConverter.toCreateOneForAdminDto(
+                foundMember.getMemberName(), attdStatus, requestDto.getDescription());
     }
 
     @Transactional(readOnly = true)

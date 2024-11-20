@@ -116,4 +116,14 @@ public class AttendancesController {
                 )
         );
     }
+
+    @PostMapping("/attendances/manual-create")
+    public ResponseEntity<AttendancesResponseDto.CreateOneDto> createOneManuallyForAdmin(
+            @RequestBody AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        AttendancesResponseDto.CreateOneDto responseDto
+                = attendancesService.createOneManuallyForAdmin(
+                requestDto, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

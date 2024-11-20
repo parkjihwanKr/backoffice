@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -63,6 +64,41 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
                 .where(
                         qAttendance.member.id.in(allMemberIdList)
                                 .and(qAttendance.createdAt.between(startOfDeletion, endOfDeletion))
+                )
+                .execute();
+    }
+
+    @Override
+    @Transactional
+    public Attendances findByMemberIdAndCreatedDate(
+            Long memberId, LocalDate createdDate) {
+        return jpaQueryFactory
+                .selectFrom(qAttendance)
+                .where(
+                        qAttendance.member.id.eq(memberId),
+                        qAttendance.createdAt.year().eq(createdDate.getYear()),
+                        qAttendance.createdAt.month().eq(createdDate.getMonthValue()),
+                        qAttendance.createdAt.dayOfMonth().eq(createdDate.getDayOfMonth())
+                )
+                .fetchOne();
+    }
+
+    @Override
+    @Transactional
+    public void saveManually(
+            Long memberId, LocalDateTime customCreatedAt,
+            Attendances attendance) {
+        jpaQueryFactory.insert(qAttendance)
+                .columns(qAttendance.member, qAttendance.attendanceStatus,
+                        qAttendance.description, qAttendance.checkInTime,
+                        qAttendance.checkOutTime, qAttendance.createdAt)
+                .values(
+                        attendance.getMember(),
+                        attendance.getAttendanceStatus(),
+                        attendance.getDescription(),
+                        attendance.getCheckInTime(),
+                        attendance.getCheckOutTime(),
+                        customCreatedAt
                 )
                 .execute();
     }

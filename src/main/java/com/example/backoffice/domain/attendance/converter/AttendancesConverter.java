@@ -7,6 +7,7 @@ import com.example.backoffice.domain.attendance.exception.AttendancesCustomExcep
 import com.example.backoffice.domain.attendance.exception.AttendancesExceptionCode;
 import com.example.backoffice.domain.member.entity.Members;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,20 @@ public class AttendancesConverter {
                 .checkInTime(null)
                 .checkOutTime(null)
                 .description("스케줄러에 의한 하루 근태 생성")
+                .member(member)
+                .build();
+    }
+
+    public static Attendances toEntityForAdmin(
+            Members member, LocalDateTime checkInTime,
+            LocalDateTime checkOutTime, AttendanceStatus attendanceStatus,
+            String description){
+        return Attendances.builder()
+                // 초기에 생성되는 status는 결석, 휴가, 휴일
+                .attendanceStatus(attendanceStatus)
+                .checkInTime(checkInTime)
+                .checkOutTime(checkOutTime)
+                .description(description)
                 .member(member)
                 .build();
     }

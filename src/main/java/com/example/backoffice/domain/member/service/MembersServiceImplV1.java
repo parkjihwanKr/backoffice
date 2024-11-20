@@ -214,14 +214,22 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByFinanceManagerOrCeo(Long memberId) {
-        Members foundMember = findById(memberId);
-        if(foundMember.getPosition().equals(MemberPosition.CEO)
-                || foundMember.getPosition().equals(MemberPosition.MANAGER)
-                && foundMember.getDepartment().equals(MemberDepartment.FINANCE)){
-            return foundMember;
+    public Members findAuditManagerOrCeo() {
+        Members auditManager = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.AUDIT);
+        if(auditManager != null){
+            return auditManager;
         }
-        return null;
+        return findByPosition(MemberPosition.CEO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByFinanceManagerOrCeo(Long memberId) {
+        Members financeManager = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.FINANCE);
+        if(financeManager != null){
+            return financeManager;
+        }
+        return findByPosition(MemberPosition.CEO);
     }
 
     // 존재하지 않다면 ceo를 찾아야함
