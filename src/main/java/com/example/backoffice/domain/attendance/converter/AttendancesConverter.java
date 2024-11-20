@@ -91,10 +91,9 @@ public class AttendancesConverter {
     }
 
     public static AttendancesResponseDto.CreateOneDto toCreateOneForAdminDto(
-            String memberName, AttendanceStatus attendanceStatus, List<Long> attendanceIdList, String description){
+            String memberName, AttendanceStatus attendanceStatus, String description){
         return AttendancesResponseDto.CreateOneDto.builder()
                 .memberName(memberName)
-                .attendanceIdList(attendanceIdList)
                 .attendanceStatus(attendanceStatus)
                 .description(description)
                 .build();

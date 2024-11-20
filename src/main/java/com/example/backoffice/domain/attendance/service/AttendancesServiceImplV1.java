@@ -12,6 +12,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.date.DateTimeUtils;
+import com.example.backoffice.global.redis.CachedMemberAttendanceRedisProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +30,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     private final MembersServiceV1 membersService;
     private final AttendancesRepository attendancesRepository;
-    private final Map<Long, DateRange> cachedMemberAttendanceMap = new HashMap<>();
+    private final CachedMemberAttendanceRedisProvider cachedMemberAttendanceRedisProvider;
 
     @Override
     @Transactional
@@ -39,16 +38,20 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         List<Members> memberList = membersService.findAll();
         List<Attendances> attendancesList = new ArrayList<>();
 
-        LocalDateTime today = DateTimeUtils.getToday();
-
-        if(cachedMemberAttendanceMap.containsValue(today)){
-
-        }
         for (Members member : memberList) {
-            AttendanceStatus status = member.getOnVacation()
-                    ? AttendanceStatus.VACATION
-                    : (isWeekDay ? AttendanceStatus.ABSENT : AttendanceStatus.HOLIDAY);
-            attendancesList.add(AttendancesConverter.toEntity(member, status));
+            // Redis에서 해당 멤버의 DateRange 데이터 가져오기
+            DateRange cachedDateRange = cachedMemberAttendanceRedisProvider.getValue(member.getId(), DateRange.class);
+
+            if (cachedDateRange != null && DateTimeUtils.isInDateRange(cachedDateRange)) {
+                // Redis에 저장된 기간 내라면 외근으로 처리
+                attendancesList.add(AttendancesConverter.toEntity(member, AttendanceStatus.OUT_OF_OFFICE));
+            } else {
+                // 일반 근태 기록 생성
+                AttendanceStatus status = member.getOnVacation()
+                        ? AttendanceStatus.VACATION
+                        : (isWeekDay ? AttendanceStatus.ABSENT : AttendanceStatus.HOLIDAY);
+                attendancesList.add(AttendancesConverter.toEntity(member, status));
+            }
         }
         attendancesRepository.saveAll(attendancesList);
     }
@@ -237,39 +240,24 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         Members foundMember
                 = membersService.findByMemberName(requestDto.getMemberName());
 
-        LocalDateTime specialStatusStartTime
-                = DateTimeUtils.parse(requestDto.getStartDate());
-        LocalDateTime specialStatusEndTime
-                = DateTimeUtils.parse(requestDto.getEndDate());
-        LocalDateTime customStartDate
-                = DateTimeUtils.getStartDayOfMonth(
-                        (long) specialStatusStartTime.getYear(),
-                (long) specialStatusStartTime.getMonthValue());
-        LocalDateTime customEndDate
-                = DateTimeUtils.getStartDayOfMonth(
-                        (long) specialStatusEndTime.getYear(),
-                (long) specialStatusEndTime.getMonthValue());
-        Long durationDays
-                = DateTimeUtils.calculateDaysBetween(customStartDate, customEndDate);
+        // 3. DateRange 계산
+        LocalDateTime startTime = DateTimeUtils.parse(requestDto.getStartDate());
+        LocalDateTime endTime = DateTimeUtils.parse(requestDto.getEndDate());
+        DateTimeUtils.validateStartAndEndDate(startTime, endTime);
 
-        AttendanceStatus attdStatus
-                = AttendancesConverter.toAttendanceStatus(
-                        requestDto.getAttendanceStatus());
-        List<Attendances> attendanceList = new ArrayList<>();
-        for(long i = 1L; i< durationDays; i++){
-            attendanceList.add(
-                    AttendancesConverter.toEntity(
-                            foundMember, attdStatus));
-        }
+        DateRange dateRange = new DateRange(
+                DateTimeUtils.getStartDayOfMonth((long) startTime.getYear(), (long) startTime.getMonthValue()),
+                DateTimeUtils.getStartDayOfMonth((long) endTime.getYear(), (long) endTime.getMonthValue()));
 
-        attendancesRepository.saveAll(attendanceList);
-        cachedMemberAttendanceMap.put(foundMember.getId(),
-                new DateRange(customStartDate, customEndDate));
+        // 4. Redis에 캐싱
+        cachedMemberAttendanceRedisProvider.saveOne(foundMember.getId(), dateRange);
 
+        // 5. Response DTO 반환
         return AttendancesConverter.toCreateOneForAdminDto(
-                foundMember.getMemberName(), attdStatus,
-                attendanceList.stream().map(Attendances::getId).toList(),
-                attendanceList.get(0).getDescription());
+                foundMember.getMemberName(),
+                AttendancesConverter.toAttendanceStatus(requestDto.getAttendanceStatus()),
+                requestDto.getDescription()
+        );
     }
 
     @Override

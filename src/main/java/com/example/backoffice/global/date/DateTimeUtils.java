@@ -1,5 +1,6 @@
 package com.example.backoffice.global.date;
 
+import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.exception.DateUtilException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class DateTimeUtils {
     private static final LocalDateTime todayCheckOutTime =
             LocalDateTime.of(LocalDate.now(), LocalTime.of(18, 0));
 
-    // 캐싱 데이터
+    // 하루마다 갱신되는 캐싱 데이터
     private static LocalDateTime today;
     private static LocalDateTime tomorrow;
 
@@ -123,5 +124,15 @@ public class DateTimeUtils {
     public static Long calculateDaysBetween(LocalDateTime startDate, LocalDateTime endDate){
         Duration duration = Duration.between(startDate, endDate);
         return duration.toDays();
+    }
+
+    public static Long calculateMinutesFromTodayToEndDate(LocalDateTime endDate){
+        Duration duration = Duration.between(today, endDate);
+        return duration.toMinutes();
+    }
+
+    public static boolean isInDateRange(DateRange dateRange) {
+        return (today.isEqual(dateRange.getStartDate()) || today.isAfter(dateRange.getStartDate()))
+                && (today.isBefore(dateRange.getEndDate()) || today.isEqual(dateRange.getEndDate()));
     }
 }
