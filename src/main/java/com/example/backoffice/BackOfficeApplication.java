@@ -27,7 +27,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 				"com.example.backoffice.domain.member.repository",
 				"com.example.backoffice.domain.reaction.repository",
 				"com.example.backoffice.domain.vacation.repository",
-				"com.example.backoffice.domain.expense.repository"
+				"com.example.backoffice.domain.expense.repository",
+				"com.example.backoffice.domain.attendance.repository",
 		})
 @EnableMongoRepositories(
 		basePackages = {

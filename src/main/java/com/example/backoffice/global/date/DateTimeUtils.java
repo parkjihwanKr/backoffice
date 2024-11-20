@@ -1,17 +1,45 @@
 package com.example.backoffice.global.date;
 
+import com.example.backoffice.global.common.DateRange;
+import com.example.backoffice.global.exception.DateUtilException;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import lombok.Getter;
+
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
+import static com.example.backoffice.global.common.DateTimeFormatters.DATE_FORMATTER;
 
 public class DateTimeUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
+    @Getter
+    private static final LocalDateTime todayCheckInTime =
+            LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0));
+    @Getter
+    private static final LocalDateTime todayCheckOutTime =
+            LocalDateTime.of(LocalDate.now(), LocalTime.of(18, 0));
+
+    // 하루마다 갱신되는 캐싱 데이터
+    private static LocalDateTime today;
+    private static LocalDateTime tomorrow;
+
     // 현재 시점(LocalDateTime) 반환
     public static LocalDateTime getCurrentDateTime() {
         return LocalDateTime.now();
+    }
+
+    public static LocalTime getCheckInTime(){
+        return todayCheckInTime.toLocalTime();
+    }
+
+    public static LocalTime getCheckOutTime(){
+        return todayCheckOutTime.toLocalTime();
     }
 
     // 특정 문자열을 LocalDateTime으로 파싱
@@ -19,21 +47,37 @@ public class DateTimeUtils {
         try {
             return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("잘못된 날짜 형식입니다: " + dateTimeStr);
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
         }
     }
 
-    // 하루의 끝 시각을 반환 (23:59:59)
-    public static LocalDateTime getEndOfDay() {
-        return LocalDate.now()
-                .plusDays(1)
-                .atStartOfDay()
-                .minusSeconds(1);
+    public static LocalDate parseToLocalDate(String dateTimeStr){
+        try {
+            return LocalDate.parse(dateTimeStr, DATE_FORMATTER); // DATE_FORMATTER는 "yyyy-MM-dd" 형식
+        } catch (DateTimeParseException e) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+    }
+    public static LocalDateTime getToday(){
+        if(today == null){
+            today = LocalDate.now().atStartOfDay();
+        }
+        return today;
     }
 
     // 내일의 시작 시각을 반환
     public static LocalDateTime getTomorrow() {
-        return LocalDate.now().plusDays(1).atStartOfDay();
+        LocalDateTime today = getToday();
+        if (tomorrow == null || !tomorrow.toLocalDate().isEqual(today.toLocalDate())) {
+            tomorrow = today.plusDays(1);
+        }
+        return tomorrow;
+    }
+
+    // 오늘이 지나서 오늘, 내일을 변경해야함
+    public static void refreshCached() {
+        today = LocalDate.now().atStartOfDay();
+        tomorrow = today.plusDays(1);
     }
 
     // 특정 년도와 월의 시작일을 반환
@@ -50,17 +94,36 @@ public class DateTimeUtils {
     public static void validateStartAndEndDate(LocalDateTime startDate, LocalDateTime endDate) {
         if (startDate != null && endDate != null) {
             if (startDate.isAfter(endDate)) {
-                throw new IllegalArgumentException("시작일이 종료일보다 이후일 수 없습니다.");
+                throw new DateUtilException(
+                        GlobalExceptionCode.START_DATE_AFTER_END_DATE);
             }
         }
     }
 
-    // 날짜 문자열을 파싱하고 검증까지 처리
-    public static void validateAndParseDates(String startDateStr, String endDateStr) {
-        LocalDateTime startDate = startDateStr != null ? parse(startDateStr) : null;
-        LocalDateTime endDate = endDateStr != null ? parse(endDateStr) : null;
 
-        // 시작일과 종료일 검증
-        validateStartAndEndDate(startDate, endDate);
+    public static Boolean isWithinHours(LocalDateTime checkInTime, LocalDateTime checkOutTime, Integer hours){
+        if (Duration.between(checkInTime, checkOutTime).toHours() <= hours) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isBeforeTodayCheckOutTime(LocalDateTime time) {
+        return time.isBefore(getTodayCheckOutTime());
+    }
+
+    public static boolean isWeekday() {
+        LocalDate today = getToday().toLocalDate();
+        return today.getDayOfWeek().getValue() >= 1 && today.getDayOfWeek().getValue() <= 5;
+    }
+
+    public static Long calculateMinutesFromTodayToEndDate(LocalDateTime endDate){
+        Duration duration = Duration.between(today, endDate);
+        return duration.toMinutes();
+    }
+
+    public static boolean isInDateRange(DateRange dateRange) {
+        return (today.isEqual(dateRange.getStartDate()) || today.isAfter(dateRange.getStartDate()))
+                && (today.isBefore(dateRange.getEndDate()) || today.isEqual(dateRange.getEndDate()));
     }
 }

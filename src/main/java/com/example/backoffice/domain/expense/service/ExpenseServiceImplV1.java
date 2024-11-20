@@ -165,8 +165,6 @@ public class ExpenseServiceImplV1 implements ExpenseServiceV1{
         }
         
         // 2. 날짜 필터링 로직 적용
-        DateTimeUtils.validateAndParseDates(requestDto.getCreatedAtStart(), requestDto.getCreatedAtEnd());
-
         LocalDateTime startDate = requestDto.getCreatedAtStart() != null ? DateTimeUtils.parse(requestDto.getCreatedAtStart()) : null;
         LocalDateTime endDate = requestDto.getCreatedAtEnd() != null ? DateTimeUtils.parse(requestDto.getCreatedAtEnd()) : null;
 

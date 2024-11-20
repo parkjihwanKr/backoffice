@@ -8,6 +8,9 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.member.repository.MembersRepository;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.SchedulerCustomException;
+import com.example.backoffice.global.scheduler.ScheduledEventType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -161,8 +164,10 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     public Members findHRManagerOrCEO(Members member){
         if ((member.getDepartment().equals(MemberDepartment.HR)
-                && member.getPosition().equals(MemberPosition.MANAGER))
-                || member.getPosition().equals(MemberPosition.CEO)){
+                && member.getPosition().equals(MemberPosition.MANAGER))){
+            return member;
+        }
+        if(member.getPosition().equals(MemberPosition.CEO)){
             return member;
         }
         throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
@@ -209,14 +214,22 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByFinanceManagerOrCeo(Long memberId) {
-        Members foundMember = findById(memberId);
-        if(foundMember.getPosition().equals(MemberPosition.CEO)
-                || foundMember.getPosition().equals(MemberPosition.MANAGER)
-                && foundMember.getDepartment().equals(MemberDepartment.FINANCE)){
-            return foundMember;
+    public Members findAuditManagerOrCeo() {
+        Members auditManager = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.AUDIT);
+        if(auditManager != null){
+            return auditManager;
         }
-        return null;
+        return findByPosition(MemberPosition.CEO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByFinanceManagerOrCeo(Long memberId) {
+        Members financeManager = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.FINANCE);
+        if(financeManager != null){
+            return financeManager;
+        }
+        return findByPosition(MemberPosition.CEO);
     }
 
     // 존재하지 않다면 ceo를 찾아야함
@@ -284,10 +297,45 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
                 ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
+    @Override
+    @Transactional
+    public void updateOneForRemainingVacationDays(
+            ScheduledEventType scheduledEventType){
+        List<Members> memberList = findAll();
+        switch (scheduledEventType) {
+            case MONTHLY_UPDATE -> {
+                for(Members member : memberList){
+                    member.updateRemainingVacation();
+                }
+            }
+            case YEARLY_UPDATE -> {
+                for(Members member : memberList){
+                    member.updateRemainingVacationYearly();
+                }
+            }
+            default ->
+                    throw new SchedulerCustomException(GlobalExceptionCode.NOT_FOUND_SCHEDULER_EVENT_TYPE);
+        }
+    }
     private Members findByPositionAndDepartment(
             MemberPosition position, MemberDepartment department){
         return membersRepository.findByPositionAndDepartment(
                 position, department).orElseThrow(
                         ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
+
+    @Override
+    @Transactional
+    public void updateOneForOnVacationFalse(Long onVacationMemberId){
+        Members member = findById(onVacationMemberId);
+        member.updateOnVacation(false);
+    }
+
+    @Override
+    @Transactional
+    public void updateOneForOnVacationTrue(Long onVacationMemberId){
+        Members member = findById(onVacationMemberId);
+        member.updateOnVacation(true);
+    }
+
 }

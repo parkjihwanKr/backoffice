@@ -62,27 +62,6 @@ public class NotificationsConverter {
                 .build();
     }
 
-    /*public static NotificationsResponseDto.CreateForAdminDto toCreateForAdminDto(
-            Members mainAdmin, Set<MemberDepartment> memberDepartmentSet,
-            List<Notifications> notificationList, String message) {
-        List<String> toMemberNameList = new ArrayList<>();
-        List<String> notificationIdList = new ArrayList<>();
-        for (Notifications notification : notificationList) {
-            toMemberNameList.add(
-                    notification.getToMemberName());
-            notificationIdList.add(notification.getId());
-        }
-
-        return NotificationsResponseDto.CreateForAdminDto.builder()
-                .notificationIdList(notificationIdList)
-                .message(message)
-                .fromAdminRole(mainAdmin.getRole())
-                .fromMemberName(mainAdmin.getMemberName())
-                .toMemberDepartmentSet(memberDepartmentSet)
-                .toMemberNameList(toMemberNameList)
-                .build();
-    }*/
-
     public static Page<NotificationsResponseDto.ReadDto> toReadDto(
             Page<Notifications> notificationPage) {
         return notificationPage.map(

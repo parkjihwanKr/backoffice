@@ -2,16 +2,13 @@ package com.example.backoffice.domain.member.facade;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
-import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
-import com.example.backoffice.global.scheduler.ScheduledEventType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 public interface MembersServiceFacadeV1 {
     MembersResponseDto.CreateOneDto createOneForSignup(
@@ -54,16 +51,6 @@ public interface MembersServiceFacadeV1 {
             MembersRequestDto.UpdateOneForVacationDto requestDto);
 
     List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember);
-
-    void updateOneForOnVacationFalse(Long onVacationMemberId);
-
-    void updateOneForOnVacationTrue(Long onVacationMemberId);
-
-    void updateOneForRemainingVacationDays(ScheduledEventType scheduledEventType);
-
-    List<Members> findAllByDepartment(String department);
-
-    Members findHRManager();
 
     Members findByMemberName(String memberName);
 }
