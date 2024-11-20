@@ -104,4 +104,12 @@ public interface AttendancesServiceV1 {
      * @param allMemberIdList : 모든 멤버의 id 리스트
      */
     void delete(List<Long> allMemberIdList);
-}
+
+    /**
+     *
+     * @param requestDto : 삭제를 원하는 멤버의 아이디 리스트 객체
+     * @param loginMember : 로그인 사용자
+     */
+    void deleteForAdmin(
+            AttendancesRequestDto.DeleteForAdminDto requestDto, Members loginMember);
+    }

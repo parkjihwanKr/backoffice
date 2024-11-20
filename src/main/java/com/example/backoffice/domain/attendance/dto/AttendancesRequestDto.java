@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class AttendancesRequestDto {
 
     @Getter
@@ -43,5 +45,13 @@ public class AttendancesRequestDto {
         private String startDate;
         private String endDate;
         private String description;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeleteForAdminDto{
+        private List<Long> deleteAttendanceIdList;
     }
 }

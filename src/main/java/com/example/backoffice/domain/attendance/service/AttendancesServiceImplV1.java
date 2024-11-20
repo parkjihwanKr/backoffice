@@ -158,7 +158,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             DateRange checkInRange, DateRange checkOutRange,
             Members loginMember, Pageable pageable){
         // 1. 접근할 수 있는 권한을 가지는지?
-        membersService.findHRManagerOrCEO(loginMember);
+        validateAccess(loginMember);
 
         // 2. memberName 확인
         Members foundMember = null;
@@ -231,11 +231,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     public AttendancesResponseDto.CreateOneDto createOneForAdmin(
             AttendancesRequestDto.CreateOneDto requestDto, Members loginMember){
         // 1. 근태 기록을 만들 수 있는 사람인지?
-        Members hrManagerOrCeo
-                = membersService.findHRManagerOrCEO(loginMember);
-        if(hrManagerOrCeo == null){
-            throw new AttendancesCustomException(AttendancesExceptionCode.RESTRICTED_ACCESS);
-        }
+        validateAccess(loginMember);
+
         // 2. 만드려는 인원이 존재하는지?
         Members foundMember
                 = membersService.findByMemberName(requestDto.getMemberName());
@@ -269,6 +266,25 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 = DateTimeUtils.getToday().minusYears(1).minusSeconds(1);
         attendancesRepository.deleteBeforeTwoYear(
                 allMemberIdList, startOfDeletion, endOfDeletion);
+    }
+
+    @Override
+    @Transactional
+    public void deleteForAdmin(
+            AttendancesRequestDto.DeleteForAdminDto requestDto, Members loginMember){
+        // 1. 접근할 수 있는 권한이 있는지?
+        validateAccess(loginMember);
+
+        // 2. 해당하는 근태 기록 존재하는지?
+        List<Long> existingIdList
+                = attendancesRepository.findAllById(
+                        requestDto.getDeleteAttendanceIdList())
+                .stream().map(Attendances::getId).toList();
+
+        // 3. 해당 아이디 리스트가 비어있지 않으면 삭제
+        if(!existingIdList.isEmpty()){
+            attendancesRepository.deleteAllById(existingIdList);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -335,6 +351,13 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         if (!time.toLocalDate().isBefore(tomorrow)) {
             throw new AttendancesCustomException(
                     AttendancesExceptionCode.TIME_EQUAL_OR_AFTER_TOMORROW);
+        }
+    }
+
+    private void validateAccess(Members loginMember){
+        Members hrManagerOrCeo = membersService.findHRManagerOrCEO(loginMember);
+        if(hrManagerOrCeo == null){
+            throw new AttendancesCustomException(AttendancesExceptionCode.RESTRICTED_ACCESS);
         }
     }
 }

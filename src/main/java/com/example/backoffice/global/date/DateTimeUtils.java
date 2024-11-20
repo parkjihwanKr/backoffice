@@ -83,14 +83,6 @@ public class DateTimeUtils {
         }
     }
 
-    // 날짜 문자열을 파싱하고 검증까지 처리
-    public static void validateAndParseDates(String startDateStr, String endDateStr) {
-        LocalDateTime startDate = startDateStr != null ? parse(startDateStr) : null;
-        LocalDateTime endDate = endDateStr != null ? parse(endDateStr) : null;
-
-        // 시작일과 종료일 검증
-        validateStartAndEndDate(startDate, endDate);
-    }
 
     public static Boolean isWithinHours(LocalDateTime checkInTime, LocalDateTime checkOutTime, Integer hours){
         if (Duration.between(checkInTime, checkOutTime).toHours() <= hours) {
@@ -106,24 +98,6 @@ public class DateTimeUtils {
     public static boolean isWeekday() {
         LocalDate today = getToday().toLocalDate();
         return today.getDayOfWeek().getValue() >= 1 && today.getDayOfWeek().getValue() <= 5;
-    }
-
-    // 작년과
-    public static void matchedBeforeOneYearOrThisYear(Long year){
-        if(!(year > today.getYear() -1 && year == today.getYear())){
-            throw new DateUtilException(GlobalExceptionCode.NOT_RETRIEVE_DATA);
-        }
-    }
-
-    public static void validateMonth(Long month){
-        if(month <= 0 || month >= 13){
-            throw new DateUtilException(GlobalExceptionCode.NOT_EXIST_MONTH);
-        }
-    }
-
-    public static Long calculateDaysBetween(LocalDateTime startDate, LocalDateTime endDate){
-        Duration duration = Duration.between(startDate, endDate);
-        return duration.toDays();
     }
 
     public static Long calculateMinutesFromTodayToEndDate(LocalDateTime endDate){

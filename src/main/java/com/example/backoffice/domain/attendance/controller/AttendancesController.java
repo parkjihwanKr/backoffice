@@ -4,6 +4,7 @@ import com.example.backoffice.domain.attendance.dto.AttendancesRequestDto;
 import com.example.backoffice.domain.attendance.dto.AttendancesResponseDto;
 import com.example.backoffice.domain.attendance.service.AttendancesServiceV1;
 import com.example.backoffice.global.common.DateRange;
+import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -102,5 +103,17 @@ public class AttendancesController {
                 = attendancesService.createOneForAdmin(
                         requestDto, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @DeleteMapping("/attendances")
+    public ResponseEntity<CommonResponseDto<Void>> deleteForAdmin(
+            @RequestBody AttendancesRequestDto.DeleteForAdminDto requestDto,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        attendancesService.deleteForAdmin(requestDto, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponseDto<>(
+                        null, "해당 근태 기록들이 삭제되었습니다.", 200
+                )
+        );
     }
 }
