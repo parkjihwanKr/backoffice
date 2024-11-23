@@ -91,11 +91,6 @@ public class AttendancesConverter {
         throw new AttendancesCustomException(AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
     }
 
-    public static AttendancesResponseDto.ReadDto toReadDto(
-            List<Attendances> memberAttendanceList){
-        return null;
-    }
-
     public static List<AttendancesResponseDto.ReadOneDto> toReadFilteredDto(
             List<Attendances> memberAttendanceList) {
         return memberAttendanceList == null || memberAttendanceList.isEmpty()
