@@ -2,6 +2,8 @@ package com.example.backoffice.global.redis;
 
 import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.date.DateTimeUtils;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.JsonCustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,7 +35,8 @@ public class CachedMemberAttendanceRedisProvider {
         try {
             valueString = objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException();
+            throw new JsonCustomException(
+                    GlobalExceptionCode.NOT_DESERIALIZED_JSON);
         }
 
         redisTemplateForCached.opsForValue().set(key, valueString);
@@ -50,23 +53,16 @@ public class CachedMemberAttendanceRedisProvider {
         if (Objects.isNull(value)) {
             return null; // 키가 없을 경우 null 반환
         }
-
         try {
             // JSON 문자열을 지정된 타입의 객체로 변환하여 반환
             return objectMapper.readValue(value, valueType);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to deserialize Redis value for key: " + key, e);
+            throw new JsonCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
         }
     }
 
     // 토큰 삭제
     public void delete(String key) {
         redisTemplateForCached.delete(key);
-    }
-
-    public boolean existsByKey(Long memberId) {
-        String key = keyPrefix + memberId;
-        String refreshToken = redisTemplateForCached.opsForValue().get(key).toString();
-        return refreshToken != null && !refreshToken.isEmpty();
     }
 }
