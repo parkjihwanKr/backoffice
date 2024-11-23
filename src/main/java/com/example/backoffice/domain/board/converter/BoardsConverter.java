@@ -168,10 +168,10 @@ public class BoardsConverter {
     }
 
     public static BoardsResponseDto.CreateOneDto toCreateOneDto(
-            Boards board, List<String> fileUrlList){
+            Boards board, List<String> fileUrlList, String loginMemberName){
         return BoardsResponseDto.CreateOneDto.builder()
                 .boardId(board.getId())
-                .author(board.getMember().getName())
+                .author(loginMemberName)
                 .title(board.getTitle())
                 .content(board.getContent())
                 .fileList(fileUrlList)
@@ -216,7 +216,6 @@ public class BoardsConverter {
     }
 
     public static BoardCategories toCategories(String categoryName){
-        System.out.println("categoryName : "+categoryName);
         for(BoardCategories categories : BoardCategories.values()){
             if(categories.getLabel().equalsIgnoreCase(categoryName)){
                 return categories;

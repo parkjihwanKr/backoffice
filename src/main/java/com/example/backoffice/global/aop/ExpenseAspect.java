@@ -29,7 +29,7 @@ public class ExpenseAspect {
     public void expenseServiceMethods() {}
 
     // 공통 메서드: 로그 메시지를 생성하고 저장
-    private void logAudit(
+    /*private void logAudit(
             String memberName, String title, String action,
             AuditLogType auditLogType, MemberDepartment department,
             MemberPosition position) {
@@ -98,5 +98,5 @@ public class ExpenseAspect {
         commonAspect.getLogMessage(message);
         auditLogService.save(AuditLogType.EXPENSE_REPORT_ERROR, member.getMemberName(), message,
                 member.getDepartment(), member.getPosition());
-    }
+    }*/
 }

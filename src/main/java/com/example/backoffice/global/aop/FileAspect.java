@@ -42,6 +42,9 @@ public class FileAspect {
         String methodName = commonAspect.getCurrentMethodName(joinPoint);
         String message = "";
         Members loginMember = commonAspect.getLoginMemberInfo();
+        if(loginMember == null){
+            log.error("해당 로그인 멤버에 대한 인증 요청이 이루어지지 않았습니다.");
+        }
         if (methodName.equals("createOneForMemberRole")
                 || methodName.equals("createOneForBoard") || methodName.equals("createImage")
                 || methodName.equals("createOneForEvent") || methodName.equals("createOneForExpense")) {
