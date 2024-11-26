@@ -2,13 +2,16 @@ package com.example.backoffice.global.scheduler;
 
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodHolder;
+import com.example.backoffice.global.date.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j(topic = "monthlyScheduler")
 public class MonthlyScheduler implements SchedulerTask{
 
     private final MembersServiceV1 membersService;
@@ -46,6 +49,18 @@ public class MonthlyScheduler implements SchedulerTask{
         // 세 번째 주의 금요일까지
         LocalDateTime startDate = secondMonday;
         LocalDateTime endDate = startDate.plusDays(11); // 월요일 + 4일 -> 금요일
+
+        // localhost test용
+        /*LocalDateTime today = DateTimeUtils.getToday();
+        vacationPeriodHolder.setVacationPeriod(
+                DateTimeUtils.getToday(),
+                DateTimeUtils.getEndDayOfMonth(
+                        (long) today.getYear(), (long) today.getMonthValue())
+        );
+
+        log.info("로컬 환경 휴가 신청 기간 설정 : "
+                +vacationPeriodHolder.getVacationPeriod().getStartDate() + " ~ "
+        +vacationPeriodHolder.getVacationPeriod().getEndDate());*/
 
         // 휴가 신청 기간을 VacationPeriod에 저장
         vacationPeriodHolder.setVacationPeriod(startDate, endDate);

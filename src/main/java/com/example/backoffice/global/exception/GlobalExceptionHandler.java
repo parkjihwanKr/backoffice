@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
 
-    /*// 그 외의 일반적인 예외 처리
+    /* 그 외의 일반적인 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CommonResponseDto<Void>> handleGlobalException(Exception ex) {
         // 에러 응답 생성
