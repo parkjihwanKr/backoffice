@@ -337,8 +337,10 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files, BoardType boardType){
         // Department board, General board 구분
-        MemberDepartment department
-                = MembersConverter.toDepartment(requestDto.getDepartment());
+        MemberDepartment department = null;
+        if(requestDto.getDepartment() != null){
+            department = MembersConverter.toDepartment(requestDto.getDepartment());
+        }
 
         BoardCategories categories
                 = BoardsConverter.toCategories(requestDto.getCategory());
@@ -353,7 +355,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
                 // GENERAL_BOARD는 잠금이 필요없음.
                 board.update(requestDto.getTitle(), requestDto.getContent(),
                         requestDto.getIsImportant(), false,
-                        department, categories);
+                        null, categories);
             }
             default -> throw new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD_TYPE);
         }

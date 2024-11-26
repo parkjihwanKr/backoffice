@@ -12,16 +12,13 @@ import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
-import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.date.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor

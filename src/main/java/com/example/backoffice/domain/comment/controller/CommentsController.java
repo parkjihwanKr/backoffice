@@ -51,7 +51,7 @@ public class CommentsController {
         );
     }
 
-    @PostMapping("/boards/{boardId}/comments/{commentId}")
+    @PostMapping("/boards/{boardId}/comments/{commentId}/replies")
     public ResponseEntity<CommentsResponseDto.CreateReplyDto> createReply(
             @PathVariable Long boardId, @PathVariable Long commentId,
             @RequestBody CommentsRequestDto.CreateReplyDto requestDto,
