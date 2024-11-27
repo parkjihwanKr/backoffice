@@ -58,6 +58,7 @@ public class DateTimeUtils {
             throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
         }
     }
+
     public static LocalDateTime getToday(){
         if(today == null){
             today = LocalDate.now().atStartOfDay();
@@ -82,11 +83,13 @@ public class DateTimeUtils {
 
     // 특정 년도와 월의 시작일을 반환
     public static LocalDateTime getStartDayOfMonth(Long year, Long month) {
+        validateYearAndMonth(year, month);
         return LocalDateTime.of(year.intValue(), month.intValue(), 1, 0, 0);
     }
 
     // 특정 년도와 월의 마지막 날을 반환
     public static LocalDateTime getEndDayOfMonth(Long year, Long month) {
+        validateYearAndMonth(year, month);
         return getStartDayOfMonth(year, month).plusMonths(1).minusSeconds(1);
     }
 
@@ -125,5 +128,15 @@ public class DateTimeUtils {
     public static boolean isInDateRange(DateRange dateRange) {
         return (today.isEqual(dateRange.getStartDate()) || today.isAfter(dateRange.getStartDate()))
                 && (today.isBefore(dateRange.getEndDate()) || today.isEqual(dateRange.getEndDate()));
+    }
+
+    private static void validateYearAndMonth(Long year, Long month){
+        if (year < 1) {
+            throw new DateUtilException(GlobalExceptionCode.INVALID_YEAR);
+        }
+
+        if (month < 1 || month > 12) {
+            throw new DateUtilException(GlobalExceptionCode.INVALID_MONTH);
+        }
     }
 }

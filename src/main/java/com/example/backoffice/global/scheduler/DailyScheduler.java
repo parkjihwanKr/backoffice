@@ -42,6 +42,11 @@ public class DailyScheduler implements SchedulerTask{
     private void refreshCachedDateData(){
         DateTimeUtils.refreshCached();
     }
+
+    private void refreshCachedMemberData(){
+
+    }
+
     private void sendNotificationForUnCompletedEvaluationMember(){
         List<Evaluations> evaluationList
                 = evaluationsService.findAllByEndDatePlusSevenDays(LocalDate.now().plusDays(7));

@@ -75,4 +75,25 @@ public class AttendancesResponseDto {
         private AttendanceStatus attendanceStatus;
         private String description;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadMonthlyDto {
+        private List<ReadDayDto> dayDtoList;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadDayDto {
+        private Long attendanceId;
+        private String memberName;
+        private Integer absentCount;
+        private Integer onTimeCount;
+        private Integer onVacationCount;
+        private Integer outOfOfficeCount;
+    }
 }

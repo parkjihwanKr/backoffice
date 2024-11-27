@@ -49,6 +49,8 @@ public enum GlobalExceptionCode {
     START_DATE_AFTER_END_DATE(HttpStatus.BAD_REQUEST, "DATE-002", "시작일이 종료일 이후 일 수 없습니다. "),
     NOT_RETRIEVE_DATA(HttpStatus.BAD_REQUEST,"DATE-003", "일정을 조회할 수 없는 년 또는 달입니다."),
     NOT_EXIST_MONTH(HttpStatus.BAD_REQUEST,"DATE-004", "존재하지 않은 달입니다."),
+    INVALID_YEAR(HttpStatus.BAD_REQUEST,"DATE-005", "알맞지 않은 년도를 요청하셨습니다."),
+    INVALID_MONTH(HttpStatus.BAD_REQUEST,"DATE-006", "알맞지 않은 달을 요청하셨습니다."),
     ;
 
     private final HttpStatus httpStatus;

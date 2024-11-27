@@ -95,4 +95,8 @@ public interface MembersServiceV1 {
     void updateOneForOnVacationFalse(Long onVacationMemberId);
 
     void updateOneForOnVacationTrue(Long onVacationMemberId);
+
+    List<Members> findAllByMemberName(String memberName);
+
+    List<Members> findAllByDepartment(MemberDepartment department, String memberName);
 }

@@ -6,10 +6,15 @@ import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
 import com.example.backoffice.domain.attendance.exception.AttendancesExceptionCode;
 import com.example.backoffice.domain.member.entity.Members;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AttendancesConverter {
 
@@ -107,5 +112,53 @@ public class AttendancesConverter {
                 .attendanceStatus(attendanceStatus)
                 .description(description)
                 .build();
+    }
+
+    public static Page<AttendancesResponseDto.ReadMonthlyDto> toReadFilteredMonthlyDto(
+            Page<Attendances> attendancePage) {
+
+        Map<LocalDate, Map<Long, List<Attendances>>> groupedAttendances =
+                attendancePage.getContent().stream()
+                        .collect(Collectors.groupingBy(
+                                attendance -> attendance.getCreatedAt().toLocalDate(), // Group by date
+                                Collectors.groupingBy(attendance -> attendance.getMember().getId()) // Group by member ID
+                        ));
+
+        List<AttendancesResponseDto.ReadMonthlyDto> monthlyDtoList = groupedAttendances.entrySet().stream()
+                .map(dateEntry -> {
+                    List<AttendancesResponseDto.ReadDayDto> dayDtoList = dateEntry.getValue().entrySet().stream()
+                            .map(memberEntry -> {
+                                List<Attendances> memberAttendances = memberEntry.getValue();
+                                Members member = memberAttendances.get(0).getMember();
+
+                                int absentCount = (int) memberAttendances.stream()
+                                        .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ABSENT)
+                                        .count();
+                                int onTimeCount = (int) memberAttendances.stream()
+                                        .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ON_TIME)
+                                        .count();
+                                int onVacationCount = (int) memberAttendances.stream()
+                                        .filter(att -> att.getAttendanceStatus() == AttendanceStatus.VACATION)
+                                        .count();
+                                int outOfOfficeCount = (int) memberAttendances.stream()
+                                        .filter(att -> att.getAttendanceStatus() == AttendanceStatus.OUT_OF_OFFICE)
+                                        .count();
+
+                                return AttendancesResponseDto.ReadDayDto.builder()
+                                        .attendanceId(memberEntry.getKey()) // Unique member ID
+                                        .memberName(member.getName()) // Member name
+                                        .absentCount(absentCount)
+                                        .onTimeCount(onTimeCount)
+                                        .onVacationCount(onVacationCount)
+                                        .outOfOfficeCount(outOfOfficeCount)
+                                        .build();
+                            }).toList();
+
+                    return AttendancesResponseDto.ReadMonthlyDto.builder()
+                            .dayDtoList(dayDtoList)
+                            .build();
+                }).toList();
+
+        return new PageImpl<>(monthlyDtoList, attendancePage.getPageable(), attendancePage.getTotalElements());
     }
 }

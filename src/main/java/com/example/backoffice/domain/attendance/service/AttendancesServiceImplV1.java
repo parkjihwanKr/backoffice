@@ -380,6 +380,45 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 foundMember.getMemberName(), attdStatus, requestDto.getDescription());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyForAdmin(
+            String memberName, String department, Long year, Long month,
+            Pageable pageable, Members loginMember) {
+
+        // 1. 해당 월의 시작일과 마지막 일 계산
+        LocalDateTime yearMonthStartDay = DateTimeUtils.getStartDayOfMonth(year, month);
+        LocalDateTime yearMonthEndDay = DateTimeUtils.getEndDayOfMonth(year, month);
+
+        // 2. 멤버 리스트 필터링
+        List<Members> filteredMembers;
+        if (memberName == null && department == null) {
+            filteredMembers = membersService.findAll();
+        } else if (memberName != null && department == null) {
+            filteredMembers = membersService.findAllByMemberName(memberName);
+        } else if (memberName == null && department != null) {
+            filteredMembers = membersService.findAllByDepartment(
+                    membersService.findDepartment(department));
+        } else {
+            filteredMembers = membersService.findAllByDepartment(
+                    membersService.findDepartment(department), memberName);
+        }
+
+        // 3. 멤버 ID 리스트 추출
+        List<Long> memberIds = filteredMembers.stream()
+                .map(Members::getId)
+                .toList();
+
+        // 4. 근태 기록 필터링
+        Page<Attendances> attendancePage
+                = attendancesRepository.findAllFilteredByMonth(
+                        memberIds, yearMonthStartDay, yearMonthEndDay, pageable);
+
+        // 5. 응답 반환
+        return AttendancesConverter.toReadFilteredMonthlyDto(attendancePage);
+    }
+
+
     @Transactional(readOnly = true)
     public Attendances findById(Long attendancesId){
         return attendancesRepository.findById(attendancesId).orElseThrow(
