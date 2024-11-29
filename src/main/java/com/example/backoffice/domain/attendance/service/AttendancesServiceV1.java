@@ -169,4 +169,22 @@ public interface AttendancesServiceV1 {
     Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyForAdmin(
             String memberName, String department, Long year, Long month,
             Pageable pageable, Members loginMember);
+
+    /**
+     * 모든 멤버의 일간 근태 기록 조회
+     *
+     * @param memberName 필터링할 멤버 이름 (optional)
+     * @param department 필터링할 부서 이름 (optional)
+     * @param year 조회할 년도
+     * @param month 조회할 월
+     * @param day 조회할 일
+     * @param pageable 페이징 정보
+     * @param loginMember 로그인 사용자
+     * @return 필터링된 일간 근태 기록 페이지
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
+     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
+     */
+    Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyForAdmin(
+            String memberName, String department, Long year, Long month, Long day,
+            Pageable pageable, Members loginMember);
 }

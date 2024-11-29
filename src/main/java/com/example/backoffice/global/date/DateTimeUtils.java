@@ -125,6 +125,12 @@ public class DateTimeUtils {
         return duration.toMinutes();
     }
 
+    public static LocalDateTime of(Long year, Long month, Long day){
+        validateYearAndMonth(year, month);
+        return LocalDateTime.of(
+                year.intValue(), month.intValue(), day.intValue(), 0, 0, 0);
+    }
+
     public static boolean isInDateRange(DateRange dateRange) {
         return (today.isEqual(dateRange.getStartDate()) || today.isAfter(dateRange.getStartDate()))
                 && (today.isBefore(dateRange.getEndDate()) || today.isEqual(dateRange.getEndDate()));

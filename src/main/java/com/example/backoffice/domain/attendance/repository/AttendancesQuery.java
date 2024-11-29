@@ -34,7 +34,7 @@ public interface AttendancesQuery {
             Long memberId, LocalDateTime customCreatedAt,
             Attendances attendance);
 
-    Page<Attendances> findAllFilteredByMonth(
+    Page<Attendances> findAllFiltered(
             List<Long> memberIdList, LocalDateTime yearMonthStartDay,
             LocalDateTime yearMonthEndDay, Pageable pageable);
 }

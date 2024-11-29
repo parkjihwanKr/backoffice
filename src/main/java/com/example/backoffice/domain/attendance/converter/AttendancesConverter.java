@@ -70,6 +70,7 @@ public class AttendancesConverter {
             Attendances attendance){
         return AttendancesResponseDto.ReadOneDto.builder()
                 .attendanceId(attendance.getId())
+                .memberId(attendance.getMember().getId())
                 .description(attendance.getDescription())
                 .attendanceStatus(attendance.getAttendanceStatus())
                 .checkInTime(attendance.getCheckInTime())
@@ -117,48 +118,76 @@ public class AttendancesConverter {
     public static Page<AttendancesResponseDto.ReadMonthlyDto> toReadFilteredMonthlyDto(
             Page<Attendances> attendancePage) {
 
-        Map<LocalDate, Map<Long, List<Attendances>>> groupedAttendances =
+        // 날짜별로 그룹화하여 각 날짜의 근태 요약 정보를 생성
+        Map<LocalDate, List<Attendances>> groupedByDate =
                 attendancePage.getContent().stream()
                         .collect(Collectors.groupingBy(
-                                attendance -> attendance.getCreatedAt().toLocalDate(), // Group by date
-                                Collectors.groupingBy(attendance -> attendance.getMember().getId()) // Group by member ID
+                                attendance -> attendance.getCreatedAt().toLocalDate() // 날짜 기준으로 그룹화
                         ));
 
-        List<AttendancesResponseDto.ReadMonthlyDto> monthlyDtoList = groupedAttendances.entrySet().stream()
-                .map(dateEntry -> {
-                    List<AttendancesResponseDto.ReadDayDto> dayDtoList = dateEntry.getValue().entrySet().stream()
-                            .map(memberEntry -> {
-                                List<Attendances> memberAttendances = memberEntry.getValue();
-                                Members member = memberAttendances.get(0).getMember();
+        // 그룹화된 데이터를 이용해 ReadMonthlyDto 리스트 생성
+        List<AttendancesResponseDto.ReadMonthlyDto> monthlyDtoList = groupedByDate.entrySet().stream()
+                .map(entry -> {
+                    LocalDate date = entry.getKey();
+                    List<Attendances> dailyAttendances = entry.getValue();
 
-                                int absentCount = (int) memberAttendances.stream()
-                                        .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ABSENT)
-                                        .count();
-                                int onTimeCount = (int) memberAttendances.stream()
-                                        .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ON_TIME)
-                                        .count();
-                                int onVacationCount = (int) memberAttendances.stream()
-                                        .filter(att -> att.getAttendanceStatus() == AttendanceStatus.VACATION)
-                                        .count();
-                                int outOfOfficeCount = (int) memberAttendances.stream()
-                                        .filter(att -> att.getAttendanceStatus() == AttendanceStatus.OUT_OF_OFFICE)
-                                        .count();
+                    // 각 상태별 카운트 계산
+                    int absentCount = (int) dailyAttendances.stream()
+                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ABSENT)
+                            .count();
+                    int onTimeCount = (int) dailyAttendances.stream()
+                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ON_TIME)
+                            .count();
+                    int onVacationCount = (int) dailyAttendances.stream()
+                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.VACATION)
+                            .count();
+                    int outOfOfficeCount = (int) dailyAttendances.stream()
+                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.OUT_OF_OFFICE)
+                            .count();
+                    int lateCount = (int) dailyAttendances.stream()
+                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.LATE)
+                            .count();
+                    int halfDayCount = (int) dailyAttendances.stream()
+                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HALF_DAY)
+                            .count();
 
-                                return AttendancesResponseDto.ReadDayDto.builder()
-                                        .attendanceId(memberEntry.getKey()) // Unique member ID
-                                        .memberName(member.getName()) // Member name
-                                        .absentCount(absentCount)
-                                        .onTimeCount(onTimeCount)
-                                        .onVacationCount(onVacationCount)
-                                        .outOfOfficeCount(outOfOfficeCount)
-                                        .build();
-                            }).toList();
-
+                    // ReadMonthlyDto 생성
                     return AttendancesResponseDto.ReadMonthlyDto.builder()
-                            .dayDtoList(dayDtoList)
+                            .createdAt(date.atStartOfDay()) // 해당 날짜의 시작 시간
+                            .absentCount(absentCount)
+                            .onTimeCount(onTimeCount)
+                            .onVacationCount(onVacationCount)
+                            .lateCount(lateCount)
+                            .halfDayCount(halfDayCount)
+                            .outOfOfficeCount(outOfOfficeCount)
                             .build();
                 }).toList();
 
+        // PageImpl 객체로 변환하여 반환
         return new PageImpl<>(monthlyDtoList, attendancePage.getPageable(), attendancePage.getTotalElements());
+    }
+
+    public static Page<AttendancesResponseDto.ReadOneDto> toReadFilteredDailyDto(
+            Page<Attendances> attendancePage) {
+
+        // Attendances 엔티티를 ReadOneDto로 변환
+        List<AttendancesResponseDto.ReadOneDto> memberAttendanceList = attendancePage.getContent().stream()
+                .map(attendance -> AttendancesResponseDto.ReadOneDto.builder()
+                        .attendanceId(attendance.getId())
+                        .memberId(attendance.getMember().getId())
+                        .memberName(attendance.getMember().getName())
+                        .checkInTime(attendance.getCheckInTime())
+                        .checkOutTime(attendance.getCheckOutTime())
+                        .attendanceStatus(attendance.getAttendanceStatus())
+                        .description(attendance.getDescription())
+                        .build())
+                .toList();
+
+        // 변환된 데이터를 PageImpl로 반환
+        return new PageImpl<>(
+                memberAttendanceList,
+                attendancePage.getPageable(),
+                attendancePage.getTotalElements()
+        );
     }
 }

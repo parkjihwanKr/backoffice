@@ -105,16 +105,16 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Attendances> findAllFilteredByMonth(
-            List<Long> memberIdList, LocalDateTime yearMonthStartDay,
-            LocalDateTime yearMonthEndDay, Pageable pageable) {
+    public Page<Attendances> findAllFiltered(
+            List<Long> memberIdList, LocalDateTime customStartDay,
+            LocalDateTime customEndDay, Pageable pageable) {
 
         // 1. BooleanBuilder를 사용해 필터 조건 생성
         BooleanBuilder builder = new BooleanBuilder();
         if (memberIdList != null && !memberIdList.isEmpty()) {
             builder.and(qAttendance.member.id.in(memberIdList));
         }
-        builder.and(qAttendance.createdAt.between(yearMonthStartDay, yearMonthEndDay));
+        builder.and(qAttendance.createdAt.between(customStartDay, customEndDay));
 
         // 2. Query 생성
         JPAQuery<Attendances> query = jpaQueryFactory

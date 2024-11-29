@@ -90,11 +90,25 @@ public class AttendancesController {
             @RequestParam(required = false) String department,
             @RequestParam(required = false) String memberName,
             @RequestParam Long year, @RequestParam Long month,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 20)Pageable pageable,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         Page<AttendancesResponseDto.ReadMonthlyDto> responseDtoPage
                 = attendancesService.readFilteredByMonthlyForAdmin(
                         department, memberName, year, month, pageable, memberDetails.getMembers());
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
+    }
+
+    @GetMapping("/admin/attendances/daily")
+    public ResponseEntity<Page<AttendancesResponseDto.ReadOneDto>> readFilteredByDailyForAdmin(
+            @RequestParam(required = false) String department,
+            @RequestParam(required = false) String memberName,
+            @RequestParam Long year, @RequestParam Long month, @RequestParam Long day,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 20) Pageable pageable,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        Page<AttendancesResponseDto.ReadOneDto> responseDtoPage
+                = attendancesService.readFilteredByDailyForAdmin(
+                        department, memberName, year, month, day, pageable, memberDetails.getMembers());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }

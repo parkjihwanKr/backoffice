@@ -350,6 +350,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional(readOnly = true)
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
         List<Members> memberList = membersService.findAll();
+        System.out.println("memberList.size() : "+memberList.size());
         return MembersConverter.toReadNameListDto(memberList);
     }
 
