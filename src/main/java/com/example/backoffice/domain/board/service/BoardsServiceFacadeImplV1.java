@@ -125,7 +125,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         BoardCategories categories
                 = BoardsConverter.toCategories(requestDto.getCategory());
         Boards board = BoardsConverter.toEntity(requestDto, loginMember, categories);
-        return saveBoardWithFiles(files, board);
+        return saveBoardWithFiles(files, board, loginMember.getMemberName());
     }
 
     @Override
@@ -177,7 +177,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
         Boards departmentBoard = BoardsConverter.toEntityForDepartment(
                 requestDto, loginMember, memberDepartment, category);
-        return saveBoardWithFiles(files, departmentBoard);
+        return saveBoardWithFiles(files, departmentBoard, loginMember.getMemberName());
     }
 
     // 모든 멤버가 접근은 가능하되, 자기가 포함되어진 부서가 아닌 멤버에게는 읽기만 허용
@@ -274,7 +274,8 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     // RequestPart files required = false로 인하여 files가 null일 수 있는 경우의 수 발생
     @Transactional
-    public BoardsResponseDto.CreateOneDto saveBoardWithFiles(List<MultipartFile> files, Boards board) {
+    public BoardsResponseDto.CreateOneDto saveBoardWithFiles(
+            List<MultipartFile> files, Boards board, String loginMemberName) {
         boardsService.save(board);
 
         List<String> fileUrlList = new ArrayList<>();
@@ -285,7 +286,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             }
         }
 
-        return BoardsConverter.toCreateOneDto(board, fileUrlList);
+        return BoardsConverter.toCreateOneDto(board, fileUrlList, loginMemberName);
     }
 
     @Override
@@ -336,8 +337,10 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
             BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files, BoardType boardType){
         // Department board, General board 구분
-        MemberDepartment department
-                = MembersConverter.toDepartment(requestDto.getDepartment());
+        MemberDepartment department = null;
+        if(requestDto.getDepartment() != null){
+            department = MembersConverter.toDepartment(requestDto.getDepartment());
+        }
 
         BoardCategories categories
                 = BoardsConverter.toCategories(requestDto.getCategory());
@@ -352,7 +355,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
                 // GENERAL_BOARD는 잠금이 필요없음.
                 board.update(requestDto.getTitle(), requestDto.getContent(),
                         requestDto.getIsImportant(), false,
-                        department, categories);
+                        null, categories);
             }
             default -> throw new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD_TYPE);
         }

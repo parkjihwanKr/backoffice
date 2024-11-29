@@ -2,9 +2,11 @@ package com.example.backoffice.global.initializer;
 
 import com.example.backoffice.domain.vacation.entity.VacationPeriod;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodHolder;
+import com.example.backoffice.global.date.DateTimeUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -16,6 +18,9 @@ import java.time.temporal.TemporalAdjusters;
 @Component
 @RequiredArgsConstructor
 public class VacationPeriodInitializer {
+
+    @Value("${cookie.secure}")
+    private boolean isSecure;
 
     private final VacationPeriodHolder vacationPeriodHolder;
 
@@ -58,13 +63,26 @@ public class VacationPeriodInitializer {
         LocalDateTime startDate = secondMonday;
         LocalDateTime endDate = startDate.plusDays(12).minusSeconds(1);
 
-        // VacationPeriodHolder에 설정된 값을 저장
-        vacationPeriodHolder.setVacationPeriod(
-                VacationPeriod.builder()
-                        .startDate(startDate)
-                        .endDate(endDate)
-                        .build()
-        );
+        if(!isSecure) {
+            // application-local.yml
+            LocalDateTime today = DateTimeUtils.getToday();
+            vacationPeriodHolder.setVacationPeriod(
+                    VacationPeriod.builder()
+                            .startDate(today)
+                            .endDate(DateTimeUtils.getEndDayOfMonth(
+                                    (long) today.getYear(),
+                                    (long) today.getMonthValue()))
+                            .build()
+            );
+        }else{
+            // application-prod.yml
+            vacationPeriodHolder.setVacationPeriod(
+                    VacationPeriod.builder()
+                            .startDate(startDate)
+                            .endDate(endDate)
+                            .build()
+            );
+        }
 
         log.info("초기화된 휴가 신청 시작일 : " + vacationPeriodHolder.getVacationPeriod().getStartDate());
         log.info("초기화된 휴가 신청 마감일 : " + vacationPeriodHolder.getVacationPeriod().getEndDate());

@@ -70,6 +70,8 @@ public class BoardsConverter {
                 .content(board.getContent())
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
+                .categories(board.getCategories().getLabel())
+                .boardType(board.getBoardType())
                 .likeCount(board.getLikeCount())
                 .viewCount(board.getViewCount())
                 .commentCount(commentCount)  // 댓글 수 추가
@@ -166,10 +168,10 @@ public class BoardsConverter {
     }
 
     public static BoardsResponseDto.CreateOneDto toCreateOneDto(
-            Boards board, List<String> fileUrlList){
+            Boards board, List<String> fileUrlList, String loginMemberName){
         return BoardsResponseDto.CreateOneDto.builder()
                 .boardId(board.getId())
-                .author(board.getMember().getName())
+                .author(loginMemberName)
                 .title(board.getTitle())
                 .content(board.getContent())
                 .fileList(fileUrlList)
@@ -214,7 +216,6 @@ public class BoardsConverter {
     }
 
     public static BoardCategories toCategories(String categoryName){
-        System.out.println("categoryName : "+categoryName);
         for(BoardCategories categories : BoardCategories.values()){
             if(categories.getLabel().equalsIgnoreCase(categoryName)){
                 return categories;

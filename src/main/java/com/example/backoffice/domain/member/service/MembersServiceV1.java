@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MembersServiceV1 {
 
@@ -70,17 +71,32 @@ public interface MembersServiceV1 {
 
     Members findAuditManagerOrCeo(Long memberId);
 
+    Members findAuditManagerOrCeo();
+
     Members findByFinanceManagerOrCeo(Long memberId);
 
     Members findByFinanceManager();
 
     Members findDepartmentManager(MemberDepartment department);
 
-    void updateOneForRemainingVacationDays(ScheduledEventType scheduledEventType);
+    Members matchLoginMember(Members member, Long memberId);
 
-    Members findCeo();
+    Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
+            List<MemberDepartment> excludedDepartmentList,
+            List<Long> excludedIdList);
+
+    Members findCeoByMemberName(String memberName);
+
+    Members findByPosition(MemberPosition position);
+
+    void updateOneForRemainingVacationDays(
+            ScheduledEventType scheduledEventType);
 
     void updateOneForOnVacationFalse(Long onVacationMemberId);
 
     void updateOneForOnVacationTrue(Long onVacationMemberId);
+
+    List<Members> findAllByMemberName(String memberName);
+
+    List<Members> findAllByDepartment(MemberDepartment department, String memberName);
 }

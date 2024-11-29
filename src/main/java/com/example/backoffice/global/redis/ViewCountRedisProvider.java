@@ -28,8 +28,8 @@ public class ViewCountRedisProvider {
     }
 
     // 조회수 증가
-    public Long incrementViewCount(String key) {
-        return redisTemplateForViewCount.opsForValue().increment(key, 1);
+    public void incrementViewCount(String key) {
+        redisTemplateForViewCount.opsForValue().increment(key, 1);
     }
 
     // 조회수 감소

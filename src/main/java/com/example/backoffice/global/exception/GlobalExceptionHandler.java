@@ -3,7 +3,6 @@ package com.example.backoffice.global.exception;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.global.dto.CommonResponseDto;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,7 +45,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
 
-    // 그 외의 일반적인 예외 처리
+    /* 그 외의 일반적인 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CommonResponseDto<Void>> handleGlobalException(Exception ex) {
         // 에러 응답 생성
@@ -70,5 +69,5 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);  // 상태 코드로 응답
-    }
+    }*/
 }

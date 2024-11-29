@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -162,8 +164,10 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     public Members findHRManagerOrCEO(Members member){
         if ((member.getDepartment().equals(MemberDepartment.HR)
-                && member.getPosition().equals(MemberPosition.MANAGER))
-                || member.getPosition().equals(MemberPosition.CEO)){
+                && member.getPosition().equals(MemberPosition.MANAGER))){
+            return member;
+        }
+        if(member.getPosition().equals(MemberPosition.CEO)){
             return member;
         }
         throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
@@ -210,14 +214,22 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByFinanceManagerOrCeo(Long memberId) {
-        Members foundMember = findById(memberId);
-        if(foundMember.getPosition().equals(MemberPosition.CEO)
-                || foundMember.getPosition().equals(MemberPosition.MANAGER)
-                && foundMember.getDepartment().equals(MemberDepartment.FINANCE)){
-            return foundMember;
+    public Members findAuditManagerOrCeo() {
+        Members auditManager = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.AUDIT);
+        if(auditManager != null){
+            return auditManager;
         }
-        return null;
+        return findByPosition(MemberPosition.CEO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByFinanceManagerOrCeo(Long memberId) {
+        Members financeManager = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.FINANCE);
+        if(financeManager != null){
+            return financeManager;
+        }
+        return findByPosition(MemberPosition.CEO);
     }
 
     // 존재하지 않다면 ceo를 찾아야함
@@ -232,6 +244,57 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Transactional(readOnly = true)
     public Members findDepartmentManager(MemberDepartment department){
         return findByPositionAndDepartment(MemberPosition.MANAGER, department);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members matchLoginMember(Members member, Long memberId){
+        if(!member.getId().equals(memberId)){
+            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
+        }
+        return findById(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
+            List<MemberDepartment> excludedDepartmentList,
+            List<Long> excludedIdList){
+        List<Members> memberList = findAllById(excludedIdList);
+
+        for(Members member : memberList){
+            System.out.println("excludedMemberName : "+member.getMemberName());
+        }
+        if(memberList.size() != excludedIdList.size()){
+            throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
+        }
+
+        List<Members> memberListExcludingDepartmentAndId
+                = findByDepartmentNotInAndIdNotIn(excludedDepartmentList, excludedIdList);
+        Map<String, MemberDepartment> memberNameMap = new HashMap<>();
+
+        for(Members member : memberListExcludingDepartmentAndId){
+            memberNameMap.put(member.getMemberName(), member.getDepartment());
+        }
+        return memberNameMap;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findCeoByMemberName(String memberName){
+        Members ceo = membersRepository.findByMemberName(memberName).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_MEMBER_NAME));
+        if(!ceo.getPosition().equals(MemberPosition.CEO)){
+            throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
+        }
+        return ceo;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByPosition(MemberPosition position) {
+        return membersRepository.findByPosition(position).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
     @Override
@@ -254,11 +317,10 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
                     throw new SchedulerCustomException(GlobalExceptionCode.NOT_FOUND_SCHEDULER_EVENT_TYPE);
         }
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members findCeo(){
-        return membersRepository.findByPosition(MemberPosition.CEO).orElseThrow(
+    private Members findByPositionAndDepartment(
+            MemberPosition position, MemberDepartment department){
+        return membersRepository.findByPositionAndDepartment(
+                position, department).orElseThrow(
                 ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
@@ -276,9 +338,16 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
         member.updateOnVacation(true);
     }
 
-    private Members findByPositionAndDepartment(
-            MemberPosition position, MemberDepartment department){
-        return membersRepository.findByPositionAndDepartment(
-                position, department).orElse(null);
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByMemberName(String memberName) {
+        return membersRepository.findAllByMemberName(memberName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByDepartment(MemberDepartment department, String memberName){
+        return membersRepository.findAllByDepartmentAndMemberName(
+                department, memberName);
     }
 }

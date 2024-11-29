@@ -27,12 +27,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final TokenRedisProvider tokenRedisProvider;
 
+    // 필터를 무시할 api 또는 websocket
+    private boolean isExcludedUrl(String requestUrl) {
+        // 필터링을 건너뛰는 경로를 명시적으로 정의
+        return requestUrl.startsWith("/ws")
+                || requestUrl.equals("/api/v1/signup")
+                || requestUrl.equals("/api/v1/login");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestUrl = request.getRequestURI();
+        log.info("Request URL: " + requestUrl);
 
-        if(requestUrl.equals("/api/v1/signup") || requestUrl.equals("/api/v1/login")){
-            log.info("requestUrl : "+requestUrl);
+        // 특정 경로는 무시하고 진행
+        if (isExcludedUrl(requestUrl)) {
             filterChain.doFilter(request, response);
             return;
         }
