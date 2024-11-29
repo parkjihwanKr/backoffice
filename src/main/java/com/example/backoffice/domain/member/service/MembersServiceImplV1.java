@@ -338,4 +338,16 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
         member.updateOnVacation(true);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByMemberName(String memberName) {
+        return membersRepository.findAllByMemberName(memberName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Members> findAllByDepartment(MemberDepartment department, String memberName){
+        return membersRepository.findAllByDepartmentAndMemberName(
+                department, memberName);
+    }
 }

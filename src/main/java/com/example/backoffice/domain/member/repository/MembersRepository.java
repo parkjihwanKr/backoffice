@@ -41,4 +41,9 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
     Page<Members> findAllByPosition(Pageable pageable, MemberPosition position);
 
     Optional<Members> findByPosition(MemberPosition position);
+
+    List<Members> findAllByMemberName(String memberName);
+
+    List<Members> findAllByDepartmentAndMemberName(
+            MemberDepartment department, String memberName);
 }

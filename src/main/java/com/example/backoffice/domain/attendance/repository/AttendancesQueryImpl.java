@@ -103,6 +103,34 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
                 .execute();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Attendances> findAllFiltered(
+            List<Long> memberIdList, LocalDateTime customStartDay,
+            LocalDateTime customEndDay, Pageable pageable) {
+
+        // 1. BooleanBuilder를 사용해 필터 조건 생성
+        BooleanBuilder builder = new BooleanBuilder();
+        if (memberIdList != null && !memberIdList.isEmpty()) {
+            builder.and(qAttendance.member.id.in(memberIdList));
+        }
+        builder.and(qAttendance.createdAt.between(customStartDay, customEndDay));
+
+        // 2. Query 생성
+        JPAQuery<Attendances> query = jpaQueryFactory
+                .selectFrom(qAttendance)
+                .where(builder);
+
+        // 3. 페이징 처리
+        long total = query.fetchCount(); // 전체 결과 개수
+        List<Attendances> content = getQuerydsl()
+                .applyPagination(pageable, query)
+                .fetch();
+
+        // 4. PageImpl로 결과 반환
+        return new PageImpl<>(content, pageable, total);
+    }
+
     private BooleanBuilder buildFilters(
             Long memberId, AttendanceStatus attendanceStatus,
             LocalDateTime checkInStartTime, LocalDateTime checkInEndTime,

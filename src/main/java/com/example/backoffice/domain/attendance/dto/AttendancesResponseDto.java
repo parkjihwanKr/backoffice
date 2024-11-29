@@ -48,6 +48,7 @@ public class AttendancesResponseDto {
     @AllArgsConstructor
     public static class ReadOneDto {
         private Long attendanceId;
+        private Long memberId;
         private String memberName;
         private LocalDateTime checkInTime;
         private LocalDateTime checkOutTime;
@@ -74,5 +75,19 @@ public class AttendancesResponseDto {
         private String memberName;
         private AttendanceStatus attendanceStatus;
         private String description;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadMonthlyDto {
+        private LocalDateTime createdAt;
+        private Integer absentCount;
+        private Integer onTimeCount;
+        private Integer onVacationCount;
+        private Integer outOfOfficeCount;
+        private Integer lateCount;
+        private Integer halfDayCount;
     }
 }

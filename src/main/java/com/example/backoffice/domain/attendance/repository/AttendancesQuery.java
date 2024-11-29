@@ -2,6 +2,7 @@ package com.example.backoffice.domain.attendance.repository;
 
 import com.example.backoffice.domain.attendance.entity.AttendanceStatus;
 import com.example.backoffice.domain.attendance.entity.Attendances;
+import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -32,4 +33,8 @@ public interface AttendancesQuery {
     void saveManually(
             Long memberId, LocalDateTime customCreatedAt,
             Attendances attendance);
+
+    Page<Attendances> findAllFiltered(
+            List<Long> memberIdList, LocalDateTime yearMonthStartDay,
+            LocalDateTime yearMonthEndDay, Pageable pageable);
 }

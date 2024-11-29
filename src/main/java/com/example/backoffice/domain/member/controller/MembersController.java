@@ -4,6 +4,7 @@ import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
 import com.example.backoffice.global.common.CommonResponse;
+import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

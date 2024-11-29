@@ -8,6 +8,7 @@ import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
 import com.example.backoffice.domain.attendance.exception.AttendancesExceptionCode;
 import com.example.backoffice.domain.attendance.repository.AttendancesRepository;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
@@ -380,6 +381,61 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 foundMember.getMemberName(), attdStatus, requestDto.getDescription());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyForAdmin(
+            String memberName, String department, Long year, Long month,
+            Pageable pageable, Members loginMember) {
+
+        // 1. 해당 월의 시작일과 마지막 일 계산
+        LocalDateTime yearMonthStartDay = DateTimeUtils.getStartDayOfMonth(year, month);
+        LocalDateTime yearMonthEndDay = DateTimeUtils.getEndDayOfMonth(year, month);
+
+        // 2. 멤버 리스트 필터링
+        List<Members> filteredMembers = filteredMember(memberName, department);
+
+        // 3. 멤버 ID 리스트 추출
+        List<Long> memberIds = filteredMembers.stream()
+                .map(Members::getId)
+                .toList();
+
+        // 4. 근태 기록 필터링
+        Page<Attendances> attendancePage
+                = attendancesRepository.findAllFiltered(
+                        memberIds, yearMonthStartDay, yearMonthEndDay, pageable);
+
+        // 5. 응답 반환
+        return AttendancesConverter.toReadFilteredMonthlyDto(attendancePage);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyForAdmin(
+            String memberName, String department, Long year, Long month, Long day,
+            Pageable pageable, Members loginMember) {
+        // 1. 해당 월의 시작일과 마지막 일 계산
+        LocalDateTime customStartDay
+                = DateTimeUtils.of(year, month, day);
+        LocalDateTime customEndDay
+                = DateTimeUtils.of(year, month, day).plusDays(1).minusSeconds(1);
+
+        // 2. 멤버 리스트 필터링
+        List<Members> filteredMembers = filteredMember(memberName, department);
+
+        // 3. 멤버 ID 리스트 추출
+        List<Long> memberIdList = filteredMembers.stream()
+                .map(Members::getId)
+                .toList();
+
+        // 4. 근태 기록 필터링
+        Page<Attendances> attendancePage
+                = attendancesRepository.findAllFiltered(
+                memberIdList, customStartDay, customEndDay, pageable);
+
+        // 5. 응답 반환
+        return AttendancesConverter.toReadFilteredDailyDto(attendancePage);
+    }
+
     @Transactional(readOnly = true)
     public Attendances findById(Long attendancesId){
         return attendancesRepository.findById(attendancesId).orElseThrow(
@@ -451,6 +507,20 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         Members hrManagerOrCeo = membersService.findHRManagerOrCEO(loginMember);
         if(hrManagerOrCeo == null){
             throw new AttendancesCustomException(AttendancesExceptionCode.RESTRICTED_ACCESS);
+        }
+    }
+
+    private List<Members> filteredMember(String memberName, String department){
+        if (memberName == null && department == null) {
+             return membersService.findAll();
+        } else if (memberName != null && department == null) {
+            return membersService.findAllByMemberName(memberName);
+        } else if (memberName == null && department != null) {
+            return membersService.findAllByDepartment(
+                    membersService.findDepartment(department));
+        } else {
+            return membersService.findAllByDepartment(
+                    membersService.findDepartment(department), memberName);
         }
     }
 }

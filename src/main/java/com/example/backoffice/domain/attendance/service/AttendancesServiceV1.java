@@ -12,17 +12,23 @@ import java.util.List;
 public interface AttendancesServiceV1 {
 
     /**
-     * @param isWeekDay : 평일 : 휴일 = true : false
-     * 스케줄러를 통한 모든 멤버의 출석 기록을 자동 생성
+     * 스케줄러를 통해 모든 멤버의 출석 기록을 자동 생성
+     *
+     * @param isWeekDay 평일 여부(true: 평일, false: 휴일),
+     *                  캐싱 데이터와 스케줄러를 이용
      */
     void create(Boolean isWeekDay);
 
     /**
+     * 출근 시간 업데이트
      *
-     * @param attendanceId : 근태 고유 아이디
-     * @param requestDto : 요청 출근 시간에 대한 요청 DTO
-     * @param loginMember : 로그인 사용자
-     * @return 출근한 사용자 이름, 출근 시간, 근태 상태
+     * @param attendanceId 근태 고유 ID
+     * @param requestDto 출근 시간 업데이트 요청 DTO
+     * @param loginMember 로그인 사용자
+     * @return 업데이트된 출근 정보
+     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 근태 기록이 존재하지 않는 경우
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 로그인 사용자와 소유자가 일치하지 않는 경우
+     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 시간 데이터가 전달된 경우
      */
     AttendancesResponseDto.UpdateCheckInTimeDto updateCheckInTime(
             Long attendanceId,
@@ -30,11 +36,15 @@ public interface AttendancesServiceV1 {
             Members loginMember);
 
     /**
-     * 상태 : ON_DATE, ABSENT,
-     * @param attendanceId : 근태 고유 아이디
-     * @param requestDto : 퇴근 시간, 상태, 설명에 대한 요청 DTO
-     * @param loginMember : 로그인 사용자
-     * @return 퇴근자 이름, 출근 시간, 퇴근 시간, 근태 상태
+     * 퇴근 시간 및 상태 업데이트
+     *
+     * @param attendanceId 근태 고유 ID
+     * @param requestDto 퇴근 시간 및 상태 업데이트 요청 DTO
+     * @param loginMember 로그인 사용자
+     * @return 업데이트된 퇴근 정보
+     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 근태 기록이 존재하지 않는 경우
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 로그인 사용자와 소유자가 일치하지 않는 경우
+     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 시간 데이터가 전달된 경우
      */
     AttendancesResponseDto.UpdateCheckOutTimeDto updateCheckOutTime(
             Long attendanceId,
@@ -42,36 +52,45 @@ public interface AttendancesServiceV1 {
             Members loginMember);
 
     /**
+     * 특정 멤버의 년/월별 근태 기록 조회
      *
-     * @param memberId : 멤버 아이디
-     * @param year : 조회하고 싶은 근태 관리 년도
-     * @param month : 조회하고 싶은 근태 관리 월
-     * @param attendanceStatus : 조회하고 싶은 근태 상태
-     * @param loginMember : 로그인 멤버
-     * @return 해당 멤버의 년, 월에 대한 근태 정보 리스트
+     * @param memberId 멤버 ID
+     * @param year 조회할 년도
+     * @param month 조회할 월
+     * @param attendanceStatus 필터링할 근태 상태 (optional)
+     * @param loginMember 로그인 사용자
+     * @return 멤버의 근태 정보 리스트
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 로그인 사용자와 멤버가 일치하지 않는 경우
+     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 년/월 데이터가 전달된 경우
      */
     List<AttendancesResponseDto.ReadOneDto> readFiltered(
             Long memberId, Long year, Long month,
             String attendanceStatus, Members loginMember);
 
     /**
+     * 특정 근태 기록 조회
      *
-     * @param attendanceId : 근태 아이디
-     * @param loginMember : 로그인 멤버
-     * @return 근태 한 개의 정보
+     * @param attendanceId 근태 고유 ID
+     * @param loginMember 로그인 사용자
+     * @return 근태 기록 정보
+     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 근태 기록이 존재하지 않는 경우
+     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 접근 권한이 없는 경우
      */
     AttendancesResponseDto.ReadOneDto readOne(
             Long attendanceId, Members loginMember);
 
     /**
+     * 관리자를 위한 근태 관리 페이지 조회
      *
-     * @param memberName : 필터링하고 싶은 멤버 이름
-     * @param attendanceStatus : 필터링하고 싶은 근태 상태
-     * @param checkInRange : 필터링하고 싶은 출근 시간 범위
-     * @param checkOutRange : 필터링하고 싶은 퇴근 시간 범위
-     * @param loginMember : 로그인 멥버
-     * @param pageable : 페이징 정렬
-     * @return 관리자를 위한 근태 관리 페이지 정보
+     * @param memberName 필터링할 멤버 이름 (optional)
+     * @param attendanceStatus 필터링할 근태 상태 (optional)
+     * @param checkInRange 필터링할 출근 시간 범위 (optional)
+     * @param checkOutRange 필터링할 퇴근 시간 범위 (optional)
+     * @param loginMember 로그인 사용자
+     * @param pageable 페이징 정보
+     * @return 필터링된 근태 관리 페이지
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
+     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
     Page<AttendancesResponseDto.ReadOneDto> readForAdmin(
             String memberName, String attendanceStatus,
@@ -79,46 +98,93 @@ public interface AttendancesServiceV1 {
             Members loginMember, Pageable pageable);
 
     /**
+     * 관리자가 특정 멤버의 근태 상태를 업데이트
      *
-     * @param memberId : 변경하려는 멤버 아이디
-     * @param attendanceId : 변경하려는 멤버의 근태 아이디
-     * @param loginMember : 로그인 멤버
-     * @param requestDto : 입력받은 근태 상태, 변경하는 이유에 대한 요청 DTO
-     * @return 변경 상황 적용
+     * @param memberId 멤버 ID
+     * @param attendanceId 근태 고유 ID
+     * @param loginMember 로그인 사용자
+     * @param requestDto 상태 업데이트 요청 DTO
+     * @return 업데이트된 근태 상태 정보
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
+     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 근태 상태가 동일한 경우
      */
     AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusForAdmin(
             Long memberId, Long attendanceId, Members loginMember,
             AttendancesRequestDto.UpdateAttendanceStatusDto requestDto);
 
     /**
+     * 관리자가 특정 날의 근태 기록을 생성
      *
-     * @param loginMember : 로그인 멤버
-     * @param requestDto : 특정한 날에 특정한 사유(외근, 긴급한 휴가)로 근태 기록을 생성하는 DTO
-     * @return 관리자가 생성한 특별한 근태 기록
+     * @param requestDto 근태 기록 생성 요청 DTO
+     * @param loginMember 로그인 사용자
+     * @return 생성된 근태 기록 정보
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
+     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
     AttendancesResponseDto.CreateOneDto createOneForAdmin(
             AttendancesRequestDto.CreateOneDto requestDto, Members loginMember);
 
     /**
+     * 오래된 근태 기록을 삭제
      *
-     * @param allMemberIdList : 모든 멤버의 id 리스트
+     * @param allMemberIdList 삭제할 멤버 ID 리스트
      */
     void delete(List<Long> allMemberIdList);
 
     /**
-     * 전산 오류로 인한 근태 기록 수동 삭제
-     * @param requestDto : 삭제를 원하는 멤버의 아이디 리스트 요청 DTO
-     * @param loginMember : 로그인 사용자
+     * 관리자가 전산 오류로 인한 근태 기록을 삭제
+     *
+     * @param requestDto 삭제 요청 DTO
+     * @param loginMember 로그인 사용자
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
      */
     void deleteForAdmin(
             AttendancesRequestDto.DeleteForAdminDto requestDto, Members loginMember);
 
     /**
-     * 전산 오류로 인한 근태 기록 수동 생성
-     * @param requestDto : 근태 기록 수동 생성 요청 DTO
-     * @param loginMember : 로그인 사용자
-     * @return 근태 기록 생성 응답 DTO
+     * 관리자가 전산 오류로 인해 근태 기록을 수동 생성
+     *
+     * @param requestDto 근태 기록 수동 생성 요청 DTO
+     * @param loginMember 로그인 사용자
+     * @return 생성된 근태 기록 정보
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
+     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 중복된 근태 기록이 존재하는 경우
      */
     AttendancesResponseDto.CreateOneDto createOneManuallyForAdmin(
             AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto, Members loginMember);
+
+    /**
+     * 모든 멤버의 월간 근태 기록 조회
+     *
+     * @param memberName 필터링할 멤버 이름 (optional)
+     * @param department 필터링할 부서 이름 (optional)
+     * @param year 조회할 년도
+     * @param month 조회할 월
+     * @param pageable 페이징 정보
+     * @param loginMember 로그인 사용자
+     * @return 필터링된 월간 근태 기록 페이지
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
+     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
+     */
+    Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyForAdmin(
+            String memberName, String department, Long year, Long month,
+            Pageable pageable, Members loginMember);
+
+    /**
+     * 모든 멤버의 일간 근태 기록 조회
+     *
+     * @param memberName 필터링할 멤버 이름 (optional)
+     * @param department 필터링할 부서 이름 (optional)
+     * @param year 조회할 년도
+     * @param month 조회할 월
+     * @param day 조회할 일
+     * @param pageable 페이징 정보
+     * @param loginMember 로그인 사용자
+     * @return 필터링된 일간 근태 기록 페이지
+     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
+     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
+     */
+    Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyForAdmin(
+            String memberName, String department, Long year, Long month, Long day,
+            Pageable pageable, Members loginMember);
 }
