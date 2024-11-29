@@ -379,10 +379,8 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     }
 
     private void sendUrgentOneForHRManager(Members loginMember) {
-        Members admin = membersService.findHRManager();
-        if(admin == null){
-            admin = membersService.findCeo();
-        }
+        Members admin = membersService.findHRManagerOrCEO(loginMember);
+
         notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
                         admin, loginMember, null, null, null, null, null),

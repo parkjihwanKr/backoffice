@@ -16,27 +16,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FileAspect {
 
-    private final AuditLogService auditLogService;
     private final CommonAspect commonAspect;
 
-    /*    String createOneForMemberRole(MultipartFile file, Members member);
-
-    String createOneForBoard(MultipartFile file, Boards board);
-
-    String createImage(MultipartFile image);
-
-    String createOneForEvent(MultipartFile file, Events event);
-
-    Files createOneForExpense(
-            MultipartFile file, Expense expense, Members loginMember);
-
-    void deleteForBoard(Long boardId, List<String> fileList);
-
-    void deleteForEvent(Long eventId, List<String> fileList);
-
-    void deleteForExpense(Long expenseId, List<String> fileList);
-
-    void deleteImage(String imageUrl);*/
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesServiceV1.*(..))")
     public void logAfterAllMethod(JoinPoint joinPoint) {
         String methodName = commonAspect.getCurrentMethodName(joinPoint);
@@ -49,18 +30,19 @@ public class FileAspect {
                 || methodName.equals("createOneForBoard") || methodName.equals("createImage")
                 || methodName.equals("createOneForEvent") || methodName.equals("createOneForExpense")) {
             message = loginMember.getMemberName() + "님이 파일을 생성하셨습니다.";
-            auditLogService.save(
+            commonAspect.auditLogServiceSave(
                     AuditLogType.CREATE_FILE, loginMember.getMemberName(), message,
                     loginMember.getDepartment(), loginMember.getPosition());
+
         } else if (methodName.equals("deleteForBoard") || methodName.equals("deleteImage")
                 || methodName.equals("deleteForEvent") || methodName.equals("deleteForExpense")) {
             message = loginMember.getMemberName() + "님이 파일을 삭제하셨습니다.";
-            auditLogService.save(
+            commonAspect.auditLogServiceSave(
                     AuditLogType.DELETE_FILE, loginMember.getMemberName(), message,
                     loginMember.getDepartment(), loginMember.getPosition());
         } else {
             message = loginMember.getMemberName() + "님이 알 수 없는 메서드를 불렀습니다.";
-            auditLogService.save(
+            commonAspect.auditLogServiceSave(
                     AuditLogType.FILE_ERROR, loginMember.getMemberName(), message,
                     loginMember.getDepartment(), loginMember.getPosition());
         }
