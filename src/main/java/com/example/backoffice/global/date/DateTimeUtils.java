@@ -16,7 +16,8 @@ import static com.example.backoffice.global.common.DateTimeFormatters.DATE_FORMA
 
 public class DateTimeUtils {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER
+            = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Getter
     private static final LocalDateTime todayCheckInTime =
@@ -28,6 +29,9 @@ public class DateTimeUtils {
     // 하루마다 갱신되는 캐싱 데이터
     private static LocalDateTime today;
     private static LocalDateTime tomorrow;
+
+    // 0초 접미사 상수
+    public static final String suffixZeroSeconds = ":00";
 
     // 현재 시점(LocalDateTime) 반환
     public static LocalDateTime getCurrentDateTime() {
@@ -55,6 +59,20 @@ public class DateTimeUtils {
         try {
             return LocalDate.parse(dateTimeStr, DATE_FORMATTER); // DATE_FORMATTER는 "yyyy-MM-dd" 형식
         } catch (DateTimeParseException e) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+    }
+
+    public static String extractDate(String dateTimeStr) {
+        if (dateTimeStr == null) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+        // "YYYY-MM-DDTHH:mm" 또는 "YYYY-MM-DD HH:mm" 모두 지원
+        if (dateTimeStr.contains("T")) {
+            return dateTimeStr.split("T")[0]; // "YYYY-MM-DD" 추출
+        } else if (dateTimeStr.contains(" ")) {
+            return dateTimeStr.split(" ")[0]; // "YYYY-MM-DD" 추출
+        } else {
             throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
         }
     }
@@ -118,6 +136,14 @@ public class DateTimeUtils {
     public static boolean isWeekday() {
         LocalDate today = getToday().toLocalDate();
         return today.getDayOfWeek().getValue() >= 1 && today.getDayOfWeek().getValue() <= 5;
+    }
+
+    public static boolean isToday(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+        LocalDate todayDate = getToday().toLocalDate();
+        return dateTime.toLocalDate().isEqual(todayDate);
     }
 
     public static Long calculateMinutesFromTodayToEndDate(LocalDateTime endDate){

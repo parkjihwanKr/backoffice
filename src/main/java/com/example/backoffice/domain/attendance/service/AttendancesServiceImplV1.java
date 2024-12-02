@@ -45,7 +45,9 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         for (Members member : memberList) {
             // Redis에서 해당 멤버의 DateRange 데이터 가져오기
-            DateRange cachedDateRange = cachedMemberAttendanceRedisProvider.getValue(member.getId(), DateRange.class);
+            DateRange cachedDateRange
+                    = cachedMemberAttendanceRedisProvider.getValue(
+                            member.getId(), DateRange.class);
 
             if (cachedDateRange != null && DateTimeUtils.isInDateRange(cachedDateRange)) {
                 // Redis에 저장된 기간 내라면 외근으로 처리
@@ -286,23 +288,58 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 = membersService.findByMemberName(requestDto.getMemberName());
 
         // 3. DateRange 계산
-        LocalDateTime startTime = DateTimeUtils.parse(requestDto.getStartDate());
-        LocalDateTime endTime = DateTimeUtils.parse(requestDto.getEndDate());
+        LocalDateTime startTime
+                = DateTimeUtils.parse(requestDto.getStartDate()+DateTimeUtils.suffixZeroSeconds);
+        LocalDateTime endTime
+                = DateTimeUtils.parse(requestDto.getEndDate()+DateTimeUtils.suffixZeroSeconds);
         DateTimeUtils.validateStartAndEndDate(startTime, endTime);
 
-        DateRange dateRange = new DateRange(
-                DateTimeUtils.getStartDayOfMonth((long) startTime.getYear(), (long) startTime.getMonthValue()),
-                DateTimeUtils.getStartDayOfMonth((long) endTime.getYear(), (long) endTime.getMonthValue()));
+        DateRange dateRange = new DateRange(startTime, endTime);
 
-        // 4. Redis에 캐싱
-        cachedMemberAttendanceRedisProvider.saveOne(foundMember.getId(), dateRange);
+        // 4. 오늘이 아닌 날짜면 Redis에 캐싱
+        AttendanceStatus attendanceStatus
+                = AttendancesConverter.toAttendanceStatus(requestDto.getAttendanceStatus());
+        if(!DateTimeUtils.isToday(startTime)){
+            cachedMemberAttendanceRedisProvider.saveOne(foundMember.getId(), dateRange);
+        }else{
+            Attendances duplicatedAttendance
+                    = attendancesRepository.findByMemberIdAndCreatedDate(
+                            foundMember.getId(), DateTimeUtils.getToday().toLocalDate());
+            if(duplicatedAttendance != null){
+                throw new AttendancesCustomException(AttendancesExceptionCode.DUPLICATED_ATTENDANCE);
+            }
+            switch (attendanceStatus) {
+                case ON_TIME, OUT_OF_OFFICE -> attendancesRepository.save(
+                        AttendancesConverter.toEntity(
+                                foundMember, attendanceStatus, requestDto.getDescription(),
+                        DateTimeUtils.getTodayCheckInTime(), DateTimeUtils.getTodayCheckOutTime()));
+                case LATE -> attendancesRepository.save(
+                        AttendancesConverter.toEntity(
+                                foundMember, attendanceStatus, requestDto.getDescription(),
+                                DateTimeUtils.getTodayCheckInTime().plusHours(1), DateTimeUtils.getTodayCheckOutTime()));
+                case ABSENT, HOLIDAY, VACATION -> attendancesRepository.save(
+                        AttendancesConverter.toEntity(
+                                foundMember, attendanceStatus, requestDto.getDescription(),
+                                null, null));
+                case HALF_DAY -> attendancesRepository.save(
+                        AttendancesConverter.toEntity(
+                                foundMember, attendanceStatus, requestDto.getDescription(),
+                                DateTimeUtils.getTodayCheckInTime().plusHours(4), DateTimeUtils.getTodayCheckOutTime()));
+            }
+        }
 
-        // 5. Response DTO 반환
+        // 5. 알림 생성
+        notificationsService.generateEntityAndSendMessage(
+                NotificationsConverter.toNotificationData(
+                        foundMember, loginMember, null,
+                        null, null, null,
+                        "새로운 근태 기록을 수동으로 작성하셨습니다."),
+                NotificationType.CREATE_ATTENDANCES_MANUALLY);
+
+        // 6. Response DTO 반환
         return AttendancesConverter.toCreateOneForAdminDto(
-                foundMember.getMemberName(),
-                AttendancesConverter.toAttendanceStatus(requestDto.getAttendanceStatus()),
-                requestDto.getDescription()
-        );
+                foundMember.getMemberName(), attendanceStatus,
+                requestDto.getDescription());
     }
 
     @Override
@@ -319,14 +356,13 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     @Override
     @Transactional
     public void deleteForAdmin(
-            AttendancesRequestDto.DeleteForAdminDto requestDto, Members loginMember){
+            List<Long> deleteAttendanceIdList, Members loginMember){
         // 1. 접근할 수 있는 권한이 있는지?
         validateAccess(loginMember);
 
         // 2. 해당하는 근태 기록 존재하는지?
         List<Long> existingIdList
-                = attendancesRepository.findAllById(
-                        requestDto.getDeleteAttendanceIdList())
+                = attendancesRepository.findAllById(deleteAttendanceIdList)
                 .stream().map(Attendances::getId).toList();
 
         // 3. 해당 아이디 리스트가 비어있지 않으면 삭제
@@ -335,7 +371,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         }
     }
 
-    @Override
+    /*@Override
     @Transactional
     public AttendancesResponseDto.CreateOneDto createOneManuallyForAdmin(
             AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto, Members loginMember) {
@@ -348,7 +384,9 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         // 3. 해당하는 날짜에 해당 멤버의 근태 기록이 존재하는지?
         LocalDate createdDate
-                = DateTimeUtils.parseToLocalDate(requestDto.getCheckInTime());
+                = DateTimeUtils.parseToLocalDate(
+                        DateTimeUtils.extractDate(requestDto.getCheckInTime()));
+
         Attendances duplicatedAttendance
                 = attendancesRepository.findByMemberIdAndCreatedDate(
                         foundMember.getId(), createdDate);
@@ -357,34 +395,41 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         }
 
         AttendanceStatus attdStatus
-                = AttendancesConverter.toAttendanceStatus(requestDto.getCheckOutTime());
+                = AttendancesConverter.toAttendanceStatus(requestDto.getAttendanceStatus());
+
         // 4. 새로운 근태 기록 생성
+        String checkInTimeWithSeconds
+                = requestDto.getCheckInTime() + DateTimeUtils.suffixZeroSeconds;
+        String checkOutTimeWithSeconds
+                = requestDto.getCheckOutTime() + DateTimeUtils.suffixZeroSeconds;
+
         Attendances newAttendance = AttendancesConverter.toEntityForAdmin(
-                foundMember, DateTimeUtils.parse(requestDto.getCheckInTime()),
-                DateTimeUtils.parse(requestDto.getCheckOutTime()),
-                attdStatus, requestDto.getDescription());
+                foundMember, DateTimeUtils.parse(checkInTimeWithSeconds),
+                DateTimeUtils.parse(checkOutTimeWithSeconds), attdStatus,
+                requestDto.getDescription());
 
         // 5. QueryDSL로 createdAt 값을 수동 설정하여 저장
-        LocalDateTime customCreatedAt = DateTimeUtils.parse(requestDto.getCheckInTime());
-        attendancesRepository.saveManually(foundMember.getId(), customCreatedAt, newAttendance);
+        LocalDateTime customCreatedAt
+                = DateTimeUtils.parse(checkInTimeWithSeconds);
+        attendancesRepository.saveManually(
+                foundMember.getId(), customCreatedAt, newAttendance);
 
         // 6. 알림 생성 및 반환
-        Members auditManagerOrCeo = membersService.findAuditManagerOrCeo();
         notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
-                        auditManagerOrCeo, loginMember, null,
+                        foundMember, loginMember, null,
                         null, null, null,
                         "새로운 근태 기록을 수동으로 작성하셨습니다."),
                 NotificationType.CREATE_ATTENDANCES_MANUALLY);
 
         return AttendancesConverter.toCreateOneForAdminDto(
                 foundMember.getMemberName(), attdStatus, requestDto.getDescription());
-    }
+    }*/
 
     @Override
     @Transactional(readOnly = true)
     public Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyForAdmin(
-            String memberName, String department, Long year, Long month,
+            String department, Long year, Long month,
             Pageable pageable, Members loginMember) {
 
         // 1. 해당 월의 시작일과 마지막 일 계산
@@ -392,7 +437,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         LocalDateTime yearMonthEndDay = DateTimeUtils.getEndDayOfMonth(year, month);
 
         // 2. 멤버 리스트 필터링
-        List<Members> filteredMembers = filteredMember(memberName, department);
+        List<Members> filteredMembers = filteredMember(null, department);
 
         // 3. 멤버 ID 리스트 추출
         List<Long> memberIds = filteredMembers.stream()
@@ -411,7 +456,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     @Override
     @Transactional(readOnly = true)
     public Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyForAdmin(
-            String memberName, String department, Long year, Long month, Long day,
+            String department, String memberName, Long year, Long month, Long day,
             Pageable pageable, Members loginMember) {
         // 1. 해당 월의 시작일과 마지막 일 계산
         LocalDateTime customStartDay
@@ -516,8 +561,9 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         } else if (memberName != null && department == null) {
             return membersService.findAllByMemberName(memberName);
         } else if (memberName == null && department != null) {
-            return membersService.findAllByDepartment(
+            List<Members> memberList = membersService.findAllByDepartment(
                     membersService.findDepartment(department));
+            return memberList;
         } else {
             return membersService.findAllByDepartment(
                     membersService.findDepartment(department), memberName);

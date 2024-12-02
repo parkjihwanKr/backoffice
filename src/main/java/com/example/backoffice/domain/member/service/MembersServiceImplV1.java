@@ -135,7 +135,11 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     @Transactional(readOnly = true)
     public List<Members> findAllByDepartment(MemberDepartment department){
-        return membersRepository.findAllByDepartment(department);
+        List<Members> memberList = membersRepository.findAllByDepartment(department);
+        if (memberList.isEmpty()){
+            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+        }
+        return memberList;
     }
 
     @Override
@@ -341,13 +345,21 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     @Transactional(readOnly = true)
     public List<Members> findAllByMemberName(String memberName) {
-        return membersRepository.findAllByMemberName(memberName);
+        List<Members> memberList = membersRepository.findAllByMemberName(memberName);
+        if(memberList.isEmpty()){
+            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+        }
+        return memberList;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Members> findAllByDepartment(MemberDepartment department, String memberName){
-        return membersRepository.findAllByDepartmentAndMemberName(
+        List<Members> memberList = membersRepository.findAllByDepartmentAndMemberName(
                 department, memberName);
+        if(memberList.isEmpty()){
+            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+        }
+        return memberList;
     }
 }

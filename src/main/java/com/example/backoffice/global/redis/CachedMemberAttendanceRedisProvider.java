@@ -38,11 +38,8 @@ public class CachedMemberAttendanceRedisProvider {
             throw new JsonCustomException(
                     GlobalExceptionCode.NOT_DESERIALIZED_JSON);
         }
-
-        redisTemplateForCached.opsForValue().set(key, valueString);
-
         Long ttl = DateTimeUtils.calculateMinutesFromTodayToEndDate(value.getEndDate());
-        redisTemplateForCached.expire(key, ttl, TimeUnit.MINUTES);
+        redisTemplateForCached.opsForValue().set(key, valueString, ttl, TimeUnit.MINUTES);
     }
 
     // 키에 해당하는 value 조회

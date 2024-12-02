@@ -29,6 +29,19 @@ public class AttendancesConverter {
                 .build();
     }
 
+    public static Attendances toEntity(
+            Members member, AttendanceStatus attendanceStatus,
+            String description, LocalDateTime checkInTime, LocalDateTime checkOutTime){
+        return Attendances.builder()
+                // 초기에 생성되는 status는 결석, 휴가, 휴일
+                .attendanceStatus(attendanceStatus)
+                .checkInTime(checkInTime)
+                .checkOutTime(checkOutTime)
+                .description(description)
+                .member(member)
+                .build();
+    }
+
     public static Attendances toEntityForAdmin(
             Members member, LocalDateTime checkInTime,
             LocalDateTime checkOutTime, AttendanceStatus attendanceStatus,
@@ -150,6 +163,9 @@ public class AttendancesConverter {
                     int halfDayCount = (int) dailyAttendances.stream()
                             .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HALF_DAY)
                             .count();
+                    int holidayCount = (int) dailyAttendances.stream()
+                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HOLIDAY)
+                            .count();
 
                     // ReadMonthlyDto 생성
                     return AttendancesResponseDto.ReadMonthlyDto.builder()
@@ -160,6 +176,7 @@ public class AttendancesConverter {
                             .lateCount(lateCount)
                             .halfDayCount(halfDayCount)
                             .outOfOfficeCount(outOfOfficeCount)
+                            .holidayCount(holidayCount)
                             .build();
                 }).toList();
 

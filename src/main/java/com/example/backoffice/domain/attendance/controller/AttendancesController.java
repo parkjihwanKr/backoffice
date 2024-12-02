@@ -33,7 +33,7 @@ public class AttendancesController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         AttendancesResponseDto.UpdateCheckInTimeDto responseDto
                 = attendancesService.updateCheckInTime(
-                        attendanceId, requestDto, memberDetails.getMembers());
+                attendanceId, requestDto, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -57,7 +57,7 @@ public class AttendancesController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<AttendancesResponseDto.ReadOneDto> responseDtoList
                 = attendancesService.readFiltered(
-                        memberId, year, month, attendanceStatus, memberDetails.getMembers());
+                memberId, year, month, attendanceStatus, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
@@ -80,7 +80,7 @@ public class AttendancesController {
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC)Pageable pageable){
         Page<AttendancesResponseDto.ReadOneDto> responseDtoPage
                 = attendancesService.readForAdmin(
-                        memberName, attendanceStatus, checkInRange,
+                memberName, attendanceStatus, checkInRange,
                 checkOutRange, memberDetails.getMembers(), pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }
@@ -88,13 +88,12 @@ public class AttendancesController {
     @GetMapping("/admin/attendances/monthly")
     public ResponseEntity<Page<AttendancesResponseDto.ReadMonthlyDto>> readFilteredByMonthlyForAdmin(
             @RequestParam(required = false) String department,
-            @RequestParam(required = false) String memberName,
             @RequestParam Long year, @RequestParam Long month,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         Page<AttendancesResponseDto.ReadMonthlyDto> responseDtoPage
                 = attendancesService.readFilteredByMonthlyForAdmin(
-                        department, memberName, year, month, pageable, memberDetails.getMembers());
+                department, year, month, pageable, memberDetails.getMembers());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }
@@ -108,7 +107,7 @@ public class AttendancesController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         Page<AttendancesResponseDto.ReadOneDto> responseDtoPage
                 = attendancesService.readFilteredByDailyForAdmin(
-                        department, memberName, year, month, day, pageable, memberDetails.getMembers());
+                department, memberName, year, month, day, pageable, memberDetails.getMembers());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }
@@ -130,15 +129,15 @@ public class AttendancesController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         AttendancesResponseDto.CreateOneDto responseDto
                 = attendancesService.createOneForAdmin(
-                        requestDto, memberDetails.getMembers());
+                requestDto, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @DeleteMapping("/attendances")
     public ResponseEntity<CommonResponseDto<Void>> deleteForAdmin(
-            @RequestBody AttendancesRequestDto.DeleteForAdminDto requestDto,
+            @RequestBody List<Long> deleteAttendanceIdList,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        attendancesService.deleteForAdmin(requestDto, memberDetails.getMembers());
+        attendancesService.deleteForAdmin(deleteAttendanceIdList, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "해당 근태 기록들이 삭제되었습니다.", 200
@@ -146,7 +145,7 @@ public class AttendancesController {
         );
     }
 
-    @PostMapping("/attendances/manual-create")
+    /*@PostMapping("/attendances/manual-create")
     public ResponseEntity<AttendancesResponseDto.CreateOneDto> createOneManuallyForAdmin(
             @RequestBody AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
@@ -154,5 +153,5 @@ public class AttendancesController {
                 = attendancesService.createOneManuallyForAdmin(
                 requestDto, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
+    }*/
 }

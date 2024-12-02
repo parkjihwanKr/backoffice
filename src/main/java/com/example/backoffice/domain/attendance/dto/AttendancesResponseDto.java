@@ -89,5 +89,6 @@ public class AttendancesResponseDto {
         private Integer outOfOfficeCount;
         private Integer lateCount;
         private Integer halfDayCount;
+        private Integer holidayCount;
     }
 }
