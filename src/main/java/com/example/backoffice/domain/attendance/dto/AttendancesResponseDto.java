@@ -62,9 +62,12 @@ public class AttendancesResponseDto {
     @AllArgsConstructor
     public static class UpdateAttendancesStatusDto {
         private Long attendanceId;
+        private Long memberId;
         private String memberName;
         private AttendanceStatus attendanceStatus;
         private String description;
+        private LocalDateTime checkInTime;
+        private LocalDateTime checkOutTime;
     }
 
     @Getter

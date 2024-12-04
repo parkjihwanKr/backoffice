@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
 
-    // DateUtils 관련 커스텀 예외 처리
+    // 근태 관련 커스텀 예외 처리
     @ExceptionHandler(AttendancesCustomException.class)
     public ResponseEntity<CommonResponseDto<String>> handleAttendanceException(AttendancesCustomException ex) {
         CommonResponseDto<String> errorResponse = new CommonResponseDto<>(

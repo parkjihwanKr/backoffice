@@ -95,9 +95,12 @@ public class AttendancesConverter {
             Attendances attendance){
         return AttendancesResponseDto.UpdateAttendancesStatusDto.builder()
                 .attendanceId(attendance.getId())
+                .memberId(attendance.getMember().getId())
                 .attendanceStatus(attendance.getAttendanceStatus())
                 .description(attendance.getDescription())
                 .memberName(attendance.getMember().getMemberName())
+                .checkInTime(attendance.getCheckInTime())
+                .checkOutTime(attendance.getCheckOutTime())
                 .build();
     }
 

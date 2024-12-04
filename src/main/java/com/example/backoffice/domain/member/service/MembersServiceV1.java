@@ -99,4 +99,6 @@ public interface MembersServiceV1 {
     List<Members> findAllByMemberName(String memberName);
 
     List<Members> findAllByDepartment(MemberDepartment department, String memberName);
+
+    Members findItManagerOrCeo();
 }
