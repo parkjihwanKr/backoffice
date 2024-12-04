@@ -84,7 +84,8 @@ public class DailyScheduler implements SchedulerTask{
         // 평일
         if(DateTimeUtils.isWeekday()){
             attendancesService.create(true);
+        }else{
+            attendancesService.create(false);
         }
-        attendancesService.create(false);
     }
 }

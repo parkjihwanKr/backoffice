@@ -1,5 +1,6 @@
 package com.example.backoffice.global.exception;
 
+import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.global.dto.CommonResponseDto;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    /*// 멤버 관련 커스텀 예외 처리
+    // 멤버 관련 커스텀 예외 처리
     @ExceptionHandler(MembersCustomException.class)
     public ResponseEntity<CommonResponseDto<String>> handleMemberException(MembersCustomException ex) {
         // 에러 응답 생성
@@ -43,7 +44,29 @@ public class GlobalExceptionHandler {
                 ex.getHttpStatus().value()  // 상태 코드 설정
         );
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
-    }*/
+    }
+
+    // DateUtils 관련 커스텀 예외 처리
+    @ExceptionHandler(AttendancesCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleAttendanceException(AttendancesCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    // DateUtils 관련 커스텀 예외 처리
+    @ExceptionHandler(DateUtilException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleDateException(DateUtilException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
 
     /* 그 외의 일반적인 예외 처리
     @ExceptionHandler(Exception.class)

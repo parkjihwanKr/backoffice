@@ -142,6 +142,9 @@ public class DateTimeUtils {
         if (dateTime == null) {
             throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
         }
+        if(dateTime.isBefore(today)){
+            throw new DateUtilException(GlobalExceptionCode.BEFORE_TODAY);
+        }
         LocalDate todayDate = getToday().toLocalDate();
         return dateTime.toLocalDate().isEqual(todayDate);
     }

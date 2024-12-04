@@ -27,36 +27,36 @@ public class AttendancesController {
     private final AttendancesServiceV1 attendancesService;
 
     @PatchMapping("/attendances/{attendanceId}/check-in")
-    public ResponseEntity<AttendancesResponseDto.UpdateCheckInTimeDto> updateCheckInTime(
+    public ResponseEntity<AttendancesResponseDto.UpdateCheckInTimeDto> updateCheckInTimeForMember(
             @PathVariable Long attendanceId,
             @RequestBody AttendancesRequestDto.UpdateCheckInTimeDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         AttendancesResponseDto.UpdateCheckInTimeDto responseDto
-                = attendancesService.updateCheckInTime(
+                = attendancesService.updateCheckInTimeForMember(
                 attendanceId, requestDto, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PatchMapping("/attendances/{attendanceId}/check-out")
-    public ResponseEntity<AttendancesResponseDto.UpdateCheckOutTimeDto> updateCheckOutTime(
+    public ResponseEntity<AttendancesResponseDto.UpdateCheckOutTimeDto> updateCheckOutTimeForMember(
             @PathVariable Long attendanceId,
             @RequestBody AttendancesRequestDto.UpdateCheckOutTimeDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         AttendancesResponseDto.UpdateCheckOutTimeDto responseDto
-                = attendancesService.updateCheckOutTime(
+                = attendancesService.updateCheckOutTimeForMember(
                 attendanceId, requestDto, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @GetMapping("/members/{memberId}/attendances")
-    public ResponseEntity<List<AttendancesResponseDto.ReadOneDto>> readFiltered(
+    public ResponseEntity<List<AttendancesResponseDto.ReadOneDto>> readFilteredForMember(
             @PathVariable Long memberId,
             @RequestParam(required = false) Long year,
             @RequestParam(required = false) Long month,
             @RequestParam(required = false) String attendanceStatus,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<AttendancesResponseDto.ReadOneDto> responseDtoList
-                = attendancesService.readFiltered(
+                = attendancesService.readFilteredForMember(
                 memberId, year, month, attendanceStatus, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
@@ -107,7 +107,8 @@ public class AttendancesController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         Page<AttendancesResponseDto.ReadOneDto> responseDtoPage
                 = attendancesService.readFilteredByDailyForAdmin(
-                department, memberName, year, month, day, pageable, memberDetails.getMembers());
+                department, memberName, year, month,
+                day, pageable, memberDetails.getMembers());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }
@@ -119,7 +120,8 @@ public class AttendancesController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody AttendancesRequestDto.UpdateAttendanceStatusDto requestDto){
         AttendancesResponseDto.UpdateAttendancesStatusDto responseDto
-                = attendancesService.updateOneStatusForAdmin(memberId, attendanceId, memberDetails.getMembers(), requestDto);
+                = attendancesService.updateOneStatusForAdmin(
+                        memberId, attendanceId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -137,7 +139,8 @@ public class AttendancesController {
     public ResponseEntity<CommonResponseDto<Void>> deleteForAdmin(
             @RequestBody List<Long> deleteAttendanceIdList,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        attendancesService.deleteForAdmin(deleteAttendanceIdList, memberDetails.getMembers());
+        attendancesService.deleteForAdmin(
+                deleteAttendanceIdList, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "해당 근태 기록들이 삭제되었습니다.", 200

@@ -65,7 +65,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional
-    public AttendancesResponseDto.UpdateCheckInTimeDto updateCheckInTime(
+    public AttendancesResponseDto.UpdateCheckInTimeDto updateCheckInTimeForMember(
             Long attendanceId,
             AttendancesRequestDto.UpdateCheckInTimeDto requestDto,
             Members loginMember){
@@ -85,7 +85,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional
-    public AttendancesResponseDto.UpdateCheckOutTimeDto updateCheckOutTime(
+    public AttendancesResponseDto.UpdateCheckOutTimeDto updateCheckOutTimeForMember(
             Long attendanceId,
             AttendancesRequestDto.UpdateCheckOutTimeDto requestDto,
             Members loginMember){
@@ -110,7 +110,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional(readOnly = true)
-    public List<AttendancesResponseDto.ReadOneDto> readFiltered(
+    public List<AttendancesResponseDto.ReadOneDto> readFilteredForMember(
             Long memberId, Long year, Long month,
             String attendanceStatus, Members loginMember){
         // 1. 로그인 멤버와 조회하려는 아이디가 일치하는지?
