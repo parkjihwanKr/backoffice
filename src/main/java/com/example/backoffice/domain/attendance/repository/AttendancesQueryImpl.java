@@ -93,8 +93,8 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
     @Transactional
     public void saveManually(Long memberId, LocalDateTime customCreatedAt, Attendances attendance) {
         String sql
-                = "INSERT INTO attendances (member_id, attendance_status, description, check_in_time, check_out_time, created_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+                = "INSERT INTO attendances (member_id, attendance_status, description, check_in_time, check_out_time, created_at, modified_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         Query query = entityManager.createNativeQuery(sql)
                 .setParameter(1, memberId)
@@ -102,7 +102,8 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
                 .setParameter(3, attendance.getDescription())
                 .setParameter(4, attendance.getCheckInTime())
                 .setParameter(5, attendance.getCheckOutTime())
-                .setParameter(6, customCreatedAt);
+                .setParameter(6, customCreatedAt)
+                .setParameter(7, customCreatedAt);
 
         query.executeUpdate();
     }
@@ -135,6 +136,7 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
         if (memberIdList != null && !memberIdList.isEmpty()) {
             builder.and(qAttendance.member.id.in(memberIdList));
         }
+
         builder.and(qAttendance.createdAt.between(customStartDay, customEndDay));
 
         // 2. Query 생성

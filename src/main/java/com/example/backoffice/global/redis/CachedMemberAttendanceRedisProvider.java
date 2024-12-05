@@ -29,11 +29,12 @@ public class CachedMemberAttendanceRedisProvider {
         this.redisTemplateForCached = redisTemplateForCached;
     }
 
-    public <T> void saveOne(Long memberId, DateRange value) {
-        String key = keyPrefix + memberId;
+    public <T> void saveOne(Long memberId, DateRange value, String description) {
+        String key = keyPrefix + memberId + ", "+description;
         String valueString = null;
         try {
-            valueString = objectMapper.writeValueAsString(value);
+            valueString
+                    = objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
             throw new JsonCustomException(
                     GlobalExceptionCode.NOT_DESERIALIZED_JSON);

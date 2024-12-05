@@ -31,6 +31,19 @@ public class AttendancesConverter {
 
     public static Attendances toEntity(
             Members member, AttendanceStatus attendanceStatus,
+            LocalDateTime checkInTime, LocalDateTime checkOutTime){
+        return Attendances.builder()
+                // 초기에 생성되는 status는 결석, 휴가, 휴일
+                .attendanceStatus(attendanceStatus)
+                .checkInTime(checkInTime)
+                .checkOutTime(checkOutTime)
+                .description("스케줄러에 의한 하루 근태 생성")
+                .member(member)
+                .build();
+    }
+
+    public static Attendances toEntity(
+            Members member, AttendanceStatus attendanceStatus,
             String description, LocalDateTime checkInTime, LocalDateTime checkOutTime){
         return Attendances.builder()
                 // 초기에 생성되는 status는 결석, 휴가, 휴일
@@ -41,6 +54,7 @@ public class AttendancesConverter {
                 .member(member)
                 .build();
     }
+
 
     public static Attendances toEntityForAdmin(
             Members member, LocalDateTime checkInTime,
