@@ -563,7 +563,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             attendance = attendancesRepository.findByMemberIdAndCreatedDate(
                     member.getId(), customCreatedAt.toLocalDate());
         }else{
-            System.out.println("checkInTime : "+checkInTime+" / checkOutTime : "+checkOutTime);
             attendance
                     = attendancesRepository.findById(attendanceId).orElseThrow(
                             () -> new AttendancesCustomException(
@@ -584,6 +583,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                     if(DateTimeUtils.isToday(lateCheckInTime)){
                         if (DateTimeUtils.isBeforeTodayCheckOutTime(DateTimeUtils.getCurrentDateTime())) {
                             attendance.update(status, description, lateCheckInTime, null);
+                        }else{
+                            attendance.update(status, description, lateCheckInTime, checkOutTime);
                         }
                     }else{
                         attendance.update(status, description, lateCheckInTime, checkOutTime);
@@ -602,6 +603,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                     if(DateTimeUtils.isToday(checkInTime)){
                         if (DateTimeUtils.isBeforeTodayCheckOutTime(DateTimeUtils.getCurrentDateTime())) {
                             attendance.update(status, description, checkInTime, null);
+                        }else{
+                            attendance.update(status, description, checkInTime, checkOutTime);
                         }
                     }else{
                         attendance.update(status, description, checkInTime, checkOutTime);
@@ -737,9 +740,5 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                     throw new AttendancesCustomException(
                             AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
         }
-    }
-
-    private boolean isDuplicateAttendance(Members member, LocalDateTime date) {
-        return attendancesRepository.existsByMemberIdAndCreatedAt(member.getId(), date.toLocalDate());
     }
 }
