@@ -118,7 +118,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             throw new AttendancesCustomException(AttendancesExceptionCode.IS_HOLIDAY);
         }
 
-        System.out.println("before afterCheckOutStatus method checkInTime : "+attendance.getCheckInTime());
         // 정시 출근, 지각, 결석(결석인데 체크하는 건 이상함)
         AttendanceStatus beforeCheckOutStatus = attendance.getAttendanceStatus();
         AttendanceStatus afterCheckOutStatus
@@ -517,25 +516,10 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     }
 
     private void validateTodayCheckInOrCheckOutTime(LocalDateTime time){
-        /*LocalDate tomorrow = DateTimeUtils.getTomorrow().toLocalDate();
-        LocalDate today = DateTimeUtils.getToday().toLocalDate();*/
-
-        // 1. 파라미터로 받는 시간이 오늘인지
-        System.out.println("request time : "+time);
         if(!DateTimeUtils.isToday(time)){
             throw new AttendancesCustomException(
                     AttendancesExceptionCode.TIME_BEFORE_TODAY);
         }
-        /*if(!time.toLocalDate().isAfter(today)){
-            throw new AttendancesCustomException(
-                    AttendancesExceptionCode.TIME_BEFORE_TODAY);
-        }
-
-        // 2. 파라미터로 받는 시간이 내일 이후로 시간이 되어있진 않은지
-        if (!time.toLocalDate().isBefore(tomorrow)) {
-            throw new AttendancesCustomException(
-                    AttendancesExceptionCode.TIME_EQUAL_OR_AFTER_TOMORROW);
-        }*/
     }
 
     private void validateAccess(Members loginMember){
