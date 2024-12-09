@@ -55,28 +55,6 @@ public class DateTimeUtils {
         }
     }
 
-    public static LocalDate parseToLocalDate(String dateTimeStr){
-        try {
-            return LocalDate.parse(dateTimeStr, DATE_FORMATTER); // DATE_FORMATTER는 "yyyy-MM-dd" 형식
-        } catch (DateTimeParseException e) {
-            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
-        }
-    }
-
-    public static String extractDate(String dateTimeStr) {
-        if (dateTimeStr == null) {
-            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
-        }
-        // "YYYY-MM-DDTHH:mm" 또는 "YYYY-MM-DD HH:mm" 모두 지원
-        if (dateTimeStr.contains("T")) {
-            return dateTimeStr.split("T")[0]; // "YYYY-MM-DD" 추출
-        } else if (dateTimeStr.contains(" ")) {
-            return dateTimeStr.split(" ")[0]; // "YYYY-MM-DD" 추출
-        } else {
-            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
-        }
-    }
-
     public static LocalDateTime getToday(){
         if(today == null){
             today = LocalDate.now().atStartOfDay();
@@ -133,6 +111,14 @@ public class DateTimeUtils {
         return time.isBefore(getTodayCheckOutTime());
     }
 
+    public static boolean isBetweenTodayCheckOutTime(LocalDateTime checkOutTime) {
+        LocalDateTime startRange = getTodayCheckOutTime().minusMinutes(30);
+        LocalDateTime endRange = getTodayCheckOutTime().plusHours(1);
+
+        // checkOutTime이 범위 내에 있는지 확인
+        return !checkOutTime.isBefore(startRange) && !checkOutTime.isAfter(endRange);
+    }
+
     public static boolean isWeekday() {
         LocalDate today = getToday().toLocalDate();
         return today.getDayOfWeek().getValue() >= 1 && today.getDayOfWeek().getValue() <= 5;
@@ -147,11 +133,11 @@ public class DateTimeUtils {
     }
 
     public static boolean isBeforeToday(LocalDateTime dateTime) {
-        return dateTime.isBefore(today) ? true : false;
+        return dateTime.isBefore(getToday()) ? true : false;
     }
 
     public static boolean isAfterToday(LocalDateTime dateTime) {
-        return dateTime.isAfter(today) ? true : false;
+        return dateTime.isAfter(getTomorrow()) ? true : false;
     }
 
     public static Long calculateMinutesFromTodayToEndDate(LocalDateTime endDate){
@@ -178,5 +164,22 @@ public class DateTimeUtils {
         if (month < 1 || month > 12) {
             throw new DateUtilException(GlobalExceptionCode.INVALID_MONTH);
         }
+    }
+
+    public static boolean isHoliday(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+
+        // LocalDate로 변환
+        LocalDate date = dateTime.toLocalDate();
+
+        // 주말(토요일/일요일)인지 확인
+        int dayOfWeek = date.getDayOfWeek().getValue(); // 월(1) ~ 일(7)
+        if (dayOfWeek == 6 || dayOfWeek == 7) {
+            return true; // 토요일 또는 일요일
+        }
+
+        return false; // 평일
     }
 }

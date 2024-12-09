@@ -51,7 +51,7 @@ public class Attendances extends CommonEntity {
     public void updateCheckOut(
             LocalDateTime checkoutTime, String description,
             AttendanceStatus attendanceStatus){
-        this.checkInTime = checkoutTime;
+        this.checkOutTime = checkoutTime;
         this.description = description;
         this.attendanceStatus = attendanceStatus;
     }

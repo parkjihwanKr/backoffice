@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Member;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -374,5 +375,24 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
         }else{
             return itManager;
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isManagerOrCeo(Members loginMember){
+        if(!loginMember.getPosition().equals(MemberPosition.MANAGER)){
+            if(!loginMember.getPosition().equals(MemberPosition.CEO)){
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByIdAndDepartment(Long memberId, MemberDepartment department){
+        return membersRepository.findByIdAndDepartment(memberId, department).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 }

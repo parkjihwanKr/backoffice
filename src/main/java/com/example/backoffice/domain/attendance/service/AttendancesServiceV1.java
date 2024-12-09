@@ -57,15 +57,13 @@ public interface AttendancesServiceV1 {
      * @param memberId 멤버 ID
      * @param year 조회할 년도
      * @param month 조회할 월
-     * @param attendanceStatus 필터링할 근태 상태 (optional)
      * @param loginMember 로그인 사용자
      * @return 멤버의 근태 정보 리스트
      * @throws com.example.backoffice.domain.member.exception.MembersCustomException 로그인 사용자와 멤버가 일치하지 않는 경우
      * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 년/월 데이터가 전달된 경우
      */
     List<AttendancesResponseDto.ReadOneDto> readFilteredForMember(
-            Long memberId, Long year, Long month,
-            String attendanceStatus, Members loginMember);
+            Long memberId, Long year, Long month, Members loginMember);
 
     /**
      * 권한에 상관 없이 특정 근태 기록 조회
@@ -186,4 +184,13 @@ public interface AttendancesServiceV1 {
     Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyForAdmin(
             String department, String memberName, Long year, Long month, Long day,
             Pageable pageable, Members loginMember);
+
+    /**
+     * 부서 관리자들의 부서원들의 외근 내역 확인
+     * @param department : 조회할 부서
+     * @param loginMember : 로그인 멤버
+     * @return 필터링된 예정된 근태 기록
+     */
+    List<AttendancesResponseDto.ReadScheduledRecordDto> readScheduledRecord(
+            String department, Members loginMember);
 }

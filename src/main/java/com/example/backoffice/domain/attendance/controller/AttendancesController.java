@@ -53,11 +53,10 @@ public class AttendancesController {
             @PathVariable Long memberId,
             @RequestParam(required = false) Long year,
             @RequestParam(required = false) Long month,
-            @RequestParam(required = false) String attendanceStatus,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<AttendancesResponseDto.ReadOneDto> responseDtoList
                 = attendancesService.readFilteredForMember(
-                memberId, year, month, attendanceStatus, memberDetails.getMembers());
+                memberId, year, month, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
@@ -113,7 +112,6 @@ public class AttendancesController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }
 
-
     @PatchMapping("/members/{memberId}/attendances/{attendanceId}/status")
     public ResponseEntity<AttendancesResponseDto.UpdateAttendancesStatusDto> updateOneStatusForAdmin(
             @PathVariable Long memberId, @PathVariable Long attendanceId,
@@ -148,13 +146,12 @@ public class AttendancesController {
         );
     }
 
-    /*@PostMapping("/attendances/manual-create")
-    public ResponseEntity<AttendancesResponseDto.CreateOneDto> createOneManuallyForAdmin(
-            @RequestBody AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        AttendancesResponseDto.CreateOneDto responseDto
-                = attendancesService.createOneManuallyForAdmin(
-                requestDto, memberDetails.getMembers());
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }*/
+    @GetMapping("/admin/attendances")
+    public ResponseEntity<List<AttendancesResponseDto.ReadScheduledRecordDto>> readScheduledRecord(
+            @RequestParam(required = false) String department,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        List<AttendancesResponseDto.ReadScheduledRecordDto> responseDtoList
+                = attendancesService.readScheduledRecord(department, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
 }

@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class AttendancesQueryImpl extends QuerydslRepositorySupport implements AttendancesQuery {
@@ -37,10 +38,19 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
     @Override
     @Transactional(readOnly = true)
     public List<Attendances> findFiltered(
-            Long memberId, LocalDateTime startDate,
-            LocalDateTime endDate, AttendanceStatus attdStatus) {
-        BooleanBuilder builder = buildFilters(memberId, attdStatus, startDate, endDate, null, null);
-        return executeQuery(builder, null).fetch();
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
+
+        // startDate : year:month:01T00:00:00
+        // endDate : year:month:monthOfLastDayT:23:59:59
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(
+                qAttendance.createdAt.goe(startDate)
+                .and(qAttendance.createdAt.loe(endDate))
+                .and(qAttendance.member.id.eq(memberId)));
+
+        return jpaQueryFactory.selectFrom(qAttendance)
+                .where(builder)
+                .fetch();
     }
 
     @Override
@@ -76,9 +86,9 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
 
     @Override
     @Transactional
-    public Attendances findByMemberIdAndCreatedDate(
+    public Optional<Attendances> findByMemberIdAndCreatedDate(
             Long memberId, LocalDate createdDate) {
-        return jpaQueryFactory
+        Attendances attendance = jpaQueryFactory
                 .selectFrom(qAttendance)
                 .where(
                         qAttendance.member.id.eq(memberId),
@@ -87,6 +97,8 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
                         qAttendance.createdAt.dayOfMonth().eq(createdDate.getDayOfMonth())
                 )
                 .fetchOne();
+
+        return Optional.ofNullable(attendance); // Optional로 감싸서 반환
     }
 
     @Override

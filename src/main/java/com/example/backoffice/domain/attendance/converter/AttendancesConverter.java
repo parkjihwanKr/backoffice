@@ -5,6 +5,7 @@ import com.example.backoffice.domain.attendance.entity.AttendanceStatus;
 import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
 import com.example.backoffice.domain.attendance.exception.AttendancesExceptionCode;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -98,10 +99,12 @@ public class AttendancesConverter {
         return AttendancesResponseDto.ReadOneDto.builder()
                 .attendanceId(attendance.getId())
                 .memberId(attendance.getMember().getId())
+                .memberName(attendance.getMember().getMemberName())
                 .description(attendance.getDescription())
                 .attendanceStatus(attendance.getAttendanceStatus())
                 .checkInTime(attendance.getCheckInTime())
                 .checkOutTime(attendance.getCheckOutTime())
+                .createdAt(attendance.getCreatedAt())
                 .build();
     }
 
@@ -223,5 +226,19 @@ public class AttendancesConverter {
                 attendancePage.getPageable(),
                 attendancePage.getTotalElements()
         );
+    }
+
+    public static AttendancesResponseDto.ReadScheduledRecordDto toReadScheduleRecordDto(
+            int index, Long memberId, String memberName, MemberDepartment department,
+            String description, LocalDateTime startDate, LocalDateTime endDate){
+        return AttendancesResponseDto.ReadScheduledRecordDto.builder()
+                .index(index)
+                .memberId(memberId)
+                .memberName(memberName)
+                .department(department)
+                .description(description)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
     }
 }

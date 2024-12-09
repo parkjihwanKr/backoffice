@@ -32,6 +32,12 @@ public enum AttendancesExceptionCode {
             HttpStatus.BAD_REQUEST, "ATTENDANCES-008",
             "요청하신 날짜에 멤버의 근태 기록이 있습니다. 해당 부분을 삭제한 뒤," +
                     " 수동 작성해주세요."),
+    IS_HOLIDAY(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-009",
+            "요청하신 날짜는 휴일입니다."),
+    CHECK_OUT_TIME_OUTSIDE_WORK_HOURS(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-010",
+            "퇴근 시간이 유효한 시간은 오후 5시 반부터 오후 7시부터입니다."),
     ;
     private final HttpStatus httpStatus;
     private final String errorCode;

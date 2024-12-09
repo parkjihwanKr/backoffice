@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +89,11 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 attendance.getMember(), loginMember.getId());
         LocalDateTime checkInTime
                 = DateTimeUtils.parse(requestDto.getCheckInTime());
+        if(DateTimeUtils.isHoliday(checkInTime)){
+            throw new AttendancesCustomException(AttendancesExceptionCode.IS_HOLIDAY);
+        }
 
+        // 당일의 체크인 타임이 적절한지
         AttendanceStatus attendanceStatus
                 = validateAndDetermineCheckInStatus(checkInTime);
         attendance.updateCheckIn(
@@ -109,15 +114,20 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         LocalDateTime checkOutTime
                 = DateTimeUtils.parse(requestDto.getCheckOutTime());
 
+        if(DateTimeUtils.isHoliday(checkOutTime)){
+            throw new AttendancesCustomException(AttendancesExceptionCode.IS_HOLIDAY);
+        }
+
+        System.out.println("before afterCheckOutStatus method checkInTime : "+attendance.getCheckInTime());
         // 정시 출근, 지각, 결석(결석인데 체크하는 건 이상함)
         AttendanceStatus beforeCheckOutStatus = attendance.getAttendanceStatus();
         AttendanceStatus afterCheckOutStatus
                 = validateAndDetermineCheckOutStatus(
-                        attendance.getCheckOutTime(),
+                        attendance.getCheckInTime(),
                 checkOutTime, beforeCheckOutStatus);
 
         attendance.updateCheckOut(
-                attendance.getCheckOutTime(), requestDto.getDescription(),
+                checkOutTime, requestDto.getDescription(),
                 afterCheckOutStatus);
         return AttendancesConverter.toUpdateCheckOutTimeDto(attendance);
     }
@@ -125,8 +135,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     @Override
     @Transactional(readOnly = true)
     public List<AttendancesResponseDto.ReadOneDto> readFilteredForMember(
-            Long memberId, Long year, Long month,
-            String attendanceStatus, Members loginMember){
+            Long memberId, Long year, Long month, Members loginMember){
         // 1. 로그인 멤버와 조회하려는 아이디가 일치하는지?
         membersService.matchLoginMember(loginMember, memberId);
 
@@ -138,16 +147,11 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         LocalDateTime endDate = (year != null && month != null)
                 ? DateTimeUtils.getEndDayOfMonth(year, month)
                 : null;
-
-        // 3. AttendanceStatus 변환
-        AttendanceStatus attdStatus = (attendanceStatus != null)
-                ? AttendancesConverter.toAttendanceStatus(attendanceStatus)
-                : null;
+        // 2024-12-01T00:00:00~2024-12-31
 
         // 4. 동적 필터링된 데이터 조회
         List<Attendances> memberAttendanceList
-                = attendancesRepository.findFiltered(
-                        memberId, startDate, endDate, attdStatus);
+                = attendancesRepository.findFiltered(memberId, startDate, endDate);
 
         // 5. DTO 반환
         return AttendancesConverter.toReadFilteredDto(memberAttendanceList);
@@ -220,7 +224,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         // 1. 변경하려는 대상과 근태 기록이 존재하는지
         membersService.findById(memberId);
-        Attendances attendance = attendancesRepository.findByIdAndMemberId(attendanceId, memberId)
+        Attendances attendance
+                = attendancesRepository.findByIdAndMemberId(attendanceId, memberId)
                 .orElseThrow(() -> new AttendancesCustomException(AttendancesExceptionCode.NOT_FOUND_ATTENDANCES));
 
         // 2. 근태 기록 변경 권한이 있는지
@@ -296,8 +301,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         }else if(DateTimeUtils.isToday(startTime) && DateTimeUtils.isToday(endTime)){
             handleTodayAttendance(
                     foundMember, attendanceStatus, requestDto.getDescription());
-        }
-        if (DateTimeUtils.isToday(startTime) && DateTimeUtils.isAfterToday(endTime)) {
+        }else if (DateTimeUtils.isToday(startTime) && DateTimeUtils.isAfterToday(endTime)) {
             // 시작 시간이 오늘이고 마감일이 오늘 이후인 기록 처리
             // 오늘의 근태 기록 하나 처리
             handleTodayAttendance(
@@ -307,7 +311,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                     foundMember.getId(), new DateRange(startTime.plusDays(1L), endTime),
                     requestDto.getDescription());
         } else if ((DateTimeUtils.isAfterToday(startTime) && DateTimeUtils.isAfterToday(endTime))) {
-            System.out.println("afterToday settings.. startDate, endDate");
             // 시작일이 내일이 아닌 경우
             cachedMemberAttendanceRedisProvider.saveOne(foundMember.getId(), dateRange,
                     requestDto.getDescription());
@@ -354,61 +357,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             attendancesRepository.deleteAllById(existingIdList);
         }
     }
-
-    /*@Override
-    @Transactional
-    public AttendancesResponseDto.CreateOneDto createOneManuallyForAdmin(
-            AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto, Members loginMember) {
-        // 1. 해당 근태 기록을 읽을 수 있는 권한인지?
-        validateAccess(loginMember);
-
-        // 2. 근태 기록을 생성하려는 인원이 존재하는지?
-        Members foundMember
-                = membersService.findByMemberName(requestDto.getMemberName());
-
-        // 3. 해당하는 날짜에 해당 멤버의 근태 기록이 존재하는지?
-        LocalDate createdDate
-                = DateTimeUtils.parseToLocalDate(
-                        DateTimeUtils.extractDate(requestDto.getCheckInTime()));
-
-        Attendances duplicatedAttendance
-                = attendancesRepository.findByMemberIdAndCreatedDate(
-                        foundMember.getId(), createdDate);
-        if(duplicatedAttendance != null){
-            throw new AttendancesCustomException(AttendancesExceptionCode.DUPLICATED_ATTENDANCE);
-        }
-
-        AttendanceStatus attdStatus
-                = AttendancesConverter.toAttendanceStatus(requestDto.getAttendanceStatus());
-
-        // 4. 새로운 근태 기록 생성
-        String checkInTimeWithSeconds
-                = requestDto.getCheckInTime() + DateTimeUtils.suffixZeroSeconds;
-        String checkOutTimeWithSeconds
-                = requestDto.getCheckOutTime() + DateTimeUtils.suffixZeroSeconds;
-
-        Attendances newAttendance = AttendancesConverter.toEntityForAdmin(
-                foundMember, DateTimeUtils.parse(checkInTimeWithSeconds),
-                DateTimeUtils.parse(checkOutTimeWithSeconds), attdStatus,
-                requestDto.getDescription());
-
-        // 5. QueryDSL로 createdAt 값을 수동 설정하여 저장
-        LocalDateTime customCreatedAt
-                = DateTimeUtils.parse(checkInTimeWithSeconds);
-        attendancesRepository.saveManually(
-                foundMember.getId(), customCreatedAt, newAttendance);
-
-        // 6. 알림 생성 및 반환
-        notificationsService.generateEntityAndSendMessage(
-                NotificationsConverter.toNotificationData(
-                        foundMember, loginMember, null,
-                        null, null, null,
-                        "새로운 근태 기록을 수동으로 작성하셨습니다."),
-                NotificationType.CREATE_ATTENDANCES_MANUALLY);
-
-        return AttendancesConverter.toCreateOneForAdminDto(
-                foundMember.getMemberName(), attdStatus, requestDto.getDescription());
-    }*/
 
     @Override
     @Transactional(readOnly = true)
@@ -466,6 +414,53 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     }
 
     @Transactional(readOnly = true)
+    public List<AttendancesResponseDto.ReadScheduledRecordDto> readScheduledRecord(
+            String department, Members loginMember) {
+        // 1. 권한 검증
+        if (!membersService.isManagerOrCeo(loginMember)) {
+            throw new AttendancesCustomException(
+                    AttendancesExceptionCode.RESTRICTED_ACCESS);
+        }
+
+        // 2. Redis에서 모든 데이터 가져오기
+        Map<String, String> redisData
+                = cachedMemberAttendanceRedisProvider.getAllRawValues();
+        List<AttendancesResponseDto.ReadScheduledRecordDto> recordList = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : redisData.entrySet()) {
+            String key = entry.getKey();
+            String rawValue = entry.getValue();
+            int index = 0;
+            // 2-1. Key에서 memberId와 description 추출
+            Long memberId = cachedMemberAttendanceRedisProvider.extractMemberIdFromKey(key);
+            String description = cachedMemberAttendanceRedisProvider.extractDescriptionFromKey(key);
+
+            if (memberId == null || description == null) continue;
+
+            // 2-2. Value에서 DateRange 파싱
+            DateRange dateRange = cachedMemberAttendanceRedisProvider.deserializeValue(rawValue, DateRange.class);
+
+            Members member;
+            if (department == null) {
+                member = membersService.findById(memberId);
+            } else {
+                member = membersService.findByIdAndDepartment(
+                        memberId, membersService.findDepartment(department));
+            }
+            if (member == null) {
+                continue;
+            }
+            // 2-3. DTO List 생성
+            recordList.add(AttendancesConverter.toReadScheduleRecordDto(
+                    index, memberId, member.getMemberName(), member.getDepartment(),
+                    description, dateRange.getStartDate(), dateRange.getEndDate()));
+            index++;
+        }
+        // 3. 결과 반환
+        return recordList;
+    }
+
+    @Transactional(readOnly = true)
     public Attendances findById(Long attendancesId){
         return attendancesRepository.findById(attendancesId).orElseThrow(
                 ()-> new AttendancesCustomException(AttendancesExceptionCode.NOT_FOUND_ATTENDANCES)
@@ -474,7 +469,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     private AttendanceStatus validateAndDetermineCheckInStatus(LocalDateTime checkInTime){
         // 1. 출근 시간 유효한지?
-        validateTime(checkInTime);
+        validateTodayCheckInOrCheckOutTime(checkInTime);
 
         // 2. 유효한 출근 시간인지 검증
         if(checkInTime.getHour() < 8 || checkInTime.getHour() > 14){
@@ -494,10 +489,10 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     private AttendanceStatus validateAndDetermineCheckOutStatus(
             LocalDateTime checkInTime, LocalDateTime checkOutTime, AttendanceStatus beforeCheckOutStatus){
-        validateTime(checkOutTime);
+        validateTodayCheckInOrCheckOutTime(checkOutTime);
 
         // 1. 결석 처리: 출근-퇴근 시간이 2시간 이하
-        if (DateTimeUtils.isWithinHours(checkInTime, checkOutTime, 2)) {
+        if (!DateTimeUtils.isWithinHours(checkInTime, checkOutTime, 2)) {
             return AttendanceStatus.ABSENT;
         }
 
@@ -511,16 +506,27 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             return beforeCheckOutStatus;
         }
 
-        // 4. 정상 퇴근 처리
+        // 4. 퇴근 시간이 유효한 시간은 오후 5시 반부터 7시까지로 고정
+        if(!DateTimeUtils.isBetweenTodayCheckOutTime(checkOutTime)){
+            throw new AttendancesCustomException(
+                    AttendancesExceptionCode.CHECK_OUT_TIME_OUTSIDE_WORK_HOURS);
+        }
+
+        // 5. 정상 퇴근 처리
         return AttendanceStatus.ON_TIME;
     }
 
-    private void validateTime(LocalDateTime time){
-        LocalDate tomorrow = DateTimeUtils.getTomorrow().toLocalDate();
-        LocalDate today = DateTimeUtils.getToday().toLocalDate();
+    private void validateTodayCheckInOrCheckOutTime(LocalDateTime time){
+        /*LocalDate tomorrow = DateTimeUtils.getTomorrow().toLocalDate();
+        LocalDate today = DateTimeUtils.getToday().toLocalDate();*/
 
-        // 1. 파라미터로 받는 시간이 오늘 이전인지
-        if(!time.toLocalDate().isAfter(today)){
+        // 1. 파라미터로 받는 시간이 오늘인지
+        System.out.println("request time : "+time);
+        if(!DateTimeUtils.isToday(time)){
+            throw new AttendancesCustomException(
+                    AttendancesExceptionCode.TIME_BEFORE_TODAY);
+        }
+        /*if(!time.toLocalDate().isAfter(today)){
             throw new AttendancesCustomException(
                     AttendancesExceptionCode.TIME_BEFORE_TODAY);
         }
@@ -529,7 +535,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         if (!time.toLocalDate().isBefore(tomorrow)) {
             throw new AttendancesCustomException(
                     AttendancesExceptionCode.TIME_EQUAL_OR_AFTER_TOMORROW);
-        }
+        }*/
     }
 
     private void validateAccess(Members loginMember){
@@ -545,9 +551,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         } else if (memberName != null && department == null) {
             return membersService.findAllByMemberName(memberName);
         } else if (memberName == null && department != null) {
-            List<Members> memberList = membersService.findAllByDepartment(
+            return membersService.findAllByDepartment(
                     membersService.findDepartment(department));
-            return memberList;
         } else {
             return membersService.findAllByDepartment(
                     membersService.findDepartment(department), memberName);
@@ -558,120 +563,96 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             Members member, AttendanceStatus status, String description,
             LocalDateTime checkInTime, LocalDateTime checkOutTime,
             LocalDateTime customCreatedAt, Long attendanceId) {
-        Attendances attendance = null;
+        LocalDateTime lateCheckInTime
+                = LocalDateTime.of(checkInTime.toLocalDate(),
+                DateTimeUtils.getCheckInTime()).plusSeconds(1);
+        LocalDateTime halfDayCheckOutTime
+                = LocalDateTime.of(checkInTime.toLocalDate(),
+                DateTimeUtils.getCheckInTime().plusHours(4));
+        // 1. 수동으로 CreatedAt를 조작하여 만들 것인지? 아닌지
         if(customCreatedAt != null){
-            attendance = attendancesRepository.findByMemberIdAndCreatedDate(
-                    member.getId(), customCreatedAt.toLocalDate());
-        }else{
-            attendance
-                    = attendancesRepository.findById(attendanceId).orElseThrow(
-                            () -> new AttendancesCustomException(
-                                    AttendancesExceptionCode.NOT_FOUND_ATTENDANCES));
-        }
-
-        if (attendance != null) {
-            // 기존 Attendance 업데이트 처리
+            // 1-1. 수동으로 조작하여 만듦, attendanceId를 애초에 null로 가져와서 해당 근태가 없음.
+            Attendances attendance = attendancesRepository.findByMemberIdAndCreatedDate(
+                    member.getId(), customCreatedAt.toLocalDate()).orElse(null);
+            if(attendance != null){
+                throw new AttendancesCustomException(AttendancesExceptionCode.DUPLICATED_ATTENDANCE);
+            }
             switch (status) {
                 case ABSENT, VACATION, HOLIDAY ->
                     // 결근, 외근, 휴가 상태: checkInTime과 checkOutTime을 null로 설정
-                        attendance.update(status, description, null, null);
+                    attendancesRepository.saveManually(
+                            member.getId(), customCreatedAt,
+                            AttendancesConverter.toEntity(
+                                    member, status, description,
+                                    null, null));
                 case LATE -> {
-                    // 지각 상태: checkInTime을 09:00:01로 설정
-                    // 오늘 이전의 근태 기록은 checkOutTime까지 정해줌
-                    LocalDateTime lateCheckInTime = LocalDateTime.of(
-                                    checkInTime.toLocalDate(), DateTimeUtils.getCheckInTime()).plusSeconds(1);
-                    if(DateTimeUtils.isToday(lateCheckInTime)){
-                        if (DateTimeUtils.isBeforeTodayCheckOutTime(DateTimeUtils.getCurrentDateTime())) {
-                            attendance.update(status, description, lateCheckInTime, null);
-                        }else{
-                            attendance.update(status, description, lateCheckInTime, checkOutTime);
-                        }
-                    }else{
-                        attendance.update(status, description, lateCheckInTime, checkOutTime);
-                    }
-                }
-                case HALF_DAY -> {
-                    // 조퇴 상태: checkOutTime을 근무 시간의 절반 종료 시간으로 설정
-                    LocalDateTime halfDayCheckOutTime = LocalDateTime.of(checkInTime.toLocalDate(), DateTimeUtils.getCheckInTime().plusHours(4));
-                    attendance.update(status, description, checkInTime, halfDayCheckOutTime);
-                }
-                // 외근 같은 경우, 오늘 오후 6시 이전이든 상관 없이 출/퇴근 시간을 정해준다.
-                case OUT_OF_OFFICE -> {
-                    attendance.update(status, description, checkInTime, checkOutTime);
-                }
-                case ON_TIME -> {
-                    if(DateTimeUtils.isToday(checkInTime)){
-                        if (DateTimeUtils.isBeforeTodayCheckOutTime(DateTimeUtils.getCurrentDateTime())) {
-                            attendance.update(status, description, checkInTime, null);
-                        }else{
-                            attendance.update(status, description, checkInTime, checkOutTime);
-                        }
-                    }else{
-                        attendance.update(status, description, checkInTime, checkOutTime);
-                    }
-                }
-                default -> {
-                    throw new AttendancesCustomException(
-                            AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
-                }
-            }
-        } else {
-            // 새로운 Attendance 생성 및 저장
-            // createdAt 수동 저장
-            switch (status) {
-                case ABSENT, VACATION ->
-                    // 결근, 외근, 휴가 상태: checkInTime과 checkOutTime을 null로 설정
-                        attendancesRepository.saveManually(
-                                member.getId(), customCreatedAt,
-                                AttendancesConverter.toEntity(
-                                        member, status, description,
-                                        null, null));
-                case LATE -> {
-                    // 지각 상태: checkInTime을 09:00:01로 설정
-                    LocalDateTime lateCheckInTime
-                            = LocalDateTime.of(
-                                    checkInTime.toLocalDate(),
-                            DateTimeUtils.getCheckInTime()).plusSeconds(1);
-                    if (DateTimeUtils.isBeforeTodayCheckOutTime(DateTimeUtils.getCurrentDateTime())) {
+                    if (DateTimeUtils.isBeforeTodayCheckOutTime(
+                            DateTimeUtils.getCurrentDateTime())) {
                         attendancesRepository.saveManually(member.getId(), customCreatedAt,
                                 AttendancesConverter.toEntity(
                                         member, status, description,
                                         lateCheckInTime, null));
                     } else {
-                        attendancesRepository.saveManually(
-                                member.getId(), customCreatedAt,
+                        attendancesRepository.saveManually(member.getId(), customCreatedAt,
                                 AttendancesConverter.toEntity(
-                                        member, status, description, lateCheckInTime,
-                                        checkOutTime));
+                                        member, status, description, lateCheckInTime, checkOutTime));
                     }
                 }
-                case HALF_DAY -> {
-                    // 조퇴 상태: checkOutTime을 근무 시간의 절반 종료 시간으로 설정
-                    LocalDateTime halfDayCheckOutTime
-                            = LocalDateTime.of(checkInTime.toLocalDate(), DateTimeUtils.getCheckInTime().plusHours(4));
+                case HALF_DAY ->
+                    // 조퇴면 09시~ 오후 1시퇴근 고정
                     attendancesRepository.saveManually(
                             member.getId(), customCreatedAt,
                             AttendancesConverter.toEntity(
                                     member, status, description, checkInTime,
                                     halfDayCheckOutTime));
-                }
-                default -> {
-                    // 기본 상태: checkOutTime 설정 여부 판단
-                    if(DateTimeUtils.isToday(customCreatedAt)){
-                        if (DateTimeUtils.isBeforeTodayCheckOutTime(DateTimeUtils.getCurrentDateTime())) {
-                            attendancesRepository.saveManually(
-                                    member.getId(), customCreatedAt,
-                                    AttendancesConverter.toEntity(
-                                            member, status, description, checkInTime,
-                                            null));
-                        }
+                case ON_TIME -> {
+                    if(DateTimeUtils.isToday(customCreatedAt)
+                            && DateTimeUtils.isBeforeTodayCheckOutTime(DateTimeUtils.getCurrentDateTime())) {
+                        attendancesRepository.saveManually(
+                                member.getId(), customCreatedAt,
+                                AttendancesConverter.toEntity(
+                                        member, status, description, checkInTime,
+                                        null));
+                    }else{
+                        attendancesRepository.saveManually(
+                                member.getId(), customCreatedAt,
+                                AttendancesConverter.toEntity(
+                                        member, status, description,
+                                        checkInTime, checkOutTime));
                     }
+                }
+                case OUT_OF_OFFICE ->
                     attendancesRepository.saveManually(
                             member.getId(), customCreatedAt,
                             AttendancesConverter.toEntity(
                                     member, status, description,
                                     checkInTime, checkOutTime));
-                }
+                default ->
+                    throw new AttendancesCustomException(
+                            AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
+            }
+        }else{
+            // 1-2. 조작하지 않고 근태 기록의 수정만 필요
+            Attendances attendance = findById(attendanceId);
+
+            switch (status) {
+                case ABSENT, VACATION, HOLIDAY ->
+                    // 결근, 외근, 휴가 상태: checkInTime과 checkOutTime을 null로 설정
+                    attendance.update(
+                            status, description, null, null);
+                case LATE ->
+                    attendance.update(
+                            status, description, lateCheckInTime, checkOutTime);
+                case HALF_DAY ->
+                    // 조퇴 상태: checkOutTime을 근무 시간의 절반 종료 시간으로 설정
+                    attendance.update(
+                            status, description, checkInTime, halfDayCheckOutTime);
+                case ON_TIME, OUT_OF_OFFICE ->
+                    attendance.update(
+                            status, description, checkInTime, checkOutTime);
+                default ->
+                    throw new AttendancesCustomException(
+                            AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
             }
         }
     }
@@ -679,6 +660,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     private void handlePastAttendance(DateRange dateRange, Members member, AttendanceStatus status, String description) {
         List<DateRange> pastDateRanges
                 = dateRange.splitUntil(dateRange.getEndDate()); // 오늘 이전의 데이터 추출
+        // 해당 메서드는 수동 create하는 메서드이기에
 
         for (DateRange range : pastDateRanges) {
             LocalDateTime pastCheckInTime
@@ -695,19 +677,23 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 case ON_TIME, OUT_OF_OFFICE ->
                         handleAttendance(
                                 member, status, description,
-                                pastCheckInTime, pastCheckOutTime, customCreatedAt, null);
+                                pastCheckInTime, pastCheckOutTime,
+                                customCreatedAt, null);
                 case LATE ->
                         handleAttendance(
                                 member, status, description,
-                                pastCheckInTime.plusMinutes(1), pastCheckOutTime, customCreatedAt, null);
+                                pastCheckInTime.plusMinutes(1), pastCheckOutTime,
+                                customCreatedAt, null);
                 case ABSENT, HOLIDAY, VACATION ->
                         handleAttendance(
                                 member, status, description,
-                                null, null, customCreatedAt, null);
+                                pastCheckInTime, null,
+                                customCreatedAt, null);
                 case HALF_DAY ->
                         handleAttendance(
                                 member, status, description,
-                                pastCheckInTime, pastCheckInTime.plusHours(4), customCreatedAt, null);
+                                pastCheckInTime, pastCheckInTime.plusHours(4),
+                                customCreatedAt, null);
                 default ->
                         throw new AttendancesCustomException(
                                 AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
@@ -723,19 +709,25 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             case ON_TIME, OUT_OF_OFFICE ->
                     handleAttendance(
                             member, status, description,
-                            todayCheckInTime, todayCheckOutTime, DateTimeUtils.getToday(), null);
+                            todayCheckInTime, todayCheckOutTime,
+                            DateTimeUtils.getToday(), null);
             case LATE ->
                     handleAttendance(
                             member, status, description,
-                            todayCheckInTime.plusMinutes(1), todayCheckOutTime, DateTimeUtils.getToday(), null);
+                            todayCheckInTime.plusMinutes(1),
+                            todayCheckOutTime, DateTimeUtils.getToday(),
+                            null);
             case ABSENT, HOLIDAY, VACATION ->
                     handleAttendance(
                             member, status, description,
-                            null, null, DateTimeUtils.getToday(), null);
+                            todayCheckInTime, null
+                            , DateTimeUtils.getToday(),
+                            null);
             case HALF_DAY ->
                     handleAttendance(
                             member, status, description,
-                            todayCheckInTime, todayCheckInTime.plusHours(4), DateTimeUtils.getToday(), null);
+                            todayCheckInTime, todayCheckInTime.plusHours(4),
+                            DateTimeUtils.getToday(), null);
             default ->
                     throw new AttendancesCustomException(
                             AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);

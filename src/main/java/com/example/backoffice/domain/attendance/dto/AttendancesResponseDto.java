@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.attendance.dto;
 
 import com.example.backoffice.domain.attendance.entity.AttendanceStatus;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,6 +53,7 @@ public class AttendancesResponseDto {
         private String memberName;
         private LocalDateTime checkInTime;
         private LocalDateTime checkOutTime;
+        private LocalDateTime createdAt;
         private AttendanceStatus attendanceStatus;
         private String description;
     }
@@ -93,5 +95,19 @@ public class AttendancesResponseDto {
         private Integer lateCount;
         private Integer halfDayCount;
         private Integer holidayCount;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadScheduledRecordDto {
+        private Integer index;
+        private Long memberId;
+        private String memberName;
+        private MemberDepartment department;
+        private String description;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
     }
 }
