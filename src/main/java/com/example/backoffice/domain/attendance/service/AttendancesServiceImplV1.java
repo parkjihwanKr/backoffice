@@ -427,10 +427,10 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 = cachedMemberAttendanceRedisProvider.getAllRawValues();
         List<AttendancesResponseDto.ReadScheduledRecordDto> recordList = new ArrayList<>();
 
+        int index = 0;
         for (Map.Entry<String, String> entry : redisData.entrySet()) {
             String key = entry.getKey();
             String rawValue = entry.getValue();
-            int index = 0;
             // 2-1. Key에서 memberId와 description 추출
             Long memberId = cachedMemberAttendanceRedisProvider.extractMemberIdFromKey(key);
             String description = cachedMemberAttendanceRedisProvider.extractDescriptionFromKey(key);
