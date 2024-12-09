@@ -9,12 +9,12 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AttendancesQuery {
 
     List<Attendances> findFiltered(
-            Long memberId, LocalDateTime startDate,
-            LocalDateTime endDate, AttendanceStatus attdStatus);
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate);
 
     Page<Attendances> findFilteredForAdmin(
             Long foundMemberId, AttendanceStatus attendanceStatus,
@@ -27,7 +27,7 @@ public interface AttendancesQuery {
             LocalDateTime startOfDeletion,
             LocalDateTime endOfDeletion);
 
-    Attendances findByMemberIdAndCreatedDate(
+    Optional<Attendances> findByMemberIdAndCreatedDate(
             Long memberId, LocalDate createdDate);
 
     void saveManually(

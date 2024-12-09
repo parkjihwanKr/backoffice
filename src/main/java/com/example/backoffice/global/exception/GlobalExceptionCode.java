@@ -51,6 +51,7 @@ public enum GlobalExceptionCode {
     NOT_EXIST_MONTH(HttpStatus.BAD_REQUEST,"DATE-004", "존재하지 않은 달입니다."),
     INVALID_YEAR(HttpStatus.BAD_REQUEST,"DATE-005", "알맞지 않은 년도를 요청하셨습니다."),
     INVALID_MONTH(HttpStatus.BAD_REQUEST,"DATE-006", "알맞지 않은 달을 요청하셨습니다."),
+    BEFORE_TODAY(HttpStatus.BAD_REQUEST,"DATE-007", "오늘 이전의 날을 설정하셨습니다."),
     ;
 
     private final HttpStatus httpStatus;

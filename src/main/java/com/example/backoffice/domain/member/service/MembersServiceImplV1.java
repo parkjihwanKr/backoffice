@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Member;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -135,7 +136,11 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     @Transactional(readOnly = true)
     public List<Members> findAllByDepartment(MemberDepartment department){
-        return membersRepository.findAllByDepartment(department);
+        List<Members> memberList = membersRepository.findAllByDepartment(department);
+        if (memberList.isEmpty()){
+            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+        }
+        return memberList;
     }
 
     @Override
@@ -341,13 +346,53 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     @Transactional(readOnly = true)
     public List<Members> findAllByMemberName(String memberName) {
-        return membersRepository.findAllByMemberName(memberName);
+        List<Members> memberList = membersRepository.findAllByMemberName(memberName);
+        if(memberList.isEmpty()){
+            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+        }
+        return memberList;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Members> findAllByDepartment(MemberDepartment department, String memberName){
-        return membersRepository.findAllByDepartmentAndMemberName(
+        List<Members> memberList = membersRepository.findAllByDepartmentAndMemberName(
                 department, memberName);
+        if(memberList.isEmpty()){
+            throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
+        }
+        return memberList;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findItManagerOrCeo() {
+        Members itManager
+                = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.IT);
+        if(itManager == null){
+            return membersRepository.findByPosition(MemberPosition.CEO).orElseThrow(
+                    ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+        }else{
+            return itManager;
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isManagerOrCeo(Members loginMember){
+        if(!loginMember.getPosition().equals(MemberPosition.MANAGER)){
+            if(!loginMember.getPosition().equals(MemberPosition.CEO)){
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findByIdAndDepartment(Long memberId, MemberDepartment department){
+        return membersRepository.findByIdAndDepartment(memberId, department).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 }

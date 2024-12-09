@@ -43,10 +43,6 @@ public class DailyScheduler implements SchedulerTask{
         DateTimeUtils.refreshCached();
     }
 
-    private void refreshCachedMemberData(){
-
-    }
-
     private void sendNotificationForUnCompletedEvaluationMember(){
         List<Evaluations> evaluationList
                 = evaluationsService.findAllByEndDatePlusSevenDays(LocalDate.now().plusDays(7));
@@ -88,11 +84,8 @@ public class DailyScheduler implements SchedulerTask{
         // 평일
         if(DateTimeUtils.isWeekday()){
             attendancesService.create(true);
+        }else{
+            attendancesService.create(false);
         }
-        attendancesService.create(false);
-    }
-
-    private void saveCachedMemberAttendance(){
-
     }
 }
