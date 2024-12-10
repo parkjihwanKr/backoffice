@@ -17,7 +17,6 @@ import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
@@ -106,7 +104,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     public Page<MembersResponseDto.ReadOneDto> readForHrManager(
             String department, String position,
             Members loginMember, Pageable pageable) {
-        System.out.println(department + " "+ position);
 
         // 1. 로그인 멤버가 HR MANAGER 또는 CEO인지 확인
         membersService.findHRManagerOrCEO(loginMember);
@@ -170,7 +167,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        String profileImageUrl = filesService.createImage(multipartFile);
+        String profileImageUrl = filesService.createImage(multipartFile, loginMember);
         matchedMember.updateMemberInfo(
                 requestDto.getName(), requestDto.getEmail(), requestDto.getAddress(),
                 requestDto.getContact(), requestDto.getIntroduction(),
@@ -196,10 +193,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
                 && loginMember.getDepartment().equals(MemberDepartment.HR);
         boolean isMainAdmin = loginMember.getPosition().equals(MemberPosition.CEO);
 
-        System.out.println("requestDto : "+requestDto.getRole());
-        System.out.println("requestDto : "+requestDto.getDepartment());
-        System.out.println("requestDto : "+requestDto.getMemberName());
-        System.out.println("requestDto : "+requestDto.getPosition());
         // 메인 어드민이 아닌 경우에 대한 처리
         if (!isMainAdmin) {
             // HR Manager일 경우의 권한 제한
@@ -277,7 +270,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             Long memberId, Members loginMember, MultipartFile image){
         membersService.matchLoginMember(loginMember, memberId);
 
-        String profileImageUrl = filesService.createImage(image);
+        String profileImageUrl = filesService.createImage(image, loginMember);
 
         loginMember.updateProfileImage(profileImageUrl);
         return MembersConverter.toUpdateOneForProfileImageDto(loginMember);
@@ -350,7 +343,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional(readOnly = true)
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
         List<Members> memberList = membersService.findAll();
-        System.out.println("memberList.size() : "+memberList.size());
         return MembersConverter.toReadNameListDto(memberList);
     }
 
