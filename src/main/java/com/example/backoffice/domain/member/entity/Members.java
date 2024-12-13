@@ -93,14 +93,13 @@ public class Members extends CommonEntity {
     // entity method
     public void updateMemberInfo(
             String name, String email, String address,
-            String contact, String introduction, String bCrytPassword, String profileImageUrl){
+            String contact, String introduction, String bCrytPassword){
         this.name = name;
         this.password = bCrytPassword;
         this.email = email;
         this.address = address;
         this.contact = contact;
         this.introduction = introduction;
-        this.profileImageUrl = profileImageUrl;
     }
 
     public void updateProfileImage(String profileImageUrl){

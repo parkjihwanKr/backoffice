@@ -24,7 +24,7 @@ public class MembersConverter {
                 .memberName("admin")
                 .name("admin")
                 .loveCount(0L)
-                .role(MemberRole.ADMIN)
+                .role(MemberRole.MAIN_ADMIN)
                 .email("admin@test.com")
                 .address("admin시 admin동")
                 .introduction("admin이다")
@@ -87,6 +87,7 @@ public class MembersConverter {
                 .memberId(member.getId())
                 .email(member.getEmail())
                 .address(member.getAddress())
+                .name(member.getName())
                 .memberName(member.getMemberName())
                 .salary(member.getSalary())
                 .position(member.getPosition())
@@ -99,6 +100,7 @@ public class MembersConverter {
                 .profileImageUrl(member.getProfileImageUrl())
                 .introduction(member.getIntroduction())
                 .remainingVacationDays(member.getRemainingVacationDays())
+                .contact(member.getContact())
                 .build();
     }
 
@@ -220,5 +222,13 @@ public class MembersConverter {
             }
         }
         throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_POSITION);
+    }
+
+    public static MembersResponseDto.ReadAvailableMemberNameDto toReadAvailableMemberNameDto(
+            Boolean isAvailable, String memberName){
+        return MembersResponseDto.ReadAvailableMemberNameDto.builder()
+                .isAvailable(isAvailable)
+                .memberName(memberName)
+                .build();
     }
 }

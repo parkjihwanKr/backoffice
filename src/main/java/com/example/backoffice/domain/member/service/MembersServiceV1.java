@@ -105,4 +105,6 @@ public interface MembersServiceV1 {
     boolean isManagerOrCeo(Members loginMember);
 
     Members findByIdAndDepartment(Long memberId, MemberDepartment department);
+
+    Boolean isExistMemberName(String memberName);
 }

@@ -49,4 +49,6 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     Optional<Members> findByIdAndDepartment(
             Long memberId, MemberDepartment department);
+
+    Boolean existsByMemberName(String memberName);
 }

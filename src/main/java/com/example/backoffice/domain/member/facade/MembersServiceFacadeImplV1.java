@@ -21,10 +21,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -87,6 +89,17 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional(readOnly = true)
+    public MembersResponseDto.ReadAvailableMemberNameDto checkAvailableMemberName(
+            String memberName){
+        if(membersService.isExistMemberName(memberName)){
+            throw new MembersCustomException(
+                    MembersExceptionCode.EXISTS_MEMBER);
+        }
+        return MembersConverter.toReadAvailableMemberNameDto(true, memberName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public MembersResponseDto.ReadOneDetailsDto readOne(
             Long memberId, Members loginMember){
         // 1. 멤버가 자기 자신인 경우
@@ -138,7 +151,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @Transactional
     public MembersResponseDto.UpdateOneDto updateOne(
-            Long memberId, Members loginMember, MultipartFile multipartFile,
+            Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneDto requestDto){
         // 엔티티가 영속성 컨택스트에 넣어야하기에
         // 수정을 하기 위해선 어떤 엔티티가 변경 되어야 하는지 알아야함
@@ -167,11 +180,9 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        String profileImageUrl = filesService.createImage(multipartFile, loginMember);
         matchedMember.updateMemberInfo(
                 requestDto.getName(), requestDto.getEmail(), requestDto.getAddress(),
-                requestDto.getContact(), requestDto.getIntroduction(),
-                bCrytPassword, profileImageUrl);
+                requestDto.getContact(), requestDto.getIntroduction(), bCrytPassword);
         return MembersConverter.toUpdateOneDto(matchedMember);
     }
 
@@ -239,8 +250,14 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             MembersRequestDto.UpdateOneForSalaryDto requestDto){
         // 1. 로그인 멤버가 바꾸려는 인물과 동일 인물이면 안됨
         // 2. 로그인 멤버가 자기 자신의 급여를 바꿀 순 없음
-        Members updateMember
-                = membersService.checkDifferentMember(loginMember.getId(), memberId);
+        Members updateMember = null;
+
+        // 2-1. 로그인 멤버가 사장이면 바꿀 수 있음.
+        if(!loginMember.getPosition().equals(MemberPosition.CEO)){
+            updateMember = membersService.checkDifferentMember(loginMember.getId(), memberId);
+        }else{
+            updateMember = loginMember;
+        }
 
         // 3. 로그인 멤버가 바꿀 권한이 있는지
         // 권한 : 부서가 재정부의 부장이거나 사장인 경우만 가능
@@ -250,11 +267,13 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
             updateMember.updateSalary(requestDto.getSalary());
 
-            String message = loginMember.getMemberName() + "님이 "
-                    + updateMember.getMemberName() + "님의 급여를 변경하셨습니다.";
-            notificationsService.saveForChangeMemberInfo(
-                    loginMember.getMemberName(), updateMember.getMemberName(),
-                    updateMember.getDepartment(), message);
+            if(!loginMember.getId().equals(updateMember.getId())){
+                String message = loginMember.getMemberName() + "님이 "
+                        + updateMember.getMemberName() + "님의 급여를 변경하셨습니다.";
+                notificationsService.saveForChangeMemberInfo(
+                        loginMember.getMemberName(), updateMember.getMemberName(),
+                        updateMember.getDepartment(), message);
+            }
 
             return MembersConverter.toUpdateOneForSalaryDto(updateMember);
         }else{
@@ -268,12 +287,13 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional
     public MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
             Long memberId, Members loginMember, MultipartFile image){
-        membersService.matchLoginMember(loginMember, memberId);
+        Members updatedMember
+                = membersService.matchLoginMember(loginMember, memberId);
 
-        String profileImageUrl = filesService.createImage(image, loginMember);
+        String profileImageUrl = filesService.createImage(image, updatedMember);
 
-        loginMember.updateProfileImage(profileImageUrl);
-        return MembersConverter.toUpdateOneForProfileImageDto(loginMember);
+        updatedMember.updateProfileImage(profileImageUrl);
+        return MembersConverter.toUpdateOneForProfileImageDto(updatedMember);
     }
 
     // 프로필 이미지 삭제
