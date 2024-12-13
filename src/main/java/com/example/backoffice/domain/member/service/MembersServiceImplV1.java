@@ -355,6 +355,15 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
+    public Boolean isExistMemberName(String memberName){
+        if(membersRepository.existsByMemberName(memberName)){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Members> findAllByDepartment(MemberDepartment department, String memberName){
         List<Members> memberList = membersRepository.findAllByDepartmentAndMemberName(
                 department, memberName);

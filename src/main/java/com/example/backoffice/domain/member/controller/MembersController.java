@@ -35,6 +35,18 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @GetMapping("/check-available-memberName")
+    public ResponseEntity<CommonResponse<MembersResponseDto.ReadAvailableMemberNameDto>> checkAvailableMemberName(
+            @RequestParam String memberName){
+        MembersResponseDto.ReadAvailableMemberNameDto responseDto
+                = membersServiceFacade.checkAvailableMemberName(memberName);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        200, "해당 아이디는 사용 가능합니다.", responseDto
+                )
+        );
+    }
+
     @GetMapping("/members/{memberId}")
     public ResponseEntity<MembersResponseDto.ReadOneDetailsDto> readOne(
             @PathVariable Long memberId,
@@ -60,12 +72,11 @@ public class MembersController {
     @PatchMapping("/members/{memberId}/profile")
     public ResponseEntity<MembersResponseDto.UpdateOneDto> updateOne(
             @PathVariable Long memberId,
-            @RequestPart(value = "data") MembersRequestDto.UpdateOneDto requestDto,
-            @RequestPart(value = "file") MultipartFile multipartFile,
+            @RequestBody MembersRequestDto.UpdateOneDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         MembersResponseDto.UpdateOneDto responseDto
                 = membersServiceFacade.updateOne(
-                        memberId, memberDetails.getMembers(), multipartFile, requestDto);
+                        memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 

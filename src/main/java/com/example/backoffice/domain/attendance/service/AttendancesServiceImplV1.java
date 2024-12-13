@@ -315,13 +315,15 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                     requestDto.getDescription());
         }
 
-        // 6. 알림 생성
-        notificationsService.generateEntityAndSendMessage(
-                NotificationsConverter.toNotificationData(
-                        foundMember, loginMember, null, null, null, null,
-                        "새로운 근태 기록을 수동으로 작성하셨습니다."),
-                NotificationType.CREATE_ATTENDANCES_MANUALLY
-        );
+        // 6. 알림 생성, 자기 자신에겐 보내지 않음.
+        if(!foundMember.getId().equals(loginMember.getId())){
+            notificationsService.generateEntityAndSendMessage(
+                    NotificationsConverter.toNotificationData(
+                            foundMember, loginMember, null, null, null, null,
+                            "새로운 근태 기록을 수동으로 작성하셨습니다."),
+                    NotificationType.CREATE_ATTENDANCES_MANUALLY
+            );
+        }
 
         // 7. Response DTO 반환
         return AttendancesConverter.toCreateOneForAdminDto(

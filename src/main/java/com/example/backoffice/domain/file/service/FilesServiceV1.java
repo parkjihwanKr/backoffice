@@ -14,7 +14,7 @@ public interface FilesServiceV1 {
 
     String createOneForBoard(MultipartFile file, Boards board);
 
-    String createImage(MultipartFile image);
+    String createImage(MultipartFile image, Members member);
 
     String createOneForEvent(MultipartFile file, Events event);
 

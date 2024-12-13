@@ -14,16 +14,18 @@ public interface MembersServiceFacadeV1 {
     MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto);
 
+    MembersResponseDto.ReadAvailableMemberNameDto checkAvailableMemberName(
+            String memberName);
+
     MembersResponseDto.ReadOneDetailsDto readOne(
             Long memberId, Members member);
-
 
     Page<MembersResponseDto.ReadOneDto> readForHrManager(
             String department, String position,
             Members loginMember, Pageable pageable);
 
     MembersResponseDto.UpdateOneDto updateOne(
-            Long memberId,  Members Member, MultipartFile multipartFile,
+            Long memberId,  Members Member,
             MembersRequestDto.UpdateOneDto requestDto);
 
     MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(

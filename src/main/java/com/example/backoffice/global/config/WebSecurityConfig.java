@@ -84,7 +84,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(
                                 "/websocket", "/ws/**","/",
-                                "/api/v1/login","/api/v1/signup").permitAll()
+                                "/api/v1/login","/api/v1/signup",
+                                "/api/v1/check-available-memberName").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout
