@@ -52,19 +52,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
         if(toMemberId.equals(fromMemberId)){
             throw new MembersCustomException(MembersExceptionCode.MATCHED_LOGIN_MEMBER);
         }
-        return membersRepository.findById(toMemberId).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
-        );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members findByIdAndRoleAndDepartment(
-            Long adminId, MemberRole role, MemberDepartment department){
-        return membersRepository.findByIdAndRoleAndDepartment(adminId, role, department)
-                .orElseThrow(
-                        ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER)
-                );
+        return findById(toMemberId);
     }
 
     @Override
@@ -145,13 +133,6 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Members> findAllByPosition(String position){
-        MemberPosition memberPosition = MembersConverter.toPosition(position);
-        return membersRepository.findAllByPosition(memberPosition);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Members> findAllExceptLoginMember(Long exceptMemberId){
         return membersRepository.findAllByIdNotIn(Collections.singletonList(exceptMemberId));
     }
@@ -219,18 +200,10 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members findAuditManagerOrCeo() {
-        Members auditManager = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.AUDIT);
-        if(auditManager != null){
-            return auditManager;
-        }
-        return findByPosition(MemberPosition.CEO);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Members findByFinanceManagerOrCeo(Long memberId) {
-        Members financeManager = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.FINANCE);
+        Members financeManager
+                = findByPositionAndDepartment(
+                        MemberPosition.MANAGER, MemberDepartment.FINANCE);
         if(financeManager != null){
             return financeManager;
         }
@@ -267,9 +240,6 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
             List<Long> excludedIdList){
         List<Members> memberList = findAllById(excludedIdList);
 
-        for(Members member : memberList){
-            System.out.println("excludedMemberName : "+member.getMemberName());
-        }
         if(memberList.size() != excludedIdList.size()){
             throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
         }
@@ -371,19 +341,6 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
             throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER);
         }
         return memberList;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members findItManagerOrCeo() {
-        Members itManager
-                = findByPositionAndDepartment(MemberPosition.MANAGER, MemberDepartment.IT);
-        if(itManager == null){
-            return membersRepository.findByPosition(MemberPosition.CEO).orElseThrow(
-                    ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
-        }else{
-            return itManager;
-        }
     }
 
     @Override
