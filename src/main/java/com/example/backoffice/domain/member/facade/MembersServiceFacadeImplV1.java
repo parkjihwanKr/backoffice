@@ -114,7 +114,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public Page<MembersResponseDto.ReadOneDto> readForHrManager(
+    public Page<MembersResponseDto.ReadOneDto> readByAdmin(
             String department, String position,
             Members loginMember, Pageable pageable) {
 
@@ -123,8 +123,10 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
         // 2. 부서와 직위에 따른 필터링 준비
         // ** null -> all과 같은 개념으로 선택되지 않으면 모든 department, position의 값을 부르기 위해
-        MemberDepartment memberDepartment = department != null ? MembersConverter.toDepartment(department) : null;
-        MemberPosition memberPosition = position != null ? MembersConverter.toPosition(position) : null;
+        MemberDepartment memberDepartment =
+                department != null ? MembersConverter.toDepartment(department) : null;
+        MemberPosition memberPosition =
+                position != null ? MembersConverter.toPosition(position) : null;
 
         // 3. 필터링된 멤버 리스트를 pageable 적용하여 가져오기
         Page<Members> pagedMemberList;
@@ -194,7 +196,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     // 메인 어드민은 모든 직원의 직책, 직위를 변경할 수 있다.
     @Override
     @Transactional
-    public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(
+    public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttributeByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForAttributeDto requestDto,
             MultipartFile multipartFile) throws MembersCustomException {
@@ -245,7 +247,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public MembersResponseDto.UpdateOneForSalaryDto updateOneForSalary(
+    public MembersResponseDto.UpdateOneForSalaryDto updateOneForSalaryByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForSalaryDto requestDto){
         // 1. 로그인 멤버가 바꾸려는 인물과 동일 인물이면 안됨
@@ -315,8 +317,8 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public void deleteOne(Long memberId, Members loginMember){
-        membersService.matchLoginMember(loginMember, memberId);
+    public void deleteOneByAdmin(Long memberId, Members loginMember){
+        membersService.findHRManagerOrCEO(loginMember);
         membersService.deleteById(memberId);
     }
 
@@ -335,7 +337,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public MembersResponseDto.UpdateOneForVacationDto updateOneForVacation(
+    public MembersResponseDto.UpdateOneForVacationDto updateMemberVacationByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForVacationDto requestDto){
         Members hrManager = membersService.findHRManagerOrCEO(loginMember);
@@ -364,12 +366,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
         List<Members> memberList = membersService.findAll();
         return MembersConverter.toReadNameListDto(memberList);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members findByMemberName(String memberName){
-        return membersService.findByMemberName(memberName);
     }
 
     private MembersExceptionEnum findExceptionType(
