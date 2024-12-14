@@ -14,6 +14,7 @@ import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 import com.example.backoffice.domain.reaction.service.ReactionsServiceV1;
 import com.example.backoffice.global.redis.ViewCountRedisProvider;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
+    private final MembersServiceV1 membersService;
     private final BoardsServiceV1 boardsService;
     private final ReactionsServiceV1 reactionsService;
     private final FilesServiceV1 filesService;
@@ -85,7 +87,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public BoardsResponseDto.ReadOneDto readOne(Long boardId){
         Boards board = boardsService.findById(boardId);
         if(!board.getBoardType().equals(BoardType.GENERAL)){

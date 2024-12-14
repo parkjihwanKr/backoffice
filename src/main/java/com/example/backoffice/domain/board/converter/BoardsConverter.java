@@ -215,6 +215,24 @@ public class BoardsConverter {
                 .build();
     }
 
+    public static BoardsResponseDto.ReadSummaryOneDto toSummaryOneDto(Boards board){
+        return BoardsResponseDto.ReadSummaryOneDto.builder()
+                .boardId(board.getId())
+                .title(board.getTitle())
+                .author(board.getMember().getMemberName())
+                .boardType(board.getBoardType())
+                .likeCount(board.getLikeCount())
+                .commentCount(board.getCommentList().size())
+                .viewCount(board.getViewCount())
+                .isImportant(board.getIsImportant())
+                .build();
+    }
+    public static List<BoardsResponseDto.ReadSummaryOneDto> toReadSummaryListDto(List<Boards> boardList) {
+        return boardList.stream()
+                .map(BoardsConverter::toSummaryOneDto)
+                .collect(Collectors.toList());
+    }
+
     public static BoardCategories toCategories(String categoryName){
         for(BoardCategories categories : BoardCategories.values()){
             if(categories.getLabel().equalsIgnoreCase(categoryName)){
@@ -222,5 +240,13 @@ public class BoardsConverter {
             }
         }
         throw new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD_CATEGORIES);
+    }
+
+    public static BoardType toBoardType(String boardTypeName){
+        return switch (boardTypeName) {
+            case "GENERAL"-> BoardType.GENERAL;
+            case "DEPARTMENT" -> BoardType.DEPARTMENT;
+            default -> throw new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD_TYPE);
+        };
     }
 }

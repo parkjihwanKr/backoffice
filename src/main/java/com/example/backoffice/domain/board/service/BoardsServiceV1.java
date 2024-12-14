@@ -80,4 +80,11 @@ public interface BoardsServiceV1 {
      * @throws BoardsCustomException 게시글이 존재하지 않을 경우 예외 발생
      */
     void deleteById(Long boardId);
+
+    /**
+     * 게시글 타입에 따른 게시글 3개 조회
+     * @param boardType : 게시글 타입
+     * @return 게시글 타입에 따른 게시글 3개
+     */
+    List<Boards> findThreeByCreatedAtDesc(BoardType boardType);
 }

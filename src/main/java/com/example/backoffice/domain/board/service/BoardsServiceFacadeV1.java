@@ -12,8 +12,7 @@ import java.util.List;
 public interface BoardsServiceFacadeV1 {
 
     /**
-     * 게시글 모두 조회 API
-     *
+     * 게시글 모두 조회
      * @param pageable 페이징 처리 정보 (페이지 번호, 크기 등)
      * @return 페이징된 게시글 목록
      *         - 중요 및 잠금 상태에 따라 상위 3개의 고정 게시글 포함
@@ -22,8 +21,7 @@ public interface BoardsServiceFacadeV1 {
     Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable);
 
     /**
-     * 게시글 상세 조회 API
-     *
+     * 게시글 상세 조회
      * @param boardId 조회하려는 게시글의 고유 식별 ID
      * @return 조회된 게시글의 세부 정보를 포함한 DTO
      *         - 게시글 정보, 작성자, 반응, 댓글 등 포함
@@ -32,7 +30,7 @@ public interface BoardsServiceFacadeV1 {
     BoardsResponseDto.ReadOneDto readOne(Long boardId);
 
     /**
-     * 게시글 생성 API
+     * 게시글 생성
      *
      * @param loginMember 게시글 생성 요청을 한 로그인 사용자
      * @param requestDto 게시글 생성에 필요한 요청 데이터 {@link BoardsRequestDto.CreateOneDto}
@@ -45,7 +43,7 @@ public interface BoardsServiceFacadeV1 {
             List<MultipartFile> files);
 
     /**
-     * 게시글 수정 API
+     * 게시글 수정
      *
      * @param boardId 수정하려는 게시글의 고유 ID
      * @param loginMember 요청을 수행한 로그인 사용자
@@ -61,7 +59,7 @@ public interface BoardsServiceFacadeV1 {
             List<MultipartFile> files);
 
     /**
-     * 게시글 삭제 API
+     * 게시글 삭제
      *
      * @param boardId 삭제하려는 게시글의 고유 ID
      * @param loginMember 요청을 수행한 로그인 사용자
@@ -69,7 +67,7 @@ public interface BoardsServiceFacadeV1 {
     void deleteOne(Long boardId, Members loginMember);
 
     /**
-     * 부서 게시글 생성 API
+     * 부서 게시글 생성
      *
      * @param department 게시글이 속한 부서 이름
      * @param loginMember 게시글 생성 요청을 한 로그인 사용자
@@ -82,7 +80,7 @@ public interface BoardsServiceFacadeV1 {
             BoardsRequestDto.CreateOneDto requestDto, List<MultipartFile> files);
 
     /**
-     * 부서별 게시글 목록 조회 API
+     * 부서별 게시글 목록 조회
      *
      * @param departmentName 조회할 부서 이름
      * @param pageable 페이징 처리 정보 (페이지 번호, 크기 등)
@@ -92,7 +90,7 @@ public interface BoardsServiceFacadeV1 {
             String departmentName, Pageable pageable);
 
     /**
-     * 부서 게시글 상세 조회 API
+     * 부서 게시글 상세 조회
      *
      * @param departmentName 게시글이 속한 부서 이름
      * @param boardId 조회하려는 게시글의 고유 식별 ID
@@ -102,7 +100,7 @@ public interface BoardsServiceFacadeV1 {
             String departmentName, Long boardId);
 
     /**
-     * 부서 게시글 수정 API
+     * 부서 게시글 수정
      *
      * @param department 게시글이 속한 부서 이름
      * @param boardId 수정하려는 게시글의 고유 ID
@@ -117,7 +115,7 @@ public interface BoardsServiceFacadeV1 {
             List<MultipartFile> files);
 
     /**
-     * 게시글 중요 상태 변경 API
+     * 게시글 중요 상태 변경
      *
      * @param boardId 상태를 변경하려는 게시글의 고유 ID
      * @param loginMember 요청을 수행한 로그인 사용자
@@ -125,7 +123,7 @@ public interface BoardsServiceFacadeV1 {
     void updateOneForMarkAsImportant(Long boardId, Members loginMember);
 
     /**
-     * 게시글 잠금 상태 변경 API
+     * 게시글 잠금 상태 변경
      *
      * @param boardId 상태를 변경하려는 게시글의 고유 ID
      * @param loginMember 요청을 수행한 로그인 사용자
