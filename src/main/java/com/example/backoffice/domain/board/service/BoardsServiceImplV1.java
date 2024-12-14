@@ -73,7 +73,7 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Boards> findThreeByCreatedAtDesc(BoardType boardType) {
         return boardsRepository.findTop3ByBoardTypeOrderByCreatedAtDesc(boardType);
     }

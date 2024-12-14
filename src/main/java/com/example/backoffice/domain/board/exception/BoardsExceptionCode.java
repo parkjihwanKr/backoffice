@@ -16,6 +16,9 @@ public enum BoardsExceptionCode {
     NOT_FOUND_BOARD_TYPE(HttpStatus.INTERNAL_SERVER_ERROR, "BOARD-007", "요청하신 게시판 타입이 존재하지 않습니다."),
     UNAUTHORIZED_ACCESS(HttpStatus.BAD_REQUEST, "BOARD-008", "접근할 수 없는 부서 게시판입니다."),
     NOT_FOUND_BOARD_CATEGORIES(HttpStatus.BAD_REQUEST, "BOARD-009", "해당 게시글의 카테고리를 찾을 수 없습니다."),
+    NOT_EQUALS_LIST_SIZE(
+            HttpStatus.INTERNAL_SERVER_ERROR, "BOARD-010",
+            "해당 게시글의 사이즈가 다릅니다. 관리자에게 문의해주세요."),
     ;
     private final HttpStatus httpStatus;
     private final String errorCode;

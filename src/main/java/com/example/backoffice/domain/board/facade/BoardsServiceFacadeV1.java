@@ -1,4 +1,4 @@
-package com.example.backoffice.domain.board.service;
+package com.example.backoffice.domain.board.facade;
 
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
@@ -23,11 +23,12 @@ public interface BoardsServiceFacadeV1 {
     /**
      * 게시글 상세 조회
      * @param boardId 조회하려는 게시글의 고유 식별 ID
+     * @param loginMember 로그인 멤버
      * @return 조회된 게시글의 세부 정보를 포함한 DTO
      *         - 게시글 정보, 작성자, 반응, 댓글 등 포함
      *         - 반환 타입: {@link BoardsResponseDto.ReadOneDto}
      */
-    BoardsResponseDto.ReadOneDto readOne(Long boardId);
+    BoardsResponseDto.ReadOneDto readOne(Long boardId, Members loginMember);
 
     /**
      * 게시글 생성
@@ -83,21 +84,23 @@ public interface BoardsServiceFacadeV1 {
      * 부서별 게시글 목록 조회
      *
      * @param departmentName 조회할 부서 이름
+     * @param loginMember 로그인 멤버
      * @param pageable 페이징 처리 정보 (페이지 번호, 크기 등)
      * @return 페이징된 부서 게시글 목록 {@link BoardsResponseDto.ReadAllDto}
      */
     Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(
-            String departmentName, Pageable pageable);
+            String departmentName, Members loginMember, Pageable pageable);
 
     /**
      * 부서 게시글 상세 조회
      *
      * @param departmentName 게시글이 속한 부서 이름
      * @param boardId 조회하려는 게시글의 고유 식별 ID
+     * @param loginMember 로그인 멤버
      * @return 부서 게시글의 세부 정보 {@link BoardsResponseDto.ReadOneDto}
      */
     BoardsResponseDto.ReadOneDto readOneForDepartment(
-            String departmentName, Long boardId);
+            String departmentName, Long boardId, Members loginMember);
 
     /**
      * 부서 게시글 수정

@@ -34,9 +34,6 @@ public class Boards extends CommonEntity {
     private String content;
 
     @Column
-    private Long viewCount;
-
-    @Column
     private Long likeCount;
 
     private Boolean isImportant;
@@ -68,11 +65,6 @@ public class Boards extends CommonEntity {
     @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Files> fileList = new ArrayList<>();
-
-    // entity method
-    public void incrementViewCount(){
-        this.viewCount++;
-    }
 
     public void update(
             String title, String content, Boolean isImportant,

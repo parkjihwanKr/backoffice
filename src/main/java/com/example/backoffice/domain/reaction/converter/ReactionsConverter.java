@@ -43,7 +43,6 @@ public class ReactionsConverter {
                 .boardTitle(board.getTitle())
                 .boardContent(board.getContent())
                 .likeCount(board.getLikeCount())
-                .viewCount(board.getViewCount())
                 .reactorName(fromMember.getName())
                 .emoji(emoji)
                 .build();
