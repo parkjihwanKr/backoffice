@@ -2,7 +2,7 @@ package com.example.backoffice.domain.board.controller;
 
 import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
-import com.example.backoffice.domain.board.service.BoardsServiceFacadeV1;
+import com.example.backoffice.domain.board.facade.BoardsServiceFacadeV1;
 import com.example.backoffice.global.common.CommonResponse;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.validation.Valid;
@@ -14,9 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +30,7 @@ public class BoardsController {
 
     // 게시글 전체 읽기
     @GetMapping("/boards")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<BoardsResponseDto.ReadAllDto>> readAll(
             @PageableDefault(size = 8) Pageable pageable) {
         Page<BoardsResponseDto.ReadAllDto> responseDtoList
@@ -40,9 +40,11 @@ public class BoardsController {
 
     // 게시글 하나 읽기
     @GetMapping("/boards/{boardId}")
-    public ResponseEntity<BoardsResponseDto.ReadOneDto> readOne(@PathVariable long boardId) {
+    public ResponseEntity<BoardsResponseDto.ReadOneDto> readOne(
+            @PathVariable long boardId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         BoardsResponseDto.ReadOneDto responseDto
-                = boardsServiceFacade.readOne(boardId);
+                = boardsServiceFacade.readOne(boardId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -88,9 +90,11 @@ public class BoardsController {
     @GetMapping("/departments/{department}/boards")
     public ResponseEntity<Page<BoardsResponseDto.ReadAllDto>> readAllForDepartment(
             @PathVariable String department,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<BoardsResponseDto.ReadAllDto> responseDtoList
-                = boardsServiceFacade.readAllForDepartment(department, pageable);
+                = boardsServiceFacade.readAllForDepartment(
+                        department, memberDetails.getMembers(), pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
@@ -98,9 +102,11 @@ public class BoardsController {
     @GetMapping("/departments/{department}/boards/{boardId}")
     public ResponseEntity<BoardsResponseDto.ReadOneDto> readOneForDepartment(
             @PathVariable String department,
-            @PathVariable Long boardId) {
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         BoardsResponseDto.ReadOneDto responseDto
-                = boardsServiceFacade.readOneForDepartment(department, boardId);
+                = boardsServiceFacade.readOneForDepartment(
+                        department, boardId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 

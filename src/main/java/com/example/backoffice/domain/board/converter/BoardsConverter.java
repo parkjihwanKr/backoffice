@@ -35,7 +35,6 @@ public class BoardsConverter {
                 .categories(category)
                 .isLocked(false)
                 .likeCount(0L)
-                .viewCount(0L)
                 .build();
     }
 
@@ -52,11 +51,10 @@ public class BoardsConverter {
                 .department(department)
                 .categories(category)
                 .likeCount(0L)
-                .viewCount(0L)
                 .build();
     }
 
-    public static BoardsResponseDto.ReadAllDto toReadAllDto(Boards board, Long commentCount) {
+    public static BoardsResponseDto.ReadAllDto toReadAllDto(Boards board, Long commentCount, Long totalViewCount) {
         // 게시글에 대한 File DTO 리스트 생성
         List<FilesResponseDto.ReadOneDto> fileResponseDtoList = board.getFileList().stream()
                 .map(FilesConverter::toReadOneDto)
@@ -73,7 +71,7 @@ public class BoardsConverter {
                 .categories(board.getCategories().getLabel())
                 .boardType(board.getBoardType())
                 .likeCount(board.getLikeCount())
-                .viewCount(board.getViewCount())
+                .viewCount(totalViewCount)
                 .commentCount(commentCount)  // 댓글 수 추가
                 .fileList(fileResponseDtoList)
                 .createdAt(board.getCreatedAt())
@@ -82,7 +80,7 @@ public class BoardsConverter {
     }
 
     public static BoardsResponseDto.ReadOneDto toReadOneDto(
-            Boards board,
+            Boards board, Long totalViewCount,
             List<ReactionsResponseDto.ReadOneForBoardDto> reactionBoardResponseDtoList,
             List<ReactionsResponseDto.ReadOneForCommentDto> reactionCommentResponseDtoList,
             List<ReactionsResponseDto.ReadOneForReplyDto> reactionReplyResponseDtoList) {
@@ -154,7 +152,6 @@ public class BoardsConverter {
                 .position(board.getMember().getPosition())
                 .content(board.getContent())
                 .likeCount(board.getLikeCount())
-                .viewCount(board.getViewCount())
                 .isImportant(board.getIsImportant())
                 .isLocked(board.getIsLocked())
                 .reactionList(reactionBoardResponseDtoList)
@@ -162,6 +159,7 @@ public class BoardsConverter {
                 .category(board.getCategories().getLabel())
                 .commentList(commentList)
                 .commentCount(commentCount)
+                .viewCount(totalViewCount)
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
                 .build();
@@ -180,7 +178,7 @@ public class BoardsConverter {
     }
 
     public static BoardsResponseDto.UpdateOneDto toUpdateOneDto(
-            String writerName, Boards board, List<String> fileUrlList){
+            Boards board, List<String> fileUrlList){
         List<CommentsResponseDto.UpdateCommentDto> commentList = new ArrayList<>();
         if(!board.getCommentList().isEmpty()){
             for(int i = 0; i<board.getCommentList().size(); i++){
@@ -209,10 +207,35 @@ public class BoardsConverter {
                 .authorDepartment(board.getDepartment())
                 .authorPosition(board.getMember().getPosition())
                 .likeCount(board.getLikeCount())
-                .viewCount(board.getViewCount())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
                 .build();
+    }
+
+    public static BoardsResponseDto.ReadSummaryOneDto toSummaryOneDto(
+            Boards board, Long viewCount){
+        return BoardsResponseDto.ReadSummaryOneDto.builder()
+                .boardId(board.getId())
+                .title(board.getTitle())
+                .author(board.getMember().getMemberName())
+                .boardType(board.getBoardType())
+                .likeCount(board.getLikeCount())
+                .viewCount(viewCount)
+                .commentCount(board.getCommentList().size())
+                .isImportant(board.getIsImportant())
+                .build();
+    }
+    public static List<BoardsResponseDto.ReadSummaryOneDto> toReadSummaryListDto(
+            List<Boards> boardList, List<Long> viewCountList) {
+        if(boardList.size() == viewCountList.size()){
+            List<BoardsResponseDto.ReadSummaryOneDto> responseDtoList = new ArrayList<>();
+            for(int i = 0; i<boardList.size(); i++){
+                responseDtoList.add(
+                        BoardsConverter.toSummaryOneDto(boardList.get(i), viewCountList.get(i)));
+            }
+            return responseDtoList;
+        }
+        throw new BoardsCustomException(BoardsExceptionCode.NOT_EQUALS_LIST_SIZE);
     }
 
     public static BoardCategories toCategories(String categoryName){
@@ -223,4 +246,12 @@ public class BoardsConverter {
         }
         throw new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD_CATEGORIES);
     }
+
+    /*public static BoardType toBoardType(String boardTypeName){
+        return switch (boardTypeName) {
+            case "GENERAL"-> BoardType.GENERAL;
+            case "DEPARTMENT" -> BoardType.DEPARTMENT;
+            default -> throw new BoardsCustomException(BoardsExceptionCode.NOT_FOUND_BOARD_TYPE);
+        };
+    }*/
 }

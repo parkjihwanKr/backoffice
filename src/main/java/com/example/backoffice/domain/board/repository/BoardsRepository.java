@@ -21,4 +21,6 @@ public interface BoardsRepository extends JpaRepository<Boards, Long> {
             Pageable pageable, MemberDepartment department, BoardType boardType);
 
     Optional<Boards> findByIdAndDepartment(Long boardId, MemberDepartment department);
+
+    List<Boards> findTop3ByBoardTypeOrderByCreatedAtDesc(BoardType boardType);
 }

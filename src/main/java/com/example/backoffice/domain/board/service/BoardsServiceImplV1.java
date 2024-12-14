@@ -71,4 +71,10 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     public void deleteById(Long boardId){
         boardsRepository.deleteById(boardId);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Boards> findThreeByCreatedAtDesc(BoardType boardType) {
+        return boardsRepository.findTop3ByBoardTypeOrderByCreatedAtDesc(boardType);
+    }
 }
