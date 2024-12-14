@@ -120,7 +120,6 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
     public BoardsResponseDto.CreateOneDto createOne(
             Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files){
-
         // 만들 자격 추가 : 전체 게시판을 만들 수 있는 인원은 권한이 admin이거나 main_admin만 가능
         if(!(loginMember.getRole().equals(MemberRole.MAIN_ADMIN)
                 || loginMember.getRole().equals(MemberRole.ADMIN))){
