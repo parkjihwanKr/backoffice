@@ -7,6 +7,9 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.service.BoardsServiceV1;
 import com.example.backoffice.domain.board.service.ViewCountServiceV1;
 import com.example.backoffice.domain.event.service.EventsServiceV1;
+import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
+import com.example.backoffice.domain.favorite.entity.Favorites;
+import com.example.backoffice.domain.favorite.service.FavoritesServiceV1;
 import com.example.backoffice.domain.mainPage.converter.MainPageConverter;
 import com.example.backoffice.domain.mainPage.dto.MainPageResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MainPageService {
 
+    private final FavoritesServiceV1 favoritesService;
     private final BoardsServiceV1 boardsService;
     private final ViewCountServiceV1 viewCountService;
     private final EventsServiceV1 eventsService;
@@ -30,7 +34,8 @@ public class MainPageService {
     @Transactional(readOnly = true)
     public MainPageResponseDto read(Members loginMember){
         // 1. 개인 즐겨찾기
-
+        List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList
+                = favoritesService.readSummary(loginMember);
         // 2. 전체 게시판 ResponseDto
         // 해당 부분 연산 속도 궁금하네 ? CreatedAt을 계산해서 가지고 오는건가?
         // 아니면 그냥 createdAt 정렬해서 맨 위의 3개를 가지고 오는 연산인가?
@@ -64,6 +69,7 @@ public class MainPageService {
         // 6. 개인 근태표
 
         return MainPageConverter.toMainPageResponseDto(
-                generalBoardDtoList, departmentBoardDtoList, null, null, null);
+                personalFavoritesDtoList, generalBoardDtoList,
+                departmentBoardDtoList, null, null, null);
     }
 }
