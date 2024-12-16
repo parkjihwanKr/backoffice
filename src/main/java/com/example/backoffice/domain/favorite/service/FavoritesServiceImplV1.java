@@ -34,7 +34,6 @@ public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
         Favorites favorites
                 = FavoritesConverter.toEntity(
                         loginMembers, requestDto.getUrl(), requestDto.getDescription());
-        System.out.println("test url:"+favorites.getFavoritesUrl());
         favoritesRepository.save(favorites);
         return FavoritesConverter.toCreateOneDto(favorites);
     }
