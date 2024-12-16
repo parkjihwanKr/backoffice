@@ -3,6 +3,7 @@ package com.example.backoffice.domain.mainPage.dto;
 import com.example.backoffice.domain.attendance.dto.AttendancesResponseDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
+import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MainPageResponseDto {
 
+    private List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList;
     private List<BoardsResponseDto.ReadSummaryOneDto> generalBoardDtoList;
     private List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardDtoList;
     /*private List<EventsResponseDto.ReadSummaryOneDto> generalEventDtoList;
