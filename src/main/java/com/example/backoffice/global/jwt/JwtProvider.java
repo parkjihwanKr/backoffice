@@ -4,6 +4,7 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.dto.TokenDto;
+import com.example.backoffice.global.redis.TokenRedisProvider;
 import com.example.backoffice.global.security.MemberDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -39,14 +40,18 @@ import java.util.stream.Collectors;
 public class JwtProvider {
     public static String BEARER_PREFIX = "Bearer ";
     public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String ACCESS_TOKEN_HEADER = "accessToken";
     public static final String REFRESH_TOKEN_HEADER = "refreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
-    // private static final long TOKEN_TIME = 60 * 60 * 1000L;
-    public Long accessTokenExpiration = 1000 * 60 * 60L;
-    public Long refreshTokenExpiration = 1000 * 60 * 60 * 24L;
+
+    public Long accessTokenExpiration = 60 * 60 * 1000L;
+    public Long refreshTokenExpiration = 24 * 60 * 60 * 1000L;
+
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     private final MemberDetailsServiceImpl memberDetailsService;
+
+    private final TokenRedisProvider tokenRedisProvider;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -144,8 +149,10 @@ public class JwtProvider {
     public String getJwtFromHeader(HttpServletRequest req) {
         log.info("httpServletRequest header : "+req.getHeader(AUTHORIZATION_HEADER));
         String accessToken = req.getHeader(AUTHORIZATION_HEADER);
-        if (accessToken == null){
-            String refreshToken = getRefreshTokenFromHeader(req);
+
+        if (accessToken == null || !StringUtils.hasText(accessToken)) {
+            log.error("Access Token is missing in the request header");
+            throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
         }
         log.info("Access Token : " + accessToken);
         return removeBearerPrefix(accessToken);
@@ -154,10 +161,19 @@ public class JwtProvider {
     // getRefreshTokenFromHeader
     public String getRefreshTokenFromHeader(HttpServletRequest request){
         String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
-        if (refreshToken == null){
+        // refresh token : Bearer tokenValue
+        System.out.println("refresh token : "+refreshToken);
+        String refreshTokenValue = removeBearerPrefix(refreshToken);
+
+        String memberName = getUsernameFromToken(refreshTokenValue);
+        String redisKey = REFRESH_TOKEN_HEADER+" : "+memberName;
+        String redisValue = tokenRedisProvider.getRefreshTokenValue(redisKey);
+
+        if (refreshToken == null || redisValue == null){
             throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
         }
-        return removeBearerPrefix(refreshToken);
+
+        return refreshTokenValue;
     }
 
     public String removeBearerPrefix(String bearerToken) {

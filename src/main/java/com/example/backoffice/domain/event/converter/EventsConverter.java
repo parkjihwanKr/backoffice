@@ -328,4 +328,9 @@ public class EventsConverter {
                                 .build())
         ).collect(Collectors.toList());
     }
+
+    public static List<EventsResponseDto.ReadDepartmentSummaryListDto> toReadDepartmentSummaryListDto(
+            List<Events> departmentSummaryDtoList){
+        return null;
+    }
 }

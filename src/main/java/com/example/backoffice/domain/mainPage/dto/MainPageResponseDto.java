@@ -20,7 +20,7 @@ public class MainPageResponseDto {
     private List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList;
     private List<BoardsResponseDto.ReadSummaryOneDto> generalBoardDtoList;
     private List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardDtoList;
-    /*private List<EventsResponseDto.ReadSummaryOneDto> generalEventDtoList;
-    private List<EventsResponseDto.ReadSummaryOneDto> personalEventDtoList;
+    private List<EventsResponseDto.ReadDepartmentSummaryListDto> departmentEventDtoList;
+    /*private List<EventsResponseDto.ReadSummaryOneDto> personalEventDtoList;
     private AttendancesResponseDto.ReadSummaryOneDto todayAttendanceDto;*/
 }

@@ -1,5 +1,7 @@
 package com.example.backoffice.global.redis;
 
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.JwtCustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +49,9 @@ public class TokenRedisProvider {
 
     public String getRefreshTokenValue(String key) {
         // Long isExpiredRefreshToken = redisTemplateForToken.getExpire(key);
+        if(redisTemplateForToken.opsForValue().get(key) == null){
+            throw new JwtCustomException(GlobalExceptionCode.TOKEN_VALUE_IS_NULL);
+        }
         return redisTemplateForToken.opsForValue().get(key).toString();
     }
 
@@ -55,8 +60,7 @@ public class TokenRedisProvider {
         redisTemplateForToken.delete(key);
     }
 
-    public boolean existsByUsername(String key) {
-        String refreshToken = redisTemplateForToken.opsForValue().get(key).toString();
-        return refreshToken != null && !refreshToken.isEmpty();
+    public boolean existsByKey(String key) {
+        return redisTemplateForToken.opsForValue().get(key) != null;
     }
 }
