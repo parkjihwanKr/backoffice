@@ -2,31 +2,12 @@ package com.example.backoffice.domain.event.facade;
 
 import com.example.backoffice.domain.event.dto.EventsRequestDto;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
-import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface EventsServiceFacadeV1 {
-
-    EventsResponseDto.CreateOneForCompanyEventDto createOneForCompany(
-            EventsRequestDto.CreateOneForCompanyEventDto requestDto ,Members loginMember);
-
-    EventsResponseDto.ReadOneForCompanyEventDto readOneForCompanyEvent(Long eventId);
-
-    List<EventsResponseDto.ReadOneForCompanyEventDto> readForCompanyMonthEvent(
-            Long year, Long month);
-
-    List<List<EventsResponseDto.ReadOneForCompanyEventDto>> readForCompanyYearEvent(
-            Long year);
-
-    EventsResponseDto.UpdateOneForCompanyEventDto updateOneForCompany(
-            Long eventId, Members loginMember,
-            EventsRequestDto.UpdateOneForCompanyEventDto requestDto,
-            List<MultipartFile> files);
-
-    void deleteOneForCompany(Long eventId, Members loginMember)   ;
 
     EventsResponseDto.CreateOneForDepartmentEventDto createOneForDepartmentEvent(
             String department, Members loginMember,

@@ -23,68 +23,6 @@ public class EventsController {
 
     private final EventsServiceFacadeV1 eventsServiceFacade;
 
-    // 회사 일정 한개 생성
-    @PostMapping("/events")
-    public ResponseEntity<EventsResponseDto.CreateOneForCompanyEventDto> createOneForCompany(
-            @RequestBody EventsRequestDto.CreateOneForCompanyEventDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        EventsResponseDto.CreateOneForCompanyEventDto responseDto
-                = eventsServiceFacade.createOneForCompany(requestDto, memberDetails.getMembers());
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    // 회사 일정 한개 상세 조회
-    @GetMapping("/events/{eventId}")
-    public ResponseEntity<EventsResponseDto.ReadOneForCompanyEventDto> readOneForCompanyEvent(
-            @PathVariable Long eventId){
-        EventsResponseDto.ReadOneForCompanyEventDto responseDto
-                = eventsServiceFacade.readOneForCompanyEvent(eventId);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    // 회사 일정 1달 조회
-    @GetMapping("/events/years/{year}/months/{month}")
-    public ResponseEntity<List<EventsResponseDto.ReadOneForCompanyEventDto>> readForCompanyMonthEvent(
-            @PathVariable Long year, @PathVariable Long month){
-        List<EventsResponseDto.ReadOneForCompanyEventDto> responseDtoList
-                = eventsServiceFacade.readForCompanyMonthEvent(year, month);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
-    }
-
-    // 회사 일정 1년 조회, 캘린더 1~12월을 한 번에 출력
-    @GetMapping("/events/years/{year}")
-    public ResponseEntity<List<List<EventsResponseDto.ReadOneForCompanyEventDto>>> readForCompanyYearEvent(
-            @PathVariable Long year){
-        List<List<EventsResponseDto.ReadOneForCompanyEventDto>> responseDto
-                = eventsServiceFacade.readForCompanyYearEvent(year);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    // 회사 일정 부분 수정
-    @PatchMapping("/events/{eventId}")
-    public ResponseEntity<EventsResponseDto.UpdateOneForCompanyEventDto> updateOneForCompany(
-            @PathVariable Long eventId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestPart(value = "data") EventsRequestDto.UpdateOneForCompanyEventDto requestDto,
-            @RequestPart(value = "files") List<MultipartFile> files){
-        EventsResponseDto.UpdateOneForCompanyEventDto responseDto
-                = eventsServiceFacade.updateOneForCompany(eventId, memberDetails.getMembers(), requestDto, files);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    // 회사 일정 부분 삭제
-    @DeleteMapping("/events/{eventId}")
-    public ResponseEntity<CommonResponseDto<Void>> deleteOneForCompany(
-            @PathVariable Long eventId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        eventsServiceFacade.deleteOneForCompany(eventId, memberDetails.getMembers());
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponseDto<>(
-                        null, "회사 일정 삭제 성공", 200
-                )
-        );
-    }
-
     // 부서 일정 1달 조회
     @GetMapping("/departments/{department}/events/years/{year}/months/{month}")
     public ResponseEntity<List<EventsResponseDto.ReadOneForDepartmentEventDto>> readForDepartmentMonthEvent(

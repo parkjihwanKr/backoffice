@@ -10,7 +10,6 @@ import com.example.backoffice.domain.event.exception.EventsCustomException;
 import com.example.backoffice.domain.event.exception.EventsExceptionCode;
 import com.example.backoffice.domain.event.service.EventsServiceV1;
 import com.example.backoffice.domain.file.service.FilesServiceV1;
-import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
@@ -36,123 +35,6 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     private final FilesServiceV1 filesService;
     private final EventsServiceV1 eventsService;
     private final VacationsServiceV1 vacationsService;
-
-    @Override
-    @Transactional
-    public EventsResponseDto.CreateOneForCompanyEventDto createOneForCompany(
-            EventsRequestDto.CreateOneForCompanyEventDto requestDto ,Members loginMember){
-
-        String message = requestDto.getStartDate() + " / " +requestDto.getEndDate();
-        System.out.println(message);
-        // 1. 해당 멤버가 회사 일정을 만들 수 있는 권한이 있는지?
-        if (!loginMember.getPosition().equals(MemberPosition.CEO) &&
-                !loginMember.getPosition().equals(MemberPosition.MANAGER)) {
-            throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_CREATE_EVENT);
-        }
-
-        // 2. 요청 날짜 검증
-        EventDateRangeDto eventDateRangeDto
-                = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
-
-        Events event
-                = EventsConverter.toEntity(requestDto.getTitle(), requestDto.getDescription(),
-                eventDateRangeDto, loginMember, loginMember.getDepartment(), EventType.COMPANY);
-
-        return EventsConverter.toCreateOneForCompanyEventDto(event);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public EventsResponseDto.ReadOneForCompanyEventDto readOneForCompanyEvent(
-            Long eventId){
-        Events event = eventsService.findById(eventId);
-        return EventsConverter.toReadOneForCompanyEventDto(event);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<EventsResponseDto.ReadOneForCompanyEventDto> readForCompanyMonthEvent(
-            Long year, Long month){
-        // 해당 날짜의 정보를 가지고 오는데
-        // 만약 2024-05-31~06-02 또는 2024-06-23~07-02까지의 프로젝트라면?
-        // 해당 이벤트를 가지고 오는지? 아닌지 확인해야함 -> 가져옴
-        List<Events> eventList = readMonthEvent(year, month, EventType.COMPANY, null);
-
-        return EventsConverter.toReadForCompanyMonthEventDto(eventList);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<List<EventsResponseDto.ReadOneForCompanyEventDto>> readForCompanyYearEvent(
-            Long year){
-        LocalDateTime start
-                = YearMonth.of(year.intValue(), 1).atDay(1).atStartOfDay();
-        LocalDateTime end = YearMonth.of(year.intValue(), 12).atEndOfMonth().atTime(23, 59, 59);
-        List<Events> eventList = eventsService.findAllByStartDateBetween(start, end);
-
-        return EventsConverter.toReadForCompanyYearEventDto(eventList);
-    }
-
-    @Override
-    @Transactional
-    public EventsResponseDto.UpdateOneForCompanyEventDto updateOneForCompany(
-            Long eventId, Members loginMember,
-            EventsRequestDto.UpdateOneForCompanyEventDto requestDto,
-            List<MultipartFile> files){
-        // 1. 일정 존재?
-        Events event = eventsService.findById(eventId);
-
-        // 2. 회사 일정인지?
-        if (!event.getEventType().equals(EventType.COMPANY)){
-            throw new EventsCustomException(EventsExceptionCode.NOT_MATCHED_EVENT_TYPE);
-        }
-
-        // 3. 일정 기한이 적절한지?
-        EventDateRangeDto eventDateRangeDto
-                = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
-
-        // 4. event에 fileList가 있었는지?
-        List<String> beforeFileUrlList = new ArrayList<>();
-        List<String> afterFileUrlList = new ArrayList<>();
-
-        for(int i = 0; i<event.getFileList().size(); i++){
-            beforeFileUrlList.add(event.getFileList().get(i).getUrl());
-        }
-        event.getFileList().clear();
-        filesService.deleteForEvent(event.getId(), beforeFileUrlList);
-
-        if(files != null){
-            for (MultipartFile file : files) {
-                // s3는 수정 관련 메서드가 없기에 제거 후, 재생성하는 방향
-                String fileUrl = filesService.createOneForEvent(file, event);
-                afterFileUrlList.add(fileUrl);
-            }
-        }
-
-        event.update(
-                requestDto.getTitle(), requestDto.getDescription(),
-                event.getDepartment(), eventDateRangeDto.getDateRange().getStartDate(),
-                eventDateRangeDto.getDateRange().getEndDate(), EventType.COMPANY);
-
-        return EventsConverter.toUpdateOneForCompanyEventDto(event);
-    }
-
-    @Override
-    @Transactional
-    public void deleteOneForCompany(Long eventId, Members loginMember){
-        // 삭제하려는 이벤트를 조회
-        Events event = eventsService.findById(eventId);
-
-        // 회사 일정이고 이벤트의 소유자가 아니고, 로그인한 유저가 CEO도 아닌 경우 삭제 권한이 없음을 예외 처리
-        if (event.getEventType().equals(EventType.COMPANY)
-                && !event.getMember().getId().equals(loginMember.getId())
-                && !loginMember.getPosition().equals(MemberPosition.CEO)) {
-            throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
-        }
-
-        // 이벤트 삭제
-        eventsService.deleteById(eventId);
-    }
 
     @Override
     @Transactional

@@ -15,8 +15,6 @@ public interface EventsServiceV1 {
 
     void deleteById(Long eventId);
 
-    List<Events> findAllByStartDateBetween(LocalDateTime start, LocalDateTime end);
-
     List<Events> findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
             EventType eventType, MemberDepartment memberDepartment,
             LocalDateTime start, LocalDateTime end);
