@@ -6,6 +6,10 @@ import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.service.BoardsServiceV1;
 import com.example.backoffice.domain.board.service.ViewCountServiceV1;
+import com.example.backoffice.domain.event.converter.EventsConverter;
+import com.example.backoffice.domain.event.dto.EventsResponseDto;
+import com.example.backoffice.domain.event.entity.EventType;
+import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.service.EventsServiceV1;
 import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
 import com.example.backoffice.domain.favorite.entity.Favorites;
@@ -14,6 +18,7 @@ import com.example.backoffice.domain.mainPage.converter.MainPageConverter;
 import com.example.backoffice.domain.mainPage.dto.MainPageResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
+import com.example.backoffice.global.date.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,13 +68,19 @@ public class MainPageService {
                         departmentBoardList, departmentBoardViewCountList);
 
         // 4. 부서 일정표
+        List<Events> departmentEventList
+                = eventsService.findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
+                EventType.DEPARTMENT, loginMember.getDepartment(),
+                DateTimeUtils.getToday(), DateTimeUtils.getToday().plusDays(6));
 
+        List<EventsResponseDto.ReadDepartmentSummaryDto> departmentEventDtoList
+                = EventsConverter.toReadDepartmentSummaryListDto(departmentEventList);
         // 5. 개인 일정표
 
         // 6. 개인 근태표
 
         return MainPageConverter.toMainPageResponseDto(
                 personalFavoritesDtoList, generalBoardDtoList,
-                departmentBoardDtoList, null, null, null);
+                departmentBoardDtoList, departmentEventDtoList, null, null);
     }
 }

@@ -40,12 +40,6 @@ public class EventsServiceImplV1 implements EventsServiceV1 {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Events> findAllByStartDateBetween(LocalDateTime start, LocalDateTime end) {
-        return eventsRepository.findAllByStartDateBetween(start, end);
-    }
-
-    @Override
     @Transactional
     public List<Events> findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
             EventType eventType, MemberDepartment memberDepartment,

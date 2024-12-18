@@ -47,115 +47,6 @@ public class EventsConverter {
                 .build();
     }
 
-    public static EventsResponseDto.CreateOneForCompanyEventDto toCreateOneForCompanyEventDto(
-            Events event){
-        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
-        for(Files file : event.getFileList()) {
-            fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
-        }
-        return EventsResponseDto.CreateOneForCompanyEventDto.builder()
-                .eventId(event.getId())
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .fileUrlList(fileResponseDtoList)
-                .startDate(event.getStartDate())
-                .endDate(event.getEndDate())
-                .createdAt(event.getCreatedAt())
-                .build();
-    }
-
-    public static EventsResponseDto.ReadOneForCompanyEventDto toReadOneForCompanyEventDto(
-            Events event) {
-        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
-        for(Files file : event.getFileList()) {
-            fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
-        }
-        return EventsResponseDto.ReadOneForCompanyEventDto.builder()
-                .eventId(event.getId())
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .fileUrlList(fileResponseDtoList)
-                .startDate(event.getStartDate())
-                .endDate(event.getEndDate())
-                .createdAt(event.getCreatedAt())
-                .modifiedAt(event.getModifiedAt())
-                .build();
-    }
-
-    public static List<EventsResponseDto.ReadOneForCompanyEventDto> toReadForCompanyMonthEventDto(
-            List<Events> eventList){
-        List<EventsResponseDto.ReadOneForCompanyEventDto> eventResponseDtoList = new ArrayList<>();
-        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
-        for (Events event : eventList) {
-            for(Files file : event.getFileList()) {
-                fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
-            }
-            eventResponseDtoList.add(
-                    EventsResponseDto.ReadOneForCompanyEventDto.builder()
-                            .eventId(event.getId())
-                            .title(event.getTitle())
-                            .fileUrlList(fileResponseDtoList)
-                            .startDate(event.getStartDate())
-                            .endDate(event.getEndDate())
-                            .createdAt(event.getCreatedAt())
-                            .build()
-            );
-        }
-        return eventResponseDtoList;
-    }
-
-    public static List<List<EventsResponseDto.ReadOneForCompanyEventDto>> toReadForCompanyYearEventDto(
-            List<Events> eventList) {
-        List<List<EventsResponseDto.ReadOneForCompanyEventDto>> yearEvents = new ArrayList<>();
-
-        for (Month month : Month.values()) {
-            List<EventsResponseDto.ReadOneForCompanyEventDto> monthlyEvents = new ArrayList<>();
-            List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
-
-            for (Events event : eventList) {
-                for(Files file : event.getFileList()) {
-                    fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
-                }
-
-                if (event.getStartDate().getMonth().equals(month)) {
-                    monthlyEvents.add(
-                            EventsResponseDto.ReadOneForCompanyEventDto.builder()
-                                    .eventId(event.getId())
-                                    .title(event.getTitle())
-                                    .description(event.getDescription())
-                                    .fileUrlList(fileResponseDtoList)
-                                    .startDate(event.getStartDate())
-                                    .endDate(event.getEndDate())
-                                    .createdAt(event.getCreatedAt())
-                                    .modifiedAt(event.getModifiedAt())
-                                    .build()
-                    );
-                }
-            }
-            yearEvents.add(monthlyEvents);
-        }
-        return yearEvents;
-    }
-
-    public static EventsResponseDto.UpdateOneForCompanyEventDto toUpdateOneForCompanyEventDto(
-            Events event){
-        List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
-        for (Files file : event.getFileList()){
-            fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
-        }
-        return EventsResponseDto.UpdateOneForCompanyEventDto.builder()
-                .eventId(event.getId())
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .department(event.getDepartment())
-                .fileUrlList(fileResponseDtoList)
-                .startDate(event.getStartDate())
-                .endDate(event.getEndDate())
-                .createdAt(event.getCreatedAt())
-                .modifiedAt(event.getModifiedAt())
-                .build();
-    }
-
     public static EventsResponseDto.CreateOneForDepartmentEventDto toCreateOneForDepartmentDto(Events event){
         List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
         for(Files file : event.getFileList()) {
@@ -217,25 +108,6 @@ public class EventsConverter {
                 .createdAt(event.getCreatedAt())
                 .modifiedAt(event.getModifiedAt())
                 .build();
-    }
-
-    public static List<EventsResponseDto.ReadOneForMemberScheduleDto> toReadForMemberScheduleDto(
-            List<Events> filteredEventList){
-        List<EventsResponseDto.ReadOneForMemberScheduleDto> memberMonthScheduleResponseDto = new ArrayList<>();
-        for (Events filteredEvent : filteredEventList) {
-            memberMonthScheduleResponseDto.add(
-                    EventsResponseDto.ReadOneForMemberScheduleDto.builder()
-                            .eventId(filteredEvent.getId())
-                            .title(filteredEvent.getTitle())
-                            .description(filteredEvent.getDescription())
-                            .department(filteredEvent.getDepartment())
-                            .startDate(filteredEvent.getStartDate())
-                            .endDate(filteredEvent.getEndDate())
-                            .createdAt(filteredEvent.getCreatedAt())
-                            .modifiedAt(filteredEvent.getModifiedAt())
-                            .build());
-        }
-        return memberMonthScheduleResponseDto;
     }
 
     public static List<EventsResponseDto.ReadOneForMemberScheduleDto> toReadOneForMemberScheduleDto(
@@ -327,5 +199,23 @@ public class EventsConverter {
                                 .modifiedAt(vacation.getModifiedAt())
                                 .build())
         ).collect(Collectors.toList());
+    }
+
+    public static List<EventsResponseDto.ReadDepartmentSummaryDto> toReadDepartmentSummaryListDto(
+            List<Events> eventList){
+        return eventList.stream()
+                .map(EventsConverter::toReadDepartmentSummaryDto)
+                .toList();
+    }
+
+    public static EventsResponseDto.ReadDepartmentSummaryDto toReadDepartmentSummaryDto(
+            Events event){
+        return EventsResponseDto.ReadDepartmentSummaryDto.builder()
+                .department(event.getDepartment())
+                .eventId(event.getId())
+                .title(event.getTitle())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .build();
     }
 }
