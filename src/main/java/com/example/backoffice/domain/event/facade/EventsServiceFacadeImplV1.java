@@ -50,8 +50,6 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         EventDateRangeDto eventDateRangeDto
                 = validateEventDate(requestDto.getStartDate(), requestDto.getEndDate());
 
-        // 메인 어드민이 부서 일정을 만들 때, HR부서인 메인 어드민이 FIANACE의 일정을 만드려 할 때가
-        // 다르게 적용될 가능성이 있기에
         MemberDepartment memberDepartment = membersService.findDepartment(department);
 
         Events event = EventsConverter.toEntity(

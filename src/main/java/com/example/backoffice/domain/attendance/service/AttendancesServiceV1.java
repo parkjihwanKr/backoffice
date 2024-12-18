@@ -6,6 +6,9 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.DateRange;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
+import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.global.exception.DateUtilException;
 
 import java.util.List;
 
@@ -26,9 +29,9 @@ public interface AttendancesServiceV1 {
      * @param requestDto 출근 시간 업데이트 요청 DTO
      * @param loginMember 로그인 사용자
      * @return 업데이트된 출근 정보
-     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 근태 기록이 존재하지 않는 경우
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 로그인 사용자와 소유자가 일치하지 않는 경우
-     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 시간 데이터가 전달된 경우
+     * @throws AttendancesCustomException 근태 기록이 존재하지 않는 경우
+     * @throws MembersCustomException 로그인 사용자와 소유자가 일치하지 않는 경우
+     * @throws DateUtilException 유효하지 않은 시간 데이터가 전달된 경우
      */
     AttendancesResponseDto.UpdateCheckInTimeDto updateCheckInTimeForMember(
             Long attendanceId,
@@ -42,9 +45,9 @@ public interface AttendancesServiceV1 {
      * @param requestDto 퇴근 시간 및 상태 업데이트 요청 DTO
      * @param loginMember 로그인 사용자
      * @return 업데이트된 퇴근 정보
-     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 근태 기록이 존재하지 않는 경우
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 로그인 사용자와 소유자가 일치하지 않는 경우
-     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 시간 데이터가 전달된 경우
+     * @throws AttendancesCustomException 근태 기록이 존재하지 않는 경우
+     * @throws MembersCustomException 로그인 사용자와 소유자가 일치하지 않는 경우
+     * @throws DateUtilException 유효하지 않은 시간 데이터가 전달된 경우
      */
     AttendancesResponseDto.UpdateCheckOutTimeDto updateCheckOutTimeForMember(
             Long attendanceId,
@@ -59,8 +62,8 @@ public interface AttendancesServiceV1 {
      * @param month 조회할 월
      * @param loginMember 로그인 사용자
      * @return 멤버의 근태 정보 리스트
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 로그인 사용자와 멤버가 일치하지 않는 경우
-     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 년/월 데이터가 전달된 경우
+     * @throws MembersCustomException 로그인 사용자와 멤버가 일치하지 않는 경우
+     * @throws DateUtilException 유효하지 않은 년/월 데이터가 전달된 경우
      */
     List<AttendancesResponseDto.ReadOneDto> readFilteredForMember(
             Long memberId, Long year, Long month, Members loginMember);
@@ -71,8 +74,8 @@ public interface AttendancesServiceV1 {
      * @param attendanceId 근태 고유 ID
      * @param loginMember 로그인 사용자
      * @return 근태 기록 정보
-     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 근태 기록이 존재하지 않는 경우
-     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 접근 권한이 없는 경우
+     * @throws AttendancesCustomException 근태 기록이 존재하지 않는 경우
+     * @throws AttendancesCustomException 접근 권한이 없는 경우
      */
     AttendancesResponseDto.ReadOneDto readOne(
             Long attendanceId, Members loginMember);
@@ -87,8 +90,8 @@ public interface AttendancesServiceV1 {
      * @param loginMember 로그인 사용자
      * @param pageable 페이징 정보
      * @return 필터링된 근태 관리 페이지
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
-     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
+     * @throws MembersCustomException 관리 권한이 없는 경우
+     * @throws DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
     Page<AttendancesResponseDto.ReadOneDto> readForAdmin(
             String memberName, String attendanceStatus,
@@ -103,8 +106,8 @@ public interface AttendancesServiceV1 {
      * @param loginMember 로그인 사용자
      * @param requestDto 상태 업데이트 요청 DTO
      * @return 업데이트된 근태 상태 정보
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
-     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 근태 상태가 동일한 경우
+     * @throws MembersCustomException 관리 권한이 없는 경우
+     * @throws AttendancesCustomException 근태 상태가 동일한 경우
      */
     AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusForAdmin(
             Long memberId, Long attendanceId, Members loginMember,
@@ -116,8 +119,8 @@ public interface AttendancesServiceV1 {
      * @param requestDto 근태 기록 생성 요청 DTO
      * @param loginMember 로그인 사용자
      * @return 생성된 근태 기록 정보
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
-     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
+     * @throws MembersCustomException 관리 권한이 없는 경우
+     * @throws DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
     AttendancesResponseDto.CreateOneDto createOneForAdmin(
             AttendancesRequestDto.CreateOneDto requestDto, Members loginMember);
@@ -134,7 +137,7 @@ public interface AttendancesServiceV1 {
      *
      * @param deleteAttendanceIdList 삭제 요청 아이디 리스트
      * @param loginMember 로그인 사용자
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
+     * @throws MembersCustomException 관리 권한이 없는 경우
      */
     void deleteForAdmin(
             List<Long> deleteAttendanceIdList, Members loginMember);
@@ -145,8 +148,8 @@ public interface AttendancesServiceV1 {
      * @param requestDto 근태 기록 수동 생성 요청 DTO
      * @param loginMember 로그인 사용자
      * @return 생성된 근태 기록 정보
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
-     * @throws com.example.backoffice.domain.attendance.exception.AttendancesCustomException 중복된 근태 기록이 존재하는 경우
+     * @throws MembersCustomException 관리 권한이 없는 경우
+     * @throws AttendancesCustomException 중복된 근태 기록이 존재하는 경우
      *//*
     AttendancesResponseDto.CreateOneDto createOneManuallyForAdmin(
             AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto, Members loginMember);*/
@@ -160,8 +163,8 @@ public interface AttendancesServiceV1 {
      * @param pageable 페이징 정보
      * @param loginMember 로그인 사용자
      * @return 필터링된 월간 근태 기록 페이지
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
-     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
+     * @throws MembersCustomException 관리 권한이 없는 경우
+     * @throws DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
     Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyForAdmin(
             String department, Long year, Long month,
@@ -178,8 +181,8 @@ public interface AttendancesServiceV1 {
      * @param pageable 페이징 정보
      * @param loginMember 로그인 사용자
      * @return 필터링된 일간 근태 기록 페이지
-     * @throws com.example.backoffice.domain.member.exception.MembersCustomException 관리 권한이 없는 경우
-     * @throws com.example.backoffice.global.exception.DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
+     * @throws MembersCustomException 관리 권한이 없는 경우
+     * @throws DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
     Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyForAdmin(
             String department, String memberName, Long year, Long month, Long day,
