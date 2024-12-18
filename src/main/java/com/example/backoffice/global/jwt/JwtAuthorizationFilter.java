@@ -91,9 +91,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     // Refresh Token이 멀쩡할 시 새로 발급
-    private void makeNewAccessToken(String refreshToken, HttpServletResponse response) throws UnsupportedEncodingException {
+    private void makeNewAccessToken(String refreshTokenValue, HttpServletResponse response) throws UnsupportedEncodingException {
         // Refresh Token에서 인증 정보 추출
-        Authentication authentication = jwtProvider.getAuthentication(refreshToken);
+        Authentication authentication = jwtProvider.getAuthentication(refreshTokenValue);
         String username = authentication.getName();
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
         // Redis에 해당 Refresh Token이 존재하는지 검증
@@ -103,13 +103,29 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             String accessToken = URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");
 
             // Access Token을 Response Cookie에 설정
-            ResponseCookie accessCookie = ResponseCookie.from(JwtProvider.ACCESS_TOKEN_HEADER, accessToken)
+            ResponseCookie accessCookie
+                    = ResponseCookie.from(JwtProvider.ACCESS_TOKEN_HEADER, accessToken)
                     .path("/")
-                    .httpOnly(true)
+                    .httpOnly(false)
+                    .secure(false)
+                    .sameSite("LAX")
                     .maxAge(jwtProvider.getAccessTokenExpiration())
                     .build();
             response.addHeader("Set-Cookie", accessCookie.toString());
 
+            ResponseCookie refreshCookie
+                    = ResponseCookie.from(JwtProvider.REFRESH_TOKEN_HEADER, refreshTokenValue)
+                    .path("/")
+                    .httpOnly(false)
+                    .secure(false)
+                    .sameSite("LAX")
+                    .maxAge(jwtProvider.getRefreshTokenExpiration())
+                    .build();
+
+            response.addHeader("Set-Cookie", refreshCookie.toString());
+
+            System.out.println("accessCookie : "+accessCookie);
+            System.out.println("refreshCookie : "+refreshCookie);
             // 원래 사용자 데이터도 함께 반환
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");

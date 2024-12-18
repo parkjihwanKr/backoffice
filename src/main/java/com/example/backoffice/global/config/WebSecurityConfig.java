@@ -78,6 +78,8 @@ public class WebSecurityConfig {
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
                             configuration.setAllowedHeaders(Arrays.asList("Authorization", "refreshToken", "Cache-Control", "Content-Type"));
                             configuration.setAllowCredentials(true);
+                            configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
+
                             return configuration;
                         })
                 )

@@ -73,7 +73,7 @@ public class MainPageService {
                 EventType.DEPARTMENT, loginMember.getDepartment(),
                 DateTimeUtils.getToday(), DateTimeUtils.getToday().plusDays(6));
 
-        List<EventsResponseDto.ReadDepartmentSummaryListDto> departmentEventDtoList
+        List<EventsResponseDto.ReadDepartmentSummaryDto> departmentEventDtoList
                 = EventsConverter.toReadDepartmentSummaryListDto(departmentEventList);
         // 5. 개인 일정표
 

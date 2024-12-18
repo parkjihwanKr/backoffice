@@ -329,8 +329,21 @@ public class EventsConverter {
         ).collect(Collectors.toList());
     }
 
-    public static List<EventsResponseDto.ReadDepartmentSummaryListDto> toReadDepartmentSummaryListDto(
-            List<Events> departmentSummaryDtoList){
-        return null;
+    public static List<EventsResponseDto.ReadDepartmentSummaryDto> toReadDepartmentSummaryListDto(
+            List<Events> eventList){
+        return eventList.stream()
+                .map(EventsConverter::toReadDepartmentSummaryDto)
+                .toList();
+    }
+
+    public static EventsResponseDto.ReadDepartmentSummaryDto toReadDepartmentSummaryDto(
+            Events event){
+        return EventsResponseDto.ReadDepartmentSummaryDto.builder()
+                .department(event.getDepartment())
+                .eventId(event.getId())
+                .title(event.getTitle())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .build();
     }
 }

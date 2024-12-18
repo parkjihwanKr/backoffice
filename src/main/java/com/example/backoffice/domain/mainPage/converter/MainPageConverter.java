@@ -16,7 +16,7 @@ public class MainPageConverter {
             List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList,
             List<BoardsResponseDto.ReadSummaryOneDto> generalBoardList,
             List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardList,
-            List<EventsResponseDto.ReadDepartmentSummaryListDto> departmentEventList,
+            List<EventsResponseDto.ReadDepartmentSummaryDto> departmentEventList,
             List<Events> personalEventList,
             List<Attendances> personalAttendanceList){ 
         return MainPageResponseDto.builder()
