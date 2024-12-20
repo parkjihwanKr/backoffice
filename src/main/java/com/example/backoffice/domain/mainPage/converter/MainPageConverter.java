@@ -7,6 +7,7 @@ import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
 import com.example.backoffice.domain.mainPage.dto.MainPageResponseDto;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 
 import java.util.List;
 
@@ -17,13 +18,14 @@ public class MainPageConverter {
             List<BoardsResponseDto.ReadSummaryOneDto> generalBoardList,
             List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardList,
             List<EventsResponseDto.ReadDepartmentSummaryDto> departmentEventList,
-            List<Events> personalEventList,
+            List<VacationsResponseDto.ReadSummaryOneDto> personalVacationList,
             List<Attendances> personalAttendanceList){ 
         return MainPageResponseDto.builder()
                 .personalFavoritesDtoList(personalFavoritesDtoList)
                 .generalBoardDtoList(generalBoardList)
                 .departmentBoardDtoList(departmentBoardList)
                 .departmentEventDtoList(departmentEventList)
+                .personalVacationDtoList(personalVacationList)
                 .build();
     }
 }

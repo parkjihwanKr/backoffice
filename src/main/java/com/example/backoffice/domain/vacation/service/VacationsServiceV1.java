@@ -34,4 +34,7 @@ public interface VacationsServiceV1 {
     List<Vacations> findFilteredVacationsOnMonth(
             LocalDateTime startDate, LocalDateTime endDate,
             Boolean isAccepted, Boolean urgent, MemberDepartment memberDepartment);
+
+    List<Vacations> findVacationsBetweenOrderByCreatedAtDesc(
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate);
 }

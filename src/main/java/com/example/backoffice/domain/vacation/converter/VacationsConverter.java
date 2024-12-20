@@ -120,4 +120,22 @@ public class VacationsConverter {
                     .build()
         ).collect(Collectors.toList());
     }
+
+    public static List<VacationsResponseDto.ReadSummaryOneDto> toReadSummaryDtoList(
+            List<Vacations> vacationList){
+        return vacationList.stream()
+                .map(VacationsConverter::toReadSummaryOneDto)
+                .toList();
+    }
+
+    public static VacationsResponseDto.ReadSummaryOneDto toReadSummaryOneDto(
+            Vacations vacation){
+        return VacationsResponseDto.ReadSummaryOneDto.builder()
+                .vacationId(vacation.getId())
+                .startDate(vacation.getStartDate())
+                .endDate(vacation.getEndDate())
+                .onVacationMemberName(vacation.getOnVacationMember().getMemberName())
+                .isAccepted(vacation.getIsAccepted())
+                .build();
+    }
 }

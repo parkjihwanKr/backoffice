@@ -99,4 +99,16 @@ public class VacationsResponseDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadSummaryOneDto{
+        private Long vacationId;
+        private String onVacationMemberName;
+        private Boolean isAccepted;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
 }

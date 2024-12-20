@@ -91,4 +91,12 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
         return vacationsRepository.findFilteredVacationsOnMonth(
                 startDate, endDate, isAccepted, urgent, memberDepartment);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vacations> findVacationsBetweenOrderByCreatedAtDesc(
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate){
+        return vacationsRepository.findVacationsBetweenOrderByCreatedAtDesc(
+                memberId, startDate, endDate);
+    }
 }
