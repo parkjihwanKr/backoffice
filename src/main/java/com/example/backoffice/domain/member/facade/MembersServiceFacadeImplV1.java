@@ -17,18 +17,18 @@ import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
@@ -89,6 +89,17 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional(readOnly = true)
+    public MembersResponseDto.ReadAvailableMemberNameDto checkAvailableMemberName(
+            String memberName){
+        if(membersService.isExistMemberName(memberName)){
+            throw new MembersCustomException(
+                    MembersExceptionCode.EXISTS_MEMBER);
+        }
+        return MembersConverter.toReadAvailableMemberNameDto(true, memberName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public MembersResponseDto.ReadOneDetailsDto readOne(
             Long memberId, Members loginMember){
         // 1. 멤버가 자기 자신인 경우
@@ -103,18 +114,19 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public Page<MembersResponseDto.ReadOneDto> readForHrManager(
+    public Page<MembersResponseDto.ReadOneDto> readByAdmin(
             String department, String position,
             Members loginMember, Pageable pageable) {
-        System.out.println(department + " "+ position);
 
         // 1. 로그인 멤버가 HR MANAGER 또는 CEO인지 확인
         membersService.findHRManagerOrCEO(loginMember);
 
         // 2. 부서와 직위에 따른 필터링 준비
         // ** null -> all과 같은 개념으로 선택되지 않으면 모든 department, position의 값을 부르기 위해
-        MemberDepartment memberDepartment = department != null ? MembersConverter.toDepartment(department) : null;
-        MemberPosition memberPosition = position != null ? MembersConverter.toPosition(position) : null;
+        MemberDepartment memberDepartment =
+                department != null ? MembersConverter.toDepartment(department) : null;
+        MemberPosition memberPosition =
+                position != null ? MembersConverter.toPosition(position) : null;
 
         // 3. 필터링된 멤버 리스트를 pageable 적용하여 가져오기
         Page<Members> pagedMemberList;
@@ -141,7 +153,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @Transactional
     public MembersResponseDto.UpdateOneDto updateOne(
-            Long memberId, Members loginMember, MultipartFile multipartFile,
+            Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneDto requestDto){
         // 엔티티가 영속성 컨택스트에 넣어야하기에
         // 수정을 하기 위해선 어떤 엔티티가 변경 되어야 하는지 알아야함
@@ -170,11 +182,9 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
         String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
 
-        String profileImageUrl = filesService.createImage(multipartFile);
         matchedMember.updateMemberInfo(
                 requestDto.getName(), requestDto.getEmail(), requestDto.getAddress(),
-                requestDto.getContact(), requestDto.getIntroduction(),
-                bCrytPassword, profileImageUrl);
+                requestDto.getContact(), requestDto.getIntroduction(), bCrytPassword);
         return MembersConverter.toUpdateOneDto(matchedMember);
     }
 
@@ -186,7 +196,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     // 메인 어드민은 모든 직원의 직책, 직위를 변경할 수 있다.
     @Override
     @Transactional
-    public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttribute(
+    public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttributeByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForAttributeDto requestDto,
             MultipartFile multipartFile) throws MembersCustomException {
@@ -196,10 +206,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
                 && loginMember.getDepartment().equals(MemberDepartment.HR);
         boolean isMainAdmin = loginMember.getPosition().equals(MemberPosition.CEO);
 
-        System.out.println("requestDto : "+requestDto.getRole());
-        System.out.println("requestDto : "+requestDto.getDepartment());
-        System.out.println("requestDto : "+requestDto.getMemberName());
-        System.out.println("requestDto : "+requestDto.getPosition());
         // 메인 어드민이 아닌 경우에 대한 처리
         if (!isMainAdmin) {
             // HR Manager일 경우의 권한 제한
@@ -241,13 +247,19 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public MembersResponseDto.UpdateOneForSalaryDto updateOneForSalary(
+    public MembersResponseDto.UpdateOneForSalaryDto updateOneForSalaryByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForSalaryDto requestDto){
         // 1. 로그인 멤버가 바꾸려는 인물과 동일 인물이면 안됨
         // 2. 로그인 멤버가 자기 자신의 급여를 바꿀 순 없음
-        Members updateMember
-                = membersService.checkDifferentMember(loginMember.getId(), memberId);
+        Members updateMember = null;
+
+        // 2-1. 로그인 멤버가 사장이면 바꿀 수 있음.
+        if(!loginMember.getPosition().equals(MemberPosition.CEO)){
+            updateMember = membersService.checkDifferentMember(loginMember.getId(), memberId);
+        }else{
+            updateMember = loginMember;
+        }
 
         // 3. 로그인 멤버가 바꿀 권한이 있는지
         // 권한 : 부서가 재정부의 부장이거나 사장인 경우만 가능
@@ -257,11 +269,13 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
             updateMember.updateSalary(requestDto.getSalary());
 
-            String message = loginMember.getMemberName() + "님이 "
-                    + updateMember.getMemberName() + "님의 급여를 변경하셨습니다.";
-            notificationsService.saveForChangeMemberInfo(
-                    loginMember.getMemberName(), updateMember.getMemberName(),
-                    updateMember.getDepartment(), message);
+            if(!loginMember.getId().equals(updateMember.getId())){
+                String message = loginMember.getMemberName() + "님이 "
+                        + updateMember.getMemberName() + "님의 급여를 변경하셨습니다.";
+                notificationsService.saveForChangeMemberInfo(
+                        loginMember.getMemberName(), updateMember.getMemberName(),
+                        updateMember.getDepartment(), message);
+            }
 
             return MembersConverter.toUpdateOneForSalaryDto(updateMember);
         }else{
@@ -275,12 +289,13 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional
     public MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
             Long memberId, Members loginMember, MultipartFile image){
-        membersService.matchLoginMember(loginMember, memberId);
+        Members updatedMember
+                = membersService.matchLoginMember(loginMember, memberId);
 
-        String profileImageUrl = filesService.createImage(image);
+        String profileImageUrl = filesService.createImage(image, updatedMember);
 
-        loginMember.updateProfileImage(profileImageUrl);
-        return MembersConverter.toUpdateOneForProfileImageDto(loginMember);
+        updatedMember.updateProfileImage(profileImageUrl);
+        return MembersConverter.toUpdateOneForProfileImageDto(updatedMember);
     }
 
     // 프로필 이미지 삭제
@@ -302,8 +317,8 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public void deleteOne(Long memberId, Members loginMember){
-        membersService.matchLoginMember(loginMember, memberId);
+    public void deleteOneByAdmin(Long memberId, Members loginMember){
+        membersService.findHRManagerOrCEO(loginMember);
         membersService.deleteById(memberId);
     }
 
@@ -322,7 +337,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public MembersResponseDto.UpdateOneForVacationDto updateOneForVacation(
+    public MembersResponseDto.UpdateOneForVacationDto updateMemberVacationByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForVacationDto requestDto){
         Members hrManager = membersService.findHRManagerOrCEO(loginMember);
@@ -350,14 +365,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional(readOnly = true)
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
         List<Members> memberList = membersService.findAll();
-        System.out.println("memberList.size() : "+memberList.size());
         return MembersConverter.toReadNameListDto(memberList);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members findByMemberName(String memberName){
-        return membersService.findByMemberName(memberName);
     }
 
     private MembersExceptionEnum findExceptionType(

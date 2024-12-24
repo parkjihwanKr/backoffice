@@ -19,6 +19,15 @@ public class FilesConverter {
                 .build();
     }
 
+    public static Files toEntityForMemberProfileImage(String url, Members member){
+        return Files.builder()
+                .url(url)
+                .member(member)
+                .board(null)
+                .event(null)
+                .expense(null)
+                .build();
+    }
     public static Files toEntityForBoards(String url, Boards board) {
         return Files.builder()
                 .url(url)

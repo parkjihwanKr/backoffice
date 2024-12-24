@@ -29,7 +29,7 @@ public class AuthController {
 
     @GetMapping("/check-auth")
     public ResponseEntity<CommonResponseDto<AuthDto>> checkAuth(HttpServletRequest request) {
-        String token = jwtProvider.getJwtFromHeader(request);
+        String accessToken = jwtProvider.getJwtFromHeader(request);
         // 해당 과정에서 이미 로그인 유저의 정보를 SecurityContextHolder에 가지고 있음.
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -44,14 +44,15 @@ public class AuthController {
                 loginMember.getDepartment().getDepartment(),
                 loginMember.getPosition().getPosition());
 
-        JwtStatus status = jwtProvider.validateToken(token);
+        JwtStatus status = jwtProvider.validateToken(accessToken);
         return switch (status) {
             case ACCESS -> ResponseEntity.status(HttpStatus.OK).body(
                     new CommonResponseDto<>(
                             authResponseDto, "인증 절차에 성공하였습니다.", 200
                     )
             );
-            case FAIL, EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.NOT_MATCHED_AUTHENTICATION);
+            case FAIL, EXPIRED
+                    -> throw new JwtCustomException(GlobalExceptionCode.NOT_MATCHED_AUTHENTICATION);
             // default -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
         };
     }

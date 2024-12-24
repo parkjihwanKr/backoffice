@@ -35,6 +35,18 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @GetMapping("/check-available-memberName")
+    public ResponseEntity<CommonResponse<MembersResponseDto.ReadAvailableMemberNameDto>> checkAvailableMemberName(
+            @RequestParam String memberName){
+        MembersResponseDto.ReadAvailableMemberNameDto responseDto
+                = membersServiceFacade.checkAvailableMemberName(memberName);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        200, "해당 아이디는 사용 가능합니다.", responseDto
+                )
+        );
+    }
+
     @GetMapping("/members/{memberId}")
     public ResponseEntity<MembersResponseDto.ReadOneDetailsDto> readOne(
             @PathVariable Long memberId,
@@ -46,13 +58,13 @@ public class MembersController {
     }
 
     @GetMapping("/admin/members/filtered")
-    public ResponseEntity<Page<MembersResponseDto.ReadOneDto>> readForHrManager(
+    public ResponseEntity<Page<MembersResponseDto.ReadOneDto>> readByAdmin(
             @RequestParam(required = false) String department,
             @RequestParam(required = false) String position,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 10) Pageable pageable){
         Page<MembersResponseDto.ReadOneDto> responseDtoList
-                = membersServiceFacade.readForHrManager(
+                = membersServiceFacade.readByAdmin(
                         department, position, memberDetails.getMembers(), pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
@@ -60,23 +72,22 @@ public class MembersController {
     @PatchMapping("/members/{memberId}/profile")
     public ResponseEntity<MembersResponseDto.UpdateOneDto> updateOne(
             @PathVariable Long memberId,
-            @RequestPart(value = "data") MembersRequestDto.UpdateOneDto requestDto,
-            @RequestPart(value = "file") MultipartFile multipartFile,
+            @RequestBody MembersRequestDto.UpdateOneDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         MembersResponseDto.UpdateOneDto responseDto
                 = membersServiceFacade.updateOne(
-                        memberId, memberDetails.getMembers(), multipartFile, requestDto);
+                        memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PatchMapping("/members/{memberId}/attribute")
-    public ResponseEntity<CommonResponse<MembersResponseDto.UpdateOneForAttributeDto>> updateOneForAttribute(
+    public ResponseEntity<CommonResponse<MembersResponseDto.UpdateOneForAttributeDto>> updateOneForAttributeByAdmin(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") MembersRequestDto.UpdateOneForAttributeDto requestDto,
             @RequestPart(value = "file", required = false) MultipartFile multipartFile){
         MembersResponseDto.UpdateOneForAttributeDto responseDto =
-                membersServiceFacade.updateOneForAttribute(
+                membersServiceFacade.updateOneForAttributeByAdmin(
                         memberId, memberDetails.getMembers(), requestDto, multipartFile);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
@@ -87,12 +98,12 @@ public class MembersController {
 
     // 급여 변경
     @PatchMapping("/members/{memberId}/attribute/salary")
-    public ResponseEntity<MembersResponseDto.UpdateOneForSalaryDto> updateOneForSalary(
+    public ResponseEntity<MembersResponseDto.UpdateOneForSalaryDto> updateOneForSalaryByAdmin(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody MembersRequestDto.UpdateOneForSalaryDto requestDto){
         MembersResponseDto.UpdateOneForSalaryDto responseDto =
-                membersServiceFacade.updateOneForSalary(
+                membersServiceFacade.updateOneForSalaryByAdmin(
                         memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -117,10 +128,10 @@ public class MembersController {
     }
 
     @DeleteMapping("/members/{memberId}")
-    public ResponseEntity<CommonResponse<Void>> deleteOne(
+    public ResponseEntity<CommonResponse<Void>> deleteOneByAdmin(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        membersServiceFacade.deleteOne(memberId, memberDetails.getMembers());
+        membersServiceFacade.deleteOneByAdmin(memberId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "회원 삭제")
         );
@@ -136,12 +147,12 @@ public class MembersController {
     }
 
     @PatchMapping("/members/{memberId}/vacations")
-    public ResponseEntity<MembersResponseDto.UpdateOneForVacationDto> updateOneForVacation(
+    public ResponseEntity<MembersResponseDto.UpdateOneForVacationDto> updateMemberVacationByAdmin(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody MembersRequestDto.UpdateOneForVacationDto requestDto){
         MembersResponseDto.UpdateOneForVacationDto responseDto
-                = membersServiceFacade.updateOneForVacation(
+                = membersServiceFacade.updateMemberVacationByAdmin(
                         memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

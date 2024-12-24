@@ -317,7 +317,7 @@ public class MembersServiceTest {
                 .thenReturn(Optional.of(memberOne));
         // when
         Members foundMember
-                = membersService.findByIdAndRoleAndDepartment(foundId, foundRole, foundDepartment);
+                = null;
 
         // then
         assertEquals(foundMember.getId(), foundId);

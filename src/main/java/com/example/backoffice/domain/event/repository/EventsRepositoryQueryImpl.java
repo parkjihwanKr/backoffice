@@ -35,8 +35,9 @@ public class EventsRepositoryQueryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public List<Events> findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
-            EventType eventType, MemberDepartment department, LocalDateTime start, LocalDateTime end) {
+    public List<Events> findFiltered(
+            EventType eventType, MemberDepartment department,
+            LocalDateTime start, LocalDateTime end) {
         return jpaQueryFactory
                 .selectFrom(qEvents)
                 .where(

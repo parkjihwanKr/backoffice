@@ -70,6 +70,21 @@ public class BoardsResponseDto {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadSummaryOneDto {
+        private Long boardId;
+        private String title;
+        private String author;
+        private BoardType boardType;
+        private Long likeCount;
+        private Long viewCount;
+        private Integer commentCount;
+        private Boolean isImportant;
+    }
+
+    @Getter
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneDto {

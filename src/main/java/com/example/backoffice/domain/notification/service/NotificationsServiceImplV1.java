@@ -216,7 +216,7 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
             }
             case CREATE_ATTENDANCES_MANUALLY -> {
                 String notificationMessage
-                        = notificationData.getFromMember()+"님이 "
+                        = notificationData.getFromMember().getMemberName()+"님이 "
                         +notificationData.getMessage();
                 yield notificationRepository.save(
                         toEntity(notificationData, notificationMessage, domainType));

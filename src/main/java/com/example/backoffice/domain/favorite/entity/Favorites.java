@@ -3,6 +3,7 @@ package com.example.backoffice.domain.favorite.entity;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,17 +21,18 @@ public class Favorites extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 해당 도메인에 대한 제목 또는 내용
-    private String content;
+    // 바로 이동하기 위한 url을 저장
+    @NotNull
+    private String favoritesUrl;
 
-    // relations
-    @Column
-    @Enumerated(EnumType.STRING)
-    private FavoriteType favoriteType;
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Members member;
 
     // entity methods
+    public void update(String description){
+        this.description = description;
+    }
 }

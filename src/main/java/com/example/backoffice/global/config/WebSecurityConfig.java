@@ -78,13 +78,16 @@ public class WebSecurityConfig {
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
                             configuration.setAllowedHeaders(Arrays.asList("Authorization", "refreshToken", "Cache-Control", "Content-Type"));
                             configuration.setAllowCredentials(true);
+                            configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
+
                             return configuration;
                         })
                 )
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(
-                                "/websocket", "/ws/**","/",
-                                "/api/v1/login","/api/v1/signup").permitAll()
+                                "/websocket", "/ws/**",
+                                "/api/v1/login","/api/v1/signup",
+                                "/api/v1/check-available-memberName").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout
@@ -99,8 +102,8 @@ public class WebSecurityConfig {
 
         ;
         // 필터 순서 조정
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
         /*http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();*/
