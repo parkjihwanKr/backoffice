@@ -182,4 +182,18 @@ public class DateTimeUtils {
 
         return false; // 평일
     }
+
+    public static DateRange setWeek(LocalDateTime today){
+        LocalDate todayToLocalDate = today.toLocalDate();
+        int dayOfWeek = todayToLocalDate.getDayOfWeek().getValue();
+
+        return switch (dayOfWeek) {
+            case 1, 2, 3, 4, 5, 6, 7 -> new DateRange(
+                    today.minusDays(dayOfWeek - 1),
+                    today.plusDays(7 - dayOfWeek));
+            default ->
+                    throw new DateUtilException(
+                            GlobalExceptionCode.NOT_PARSE_DATE);
+        };
+    }
 }
