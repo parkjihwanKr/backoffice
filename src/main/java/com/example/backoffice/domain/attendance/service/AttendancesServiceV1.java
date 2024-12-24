@@ -196,4 +196,12 @@ public interface AttendancesServiceV1 {
      */
     List<AttendancesResponseDto.ReadScheduledRecordDto> readScheduledRecord(
             String department, Members loginMember);
+
+    /**
+     * 메인 페이지 개인 근태 기록표 (월요일~일요일) 조회
+     * @param loginMember : 로그인 멤버
+     * @return : 메인 페이지 개인 근태 기록표 응답 DTO
+     */
+    List<AttendancesResponseDto.ReadSummaryOneDto> getPersonalAttendanceDtoList(
+            Members loginMember);
 }

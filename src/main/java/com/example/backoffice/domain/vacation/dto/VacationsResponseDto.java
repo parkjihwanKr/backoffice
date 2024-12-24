@@ -107,6 +107,7 @@ public class VacationsResponseDto {
     public static class ReadSummaryOneDto{
         private Long vacationId;
         private String onVacationMemberName;
+        private VacationType vacationType;
         private Boolean isAccepted;
         private LocalDateTime startDate;
         private LocalDateTime endDate;

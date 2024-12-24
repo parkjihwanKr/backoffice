@@ -241,4 +241,28 @@ public class AttendancesConverter {
                 .endDate(endDate)
                 .build();
     }
+
+    public static List<AttendancesResponseDto.ReadSummaryOneDto> toReadSummaryListDto(
+            List<Attendances> personalAttendanceList, LocalDateTime today){
+        List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceDtoList = new ArrayList<>();
+        for(int i = 0; i<personalAttendanceList.size(); i++){
+            personalAttendanceDtoList.add(
+                    AttendancesConverter.toReadSummaryOneDto(
+                            personalAttendanceList.get(i),
+                            today.plusDays(i)));
+        }
+        return personalAttendanceDtoList;
+    }
+
+    public static AttendancesResponseDto.ReadSummaryOneDto toReadSummaryOneDto(
+            Attendances attendance, LocalDateTime date){
+        return AttendancesResponseDto.ReadSummaryOneDto.builder()
+                .attendanceId(attendance.getId())
+                .checkInTime(attendance.getCheckInTime())
+                .checkOutTime(attendance.getCheckOutTime())
+                .memberName(attendance.getMember().getMemberName())
+                .attendanceStatus(attendance.getAttendanceStatus())
+                .today(date.toLocalDate())
+                .build();
+    }
 }

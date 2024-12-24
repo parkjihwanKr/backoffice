@@ -1,23 +1,28 @@
 package com.example.backoffice.domain.board.service;
 
+import com.example.backoffice.domain.board.converter.BoardsConverter;
+import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.Members;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
+    private final ViewCountServiceV1 viewCountService;
     private final BoardsRepository boardsRepository;
 
     @Override
@@ -76,5 +81,36 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     @Transactional(readOnly = true)
     public List<Boards> findThreeByCreatedAtDesc(BoardType boardType) {
         return boardsRepository.findTop3ByBoardTypeOrderByCreatedAtDesc(boardType);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BoardsResponseDto.ReadSummaryOneDto> getGeneralBoardDtoList(Members loginMember) {
+        List<Boards> generalBoardList
+                = findThreeByCreatedAtDesc(BoardType.GENERAL);
+        List<Long> generalBoardViewCountList = new ArrayList<>();
+        for(Boards board : generalBoardList){
+            generalBoardViewCountList.add(
+                    viewCountService.getTotalViewCountByBoardId(board.getId()));
+        }
+
+        return BoardsConverter.toReadSummaryListDto(
+                generalBoardList, generalBoardViewCountList);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BoardsResponseDto.ReadSummaryOneDto> getDepartmentBoardDtoList(
+            Members loginMember) {
+        List<Boards> departmentBoardList
+                = findThreeByCreatedAtDesc(BoardType.DEPARTMENT);
+        List<Long> departmentBoardViewCountList = new ArrayList<>();
+        for(Boards board : departmentBoardList){
+            departmentBoardViewCountList.add(
+                    viewCountService.getTotalViewCountByBoardId(board.getId()));
+        }
+
+        return BoardsConverter.toReadSummaryListDto(
+                departmentBoardList, departmentBoardViewCountList);
     }
 }

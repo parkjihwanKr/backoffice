@@ -152,9 +152,10 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadDepartmentSummaryDto {
+    public static class ReadCompanySummaryOneDto {
         private Long eventId;
         private String title;
+        private EventType eventType;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private MemberDepartment department;

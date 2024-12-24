@@ -461,6 +461,21 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         return recordList;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<AttendancesResponseDto.ReadSummaryOneDto> getPersonalAttendanceDtoList(
+            Members loginMember) {
+
+        LocalDateTime today = DateTimeUtils.getToday();
+        DateRange attendanceDateRange = DateTimeUtils.setWeek(today);
+        List<Attendances> personalAttendanceList
+                = attendancesRepository.findFiltered(
+                        loginMember.getId(), attendanceDateRange.getStartDate(),
+                attendanceDateRange.getEndDate());
+
+        return AttendancesConverter.toReadSummaryListDto(personalAttendanceList, today);
+    }
+
     @Transactional(readOnly = true)
     public Attendances findById(Long attendancesId){
         return attendancesRepository.findById(attendancesId).orElseThrow(

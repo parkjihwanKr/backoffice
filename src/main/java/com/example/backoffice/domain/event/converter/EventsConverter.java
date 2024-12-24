@@ -201,16 +201,16 @@ public class EventsConverter {
         ).collect(Collectors.toList());
     }
 
-    public static List<EventsResponseDto.ReadDepartmentSummaryDto> toReadDepartmentSummaryListDto(
+    public static List<EventsResponseDto.ReadCompanySummaryOneDto> toReadCompanySummaryListDto(
             List<Events> eventList){
         return eventList.stream()
-                .map(EventsConverter::toReadDepartmentSummaryDto)
+                .map(EventsConverter::toReadCompanySummaryOneDto)
                 .toList();
     }
 
-    public static EventsResponseDto.ReadDepartmentSummaryDto toReadDepartmentSummaryDto(
+    public static EventsResponseDto.ReadCompanySummaryOneDto toReadCompanySummaryOneDto(
             Events event){
-        return EventsResponseDto.ReadDepartmentSummaryDto.builder()
+        return EventsResponseDto.ReadCompanySummaryOneDto.builder()
                 .department(event.getDepartment())
                 .eventId(event.getId())
                 .title(event.getTitle())

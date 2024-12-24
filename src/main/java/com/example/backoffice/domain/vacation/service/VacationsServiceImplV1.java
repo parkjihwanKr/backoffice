@@ -1,10 +1,13 @@
 package com.example.backoffice.domain.vacation.service;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.vacation.converter.VacationsConverter;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsExceptionCode;
 import com.example.backoffice.domain.vacation.repository.VacationsRepository;
+import com.example.backoffice.global.date.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,9 +97,12 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Vacations> findVacationsBetweenOrderByCreatedAtDesc(
-            Long memberId, LocalDateTime startDate, LocalDateTime endDate){
-        return vacationsRepository.findVacationsBetweenOrderByCreatedAtDesc(
-                memberId, startDate, endDate);
+    public List<VacationsResponseDto.ReadSummaryOneDto> getPersonalVacationDtoList(
+            Long memberId) {
+        List<Vacations> vacationList
+                = vacationsRepository.findVacationsBetweenOrderByCreatedAtDesc(
+                        memberId, DateTimeUtils.getToday(), DateTimeUtils.getToday().plusDays(6));
+
+        return VacationsConverter.toReadSummaryDtoList(vacationList);
     }
 }

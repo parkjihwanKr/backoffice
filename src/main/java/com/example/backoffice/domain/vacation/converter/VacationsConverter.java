@@ -134,7 +134,9 @@ public class VacationsConverter {
                 .vacationId(vacation.getId())
                 .startDate(vacation.getStartDate())
                 .endDate(vacation.getEndDate())
-                .onVacationMemberName(vacation.getOnVacationMember().getMemberName())
+                .vacationType(vacation.getVacationType())
+                .onVacationMemberName(
+                        vacation.getOnVacationMember().getMemberName())
                 .isAccepted(vacation.getIsAccepted())
                 .build();
     }
