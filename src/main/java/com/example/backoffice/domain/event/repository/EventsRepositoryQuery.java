@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventsRepositoryQuery {
-    List<Events> findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
-            EventType eventType, MemberDepartment department, LocalDateTime start, LocalDateTime end);
+    List<Events> findFiltered(
+            EventType eventType, MemberDepartment department,
+            LocalDateTime start, LocalDateTime end);
 }

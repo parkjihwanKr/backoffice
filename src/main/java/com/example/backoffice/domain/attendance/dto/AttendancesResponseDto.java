@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -109,5 +110,18 @@ public class AttendancesResponseDto {
         private String description;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadSummaryOneDto {
+        private String memberName;
+        private Long attendanceId;
+        private AttendanceStatus attendanceStatus;
+        private LocalDate today;
+        private LocalDateTime checkInTime;
+        private LocalDateTime checkOutTime;
     }
 }

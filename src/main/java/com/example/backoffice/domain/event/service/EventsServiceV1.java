@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.event.service;
 
+import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
@@ -56,4 +57,12 @@ public interface EventsServiceV1 {
     List<Events> findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
             EventType eventType, MemberDepartment department,
             LocalDateTime start, LocalDateTime end);
+
+    /**
+     * 요약된 부서 일정 조회
+     * @param department : 조회하려는 부서
+     * @return 메인 페이지에서 사용할 요약된 부서 일정 응답 DTO
+     */
+    List<EventsResponseDto.ReadCompanySummaryOneDto> getCompanyEventDtoList(
+            MemberDepartment department);
 }

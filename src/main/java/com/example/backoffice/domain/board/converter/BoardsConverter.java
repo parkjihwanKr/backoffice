@@ -19,6 +19,7 @@ import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class BoardsConverter {
 
@@ -225,7 +226,7 @@ public class BoardsConverter {
                 .isImportant(board.getIsImportant())
                 .build();
     }
-    public static List<BoardsResponseDto.ReadSummaryOneDto> toReadSummaryListDto(
+    /*public static List<BoardsResponseDto.ReadSummaryOneDto> toReadSummaryListDto(
             List<Boards> boardList, List<Long> viewCountList) {
         if(boardList.size() == viewCountList.size()){
             List<BoardsResponseDto.ReadSummaryOneDto> responseDtoList = new ArrayList<>();
@@ -236,6 +237,17 @@ public class BoardsConverter {
             return responseDtoList;
         }
         throw new BoardsCustomException(BoardsExceptionCode.NOT_EQUALS_LIST_SIZE);
+    }*/
+    public static List<BoardsResponseDto.ReadSummaryOneDto> toReadSummaryListDto(
+        List<Boards> boardList, List<Long> viewCountList) {
+    if (boardList.size() != viewCountList.size()) {
+        throw new BoardsCustomException(BoardsExceptionCode.NOT_EQUALS_LIST_SIZE);
+    }
+
+    // Stream API를 사용하여 더 간결하게 작성
+    return IntStream.range(0, boardList.size())
+            .mapToObj(i -> BoardsConverter.toSummaryOneDto(boardList.get(i), viewCountList.get(i)))
+            .collect(Collectors.toList());
     }
 
     public static BoardCategories toCategories(String categoryName){

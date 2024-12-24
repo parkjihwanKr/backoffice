@@ -1,10 +1,12 @@
 package com.example.backoffice.domain.board.service;
 
+import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
@@ -88,4 +90,9 @@ public interface BoardsServiceV1 {
      */
     List<Boards> findThreeByCreatedAtDesc(BoardType boardType);
 
+    List<BoardsResponseDto.ReadSummaryOneDto> getGeneralBoardDtoList(
+            Members loginMember);
+
+    List<BoardsResponseDto.ReadSummaryOneDto> getDepartmentBoardDtoList(
+            Members loginMember);
 }

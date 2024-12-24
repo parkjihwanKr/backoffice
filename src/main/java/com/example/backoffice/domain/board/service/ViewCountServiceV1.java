@@ -25,8 +25,4 @@ public interface ViewCountServiceV1 {
      * @param boardId 삭제하려는 게시글 아이디
      */
     void deleteByBoardId(Long boardId);
-
-    /**
-     * 월간 단위로 해당 레디스 조회 수 로직 초기화
-     */
 }

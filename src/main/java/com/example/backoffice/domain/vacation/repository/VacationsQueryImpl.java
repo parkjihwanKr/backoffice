@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -140,6 +141,18 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
                         isAccepted(isAccepted),
                         isUrgent(urgent),
                         filterByDepartment(memberDepartment))
+                .fetch();
+    }
+
+    @Override
+    public List<Vacations> findVacationsBetweenOrderByCreatedAtDesc(
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
+        return jpaQueryFactory
+                .selectFrom(qVacations)
+                .where(
+                        qVacations.onVacationMember.id.eq(memberId),
+                        vacationDateOverlap(startDate, endDate))
+                .orderBy(qVacations.createdAt.desc())
                 .fetch();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.vacation.service;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 
 import java.time.LocalDateTime;
@@ -34,4 +35,7 @@ public interface VacationsServiceV1 {
     List<Vacations> findFilteredVacationsOnMonth(
             LocalDateTime startDate, LocalDateTime endDate,
             Boolean isAccepted, Boolean urgent, MemberDepartment memberDepartment);
+
+    List<VacationsResponseDto.ReadSummaryOneDto> getPersonalVacationDtoList(
+            Long memberId);
 }
