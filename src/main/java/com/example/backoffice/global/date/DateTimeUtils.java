@@ -186,7 +186,7 @@ public class DateTimeUtils {
     public static DateRange setWeek(LocalDateTime today){
         LocalDate todayToLocalDate = today.toLocalDate();
         int dayOfWeek = todayToLocalDate.getDayOfWeek().getValue();
-        System.out.println("dayOfWeek : "+dayOfWeek);
+
         return switch (dayOfWeek) {
             case 1, 2, 3, 4, 5, 6, 7 -> new DateRange(
                     today.minusDays(dayOfWeek - 1),
