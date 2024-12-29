@@ -12,13 +12,20 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
-@RequiredArgsConstructor
 public class ViewCountRedisProvider {
     public static final String memberIdPrefix = "memberId:";
     public static final String boardIdPrefix = "boardId:";
+
     private final ObjectMapper objectMapper;
     @Qualifier("redisTemplateForViewCount")
     private final RedisTemplate<String, Object> redisTemplateForViewCount;
+
+    public ViewCountRedisProvider (
+            ObjectMapper objectMapper,
+            @Qualifier("redisTemplateForViewCount") RedisTemplate<String, Object> redisTemplateForViewCount){
+        this.objectMapper = objectMapper;
+        this.redisTemplateForViewCount = redisTemplateForViewCount;
+    }
 
     public <T> void saveViewCount(String key, T value) {
         String valueString = null;

@@ -37,7 +37,7 @@ public class MembersController {
 
     @GetMapping("/check-available-memberName")
     public ResponseEntity<CommonResponse<MembersResponseDto.ReadAvailableMemberNameDto>> checkAvailableMemberName(
-            @RequestParam String memberName){
+            @RequestParam(name = "memberName") String memberName){
         MembersResponseDto.ReadAvailableMemberNameDto responseDto
                 = membersServiceFacade.checkAvailableMemberName(memberName);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -59,8 +59,8 @@ public class MembersController {
 
     @GetMapping("/admin/members/filtered")
     public ResponseEntity<Page<MembersResponseDto.ReadOneDto>> readByAdmin(
-            @RequestParam(required = false) String department,
-            @RequestParam(required = false) String position,
+            @RequestParam(name = "department", required = false) String department,
+            @RequestParam(name = "position", required = false) String position,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 10) Pageable pageable){
         Page<MembersResponseDto.ReadOneDto> responseDtoList
@@ -111,7 +111,7 @@ public class MembersController {
     @PatchMapping("/members/{memberId}/profileImage")
     public ResponseEntity<MembersResponseDto.UpdateOneForProfileImageDto> updateOneForProfileImage(
             @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestParam("file")MultipartFile image){
+            @RequestParam(name = "file")MultipartFile image){
         MembersResponseDto.UpdateOneForProfileImageDto responseDto =
                 membersServiceFacade.updateOneForProfileImage(
                         memberId, memberDetails.getMembers(), image);

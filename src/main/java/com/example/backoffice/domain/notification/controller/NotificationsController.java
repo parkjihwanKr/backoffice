@@ -51,21 +51,10 @@ public class NotificationsController {
                         deleteIdList, "알림 삭제 성공", 200));
     }
 
-    // 실시간 알림 요청
-    // 관리자 전용 단체 메세지 전달
-    /*@MessageMapping("/admins/notifications")
-    public void createForAdmin(
-            @Payload NotificationsRequestDto.CreateForAdminDto requestDto,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        // userDetails.getUsername(); = member.getMemberName();
-        notificationsServiceFacade.createForAdmin(
-                memberDetails.getMembers().getName(), requestDto);
-    }*/
-
     // 알림 리스트 조회
     @GetMapping("/members/{memberId}/notifications")
     public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> read(
-            @PathVariable Long memberId,
+            @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<NotificationsResponseDto.ReadDto> responseDto

@@ -101,9 +101,9 @@ public class VacationsController {
     @GetMapping("/vacations/years/{year}/months/{month}/filtered")
     public ResponseEntity<List<VacationsResponseDto.ReadMonthDto>> readForHrManager(
             @PathVariable Long year, @PathVariable Long month,
-            @RequestParam(required = false) Boolean isAccepted,
-            @RequestParam(required = false) Boolean urgent,
-            @RequestParam(required = false) String department,
+            @RequestParam(name = "isAccepted", required = false) Boolean isAccepted,
+            @RequestParam(name = "urgent", required = false) Boolean urgent,
+            @RequestParam(name = "department", required = false) String department,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<VacationsResponseDto.ReadMonthDto> responseDtoList
                 = vacationsServiceFacade.readForHrManager(

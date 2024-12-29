@@ -38,7 +38,15 @@ public enum AttendancesExceptionCode {
     CHECK_OUT_TIME_OUTSIDE_WORK_HOURS(
             HttpStatus.BAD_REQUEST, "ATTENDANCES-010",
             "퇴근 시간이 유효한 시간은 오후 5시 반부터 오후 7시부터입니다."),
+    TIME_BEFORE_HALF_DAY(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-011",
+            "해당 시간은 허용된 조퇴 시간이 아닙니다." +
+                    "1시 이후 또는 해당 관리자에게 문의해주세요."),
+    EXIST_CHECKOUT_TIME(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-012",
+            "퇴근 요청을 이미 하셨습니다."),
     ;
+
     private final HttpStatus httpStatus;
     private final String errorCode;
     private final String message;

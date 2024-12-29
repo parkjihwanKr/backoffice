@@ -204,4 +204,13 @@ public interface AttendancesServiceV1 {
      */
     List<AttendancesResponseDto.ReadSummaryOneDto> getPersonalAttendanceDtoList(
             Members loginMember);
+
+    /**
+     * 오늘의 근태 기록 조회 및 클라이언트 캐싱 활용
+     * @param memberId : 조회하려는 멤버 아이디
+     * @param loginMember : 로그인 멤버
+     * @return : 해당하는 멤버의 오늘 근태 기록 응답 DTO
+     */
+    AttendancesResponseDto.ReadTodayOneDto readTodayOne(
+            Long memberId, Members loginMember);
 }
