@@ -49,12 +49,23 @@ public class FavoritesController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
-    // 즐겨찾기 삭제
-    @DeleteMapping("/favorites")
-    public ResponseEntity<CommonResponseDto<Void>> delete(
-            @RequestBody FavoritesRequestDto.DeleteDto requestDto,
+    @PatchMapping("/favorites/{favoritesId}")
+    public ResponseEntity<FavoritesResponseDto.UpdateOneDto> updateOne(
+            @PathVariable Long favoritesId,
+            @RequestBody FavoritesRequestDto.UpdateOneDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        favoritesService.delete(requestDto, memberDetails.getMembers());
+        FavoritesResponseDto.UpdateOneDto responseDto
+                = favoritesService.updateOne(
+                        favoritesId, requestDto, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    // 즐겨찾기 삭제
+    @DeleteMapping("/favorites/{favoritesId}")
+    public ResponseEntity<CommonResponseDto<Void>> deleteOne(
+            @PathVariable Long favoritesId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        favoritesService.deleteOne(favoritesId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null, "즐겨찾기 삭제 성공", 200

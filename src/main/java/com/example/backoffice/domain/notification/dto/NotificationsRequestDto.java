@@ -15,6 +15,14 @@ public class NotificationsRequestDto {
     @NoArgsConstructor
     public static class CreateForAdminDto {
         private String message;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CreateFilteredForAdminDto {
+        private String message;
         private List<Long> excludedMemberIdList;
         private List<String> excludedMemberDepartment;
     }

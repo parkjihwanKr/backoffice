@@ -26,31 +26,55 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final TokenRedisProvider tokenRedisProvider;
+    private static final String CHECK_REFRESH_TOKEN_URL = "/api/v1/refresh-token";
+    // 필터를 무시할 api 또는 websocket
+    private boolean isExcludedUrl(String requestUrl) {
+        // 필터링을 건너뛰는 경로를 명시적으로 정의
+        return requestUrl.startsWith("/ws")
+                || requestUrl.equals("/api/v1/signup")
+                || requestUrl.equals("/api/v1/login")
+                || requestUrl.equals("/api/v1/check-available-memberName");
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("doFilterInternal!!");
         String requestUrl = request.getRequestURI();
+        log.info("Request URL: " + requestUrl);
 
-        if(requestUrl.equals("/api/v1/signup") || requestUrl.equals("/api/v1/login")){
-            log.info("requestUrl : "+requestUrl);
+        // 특정 경로는 무시하고 진행
+        if (isExcludedUrl(requestUrl)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String accessToken = jwtProvider.getJwtFromHeader(request);
-
-        log.info("doFilterInternal!!");
-        log.info("accessToken : " + accessToken);
-        if (StringUtils.hasText(accessToken)) {
-            JwtStatus jwtStatus = jwtProvider.validateToken(accessToken);
+        if(!requestUrl.equals(CHECK_REFRESH_TOKEN_URL)){
+            String accessTokenValue = jwtProvider.getJwtFromHeader(request);
+            JwtStatus jwtStatus = validateToken(accessTokenValue);
             switch (jwtStatus) {
                 case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
-                case ACCESS -> successValidatedToken(accessToken);
-                case EXPIRED -> checkRefreshToken(request, response);
+                case ACCESS -> successValidatedToken(accessTokenValue);
+                case EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.EXPIRED_JWT_TOKEN);
+            }
+        }else{
+            String refreshTokenValue
+                    = jwtProvider.getRefreshTokenFromHeader(request);
+            JwtStatus jwtStatus = validateToken(refreshTokenValue);
+            switch (jwtStatus) {
+                case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+                case ACCESS, EXPIRED -> makeNewAccessToken(refreshTokenValue, response);
+                /*case EXPIRED -> makeNewAccessToken(refreshTokenValue, response);*/
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private JwtStatus validateToken(String token){
+        if (StringUtils.hasText(token)) {
+            return jwtProvider.validateToken(token);
+        }
+        throw new JwtCustomException(GlobalExceptionCode.NOT_EXIST_JWT_STATUS);
     }
 
     private void successValidatedToken(String accessToken) {
@@ -58,38 +82,64 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String authName = authentication.getName();
         String refreshTokenKey = JwtProvider.REFRESH_TOKEN_HEADER + " : " + authName;
         // RefreshToken : name
-        if (!tokenRedisProvider.existsByUsername(refreshTokenKey)) {
-            return;
+        if (!tokenRedisProvider.existsByKey(refreshTokenKey)) {
+            throw new JwtCustomException(GlobalExceptionCode.NOT_FOUND_REFRESH_TOKEN);
         }
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
 
-    // Access Token 기간이 만료시 Refresh Token을 체크해야 한다.
-    private void checkRefreshToken(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-        String refreshToken = jwtProvider.getJwtFromHeader(request);
-        String refreshTokenValue = jwtProvider.removeBearerPrefix(refreshToken);
-        JwtStatus jwtStatus = jwtProvider.validateToken(refreshTokenValue);
-        switch (jwtStatus) {
-            case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
-            case ACCESS -> makeNewAccessToken(refreshTokenValue, response);
-            case EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.UNAUTHORIZED_REFRESH_TOKEN_VALUE);
-        }
-    }
-
     // Refresh Token이 멀쩡할 시 새로 발급
-    private void makeNewAccessToken(String tokenValue, HttpServletResponse response) throws UnsupportedEncodingException {
-        Authentication authentication = jwtProvider.getAuthentication(tokenValue);
-        if (tokenRedisProvider.existsByUsername(authentication.getName())) {
-            String newAccessToken = jwtProvider.createToken(authentication.getName(), null)
-                    .getAccessToken();
+    private void makeNewAccessToken(String refreshTokenValue, HttpServletResponse response) throws UnsupportedEncodingException {
+        // Refresh Token에서 인증 정보 추출
+        Authentication authentication = jwtProvider.getAuthentication(refreshTokenValue);
+        String username = authentication.getName();
+        String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
+        // Redis에 해당 Refresh Token이 존재하는지 검증
+        if (tokenRedisProvider.existsByKey(redisKey)) {
+            // 새 Access Token 생성
+            String newAccessToken = jwtProvider.createToken(username, null).getAccessToken();
             String accessToken = URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");
-            ResponseCookie accessCookie = ResponseCookie.from(JwtProvider.AUTHORIZATION_HEADER, accessToken)
+
+            // Access Token을 Response Cookie에 설정
+            ResponseCookie accessCookie
+                    = ResponseCookie.from(JwtProvider.ACCESS_TOKEN_HEADER, accessToken)
                     .path("/")
-                    .httpOnly(true)
+                    .httpOnly(false)
+                    .secure(false)
+                    .sameSite("LAX")
+                    .maxAge(jwtProvider.getAccessTokenExpiration())
                     .build();
             response.addHeader("Set-Cookie", accessCookie.toString());
+
+            ResponseCookie refreshCookie
+                    = ResponseCookie.from(JwtProvider.REFRESH_TOKEN_HEADER, refreshTokenValue)
+                    .path("/")
+                    .httpOnly(false)
+                    .secure(false)
+                    .sameSite("LAX")
+                    .maxAge(jwtProvider.getRefreshTokenExpiration())
+                    .build();
+
+            response.addHeader("Set-Cookie", refreshCookie.toString());
+
+            System.out.println("accessCookie : "+accessCookie);
+            System.out.println("refreshCookie : "+refreshCookie);
+            // 원래 사용자 데이터도 함께 반환
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            String jsonResponse
+                    = String.format(
+                            "{\"accessToken\":\"%s\", \"username\":\"%s\"}",
+                    newAccessToken, username);
+            try{
+                response.getWriter().write(jsonResponse);
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
         }
     }
 }

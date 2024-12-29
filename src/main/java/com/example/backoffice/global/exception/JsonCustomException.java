@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class JsonCustomException extends CustomException {
-    public JsonCustomException(JsonCustomException e) {
+    public JsonCustomException(GlobalExceptionCode e) {
         super(e.getHttpStatus(), e.getErrorCode(), e.getMessage());
     }
 }

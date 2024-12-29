@@ -1,5 +1,6 @@
 package com.example.backoffice.global.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,9 +37,18 @@ public class RedisConfig {
         return new JedisConnectionFactory(config);
     }
 
+    @Bean
+    public JedisConnectionFactory redisConnectionFactoryForCachedMemberAttendance() {
+        RedisStandaloneConfiguration config
+                = new RedisStandaloneConfiguration(host, port);
+        // cachedMemberAttendance 데이터베이스
+        config.setDatabase(2);
+        return new JedisConnectionFactory(config);
+    }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplateForToken(
+            @Qualifier("redisConnectionFactoryForToken")
             JedisConnectionFactory redisConnectionFactoryForToken) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactoryForToken);
@@ -49,9 +59,21 @@ public class RedisConfig {
 
     @Bean
     public RedisTemplate<String, Object> redisTemplateForViewCount(
+            @Qualifier("redisConnectionFactoryForViewCount")
             JedisConnectionFactory redisConnectionFactoryForViewCount) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactoryForViewCount);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplateForCachedMemberAttendance(
+            @Qualifier("redisConnectionFactoryForCachedMemberAttendance")
+            JedisConnectionFactory redisConnectionFactoryForCachedMemberAttendance) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactoryForCachedMemberAttendance);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;

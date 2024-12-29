@@ -8,7 +8,6 @@ import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -102,9 +101,9 @@ public class VacationsController {
     @GetMapping("/vacations/years/{year}/months/{month}/filtered")
     public ResponseEntity<List<VacationsResponseDto.ReadMonthDto>> readForHrManager(
             @PathVariable Long year, @PathVariable Long month,
-            @RequestParam(required = false) Boolean isAccepted,
-            @RequestParam(required = false) Boolean urgent,
-            @RequestParam(required = false) String department,
+            @RequestParam(name = "isAccepted", required = false) Boolean isAccepted,
+            @RequestParam(name = "urgent", required = false) Boolean urgent,
+            @RequestParam(name = "department", required = false) String department,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         List<VacationsResponseDto.ReadMonthDto> responseDtoList
                 = vacationsServiceFacade.readForHrManager(

@@ -13,5 +13,7 @@ public interface FavoritesRepository extends JpaRepository<Favorites, Long> {
 
     Optional<Favorites> findByIdAndMember(Long favoriteId, Members loginMember);
 
-    void deleteByIdAndMember(Long id, Members loginMember);
+    List<Favorites> findByMemberId(Long memberId);
+
+    Optional<Favorites> findByIdAndMemberId(Long favoritesId, Long memberId);
 }

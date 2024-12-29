@@ -34,6 +34,14 @@ public class MembersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ReadAvailableMemberNameDto {
+        private Boolean isAvailable;
+        private String memberName;
+    }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReadOneDto {
         private Long memberId;
         private String memberName;
@@ -53,6 +61,7 @@ public class MembersResponseDto {
     public static class ReadOneDetailsDto {
         private Long memberId;
         private String memberName;
+        private String name;
         private String email;
         private String address;
         private Long loveCount;
@@ -66,6 +75,7 @@ public class MembersResponseDto {
         private MemberDepartment department;
         private MemberPosition position;
         private MemberRole role;
+        private String contact;
     }
 
     @Getter
@@ -159,5 +169,16 @@ public class MembersResponseDto {
         private Long toMemberId;
         private String toMemberName;
         private Integer changeMemberVacationDays;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadNameDto{
+        private Long memberId;
+        private String memberName;
+        private MemberDepartment department;
+        private MemberPosition position;
     }
 }

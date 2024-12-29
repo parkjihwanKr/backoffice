@@ -2,6 +2,7 @@ package com.example.backoffice.global.security;
 
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,11 +28,6 @@ public class MemberDetailsImpl implements UserDetails {
         authorities.add(simpleGrantedAuthority);
 
         return authorities;
-    }
-
-    // 멤버 자체를 불러와야하는 경우가 생김
-    public Members getMember(){
-        return this.members;
     }
 
     @Override

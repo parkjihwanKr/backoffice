@@ -24,6 +24,8 @@ public class QMembers extends EntityPathBase<Members> {
 
     public final StringPath address = createString("address");
 
+    public final ListPath<com.example.backoffice.domain.attendance.entity.Attendances, com.example.backoffice.domain.attendance.entity.QAttendances> attendanceList = this.<com.example.backoffice.domain.attendance.entity.Attendances, com.example.backoffice.domain.attendance.entity.QAttendances>createList("attendanceList", com.example.backoffice.domain.attendance.entity.Attendances.class, com.example.backoffice.domain.attendance.entity.QAttendances.class, PathInits.DIRECT2);
+
     public final StringPath contact = createString("contact");
 
     //inherited

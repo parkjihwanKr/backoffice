@@ -2,6 +2,7 @@ package com.example.backoffice.domain.file.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.event.entity.Events;
+import com.example.backoffice.domain.expense.entity.Expense;
 import com.example.backoffice.domain.file.converter.FilesConverter;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.file.exception.FilesCustomException;
@@ -60,8 +61,25 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
     }
 
     @Override
-    public String createImage(MultipartFile image) {
-        return s3Util.uploadImage(image);
+    @Transactional
+    public Files createOneForExpense(
+            MultipartFile file, Expense expense, Members loginMember){
+        String filename = s3Util.uploadFile(file);
+        Files fileForExpense
+                = FilesConverter.toEntityForExpense(filename, expense, loginMember);
+        filesRepository.save(fileForExpense);
+        return fileForExpense;
+    }
+
+    @Override
+    @Transactional
+    public String createImage(MultipartFile image, Members member) {
+        String fileName = s3Util.uploadImage(image);
+        Files fileForMemberProfileImage
+                = FilesConverter.toEntityForMemberProfileImage(fileName, member);
+        filesRepository.save(fileForMemberProfileImage);
+
+        return fileName;
     }
 
     @Override
@@ -77,6 +95,14 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
         List<Files> files = filesRepository.findByEventId(eventId);
         deleteForDomain(files, fileUrlList);
     }
+
+    @Override
+    @Transactional
+    public void deleteForExpense(Long expenseId, List<String> fileUrlList) {
+        List<Files> files = filesRepository.findByExpenseId(expenseId);
+        deleteForDomain(files, fileUrlList);
+    }
+
 
     private void deleteForDomain(List<Files> files, List<String> fileUrlList){
         for (String fileUrl : fileUrlList) {
