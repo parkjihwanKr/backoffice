@@ -16,11 +16,11 @@ public interface FilesServiceV1 {
 
     /**
      * 멤버 프로필 이미지 생성
-     * @param image
-     * @param member
-     * @return
+     * @param image : 해당 멤버 프로필 이미지
+     * @param member : 파일을 생성하려는 멤버
+     * @return : 해당 멤버의 랜덤으로 생성된 UUID 접두사 프로필 이미지 URL
      */
-    String createImage(MultipartFile image, Members member);
+    String createMemberProfileImage(MultipartFile image, Members member);
 
     String createOneForEvent(MultipartFile file, Events event);
 
