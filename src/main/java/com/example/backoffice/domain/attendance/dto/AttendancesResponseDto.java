@@ -119,9 +119,18 @@ public class AttendancesResponseDto {
     public static class ReadSummaryOneDto {
         private String memberName;
         private Long attendanceId;
+        private LocalDateTime createdAt;
         private AttendanceStatus attendanceStatus;
-        private LocalDate today;
         private LocalDateTime checkInTime;
         private LocalDateTime checkOutTime;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadTodayOneDto {
+        private Long attendanceId;
+        private AttendanceStatus attendanceStatus;
     }
 }

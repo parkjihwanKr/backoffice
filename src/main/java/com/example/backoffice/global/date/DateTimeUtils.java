@@ -196,4 +196,8 @@ public class DateTimeUtils {
                             GlobalExceptionCode.NOT_PARSE_DATE);
         };
     }
+
+    public static LocalDateTime getStartTimeOfHalfDay(int year, int month, int day){
+        return LocalDateTime.of(year, month, day, 12, 59, 59);
+    }
 }

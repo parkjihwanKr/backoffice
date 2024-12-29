@@ -89,7 +89,7 @@ public class BoardsController {
     // 부서별 전체 게시글 읽기
     @GetMapping("/departments/{department}/boards")
     public ResponseEntity<Page<BoardsResponseDto.ReadAllDto>> readAllForDepartment(
-            @PathVariable String department,
+            @PathVariable(name = "department") String department,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<BoardsResponseDto.ReadAllDto> responseDtoList
@@ -101,8 +101,8 @@ public class BoardsController {
     // 부서별 게시글 하나 읽기
     @GetMapping("/departments/{department}/boards/{boardId}")
     public ResponseEntity<BoardsResponseDto.ReadOneDto> readOneForDepartment(
-            @PathVariable String department,
-            @PathVariable Long boardId,
+            @PathVariable(name = "department") String department,
+            @PathVariable(name = "boardId") Long boardId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         BoardsResponseDto.ReadOneDto responseDto
                 = boardsServiceFacade.readOneForDepartment(

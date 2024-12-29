@@ -243,26 +243,33 @@ public class AttendancesConverter {
     }
 
     public static List<AttendancesResponseDto.ReadSummaryOneDto> toReadSummaryListDto(
-            List<Attendances> personalAttendanceList, LocalDateTime today){
+            List<Attendances> personalAttendanceList){
         List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceDtoList = new ArrayList<>();
         for(int i = 0; i<personalAttendanceList.size(); i++){
             personalAttendanceDtoList.add(
                     AttendancesConverter.toReadSummaryOneDto(
-                            personalAttendanceList.get(i),
-                            today.plusDays(i)));
+                            personalAttendanceList.get(i)));
         }
         return personalAttendanceDtoList;
     }
 
     public static AttendancesResponseDto.ReadSummaryOneDto toReadSummaryOneDto(
-            Attendances attendance, LocalDateTime date){
+            Attendances attendance){
         return AttendancesResponseDto.ReadSummaryOneDto.builder()
                 .attendanceId(attendance.getId())
                 .checkInTime(attendance.getCheckInTime())
                 .checkOutTime(attendance.getCheckOutTime())
                 .memberName(attendance.getMember().getMemberName())
                 .attendanceStatus(attendance.getAttendanceStatus())
-                .today(date.toLocalDate())
+                .createdAt(attendance.getCreatedAt())
+                .build();
+    }
+
+    public static AttendancesResponseDto.ReadTodayOneDto toReadTodayOneDto(
+            Attendances attendance){
+        return AttendancesResponseDto.ReadTodayOneDto.builder()
+                .attendanceId(attendance.getId())
+                .attendanceStatus(attendance.getAttendanceStatus())
                 .build();
     }
 }

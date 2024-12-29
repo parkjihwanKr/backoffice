@@ -74,6 +74,10 @@ public class S3Util {
             metadata.setContentLength(file.getSize());
             amazonS3Client.putObject(bucket, filename, file.getInputStream(), metadata);
 
+            // pjhawss3buckect
+            log.info(
+                    "s3 서비스에 파일을 등록했습니다. : "
+                    +amazonS3Client.getUrl(bucket, filename).toString());
             return amazonS3Client.getUrl(bucket, filename).toString();
         } catch (IOException e) {
             throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_UPLOAD_FAIL);

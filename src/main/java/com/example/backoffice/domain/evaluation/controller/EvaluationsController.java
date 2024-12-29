@@ -44,7 +44,7 @@ public class EvaluationsController {
     // 시행 기간은 일괄적으로 정해져 있는데?
     @GetMapping("/evaluations-department/{evaluationId}")
     public ResponseEntity<EvaluationsResponseDto.ReadOneForDepartmentDto> readOneForDepartment(
-            @RequestParam Integer year, @RequestParam Integer quarter,
+            @RequestParam(name = "year")Integer year, @RequestParam(name = "quarter")Integer quarter,
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         EvaluationsResponseDto.ReadOneForDepartmentDto responseDto
@@ -55,7 +55,7 @@ public class EvaluationsController {
 
     @GetMapping("/evaluations-company/{evaluationId}")
     public ResponseEntity<EvaluationsResponseDto.ReadOneForCompanyDto> readOneForCompany(
-            @RequestParam Integer year, @PathVariable Long evaluationId,
+            @RequestParam(name = "year") Integer year, @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         EvaluationsResponseDto.ReadOneForCompanyDto responseDto
                 = evaluationsServiceFacade.readOneForCompany(

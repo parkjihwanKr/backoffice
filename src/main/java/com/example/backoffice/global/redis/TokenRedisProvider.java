@@ -4,7 +4,6 @@ import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -13,13 +12,19 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@RequiredArgsConstructor
 public class TokenRedisProvider {
     private final ObjectMapper objectMapper;
-    // database 0 : jwt token -> refreshToken
 
+    // database 0 : jwt token -> refreshToken
     @Qualifier("redisTemplateForToken")
     private final RedisTemplate<String, Object> redisTemplateForToken;
+
+    public TokenRedisProvider (
+            ObjectMapper objectMapper,
+            @Qualifier("redisTemplateForToken") RedisTemplate<String, Object> redisTemplateForToken){
+        this.objectMapper = objectMapper;
+        this.redisTemplateForToken = redisTemplateForToken;
+    }
 
     public <T> void saveToken(String key, Integer minutes, T value) {
         String valueString = null;

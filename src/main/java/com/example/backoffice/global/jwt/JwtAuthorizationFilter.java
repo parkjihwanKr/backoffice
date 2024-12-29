@@ -62,8 +62,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             JwtStatus jwtStatus = validateToken(refreshTokenValue);
             switch (jwtStatus) {
                 case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
-                case ACCESS -> makeNewAccessToken(refreshTokenValue, response);
-                case EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.EXPIRED_JWT_TOKEN);
+                case ACCESS, EXPIRED -> makeNewAccessToken(refreshTokenValue, response);
+                /*case EXPIRED -> makeNewAccessToken(refreshTokenValue, response);*/
             }
         }
 

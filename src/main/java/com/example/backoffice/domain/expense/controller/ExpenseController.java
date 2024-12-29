@@ -44,7 +44,7 @@ public class ExpenseController {
     public ResponseEntity<ExpenseResponseDto.UpdateOneForProcessDto> updateOneForProcess(
             @PathVariable Long expenseId,
             @PathVariable String department,
-            @RequestParam String process,
+            @RequestParam(name = "process") String process,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         ExpenseResponseDto.UpdateOneForProcessDto responseDto
                 = expenseService.updateOneForProcess(expenseId, department, process, memberDetails.getMembers());

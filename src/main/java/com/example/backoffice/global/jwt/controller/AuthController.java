@@ -51,6 +51,10 @@ public class AuthController {
                             authResponseDto, "인증 절차에 성공하였습니다.", 200
                     )
             );
+            // access Token이 FAIL 상태이면 잘못된 토큰을 가지고 온거기에 에러
+            // access Token이 EXPIRED 상태이면 만기된 토큰임으로 다른 API 요청을 통해 전달하기에 에러
+            // 해당 방법은 바로 서버에서 API 요청이 가도록 하기에
+            // {@link }
             case FAIL, EXPIRED
                     -> throw new JwtCustomException(GlobalExceptionCode.NOT_MATCHED_AUTHENTICATION);
             // default -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);

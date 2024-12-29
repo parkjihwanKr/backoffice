@@ -109,6 +109,9 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             AttendancesRequestDto.UpdateCheckOutTimeDto requestDto,
             Members loginMember){
         Attendances attendance = findById(attendanceId);
+        if(attendance.getCheckOutTime() != null){
+            throw new AttendancesCustomException(AttendancesExceptionCode.EXIST_CHECKOUT_TIME);
+        }
         membersService.matchLoginMember(
                 attendance.getMember(), loginMember.getId());
         LocalDateTime checkOutTime
@@ -466,14 +469,29 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     public List<AttendancesResponseDto.ReadSummaryOneDto> getPersonalAttendanceDtoList(
             Members loginMember) {
 
-        LocalDateTime today = DateTimeUtils.getToday();
-        DateRange attendanceDateRange = DateTimeUtils.setWeek(today);
+        DateRange attendanceDateRange
+                = DateTimeUtils.setWeek(DateTimeUtils.getToday());
         List<Attendances> personalAttendanceList
                 = attendancesRepository.findFiltered(
                         loginMember.getId(), attendanceDateRange.getStartDate(),
                 attendanceDateRange.getEndDate());
 
-        return AttendancesConverter.toReadSummaryListDto(personalAttendanceList, today);
+        return AttendancesConverter.toReadSummaryListDto(personalAttendanceList);
+    }
+
+    @Override
+    @Transactional
+    public AttendancesResponseDto.ReadTodayOneDto readTodayOne(
+            Long memberId, Members loginMember) {
+        membersService.matchLoginMember(loginMember, memberId);
+        Attendances attendance
+                = attendancesRepository.findByMemberIdAndCreatedDate(
+                        memberId, DateTimeUtils.getToday().toLocalDate())
+                .orElseThrow(
+                        () -> new AttendancesCustomException(
+                                AttendancesExceptionCode.NOT_FOUND_ATTENDANCES));
+
+        return AttendancesConverter.toReadTodayOneDto(attendance);
     }
 
     @Transactional(readOnly = true)
@@ -641,16 +659,44 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                     // 결근, 외근, 휴가 상태: checkInTime과 checkOutTime을 null로 설정
                     attendance.update(
                             status, description, null, null);
-                case LATE ->
-                    attendance.update(
-                            status, description, lateCheckInTime, checkOutTime);
-                case HALF_DAY ->
+                case LATE -> {
+                    LocalDateTime currentTime = DateTimeUtils.getCurrentDateTime();
+
+                    if(currentTime.isAfter(DateTimeUtils.getTodayCheckOutTime())){
+                        attendance.update(
+                                status, description, lateCheckInTime, checkOutTime);
+                    }else{
+                        attendance.update(status, description, lateCheckInTime, null);
+                    }
+                }
+                case HALF_DAY -> {
+                    LocalDateTime currentTime = DateTimeUtils.getCurrentDateTime();
+                    LocalDateTime todayHalfDayTime
+                            = DateTimeUtils.getStartTimeOfHalfDay(
+                                    currentTime.getYear(), currentTime.getMonthValue(),
+                            currentTime.getDayOfMonth());
                     // 조퇴 상태: checkOutTime을 근무 시간의 절반 종료 시간으로 설정
-                    attendance.update(
-                            status, description, checkInTime, halfDayCheckOutTime);
-                case ON_TIME, OUT_OF_OFFICE ->
+
+                    if(!currentTime.isBefore(todayHalfDayTime)){
+                        attendance.update(
+                                status, description, checkInTime, currentTime);
+                    }else{
+                        throw new AttendancesCustomException(AttendancesExceptionCode.TIME_BEFORE_HALF_DAY);
+                    }
+                }
+                case OUT_OF_OFFICE ->
                     attendance.update(
                             status, description, checkInTime, checkOutTime);
+                case ON_TIME -> {
+                    LocalDateTime currentTime = DateTimeUtils.getCurrentDateTime();
+                    if(currentTime.isBefore(DateTimeUtils.getTodayCheckOutTime())){
+                        attendance.update(
+                                status, description, checkInTime, null);
+                    }else{
+                        attendance.update(
+                                status, description, checkInTime, checkOutTime);
+                    }
+                }
                 default ->
                     throw new AttendancesCustomException(
                             AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
