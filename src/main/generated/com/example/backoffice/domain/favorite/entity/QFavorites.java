@@ -24,12 +24,12 @@ public class QFavorites extends EntityPathBase<Favorites> {
 
     public final com.example.backoffice.global.common.QCommonEntity _super = new com.example.backoffice.global.common.QCommonEntity(this);
 
+    public final StringPath content = createString("content");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final StringPath description = createString("description");
-
-    public final StringPath favoritesUrl = createString("favoritesUrl");
+    public final EnumPath<FavoriteType> favoriteType = createEnum("favoriteType", FavoriteType.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

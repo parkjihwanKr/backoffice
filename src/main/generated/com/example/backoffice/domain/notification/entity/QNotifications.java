@@ -19,7 +19,10 @@ public class QNotifications extends EntityPathBase<Notifications> {
 
     public static final QNotifications notifications = new QNotifications("notifications");
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+    public final com.example.backoffice.global.common.QCommonEntity _super = new com.example.backoffice.global.common.QCommonEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final EnumPath<com.example.backoffice.domain.member.entity.MemberDepartment> fromMemberDepartment = createEnum("fromMemberDepartment", com.example.backoffice.domain.member.entity.MemberDepartment.class);
 
@@ -31,7 +34,8 @@ public class QNotifications extends EntityPathBase<Notifications> {
 
     public final StringPath message = createString("message");
 
-    public final DateTimePath<java.time.LocalDateTime> modifiedAt = createDateTime("modifiedAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
     public final EnumPath<NotificationType> notificationType = createEnum("notificationType", NotificationType.class);
 
