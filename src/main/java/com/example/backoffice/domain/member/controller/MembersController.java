@@ -164,4 +164,14 @@ public class MembersController {
                 = membersServiceFacade.readNameList(memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
+
+    @GetMapping("/members/{memberId}/profileImageUrl")
+    public ResponseEntity<MembersResponseDto.ReadOneForProfileImageDto> readOneForProfileImage(
+            @PathVariable(name = "memberId") Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        MembersResponseDto.ReadOneForProfileImageDto responseDto
+                = membersServiceFacade.readOneForProfileImage(
+                        memberId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

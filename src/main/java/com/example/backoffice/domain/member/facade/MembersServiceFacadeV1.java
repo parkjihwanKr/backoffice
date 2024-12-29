@@ -180,4 +180,14 @@ public interface MembersServiceFacadeV1 {
      * @return 멤버 이름 리스트 응답 DTO
      */
     List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember);
+
+    /**
+     * 멤버의 프로필 이미지 조회
+     * @param memberId : 조회하려는 멤버 아이디
+     * @param loginMember : 로그인 멤버
+     * @return 해당하는 멤버의 프로필 이미지 응답 DTO
+     * @throws MembersCustomException {@link MembersExceptionCode#NOT_EXISTS_PROFILE_IMAGE}
+     */
+    MembersResponseDto.ReadOneForProfileImageDto readOneForProfileImage(
+            Long memberId, Members loginMember);
 }
