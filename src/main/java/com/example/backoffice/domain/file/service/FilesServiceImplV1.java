@@ -73,8 +73,8 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
 
     @Override
     @Transactional
-    public String createImage(MultipartFile image, Members member) {
-        String fileName = s3Util.uploadImage(image);
+    public String createMemberProfileImage(MultipartFile image, Members member) {
+        String fileName = s3Util.uploadMemberProfile(image, member.getId());
         Files fileForMemberProfileImage
                 = FilesConverter.toEntityForMemberProfileImage(fileName, member);
         filesRepository.save(fileForMemberProfileImage);

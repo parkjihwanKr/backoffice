@@ -19,24 +19,6 @@ public class FileAspect {
     private final AuditLogService auditLogService;
     private final CommonAspect commonAspect;
 
-    /*    String createOneForMemberRole(MultipartFile file, Members member);
-
-    String createOneForBoard(MultipartFile file, Boards board);
-
-    String createImage(MultipartFile image);
-
-    String createOneForEvent(MultipartFile file, Events event);
-
-    Files createOneForExpense(
-            MultipartFile file, Expense expense, Members loginMember);
-
-    void deleteForBoard(Long boardId, List<String> fileList);
-
-    void deleteForEvent(Long eventId, List<String> fileList);
-
-    void deleteForExpense(Long expenseId, List<String> fileList);
-
-    void deleteImage(String imageUrl);*/
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.file.service.FilesServiceV1.*(..))")
     public void logAfterAllMethod(JoinPoint joinPoint) {
         String methodName = commonAspect.getCurrentMethodName(joinPoint);
@@ -46,7 +28,7 @@ public class FileAspect {
             log.error("해당 로그인 멤버에 대한 인증 요청이 이루어지지 않았습니다.");
         }
         if (methodName.equals("createOneForMemberRole")
-                || methodName.equals("createOneForBoard") || methodName.equals("createImage")
+                || methodName.equals("createOneForBoard") || methodName.equals("createMemberProfileImage")
                 || methodName.equals("createOneForEvent") || methodName.equals("createOneForExpense")) {
             message = loginMember.getMemberName() + "님이 파일을 생성하셨습니다.";
             auditLogService.save(

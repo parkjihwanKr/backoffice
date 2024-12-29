@@ -292,7 +292,8 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         Members updatedMember
                 = membersService.matchLoginMember(loginMember, memberId);
 
-        String profileImageUrl = filesService.createImage(image, updatedMember);
+        String profileImageUrl
+                = filesService.createMemberProfileImage(image, updatedMember);
 
         updatedMember.updateProfileImage(profileImageUrl);
         return MembersConverter.toUpdateOneForProfileImageDto(updatedMember);
