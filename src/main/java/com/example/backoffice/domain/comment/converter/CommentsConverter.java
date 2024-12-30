@@ -15,7 +15,6 @@ public class CommentsConverter {
                 .member(member)
                 .board(board)
                 .likeCount(0L)
-                .unLikeCount(0L)
                 .content(requestDto.getContent())
                 .build();
     }
@@ -24,7 +23,10 @@ public class CommentsConverter {
             Comments comment, Members member){
         return CommentsResponseDto.CreateCommentDto.builder()
                 .commentId(comment.getId())
-                .writer(member.getMemberName())
+                .author(member.getName())
+                .authorDepartment(member.getDepartment())
+                .authorPosition(member.getPosition())
+                .likeCount(comment.getLikeCount())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();
@@ -34,10 +36,9 @@ public class CommentsConverter {
             Comments comment, Members member){
         return CommentsResponseDto.UpdateCommentDto.builder()
                 .commentId(comment.getId())
-                .writer(member.getMemberName())
+                .author(member.getName())
                 .content(comment.getContent())
                 .likeCount(comment.getLikeCount())
-                .unLikeCount(comment.getUnLikeCount())
                 .createdAt(comment.getCreatedAt())
                 .modifiedAt(comment.getModifiedAt())
                 .build();
@@ -50,7 +51,6 @@ public class CommentsConverter {
                 .member(member)
                 .board(board)
                 .likeCount(0L)
-                .unLikeCount(0L)
                 .parent(comment)
                 .content(requestDto.getContent())
                 .build();
@@ -59,14 +59,13 @@ public class CommentsConverter {
     public static CommentsResponseDto.CreateReplyDto toCreateReplyDto(
             Comments parentComment, Comments childComment, Members member){
         return CommentsResponseDto.CreateReplyDto.builder()
-                .commentId(parentComment.getId())
                 .replyId(childComment.getId())
-                .toMemberName(parentComment.getMember().getMemberName())
-                .parentContent(parentComment.getContent())
-                .parentCreatedAt(parentComment.getCreatedAt())
-                .fromMemberName(member.getMemberName())
-                .childContent(childComment.getContent())
-                .childCreatedAt(parentComment.getCreatedAt())
+                .author(member.getName())
+                .likeCount(childComment.getLikeCount())
+                .authorDepartment(member.getDepartment())
+                .authorPosition(member.getPosition())
+                .content(childComment.getContent())
+                .createdAt(parentComment.getCreatedAt())
                 .build();
     }
 
@@ -77,19 +76,14 @@ public class CommentsConverter {
         // 해당 부분은 성능이 중요하다면 필드 writerName을 만드는게 좋음
         return CommentsResponseDto.UpdateReplyDto.builder()
                 .commentId(parentComment.getId())
-                .toMemberName(parentComment.getMember().getMemberName())
-                .parentContent(parentComment.getContent())
-                .parentCreatedAt(parentComment.getCreatedAt())
-                .parentModifiedAt(parentComment.getModifiedAt())
-                .parentLikeCount(parentComment.getLikeCount())
-                .parentUnLikeCount(parentComment.getUnLikeCount())
-                .fromMemberName(member.getMemberName())
+                .author(member.getName())
                 .replyId(childComment.getId())
-                .childContent(childComment.getContent())
-                .childCreatedAt(childComment.getCreatedAt())
-                .childModifiedAt(childComment.getModifiedAt())
-                .childLikeCount(childComment.getLikeCount())
-                .childUnLikeCount(childComment.getUnLikeCount())
+                .content(childComment.getContent())
+                .createdAt(childComment.getCreatedAt())
+                .modifiedAt(childComment.getModifiedAt())
+                .authorDepartment(member.getDepartment())
+                .authorPosition(member.getPosition())
+                .likeCount(childComment.getLikeCount())
                 .build();
     }
 }

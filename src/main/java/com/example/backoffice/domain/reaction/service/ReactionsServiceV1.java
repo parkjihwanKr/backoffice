@@ -4,6 +4,8 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.reaction.dto.ReactionsRequestDto;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 
+import java.util.List;
+
 public interface ReactionsServiceV1 {
 
     ReactionsResponseDto.CreateOneForMemberDto createOneForMember(
@@ -12,6 +14,12 @@ public interface ReactionsServiceV1 {
 
     void deleteOneForMember(
             Long toMemberId, Long reactionId, Members fromMember);
+
+    List<ReactionsResponseDto.ReadOneForBoardDto> readAllForBoard(Long boardId);
+
+    List<ReactionsResponseDto.ReadOneForCommentDto> readAllForComment(Long boardId);
+
+    List<ReactionsResponseDto.ReadOneForReplyDto> readAllForReply(Long commentId);
 
     ReactionsResponseDto.CreateOneForBoardDto createOneForBoard(
             Long boardId, Members fromMember,

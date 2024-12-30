@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.member.entity;
 
+import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.favorite.entity.Favorites;
 import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
@@ -50,6 +51,7 @@ public class Members extends CommonEntity {
 
     private String profileImageUrl;
 
+    @Column(length = 500)
     private String introduction;
 
     private Long loveCount;
@@ -85,17 +87,19 @@ public class Members extends CommonEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MembersEvaluations> membersEvaluations;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Attendances> attendanceList;
+
     // entity method
     public void updateMemberInfo(
             String name, String email, String address,
-            String contact, String introduction, String bCrytPassword, String profileImageUrl){
+            String contact, String introduction, String bCrytPassword){
         this.name = name;
         this.password = bCrytPassword;
         this.email = email;
         this.address = address;
         this.contact = contact;
         this.introduction = introduction;
-        this.profileImageUrl = profileImageUrl;
     }
 
     public void updateProfileImage(String profileImageUrl){
@@ -127,6 +131,18 @@ public class Members extends CommonEntity {
 
     public void updateRemainingVacation(){
         this.remainingVacationDays++;
+    }
+
+    public void plusRemainingVacation(int vacationDay){
+        this.remainingVacationDays += vacationDay;
+    }
+
+    public void minusRemainingVacation(int vacationDay){
+        this.remainingVacationDays -= vacationDay;
+    }
+
+    public void updateRemainingVacationDays (int vacationDay){
+        this.remainingVacationDays = vacationDay;
     }
 
     public void updateRemainingVacationYearly(){

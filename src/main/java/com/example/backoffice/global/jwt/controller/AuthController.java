@@ -29,25 +29,34 @@ public class AuthController {
 
     @GetMapping("/check-auth")
     public ResponseEntity<CommonResponseDto<AuthDto>> checkAuth(HttpServletRequest request) {
-        String token = jwtProvider.getJwtFromHeader(request);
-        log.info("checking auth...");
-        JwtStatus status = jwtProvider.validateToken(token);
+        String accessToken = jwtProvider.getJwtFromHeader(request);
+        // 해당 과정에서 이미 로그인 유저의 정보를 SecurityContextHolder에 가지고 있음.
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        log.info("isAuthenticated : " + auth.isAuthenticated());
+
         MemberDetailsImpl memberDetails = (MemberDetailsImpl) auth.getPrincipal();
         Members loginMember = memberDetails.getMembers();
 
+        AuthDto authResponseDto = AuthDto.of(
+                loginMember.getId(),
+                loginMember.getName(),
+                loginMember.getDepartment().getDepartment(),
+                loginMember.getPosition().getPosition());
+
+        JwtStatus status = jwtProvider.validateToken(accessToken);
         return switch (status) {
             case ACCESS -> ResponseEntity.status(HttpStatus.OK).body(
                     new CommonResponseDto<>(
-                            AuthDto.of(
-                                    loginMember.getMemberName(),
-                                    loginMember.getDepartment().getDepartment(),
-                                    loginMember.getPosition().getPosition()
-                            ), "인증 절차에 성공하였습니다.", 200
+                            authResponseDto, "인증 절차에 성공하였습니다.", 200
                     )
             );
-            case FAIL, EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.NOT_MATCHED_AUTHENTICATION);
+            // access Token이 FAIL 상태이면 잘못된 토큰을 가지고 온거기에 에러
+            // access Token이 EXPIRED 상태이면 만기된 토큰임으로 다른 API 요청을 통해 전달하기에 에러
+            // 해당 방법은 바로 서버에서 API 요청이 가도록 하기에
+            // {@link }
+            case FAIL, EXPIRED
+                    -> throw new JwtCustomException(GlobalExceptionCode.NOT_MATCHED_AUTHENTICATION);
             // default -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
         };
     }

@@ -1,5 +1,7 @@
 package com.example.backoffice.domain.reaction.dto;
 
+import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.reaction.entity.Emoji;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +17,7 @@ public class ReactionsResponseDto {
     @AllArgsConstructor
     public static class CreateOneForMemberDto {
         private Long reactionId;
-        private String fromMemberName;
+        private String reactorName;
         private String toMemberName;
         private String emoji;
         private LocalDateTime createdAt;
@@ -32,8 +34,46 @@ public class ReactionsResponseDto {
         private Long likeCount;
         private Long unLikeCount;
         private Long viewCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneForBoardDto {
+        private Long reactionId;
+        private Long reactorId;
+        private String reactorName;
+        private Emoji emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneForCommentDto {
+        private Long commentId;
+        private Long reactionId;
+        private Long reactorId;
+        private String reactorName;
+        private Emoji emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadOneForReplyDto {
+        // parent
+        private Long commentId;
+        // child
+        private Long replyId;
+        private Long reactionId;
+        private Long reactorId;
+        private String reactorName;
+        private Emoji emoji;
     }
 
     @Getter
@@ -42,10 +82,9 @@ public class ReactionsResponseDto {
     @AllArgsConstructor
     public static class CreateOneForCommentDto {
         private Long reactionId;
-        private String commentContent;
+        private String content;
         private Long likeCount;
-        private Long unLikeCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
     }
 
@@ -55,10 +94,9 @@ public class ReactionsResponseDto {
     @AllArgsConstructor
     public static class CreateOneForReplyDto {
         private Long reactionId;
-        private String replyContent;
+        private String content;
         private Long likeCount;
-        private Long unLikeCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
     }
 }

@@ -14,8 +14,16 @@ public class FavoritesRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneDto {
-        private String targetType;
-        private Long targetId;
+        private String url;
+        private String description;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateOneDto {
+        private String description;
     }
 
     @Getter

@@ -1,10 +1,14 @@
 package com.example.backoffice.domain.event.service;
 
+import com.example.backoffice.domain.event.converter.EventsConverter;
+import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
 import com.example.backoffice.domain.event.exception.EventsExceptionCode;
 import com.example.backoffice.domain.event.repository.EventsRepository;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.global.date.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class EventsServiceImplV1 implements EventsService {
+public class EventsServiceImplV1 implements EventsServiceV1 {
 
     private final EventsRepository eventsRepository;
 
@@ -39,28 +43,30 @@ public class EventsServiceImplV1 implements EventsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Events> findAllByStartDateBetween(LocalDateTime start, LocalDateTime end) {
-        return eventsRepository.findAllByStartDateBetween(start, end);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Events> findAllByEventTypeAndEndDateBefore(
-            EventType eventType, LocalDateTime endOfDay) {
-        return eventsRepository.findAllByEventTypeAndEndDateBefore(eventType, endOfDay);
-    }
-
-    @Override
     @Transactional
-    public Long countVacationingMembers(LocalDateTime customStartDate) {
-        return eventsRepository.countVacationingMembers(customStartDate);
+    public List<Events> findAllByEventTypeAndDepartmentAndStartOrEndDateBetween(
+            EventType eventType, MemberDepartment memberDepartment,
+            LocalDateTime start, LocalDateTime end){
+        return eventsRepository.findFiltered(eventType, memberDepartment, start, end);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Events> findAllByEventTypeAndStartDateBetween(
-            EventType eventType, LocalDateTime startOfDay, LocalDateTime endOfDay) {
-        return eventsRepository.findAllByEventTypeAndStartDateBetween(eventType, startOfDay, endOfDay);
+    public List<Events> findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
+            EventType eventType, MemberDepartment department, LocalDateTime start, LocalDateTime end) {
+        // 이벤트 타입과 부서별로 시작 또는 종료일이 주어진 범위와 겹치는 이벤트를 모두 조회
+        return eventsRepository.findFiltered(eventType, department, start, end);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventsResponseDto.ReadCompanySummaryOneDto> getCompanyEventDtoList(
+            MemberDepartment department){
+        List<Events> departmentEventList
+                = findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
+                        null, department,
+                DateTimeUtils.getToday(), DateTimeUtils.getToday().plusDays(6));
+
+        return EventsConverter.toReadCompanySummaryListDto(departmentEventList);
     }
 }

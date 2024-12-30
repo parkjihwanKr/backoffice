@@ -17,8 +17,11 @@ public interface NotificationsServiceFacadeV1 {
             Long memberId, String notificationId, Members member);
 
     void createForAdmin(
+            String memberName, NotificationsRequestDto.CreateForAdminDto requestDto);
+
+    void createFilteredForAdmin(
             String memberName,
-            NotificationsRequestDto.CreateForAdminDto requestDto);
+            NotificationsRequestDto.CreateFilteredForAdminDto requestDto);
 
     Page<NotificationsResponseDto.ReadDto> read(
             Long memberId, Members member, Pageable pageable);
@@ -32,5 +35,5 @@ public interface NotificationsServiceFacadeV1 {
     List<String> delete(
             Long memberId, NotificationsRequestDto.DeleteDto requestDto, Members member);
 
-    List<NotificationsResponseDto.ReadAllDto> readAll(Long memberId, Members member);
+    List<NotificationsResponseDto.ReadAllDto> readAll(Long memberId, Members member);;
 }

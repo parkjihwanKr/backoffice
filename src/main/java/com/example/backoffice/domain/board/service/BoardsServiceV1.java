@@ -1,46 +1,98 @@
 package com.example.backoffice.domain.board.service;
 
-import com.example.backoffice.domain.board.dto.BoardsRequestDto;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
+import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.board.exception.BoardsCustomException;
+import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
 public interface BoardsServiceV1 {
 
-    Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable);
+    /**
+     * 중요 표시된 게시글을 수정일 기준으로 내림차순으로 조회
+     *
+     * @param boardType 게시글 타입 (예: 전체 게시판, 부서 게시판 등)
+     * @return 중요 표시된 게시글 리스트
+     */
+    List<Boards> findByIsImportantTrueAndBoardTypeOrderByModifiedAtDesc(BoardType boardType);
 
-    BoardsResponseDto.ReadOneDto readOne(Long boardId);
+    /**
+     * 중요하지 않은 게시글을 생성일 기준으로 내림차순으로 페이징하여 조회
+     *
+     * @param pageable 페이징 정보
+     * @param boardType 게시글 타입
+     * @return 중요하지 않은 게시글의 페이지 객체
+     */
+    Page<Boards> findByIsImportantFalseAndBoardTypeOrderByCreatedAtDesc(Pageable pageable, BoardType boardType);
 
-    BoardsResponseDto.CreateOneDto createOne(
-            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
-            List<MultipartFile> files);
+    /**
+     * 게시글의 댓글 수를 반환
+     *
+     * @param board 댓글 수를 계산할 게시글
+     * @return 게시글의 댓글 수
+     */
+    Long getCommentListSize(Boards board);
 
-    BoardsResponseDto.UpdateOneDto updateOne(
-            Long boardId, Members loginMember,
-            BoardsRequestDto.UpdateOneDto requestDto,
-            List <MultipartFile> files);
+    /**
+     * 부서와 전체 게시글 타입에 따라 게시글을 페이징하여 조회
+     *
+     * @param pageable 페이징 정보
+     * @param department 부서 이름
+     * @param boardType 게시글 타입
+     * @return 해당 부서와 게시글 타입의 페이지 객체
+     */
+    Page<Boards> findAllByDepartmentAndBoardType(Pageable pageable, MemberDepartment department, BoardType boardType);
 
-    void deleteOne(Long boardId, Members member);
+    /**
+     * 게시글 저장
+     *
+     * @param board 저장할 게시글
+     * @return 저장된 게시글
+     */
+    Boards save(Boards board);
 
-    BoardsResponseDto.CreateOneDto createOneForDepartment(
-            Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
-            List<MultipartFile> files);
+    /**
+     * 부서와 게시글 ID로 게시글 조회
+     *
+     * @param boardId 게시글 ID
+     * @param department 부서 이름
+     * @return 해당 게시글
+     * @throws BoardsCustomException {@link BoardsExceptionCode#NOT_FOUND_BOARD} 게시글이 존재하지 않을 경우 예외 발생
+     */
+    Boards findByIdAndDepartment(Long boardId, MemberDepartment department);
 
-    Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(Pageable pageable);
-
-    BoardsResponseDto.ReadOneDto readOneForDepartment(Long boardId);
-
-    BoardsResponseDto.UpdateOneDto updateOneForDepartment(
-            Long boardId, Members loginMember,
-            BoardsRequestDto.UpdateOneDto requestDto,
-            List<MultipartFile> files);
-
-    void updateOneForMarkAsImportant(Long boardId, Members loginMember);
-
+    /**
+     * 게시글 ID로 게시글 조회
+     *
+     * @param boardId 게시글 ID
+     * @return 해당 게시글
+     * @throws BoardsCustomException {@link BoardsExceptionCode#NOT_FOUND_BOARD} 게시글이 존재하지 않을 경우 예외 발생
+     */
     Boards findById(Long boardId);
+
+    /**
+     * 게시글 ID로 게시글 삭제
+     *
+     * @param boardId 삭제할 게시글 ID
+     * @throws BoardsCustomException 게시글이 존재하지 않을 경우 예외 발생
+     */
+    void deleteById(Long boardId);
+
+    /**
+     * 게시글 타입에 따른 게시글 3개 조회
+     * @param boardType : 게시글 타입
+     * @return 게시글 타입에 따른 게시글 3개
+     */
+    List<Boards> findThreeByCreatedAtDesc(BoardType boardType);
+
+    List<BoardsResponseDto.ReadSummaryOneDto> getGeneralBoardDtoList(
+            Members loginMember);
+
+    List<BoardsResponseDto.ReadSummaryOneDto> getDepartmentBoardDtoList(
+            Members loginMember);
 }

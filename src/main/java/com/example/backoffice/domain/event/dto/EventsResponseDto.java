@@ -1,12 +1,16 @@
 package com.example.backoffice.domain.event.dto;
 
+import com.example.backoffice.domain.event.entity.EventType;
+import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.vacation.entity.VacationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class EventsResponseDto {
 
@@ -18,6 +22,7 @@ public class EventsResponseDto {
         private Long eventId;
         private String title;
         private String description;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private LocalDateTime createdAt;
@@ -32,6 +37,7 @@ public class EventsResponseDto {
         private String title;
         private String description;
         private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private LocalDateTime createdAt;
@@ -47,6 +53,39 @@ public class EventsResponseDto {
         private String title;
         private String description;
         private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateOneForCompanyEventDto {
+        private Long eventId;
+        private String title;
+        private String description;
+        private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadOneForDepartmentEventDto {
+        private Long eventId;
+        private String title;
+        private String description;
+        private MemberDepartment department;
+        private List<String> fileUrlList;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private LocalDateTime createdAt;
@@ -62,6 +101,7 @@ public class EventsResponseDto {
         private String title;
         private String description;
         private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private LocalDateTime createdAt;
@@ -72,45 +112,52 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateOneForVacationEventDto {
+    public static class ReadOneForMemberScheduleDto {
         private Long eventId;
+        private Long vacationId;
         private String title;
         private String description;
-        private Boolean urgent;
+        private Boolean isAccepted;
+        private EventType eventType;
+        private MemberDepartment department;
+        private VacationType vacationType;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadOneForVacationEventDto {
+    public static class ReadOneForEventDto{
         private Long eventId;
-        private String vacationMemberName;
+        private Long vacationId;
+        private String title;
+        private String description;
+        private Boolean isAccepted;
+        private EventType eventType;
+        private VacationType vacationType;
+        private MemberDepartment department;
+        private List<FilesResponseDto.ReadOneDto> fileUrlList;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadMemberForVacationEventDto {
+    public static class ReadCompanySummaryOneDto {
         private Long eventId;
-        private String vacationMemberName;
+        private String title;
+        private EventType eventType;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateOneForVacationEventDto {
-        private Long eventId;
-        private String vacationMemberName;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
+        private MemberDepartment department;
     }
 }

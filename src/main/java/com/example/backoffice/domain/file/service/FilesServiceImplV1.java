@@ -1,6 +1,8 @@
 package com.example.backoffice.domain.file.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.event.entity.Events;
+import com.example.backoffice.domain.expense.entity.Expense;
 import com.example.backoffice.domain.file.converter.FilesConverter;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.file.exception.FilesCustomException;
@@ -31,6 +33,7 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
     // 1. board의 게시글 -> writer, board id는 가지고 있을 것
     // 2. member의 권한 변경 증빙 서류 -> writer는 있어야할 것
     @Override
+    @Transactional
     public String createOneForMemberRole(MultipartFile file, Members member) {
         String originalFilename = file.getOriginalFilename();
         String uuidOriginalFilename = UUID.randomUUID() + "_" + originalFilename;
@@ -40,6 +43,7 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
     }
 
     @Override
+    @Transactional
     public String createOneForBoard(MultipartFile file, Boards board) {
         String filename = s3Util.uploadFile(file);
         Files fileForBoard = FilesConverter.toEntityForBoards(filename, board);
@@ -48,15 +52,59 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
     }
 
     @Override
-    public String createImage(MultipartFile image) {
-        return s3Util.uploadImage(image);
+    @Transactional
+    public String createOneForEvent(MultipartFile file, Events event) {
+        String filename = s3Util.uploadFile(file);
+        Files fileForBoard = FilesConverter.toEntityForEvents(filename, event);
+        filesRepository.save(fileForBoard);
+        return filename;
     }
 
     @Override
     @Transactional
-    public void delete(Long boardId, List<String> fileUrlList) {
-        List<Files> files = filesRepository.findByBoardId(boardId);
+    public Files createOneForExpense(
+            MultipartFile file, Expense expense, Members loginMember){
+        String filename = s3Util.uploadFile(file);
+        Files fileForExpense
+                = FilesConverter.toEntityForExpense(filename, expense, loginMember);
+        filesRepository.save(fileForExpense);
+        return fileForExpense;
+    }
 
+    @Override
+    @Transactional
+    public String createMemberProfileImage(MultipartFile image, Members member) {
+        String fileName = s3Util.uploadMemberProfile(image, member.getId());
+        Files fileForMemberProfileImage
+                = FilesConverter.toEntityForMemberProfileImage(fileName, member);
+        filesRepository.save(fileForMemberProfileImage);
+
+        return fileName;
+    }
+
+    @Override
+    @Transactional
+    public void deleteForBoard(Long boardId, List<String> fileUrlList) {
+        List<Files> files = filesRepository.findByBoardId(boardId);
+        deleteForDomain(files, fileUrlList);
+    }
+
+    @Override
+    @Transactional
+    public void deleteForEvent(Long eventId, List<String> fileUrlList) {
+        List<Files> files = filesRepository.findByEventId(eventId);
+        deleteForDomain(files, fileUrlList);
+    }
+
+    @Override
+    @Transactional
+    public void deleteForExpense(Long expenseId, List<String> fileUrlList) {
+        List<Files> files = filesRepository.findByExpenseId(expenseId);
+        deleteForDomain(files, fileUrlList);
+    }
+
+
+    private void deleteForDomain(List<Files> files, List<String> fileUrlList){
         for (String fileUrl : fileUrlList) {
             try {
                 s3Util.removeFile(fileUrl);

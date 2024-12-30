@@ -4,6 +4,7 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.notification.dto.NotificationsResponseDto;
 import com.example.backoffice.domain.notification.entity.NotificationData;
@@ -47,38 +48,19 @@ public class NotificationsConverter {
     }
 
     public static NotificationsResponseDto.ReadOneDto toReadOneDto(
-            Notifications notification) {
+            Notifications notification, MemberPosition position) {
         return NotificationsResponseDto.ReadOneDto.builder()
                 .notificationId(notification.getId())
                 .fromMemberName(notification.getFromMemberName())
                 .toMemberName(notification.getToMemberName())
+                .notificationType(notification.getNotificationType())
                 .fromMemberDepartment(notification.getFromMemberDepartment())
+                .fromMemberPosition(position)
                 .createdAt(notification.getCreatedAt())
                 .isRead(notification.getIsRead())
                 .message(notification.getMessage())
                 .build();
     }
-
-    /*public static NotificationsResponseDto.CreateForAdminDto toCreateForAdminDto(
-            Members mainAdmin, Set<MemberDepartment> memberDepartmentSet,
-            List<Notifications> notificationList, String message) {
-        List<String> toMemberNameList = new ArrayList<>();
-        List<String> notificationIdList = new ArrayList<>();
-        for (Notifications notification : notificationList) {
-            toMemberNameList.add(
-                    notification.getToMemberName());
-            notificationIdList.add(notification.getId());
-        }
-
-        return NotificationsResponseDto.CreateForAdminDto.builder()
-                .notificationIdList(notificationIdList)
-                .message(message)
-                .fromAdminRole(mainAdmin.getRole())
-                .fromMemberName(mainAdmin.getMemberName())
-                .toMemberDepartmentSet(memberDepartmentSet)
-                .toMemberNameList(toMemberNameList)
-                .build();
-    }*/
 
     public static Page<NotificationsResponseDto.ReadDto> toReadDto(
             Page<Notifications> notificationPage) {
@@ -89,6 +71,8 @@ public class NotificationsConverter {
                         .fromMemberName(notification.getFromMemberName())
                         .createdAt(notification.getCreatedAt())
                         .isRead(notification.getIsRead())
+                        .message(notification.getMessage())
+                        .notificationType(notification.getNotificationType())
                         .build());
     }
 

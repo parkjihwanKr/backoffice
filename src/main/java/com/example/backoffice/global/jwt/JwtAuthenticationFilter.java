@@ -65,33 +65,46 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // Access Token Cookie settings
         ResponseCookie accessTokenCookie
                 = cookieUtil.createCookie(
-                        "accessToken", tokenDto.getAccessToken(),
-                jwtProvider.getAccessTokenExpiration() / 1000);
+                        JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
+                jwtProvider.getAccessTokenExpiration());
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
 
         // Refresh Token Cookie settings
-        ResponseCookie refreshTokenCookie
-                = cookieUtil.createCookie(
-                        "refreshToken", tokenDto.getRefreshToken(),
-                jwtProvider.getRefreshTokenExpiration() / 1000);
+        String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
 
-        // add Response Header Cookie
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        // java.lang.NullPointerException: Cannot invoke "Object.toString()" because the return value of "org.springframework.data.redis.core.ValueOperations.get(Object)" is null
+        // at com.example.backoffice.global.redis.TokenRedisProvider.existsByUsername(TokenRedisProvider.java:59) ~[main/:na]
+        boolean existRefreshToken
+                = tokenRedisProvider.existsByKey(redisKey);
+        if(!existRefreshToken){
+            ResponseCookie refreshTokenCookie
+                    = cookieUtil.createCookie(
+                    JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
+                    jwtProvider.getRefreshTokenExpiration());
+            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
+            System.out.println("refreshTokenCookie : "+refreshTokenCookie.toString());
+            tokenRedisProvider.saveToken(
+                    refreshTokenCookie.getName()+ " : " + username,
+                    Math.toIntExact(
+                            jwtProvider.getRefreshTokenExpiration()),
+                    tokenDto.getRefreshToken());
+        }else{
+            String redisValue
+                    = tokenRedisProvider.getRefreshTokenValue(redisKey);
+            ResponseCookie refreshTokenCookie
+                    = cookieUtil.createCookie(
+                            JwtProvider.REFRESH_TOKEN_HEADER,
+                    redisValue, jwtProvider.getRefreshTokenExpiration());
+            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        }
 
         // logging response Header
         log.info("Set-Cookie : "+accessTokenCookie.toString());
 
-        // add Refresh token in redis
-        tokenRedisProvider.saveToken(
-                 refreshTokenCookie.getName()+ " : " + username,
-                Math.toIntExact(
-                        jwtProvider.getRefreshTokenExpiration() / 1000),
-                tokenDto.getRefreshToken());
-
         log.info("AccessToken : " + tokenDto.getAccessToken());
         log.info("RefreshToken : " + tokenDto.getRefreshToken());
 
-        // 쿠키 설정은 이미 되어 있으므로 생략
         // JSON 응답 보내기
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -100,20 +113,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // 이전에 사용하던 방식
-        /*response.setHeader(JwtProvider.AUTHORIZATION_HEADER, tokenDto.getAccessToken());
-        String refreshToken = JwtProvider.REFRESH_TOKEN_HEADER;
-        response.setHeader(refreshToken, tokenDto.getRefreshToken());
-        tokenRedisProvider.saveToken(
-                refreshToken + " : " + username,
-                Math.toIntExact(
-                        jwtProvider.getRefreshTokenExpiration() / 1000),
-                tokenDto.getRefreshToken()
-        );
-        log.info("AccessToken : " + tokenDto.getAccessToken());
-        log.info("RefreshToken : " + tokenDto.getRefreshToken());*/
-        // response.setHeader(); 없을 때 넣어주는데, 중복된 토큰이 있으면 업데이트 해준다.
     }
 
     @Override

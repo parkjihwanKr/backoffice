@@ -1,5 +1,7 @@
 package com.example.backoffice.global.redis;
 
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.JsonCustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -7,13 +9,23 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-public class ViewCountRedisProvider {
-    private final ObjectMapper objectMapper;
+import java.util.Set;
 
+@Component
+public class ViewCountRedisProvider {
+    public static final String memberIdPrefix = "memberId:";
+    public static final String boardIdPrefix = "boardId:";
+
+    private final ObjectMapper objectMapper;
     @Qualifier("redisTemplateForViewCount")
     private final RedisTemplate<String, Object> redisTemplateForViewCount;
+
+    public ViewCountRedisProvider (
+            ObjectMapper objectMapper,
+            @Qualifier("redisTemplateForViewCount") RedisTemplate<String, Object> redisTemplateForViewCount){
+        this.objectMapper = objectMapper;
+        this.redisTemplateForViewCount = redisTemplateForViewCount;
+    }
 
     public <T> void saveViewCount(String key, T value) {
         String valueString = null;
@@ -28,8 +40,8 @@ public class ViewCountRedisProvider {
     }
 
     // 조회수 증가
-    public Long incrementViewCount(String key) {
-        return redisTemplateForViewCount.opsForValue().increment(key, 1);
+    public void incrementViewCount(String key) {
+        redisTemplateForViewCount.opsForValue().increment(key, 1);
     }
 
     // 조회수 감소
@@ -43,6 +55,43 @@ public class ViewCountRedisProvider {
         String serializeToJsonValue = serializeToJson(value);
         return value != null ? Long.parseLong(serializeToJsonValue) : null;
     }
+
+    // 해당 게시글의 조회수 총 합 가지고 오기
+    public Long getTotalViewCountByBoardId(Long boardId) {
+        String keyPattern = getBoardKeyPattern(boardId);
+        Set<String> keys = redisTemplateForViewCount.keys(keyPattern);
+
+        if (keys == null || keys.isEmpty()) {
+            return 0L; // 키가 없을 경우 0 반환
+        }
+
+        long totalViewCount = 0L;
+        for (String key : keys) {
+            Object value = redisTemplateForViewCount.opsForValue().get(key);
+            if (value != null) {
+                try {
+                    totalViewCount += Long.parseLong(value.toString());
+                } catch (NumberFormatException e) {
+                    throw new JsonCustomException(GlobalExceptionCode.NOT_SERIALIZED_JSON);
+                }
+            }
+        }
+
+        return totalViewCount;
+    }
+
+    public void deleteByBoardId(Long boardId) {
+        // 키 패턴 정의
+        String keyPattern = getBoardKeyPattern(boardId);
+
+        Set<String> keys = redisTemplateForViewCount.keys(keyPattern);
+
+        if (keys != null && !keys.isEmpty()) {
+            // 해당 키들을 삭제합니다.
+            redisTemplateForViewCount.delete(keys);
+        }
+    }
+
 
     // JSON 직렬화
     private String serializeToJson(Object value) {
@@ -63,5 +112,9 @@ public class ViewCountRedisProvider {
             // log.error("JSON reading error", e);
             throw new RuntimeException("Error deserializing object from JSON", e);
         }
+    }
+
+    private String getBoardKeyPattern(Long domainId){
+        return boardIdPrefix+domainId+":*";
     }
 }

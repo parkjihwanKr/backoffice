@@ -1,17 +1,14 @@
 package com.example.backoffice.domain.favorite.service;
 
-import com.example.backoffice.domain.board.service.BoardsServiceV1;
-import com.example.backoffice.domain.comment.service.CommentsServiceV1;
-import com.example.backoffice.domain.event.service.EventsService;
 import com.example.backoffice.domain.favorite.converter.FavoritesConverter;
 import com.example.backoffice.domain.favorite.dto.FavoritesRequestDto;
 import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
-import com.example.backoffice.domain.favorite.entity.FavoriteType;
 import com.example.backoffice.domain.favorite.entity.Favorites;
 import com.example.backoffice.domain.favorite.exception.FavoritesCustomException;
 import com.example.backoffice.domain.favorite.exception.FavoritesExceptionCode;
 import com.example.backoffice.domain.favorite.repository.FavoritesRepository;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.service.MembersServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
 
-    private final BoardsServiceV1 boardsService;
-    private final EventsService eventsService;
-    private final CommentsServiceV1 commentsService;
+    private final MembersServiceV1 membersService;
     private final FavoritesRepository favoritesRepository;
 
     @Override
@@ -32,23 +27,13 @@ public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
     public FavoritesResponseDto.CreateOneDto createOne(
             Members loginMembers, FavoritesRequestDto.CreateOneDto requestDto){
 
-        String targetType = requestDto.getTargetType();
-        FavoriteType favoriteType = FavoritesConverter.toFavoriteType(targetType);
-        String domainTitle;
-
-        switch (favoriteType) {
-            case BOARD ->
-                    domainTitle = boardsService.findById(requestDto.getTargetId()).getTitle();
-            case EVENT ->
-                    domainTitle = eventsService.findById(requestDto.getTargetId()).getTitle();
-            case COMMENT, REPLY ->
-                    // 댓글과 대댓글은 제목이 없음으로 content를 가져옴
-                    domainTitle = commentsService.findById(requestDto.getTargetId()).getContent();
-            default -> throw new FavoritesCustomException(FavoritesExceptionCode.INVALID_FAVORITE_TYPE);
+        if(favoritesRepository.findByMemberId(loginMembers.getId()).size() >= 11){
+            throw new FavoritesCustomException(FavoritesExceptionCode.NOT_EXCEED);
         }
 
         Favorites favorites
-                = FavoritesConverter.toEntity(loginMembers, favoriteType, domainTitle);
+                = FavoritesConverter.toEntity(
+                        loginMembers, requestDto.getUrl(), requestDto.getDescription());
         favoritesRepository.save(favorites);
         return FavoritesConverter.toCreateOneDto(favorites);
     }
@@ -73,22 +58,52 @@ public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
 
     @Override
     @Transactional
-    public void delete(
-            FavoritesRequestDto.DeleteDto requestDto, Members loginMember){
-        for (Long favoriteId : requestDto.getFavoriteIdList()) {
-            try {
-                favoritesRepository.deleteByIdAndMember(favoriteId, loginMember);
-            } catch (Exception e) {
-                throw new FavoritesCustomException(FavoritesExceptionCode.NO_PERMISSION_TO_DELETE_FAVORITE);
-            }
+    public FavoritesResponseDto.UpdateOneDto updateOne(
+            Long favoritesId, FavoritesRequestDto.UpdateOneDto requestDto,
+            Members loginMember) {
+        membersService.findById(loginMember.getId());
+        Favorites favorites
+                = favoritesRepository.findByIdAndMemberId(
+                        favoritesId, loginMember.getId()).orElseThrow(
+                ()-> new FavoritesCustomException(FavoritesExceptionCode.NOT_FOUND_FAVORITES)
+        );
+
+        if(requestDto.getDescription().equals(favorites.getDescription())){
+            throw new FavoritesCustomException(FavoritesExceptionCode.EQUALS_DESCRIPTION);
         }
+
+        favorites.update(requestDto.getDescription());
+
+        return FavoritesConverter.toUpdateOneDto(favorites);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOne(Long favoritesId, Members loginMember){
+        Favorites favorites = findById(favoritesId);
+        if(!favorites.getMember().getId().equals(loginMember.getId())){
+            throw new FavoritesCustomException(
+                    FavoritesExceptionCode.NO_PERMISSION_TO_DELETE_FAVORITE);
+        }
+        favoritesRepository.deleteById(favoritesId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Favorites findById(Long favoriteId){
         return favoritesRepository.findById(favoriteId).orElseThrow(
-                ()-> new FavoritesCustomException(FavoritesExceptionCode.NOT_FOUND_FAVORITIES)
+                ()-> new FavoritesCustomException(FavoritesExceptionCode.NOT_FOUND_FAVORITES)
         );
+    }
+
+    @Override
+    @Transactional
+    public List<FavoritesResponseDto.ReadSummaryOneDto> readSummary(
+            Members loginMember) {
+        membersService.findById(loginMember.getId());
+        List<Favorites> favoritesList
+                = favoritesRepository.findByMemberId(loginMember.getId());
+
+        return FavoritesConverter.toReadSummaryListDto(favoritesList);
     }
 }

@@ -8,6 +8,14 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
+import com.example.backoffice.domain.vacation.converter.VacationsConverter;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
+import com.example.backoffice.domain.vacation.entity.Vacations;
+import org.springframework.data.domain.Page;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MembersConverter {
 
@@ -16,7 +24,7 @@ public class MembersConverter {
                 .memberName("admin")
                 .name("admin")
                 .loveCount(0L)
-                .role(MemberRole.ADMIN)
+                .role(MemberRole.MAIN_ADMIN)
                 .email("admin@test.com")
                 .address("admin시 admin동")
                 .introduction("admin이다")
@@ -26,7 +34,7 @@ public class MembersConverter {
                 .position(MemberPosition.CEO)
                 .remainingVacationDays(4)
                 .onVacation(false)
-                .salary(20000000L)
+                .salary(200000000L)
                 .build();
     }
     public static Members toEntity(
@@ -53,7 +61,7 @@ public class MembersConverter {
                 .memberId(member.getId())
                 .email(member.getEmail())
                 .memberName(member.getMemberName())
-                .name(member.getMemberName())
+                .name(member.getName())
                 .contact(member.getContact())
                 .role(member.getRole())
                 .address(member.getAddress())
@@ -66,14 +74,33 @@ public class MembersConverter {
                 .email(member.getEmail())
                 .address(member.getAddress())
                 .memberName(member.getMemberName())
-                .role(member.getRole())
+                .salary(member.getSalary())
                 .position(member.getPosition())
                 .department(member.getDepartment())
+                .createdAt(member.getCreatedAt())
+                .modifiedAt(member.getModifiedAt())
+                .build();
+    }
+
+    public static MembersResponseDto.ReadOneDetailsDto toReadOneForDetailsDto(Members member){
+        return MembersResponseDto.ReadOneDetailsDto.builder()
+                .memberId(member.getId())
+                .email(member.getEmail())
+                .address(member.getAddress())
+                .name(member.getName())
+                .memberName(member.getMemberName())
+                .salary(member.getSalary())
+                .position(member.getPosition())
+                .department(member.getDepartment())
+                .role(member.getRole())
                 .loveCount(member.getLoveCount())
                 .createdAt(member.getCreatedAt())
                 .modifiedAt(member.getModifiedAt())
                 .onVacation(member.getOnVacation())
+                .profileImageUrl(member.getProfileImageUrl())
+                .introduction(member.getIntroduction())
                 .remainingVacationDays(member.getRemainingVacationDays())
+                .contact(member.getContact())
                 .build();
     }
 
@@ -132,6 +159,52 @@ public class MembersConverter {
                 .build();
     }
 
+    public static MembersResponseDto.ReadOneForVacationListDto toReadOneForVacationList(
+            Members member, List<Vacations> memberVacationList){
+        List<VacationsResponseDto.ReadDayDto> vacationResponseDtoList
+                = memberVacationList.stream().map(
+                        VacationsConverter::toReadDayDto).collect(Collectors.toList());
+        return MembersResponseDto.ReadOneForVacationListDto.builder()
+                .position(member.getPosition())
+                .remainingVacationDays(member.getRemainingVacationDays())
+                .vacationList(vacationResponseDtoList)
+                .build();
+    }
+
+    public static Page<MembersResponseDto.ReadOneDto> toReadDtoForHrManager(
+            Page<Members> memberPage){
+        return memberPage.map(MembersConverter::toReadOneDto);
+    }
+
+    public static MembersResponseDto.UpdateOneForVacationDto toUpdateOneForVacationDto(
+            Long toMemberId, String toMemberName, Integer toMemberVacationDays){
+        return MembersResponseDto.UpdateOneForVacationDto.builder()
+                .toMemberId(toMemberId)
+                .changeMemberVacationDays(toMemberVacationDays)
+                .toMemberName(toMemberName)
+                .build();
+    }
+
+    public static List<MembersResponseDto.ReadNameDto> toReadNameListDto(
+            List<Members> memberList){
+        return memberList.stream()
+                .map(member -> MembersResponseDto.ReadNameDto.builder()
+                        .memberName(member.getMemberName())
+                        .memberId(member.getId())
+                        .department(member.getDepartment())
+                        .position(member.getPosition())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public static MembersResponseDto.ReadOneForProfileImageDto toReadOneForProfileImageDto(
+            String profileImageUrl, Long memberId){
+        return MembersResponseDto.ReadOneForProfileImageDto.builder()
+                .memberId(memberId)
+                .profileImageUrl(profileImageUrl)
+                .build();
+    }
+
     public static MemberRole toRole(String roleName){
         for(MemberRole role : MemberRole.values()){
             if(role.getAuthority().equalsIgnoreCase(roleName)){
@@ -157,5 +230,13 @@ public class MembersConverter {
             }
         }
         throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_POSITION);
+    }
+
+    public static MembersResponseDto.ReadAvailableMemberNameDto toReadAvailableMemberNameDto(
+            Boolean isAvailable, String memberName){
+        return MembersResponseDto.ReadAvailableMemberNameDto.builder()
+                .isAvailable(isAvailable)
+                .memberName(memberName)
+                .build();
     }
 }
