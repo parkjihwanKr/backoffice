@@ -181,4 +181,13 @@ public class MembersResponseDto {
         private MemberDepartment department;
         private MemberPosition position;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadOneForProfileImageDto {
+        private Long memberId;
+        private String profileImageUrl;
+    }
 }

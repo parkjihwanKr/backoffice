@@ -21,12 +21,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -384,6 +382,21 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             return MembersExceptionEnum.MEMBER_NAME;
         }
         return MembersExceptionEnum.NULL;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MembersResponseDto.ReadOneForProfileImageDto readOneForProfileImage(
+            Long memberId, Members loginMember){
+        Members foundMember
+                = membersService.matchLoginMember(loginMember, memberId);
+
+        if(foundMember.getProfileImageUrl().isEmpty()){
+           throw new MembersCustomException(MembersExceptionCode.NOT_EXISTS_PROFILE_IMAGE);
+        }
+
+        return MembersConverter.toReadOneForProfileImageDto(
+                foundMember.getProfileImageUrl(), memberId);
     }
 
     public MemberRole checkedRole(String role){

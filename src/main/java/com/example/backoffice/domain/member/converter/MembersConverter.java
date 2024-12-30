@@ -197,6 +197,14 @@ public class MembersConverter {
                 .collect(Collectors.toList());
     }
 
+    public static MembersResponseDto.ReadOneForProfileImageDto toReadOneForProfileImageDto(
+            String profileImageUrl, Long memberId){
+        return MembersResponseDto.ReadOneForProfileImageDto.builder()
+                .memberId(memberId)
+                .profileImageUrl(profileImageUrl)
+                .build();
+    }
+
     public static MemberRole toRole(String roleName){
         for(MemberRole role : MemberRole.values()){
             if(role.getAuthority().equalsIgnoreCase(roleName)){

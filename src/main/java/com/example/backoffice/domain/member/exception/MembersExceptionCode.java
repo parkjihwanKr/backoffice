@@ -29,6 +29,7 @@ public enum MembersExceptionCode {
     NOT_FOUND_HR_MANAGER(HttpStatus.BAD_REQUEST,"MEMBER-020","인사 부장을 찾을 수 없습니다."),
     VACATION_EXCEEDS_LIMIT(HttpStatus.BAD_REQUEST, "MEMBER-021", "15일 이상의 휴가를 요청할 수 없습니다."),
     VACATION_UNDER_ZERO(HttpStatus.BAD_REQUEST, "MEMBER-022", "개인 휴가를 0일 미만으로 설정할 수 없습니다."),
+    NOT_EXISTS_PROFILE_IMAGE(HttpStatus.BAD_REQUEST, "MEMBER-023", "해당 멤버는 프로필 사진을 가지고 있지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
