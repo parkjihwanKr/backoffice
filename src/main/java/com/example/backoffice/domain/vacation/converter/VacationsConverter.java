@@ -135,6 +135,7 @@ public class VacationsConverter {
                 .startDate(vacation.getStartDate())
                 .endDate(vacation.getEndDate())
                 .vacationType(vacation.getVacationType())
+                .urgentReason(vacation.getUrgentReason())
                 .onVacationMemberName(
                         vacation.getOnVacationMember().getMemberName())
                 .isAccepted(vacation.getIsAccepted())

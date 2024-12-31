@@ -111,5 +111,6 @@ public class VacationsResponseDto {
         private Boolean isAccepted;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+        private String urgentReason;
     }
 }
