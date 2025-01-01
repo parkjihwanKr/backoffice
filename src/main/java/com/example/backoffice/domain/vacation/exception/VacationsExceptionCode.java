@@ -34,6 +34,10 @@ public enum VacationsExceptionCode {
     INVALID_END_DATE_WEEKEND(HttpStatus.BAD_REQUEST, "VACATIONS-021", "휴가 마지막날은 토요일/일요일은 불가능합니다."),
     NOT_FOUND_VACATION_IS_ACCEPTED_TYPE(HttpStatus.BAD_REQUEST, "VACATIONS-022", "잘못된 휴가 필터 요청입니다."),
     INVALID_VACATION_PERIOD(HttpStatus.BAD_REQUEST, "VACATIONS-023","적절한 휴가 신청 기간으로 설정해주세요."),
+    NOT_ACCEPTED_UPDATE_VACATION(
+            HttpStatus.BAD_REQUEST, "VACATION-024",
+            "해당 휴가는 신청이 된 상태입니다." +
+                    " 수정하고 싶으시다면 관리자를 찾아가주세요."),
     ;
 
     private final HttpStatus httpStatus;

@@ -159,16 +159,16 @@ public interface MembersServiceFacadeV1 {
             Long memberId, Members loginMember);
 
     /**
-     * 관리자가 멤버의 휴가 하나를 수정
+     * 관리자가 멤버의 잔여 휴가 일수를 수정
      * @param memberId : 수정할 멤버 아이디
      * @param loginMember : 로그인 멤버(HR Manager || CEO)
      * @param requestDto : 멤버의 휴가를 수정하는 요청 DTO
      * @return 멤버의 휴가를 수정하는 응답 DTO
      * (**) 특이 사항 : 자기 자신이 휴가를 수정하고자 하는 경우 Vacation 도메인에 존재.
      * @throws MembersCustomException {@link MembersExceptionCode#VACATION_EXCEEDS_LIMIT}
-     * 휴가 요청이 15일을 초과한 경우
+     * 휴가 요청이 잔여 휴가 일 수보다 15일을 초과한 경우
      * @throws MembersCustomException {@link MembersExceptionCode#VACATION_UNDER_ZERO}
-     * 휴가 일수가 0일 미만일 경우
+     * 요청한 휴가 일수가 0일 미만일 경우
      */
     MembersResponseDto.UpdateOneForVacationDto updateMemberVacationByAdmin(
             Long memberId, Members loginMember,

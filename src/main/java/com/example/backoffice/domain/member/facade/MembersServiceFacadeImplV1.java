@@ -339,22 +339,27 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     public MembersResponseDto.UpdateOneForVacationDto updateMemberVacationByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForVacationDto requestDto){
-        Members hrManager = membersService.findHRManagerOrCEO(loginMember);
+        Members hrManagerOrCEO = membersService.findHRManagerOrCEO(loginMember);
         Members toMember = membersService.findById(memberId);
 
-        if(requestDto.getVacationDays() > 15){
+        int remainingVacationDays = toMember.getRemainingVacationDays();
+
+        if(requestDto.getVacationDays() - remainingVacationDays > 15){
             throw new MembersCustomException(MembersExceptionCode.VACATION_EXCEEDS_LIMIT);
-        }else if(requestDto.getVacationDays() > 0){
+        }else if((requestDto.getVacationDays() - remainingVacationDays >= 0) ||
+                (requestDto.getVacationDays() - remainingVacationDays <= 15)){
             toMember.updateRemainingVacationDays(requestDto.getVacationDays());
-        }else {
+        }else if(requestDto.getVacationDays() < 0) {
             throw new MembersCustomException(MembersExceptionCode.VACATION_UNDER_ZERO);
         }
 
-        String message = hrManager.getMemberName() + "님이 "
-                + toMember.getMemberName() + "님의 휴가 정보를 변경하셨습니다.";
-        notificationsService.saveForChangeMemberInfo(
-                hrManager.getMemberName(), toMember.getMemberName(),
-                toMember.getDepartment(), message);
+        if(!hrManagerOrCEO.getId().equals(toMember.getId())){
+            String message = hrManagerOrCEO.getMemberName() + "님이 "
+                    + toMember.getMemberName() + "님의 휴가 정보를 변경하셨습니다.";
+            notificationsService.saveForChangeMemberInfo(
+                    hrManagerOrCEO.getMemberName(), toMember.getMemberName(),
+                    toMember.getDepartment(), message);
+        }
 
         return MembersConverter.toUpdateOneForVacationDto(
                 toMember.getId(), toMember.getMemberName(), toMember.getRemainingVacationDays());
@@ -390,10 +395,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             Long memberId, Members loginMember){
         Members foundMember
                 = membersService.matchLoginMember(loginMember, memberId);
-
-        if(foundMember.getProfileImageUrl().isEmpty()){
-           throw new MembersCustomException(MembersExceptionCode.NOT_EXISTS_PROFILE_IMAGE);
-        }
 
         return MembersConverter.toReadOneForProfileImageDto(
                 foundMember.getProfileImageUrl(), memberId);

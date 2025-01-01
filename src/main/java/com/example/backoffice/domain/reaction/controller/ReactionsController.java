@@ -20,7 +20,7 @@ public class ReactionsController {
 
     @PostMapping("/member/{memberId}/reactions")
     public ResponseEntity<ReactionsResponseDto.CreateOneForMemberDto> createOneForMember(
-            @PathVariable Long memberId,
+            @PathVariable(name = "memberId") Long memberId,
             @RequestBody ReactionsRequestDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         ReactionsResponseDto.CreateOneForMemberDto responseDto
@@ -31,7 +31,8 @@ public class ReactionsController {
 
     @DeleteMapping("/member/{memberId}/reactions/{reactionId}")
     public ResponseEntity<CommonResponse<Void>> deleteOneForMember(
-            @PathVariable Long memberId, @PathVariable Long reactionId,
+            @PathVariable(name = "memberId") Long memberId,
+            @PathVariable(name = "reactionId") Long reactionId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         reactionsService.deleteOneForMember(
                 memberId, reactionId, memberDetails.getMembers());
@@ -41,7 +42,7 @@ public class ReactionsController {
 
     @PostMapping("/boards/{boardId}/reactions")
     public ResponseEntity<ReactionsResponseDto.CreateOneForBoardDto> createOneForBoard(
-            @PathVariable Long boardId,
+            @PathVariable(name = "boardId") Long boardId,
             @RequestBody ReactionsRequestDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         ReactionsResponseDto.CreateOneForBoardDto responseDto =
@@ -62,7 +63,8 @@ public class ReactionsController {
 
     @PostMapping("/boards/{boardId}/comments/{commentId}/reactions")
     public ResponseEntity<ReactionsResponseDto.CreateOneForCommentDto> createOneForComment(
-            @PathVariable Long boardId, @PathVariable Long commentId,
+            @PathVariable(name = "boardId") Long boardId,
+            @PathVariable(name = "commentId") Long commentId,
             @RequestBody ReactionsRequestDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         ReactionsResponseDto.CreateOneForCommentDto responseDto
@@ -73,7 +75,8 @@ public class ReactionsController {
 
     @DeleteMapping("/comments/{commentId}/reactions/{reactionId}")
     public ResponseEntity<CommonResponse<Void>> deleteOneForComment(
-            @PathVariable Long commentId, @PathVariable Long reactionId,
+            @PathVariable(name = "commentId") Long commentId,
+            @PathVariable(name = "reactionId") Long reactionId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         reactionsService.deleteOneForComment(
                 commentId, reactionId, memberDetails.getMembers());
@@ -83,7 +86,8 @@ public class ReactionsController {
 
     @PostMapping("/comments/{commentId}/replies/{replyId}/reactions")
     public ResponseEntity<ReactionsResponseDto.CreateOneForReplyDto> createOneForReply(
-            @PathVariable Long commentId, @PathVariable Long replyId,
+            @PathVariable(name = "commentId") Long commentId,
+            @PathVariable(name = "replyId") Long replyId,
             @RequestBody ReactionsRequestDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         ReactionsResponseDto.CreateOneForReplyDto responseDto
@@ -94,7 +98,8 @@ public class ReactionsController {
 
     @DeleteMapping("/replies/{replyId}/reactions/{reactionId}")
     public ResponseEntity<CommonResponse<Void>> deleteOneForReply(
-            @PathVariable Long replyId, @PathVariable Long reactionId,
+            @PathVariable(name = "replyId") Long replyId,
+            @PathVariable(name = "reactionId") Long reactionId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         reactionsService.deleteOneForReply(
                 replyId, reactionId, memberDetails.getMembers());

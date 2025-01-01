@@ -123,6 +123,10 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
 
         Vacations vacation = vacationsService.findById(vacationId);
 
+        if(vacation.getIsAccepted()){
+            throw new VacationsCustomException(VacationsExceptionCode.NO_PERMISSION_TO_UPDATE_VACATION);
+        }
+
         VacationType vacationType = VacationsConverter.toVacationType(requestDto.getVacationType());
         validateVacationType(vacationType, requestDto.getUrgent());
 
