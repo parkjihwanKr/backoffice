@@ -75,6 +75,7 @@ public class VacationsConverter {
                 .onVacationMemberName(vacation.getOnVacationMember().getMemberName())
                 .vacationType(vacation.getVacationType())
                 .isAccepted(vacation.getIsAccepted())
+                .urgent(vacation.getUrgent())
                 .title(vacation.getTitle())
                 .urgentReason(vacation.getUrgentReason())
                 .startDate(vacation.getStartDate())

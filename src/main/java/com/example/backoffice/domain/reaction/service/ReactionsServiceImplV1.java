@@ -133,8 +133,6 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
     @Override
     @Transactional
     public void deleteOneForBoard(Long boardId, Long reactionId, Members member) {
-
-        // 1. 예외 검증
         Boards board = boardsService.findById(boardId);
         membersService.checkDifferentMember(member.getId(), board.getMember().getId());
         if (!reactionsRepository.existsByIdAndBoardAndReactor(reactionId, board, member)) {
@@ -142,7 +140,6 @@ public class ReactionsServiceImplV1 implements ReactionsServiceV1 {
         }
 
         Reactions reaction = findById(reactionId);
-
         board.deleteEmoji(reaction.getEmoji().toString());
         reactionsRepository.deleteById(reactionId);
     }

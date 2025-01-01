@@ -396,10 +396,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         Members foundMember
                 = membersService.matchLoginMember(loginMember, memberId);
 
-        if(foundMember.getProfileImageUrl().isEmpty()){
-           throw new MembersCustomException(MembersExceptionCode.NOT_EXISTS_PROFILE_IMAGE);
-        }
-
         return MembersConverter.toReadOneForProfileImageDto(
                 foundMember.getProfileImageUrl(), memberId);
     }

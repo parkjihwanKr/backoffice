@@ -45,6 +45,7 @@ public class VacationsResponseDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private VacationType vacationType;
+        private Boolean urgent;
     }
 
     @Getter
@@ -55,6 +56,7 @@ public class VacationsResponseDto {
         private Long vacationId;
         private String onVacationMemberName;
         private String title;
+        private Boolean urgent;
         private String urgentReason;
         private Boolean isAccepted;
         private MemberDepartment department;
