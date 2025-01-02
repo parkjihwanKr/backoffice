@@ -44,8 +44,6 @@ public class MainPageService {
                 = favoritesService.readSummary(loginMember);
 
         // 2. 전체 게시판 ResponseDto
-        // 해당 부분 연산 속도 궁금하네 ? CreatedAt을 계산해서 가지고 오는건가?
-        // 아니면 그냥 createdAt 정렬해서 맨 위의 3개를 가지고 오는 연산인가?
         List<BoardsResponseDto.ReadSummaryOneDto> generalBoardDtoList
                 = boardsService.getGeneralBoardDtoList(loginMember);
 

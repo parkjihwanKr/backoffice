@@ -38,6 +38,10 @@ public enum VacationsExceptionCode {
             HttpStatus.BAD_REQUEST, "VACATION-024",
             "해당 휴가는 신청이 된 상태입니다." +
                     " 수정하고 싶으시다면 관리자를 찾아가주세요."),
+    NOT_ACCEPTED_DELETE_VACATION(
+            HttpStatus.BAD_REQUEST, "VACATION-025",
+            "해당 휴가는 신청이 된 상태입니다." +
+                    " 삭제하고 싶으시다면 관리자를 찾아가주세요."),
     ;
 
     private final HttpStatus httpStatus;

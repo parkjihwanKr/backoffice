@@ -37,7 +37,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     // 휴가 관련 피드백 : 생성할 때, 승인이 될 시에, 잔여 휴가 일 변경
     // 날짜가 시작 날이 토요일/ 일요일은 안됨, 마지막일 또한 토요일/ 일요일은 안됨.
     @Override
-    public VacationsResponseDto.UpdatePeriodDto updatePeriod(
+    public VacationsResponseDto.UpdatePeriodDto updatePeriodByAdmin(
             Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto){
         validateUpdatePermission(loginMember);
 
@@ -78,7 +78,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
 
     @Override
     @Transactional
-    public VacationsResponseDto.CreateOneDto createOne(
+    public VacationsResponseDto.CreateOneDto createOneByMember(
             Members loginMember, VacationsRequestDto.CreateOneDto requestDto) {
 
         // 1. 기간 범위 검증
@@ -97,10 +97,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         vacationsService.save(vacation);
 
         if(requestDto.getUrgent()){
-            sendUrgentOneForHRManager(loginMember);
-            if(vacationType.equals(VacationType.ANNUAL_LEAVE)){
-                throw new VacationsCustomException(VacationsExceptionCode.DO_NOT_NEED_URGENT);
-            }
+            sendUrgentOneByHrManager(loginMember);
         }
 
         return VacationsConverter.toCreateOneDto(vacation);
@@ -108,7 +105,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
 
     @Override
     @Transactional(readOnly = true)
-    public VacationsResponseDto.ReadDayDto readDay(Long vacationId, Members loginMember) {
+    public VacationsResponseDto.ReadDayDto readDayByMember(Long vacationId, Members loginMember) {
         Vacations vacation = vacationsService.findById(vacationId);
         if (vacation.getOnVacationMember().getId().equals(loginMember.getId())) {
             throw new VacationsCustomException(VacationsExceptionCode.NO_PERMISSION_TO_READ_VACATION);
@@ -118,7 +115,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
 
     @Override
     @Transactional
-    public VacationsResponseDto.UpdateOneDto updateOne(
+    public VacationsResponseDto.UpdateOneDto updateOneByMember(
             Long vacationId, Members loginMember, VacationsRequestDto.UpdateOneDto requestDto) {
 
         Vacations vacation = vacationsService.findById(vacationId);
@@ -140,7 +137,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 requestDto.getEndDate(), requestDto.getUrgent());
 
         if(requestDto.getUrgent()){
-            sendUrgentOneForHRManager(loginMember);
+            sendUrgentOneByHrManager(loginMember);
             if(vacationType.equals(VacationType.ANNUAL_LEAVE)){
                 throw new VacationsCustomException(VacationsExceptionCode.DO_NOT_NEED_URGENT);
             }
@@ -154,10 +151,9 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         return VacationsConverter.toUpdateOneDto(vacation);
     }
 
-    // 승인 요청만 받는 형태이기에 Admin이 RequestDto를 받을 필요가 없다.
     @Override
     @Transactional
-    public VacationsResponseDto.UpdateOneForAdminDto updateOneForAdmin(
+    public VacationsResponseDto.UpdateOneByAdminDto updateOneByAdmin(
             Long vacationId, Members loginMember){
         // 1. 로그인 멤버가 CEO || HR_MANAGER인지 확인
         validateUpdatePermission(loginMember);
@@ -208,24 +204,28 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         }
 
         // 6. DTO 전송
-        return VacationsConverter.toUpdateOneForAdminDto(vacation);
+        return VacationsConverter.toUpdateOneByAdminDto(vacation);
     }
 
     @Override
     @Transactional
-    public void deleteOne(Long vacationId, Members loginMember) {
+    public void deleteOneByMember(Long vacationId, Members loginMember) {
         Vacations vacation = vacationsService.findById(vacationId);
         validateMemberPermission(
                 loginMember, vacation.getOnVacationMember().getId(),
                 null, VacationCrudType.DELETE_VACATION);
 
+        // 로그인 사용자가 해당 휴가라는 사실을 위에서 점검
+        if((vacation.getIsAccepted() == Boolean.TRUE)){
+            throw new VacationsCustomException(VacationsExceptionCode.NOT_ACCEPTED_DELETE_VACATION);
+        }
         vacationsService.deleteById(vacationId);
     }
 
     // 필터링된 휴가 관리 시스템 입장 시, 보이는 휴가 리스트
     @Override
     @Transactional(readOnly = true)
-    public List<VacationsResponseDto.ReadMonthDto> readForHrManager(
+    public List<VacationsResponseDto.ReadMonthDto> readByHrManager(
             Long year, Long month, Boolean isAccepted, Boolean urgent,
             String department, Members loginMember){
 
@@ -243,7 +243,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         if (department == null && urgent == null && isAccepted == null){
             List<Vacations> vacationList
                     = vacationsService.findVacationsOnMonth(startDate, endDate);
-            return VacationsConverter.toReadMonthForHrManager(vacationList);
+            return VacationsConverter.toReadMonthByHrManager(vacationList);
         }
 
         // 3-2 department가 null이 아닐 때 필터링 상태 리턴
@@ -256,13 +256,13 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 = vacationsService.findFilteredVacationsOnMonth(
                         startDate, endDate, isAccepted, urgent, memberDepartment);
 
-        return VacationsConverter.toReadMonthForHrManager(vacationList);
+        return VacationsConverter.toReadMonthByHrManager(vacationList);
     }
 
     @Override
     @Transactional
-    public void deleteOneForHrManager(
-            Long vacationId, VacationsRequestDto.DeleteOneForAdminDto requestDto,
+    public void deleteOneByHrManager(
+            Long vacationId, VacationsRequestDto.DeleteOneByAdminDto requestDto,
             Members loginMember){
         membersService.findHRManagerOrCEO(loginMember);
         Vacations vacation = vacationsService.findById(vacationId);
@@ -379,7 +379,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         }
     }
 
-    private void sendUrgentOneForHRManager(Members loginMember) {
+    private void sendUrgentOneByHrManager(Members loginMember) {
         Members hrManager = membersService.findHRManager();
         notificationsServiceFacade.createOne(
                 NotificationsConverter.toNotificationData(
@@ -406,9 +406,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 break;
             }
             case DELETE_VACATION: {
-                if (!loginMember.getId().equals(onVacationMemberId)
-                        && !(loginMember.getPosition().equals(MemberPosition.MANAGER)
-                        && loginMember.getDepartment().equals(MemberDepartment.HR))) {
+                if (!loginMember.getId().equals(onVacationMemberId)) {
                     throw new VacationsCustomException(VacationsExceptionCode.NO_PERMISSION_TO_DELETE_VACATION);
                 }
                 break;

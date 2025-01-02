@@ -94,16 +94,16 @@ public class VacationsConverter {
                 .build();
     }
 
-    public static VacationsResponseDto.UpdateOneForAdminDto toUpdateOneForAdminDto(
+    public static VacationsResponseDto.UpdateOneByAdminDto toUpdateOneByAdminDto(
             Vacations vacation){
-        return VacationsResponseDto.UpdateOneForAdminDto.builder()
+        return VacationsResponseDto.UpdateOneByAdminDto.builder()
                 .acceptedVacationMemberName(vacation.getOnVacationMember().getMemberName())
                 .vacationId(vacation.getId())
                 .isAccepted(vacation.getIsAccepted())
                 .build();
     }
 
-    public static List<VacationsResponseDto.ReadMonthDto> toReadMonthForHrManager(
+    public static List<VacationsResponseDto.ReadMonthDto> toReadMonthByHrManager(
             List<Vacations> vacationList){
         return vacationList.stream().map(
             vacation -> VacationsResponseDto.ReadMonthDto.builder()
