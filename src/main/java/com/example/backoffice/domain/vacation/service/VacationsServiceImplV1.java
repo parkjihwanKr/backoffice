@@ -68,8 +68,8 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Vacations> findAllByEndDateBefore(LocalDateTime now){
-        return vacationsRepository.findAllByEndDateBefore(now);
+    public List<Vacations> findAllBetweenYesterday(LocalDateTime endOfYesterday){
+        return vacationsRepository.findAllBetweenYesterday(endOfYesterday);
     }
 
     @Override

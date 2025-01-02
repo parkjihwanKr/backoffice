@@ -84,7 +84,7 @@ public class VacationsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UpdateOneForAdminDto {
+    public static class UpdateOneByAdminDto {
         private Long vacationId;
         private String acceptedVacationMemberName;
         private Boolean isAccepted;
