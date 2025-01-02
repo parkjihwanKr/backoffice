@@ -347,8 +347,8 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         // 1. 모든 멤버의 수에 비례에서 휴가 사용
         if (memberTotalCount > 10) {
             for (long i = 0; i < vacationDays; i++) {
-                LocalDateTime customStartDate = startDate.plusDays(i);
-                long vacationingMembersCount = vacationsService.countVacationingMembers(customStartDate);
+                LocalDateTime currentDate = startDate.plusDays(i);
+                long vacationingMembersCount = vacationsService.countVacationingMembers(currentDate);
 
                 double vacationRate = (double) vacationingMembersCount / memberTotalCount;
 

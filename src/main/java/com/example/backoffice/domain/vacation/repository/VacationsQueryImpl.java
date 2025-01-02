@@ -61,12 +61,10 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
     }
 
     @Override
-    public List<Vacations> findAllByEndDateBefore(LocalDateTime now) {
-        LocalDateTime endOfYesterday = now.minusDays(1).withHour(23).withMinute(59).withSecond(59);
-
+    public List<Vacations> findAllBetweenYesterday(LocalDateTime endOfYesterday) {
         return jpaQueryFactory
                 .selectFrom(qVacations)
-                .where(qVacations.endDate.before(endOfYesterday)) // 어제까지 끝난 모든 휴가 찾기
+                .where(qVacations.endDate.eq(endOfYesterday))
                 .fetch();
     }
 

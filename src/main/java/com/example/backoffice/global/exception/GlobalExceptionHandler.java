@@ -90,17 +90,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
 
-
-    /*@ExceptionHandler(VacationsCustomException.class)
-    public ResponseEntity<CommonResponseDto<String>> handleVacationsException(VacationsCustomException ex) {
-        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
-                ex.getErrorCode(),  // 에러 코드
-                ex.getMessage(),    // 에러 메시지
-                ex.getHttpStatus().value()  // 상태 코드 설정
-        );
-        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
-    }*/
-
     /* 그 외의 일반적인 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CommonResponseDto<Void>> handleGlobalException(Exception ex) {

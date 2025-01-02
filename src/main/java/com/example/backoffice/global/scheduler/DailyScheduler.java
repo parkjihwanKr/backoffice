@@ -63,18 +63,17 @@ public class DailyScheduler implements SchedulerTask{
     }
 
     private void updateMemberOnVacation() {
-        LocalDateTime now = DateTimeUtils.getCurrentDateTime();
-
         // 휴가가 끝난 멤버들의 상태를 false로 설정
         List<Vacations> endedVacationList
-                = vacationsService.findAllByEndDateBefore(now);
+                = vacationsService.findAllBetweenYesterday(
+                        DateTimeUtils.getToday().minusSeconds(1));
         for (Vacations vacation : endedVacationList) {
             membersService.updateOneForOnVacationFalse(vacation.getOnVacationMember().getId());
         }
 
         // 휴가가 시작된 멤버들의 상태를 true로 설정
         List<Vacations> startedVacationList
-                = vacationsService.findAllByStartDate(now);
+                = vacationsService.findAllByStartDate(DateTimeUtils.getToday());
         for (Vacations vacation : startedVacationList) {
             membersService.updateOneForOnVacationTrue(vacation.getOnVacationMember().getId());
         }
