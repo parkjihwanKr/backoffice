@@ -233,8 +233,8 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         membersService.findHRManagerOrCEO(loginMember);
 
         // 2. 시작일과 마감일을 DateTimeUtils에서 가져오기
-        LocalDateTime startDate = DateTimeUtils.getStartDayOfMonth(year, month);
-        LocalDateTime endDate = DateTimeUtils.getEndDayOfMonth(year, month); // 다음 달 1일 바로 전
+        LocalDateTime startDayOfMonth = DateTimeUtils.getStartDayOfMonth(year, month);
+        LocalDateTime endDayOfMonth = DateTimeUtils.getEndDayOfMonth(year, month); // 다음 달 1일 바로 전
 
         // 3. 초기 상태와 필터링 상태에 따른 리턴 형태 변경
         MemberDepartment memberDepartment = null;
@@ -242,7 +242,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         // 3-1. 초기 상태 리턴
         if (department == null && urgent == null && isAccepted == null){
             List<Vacations> vacationList
-                    = vacationsService.findVacationsOnMonth(startDate, endDate);
+                    = vacationsService.findVacationsOnMonth(startDayOfMonth, endDayOfMonth);
             return VacationsConverter.toReadMonthByHrManager(vacationList);
         }
 
@@ -254,7 +254,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         // 3-3 department가 null이면 모든 부서의 값을 가져온 상태로 리턴
         List<Vacations> vacationList
                 = vacationsService.findFilteredVacationsOnMonth(
-                        startDate, endDate, isAccepted, urgent, memberDepartment);
+                        startDayOfMonth, endDayOfMonth, isAccepted, urgent, memberDepartment);
 
         return VacationsConverter.toReadMonthByHrManager(vacationList);
     }
