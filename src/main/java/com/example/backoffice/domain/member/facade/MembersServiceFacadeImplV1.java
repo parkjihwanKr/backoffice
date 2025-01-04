@@ -272,7 +272,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
                         + updateMember.getMemberName() + "님의 급여를 변경하셨습니다.";
                 notificationsService.saveForChangeMemberInfo(
                         loginMember.getMemberName(), updateMember.getMemberName(),
-                        updateMember.getDepartment(), message);
+                        loginMember.getDepartment(), message);
             }
 
             return MembersConverter.toUpdateOneForSalaryDto(updateMember);
