@@ -62,39 +62,13 @@ public class NotificationsController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    // 읽지 않은 알림 리스트 조회
-    // 필요 없을듯 -> client에서 받아 놓은 알림 리스트를 isRead의 상태를 보고 변경하기만 하면 됨
-    @GetMapping("/members/{memberId}/notifications/unread")
-    public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> readUnRead(
-            @PathVariable Long memberId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
-        Page<NotificationsResponseDto.ReadDto> responseDto
-                = notificationsServiceFacade.readUnread(
-                memberId, memberDetails.getMembers(), pageable);
-        return ResponseEntity.ok().body(responseDto);
-    }
-
-    // 읽은 알림 리스트 조회
-    // 위의 readUnRead 메서드와 마찬가지의 이유로 필요없음
-    @GetMapping("/members/{memberId}/notifications/read")
-    public ResponseEntity<Page<NotificationsResponseDto.ReadDto>> readRead(
-            @PathVariable Long memberId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
-        Page<NotificationsResponseDto.ReadDto> responseDto
-                = notificationsServiceFacade.readRead(
-                memberId, memberDetails.getMembers(), pageable);
-        return ResponseEntity.ok().body(responseDto);
-    }
-
     // 모든 알림 리스트를 '읽음' 버튼으로 모두 읽음으로 변경
-    @PostMapping("/members/{memberId}/notifications/changeIsReadTrue")
-    public ResponseEntity<CommonResponseDto<List<NotificationsResponseDto.ReadAllDto>>> readAll(
+    @PostMapping("/members/{memberId}/notifications/change-is-read-true")
+    public ResponseEntity<CommonResponseDto<List<NotificationsResponseDto.ReadAllDto>>> changeIsReadTrue(
             @PathVariable Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         List<NotificationsResponseDto.ReadAllDto> responseDtoList
-                = notificationsServiceFacade.readAll(memberId, memberDetails.getMembers());
+                = notificationsServiceFacade.changeIsReadTrue(memberId, memberDetails.getMembers());
         return ResponseEntity.ok().body(
                 new CommonResponseDto<>(
                         responseDtoList, "모든 알림 리스트 읽기 성공", 200

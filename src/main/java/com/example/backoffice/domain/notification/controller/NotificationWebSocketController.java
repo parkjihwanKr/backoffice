@@ -16,18 +16,18 @@ public class NotificationWebSocketController {
     private final NotificationsServiceFacadeV1 notificationsServiceFacade;
 
     @MessageMapping("/admins/notifications")
-    public void createForAdmin(
-            @Payload NotificationsRequestDto.CreateForAdminDto requestDto,
+    public void createByAdmin(
+            @Payload NotificationsRequestDto.CreateByAdminDto requestDto,
             Principal principal){
-        notificationsServiceFacade.createForAdmin(principal.getName(), requestDto);
+        notificationsServiceFacade.createByAdmin(principal.getName(), requestDto);
     }
 
     @MessageMapping("/admins/notifications/filtered")
-    public void createFilteredForAdmin(
-            @Payload NotificationsRequestDto.CreateFilteredForAdminDto requestDto,
+    public void createFilteredByAdmin(
+            @Payload NotificationsRequestDto.CreateFilteredByAdminDto requestDto,
             Principal principal) {
 
-        notificationsServiceFacade.createFilteredForAdmin(principal.getName(), requestDto);
+        notificationsServiceFacade.createFilteredByAdmin(principal.getName(), requestDto);
     }
 }
 
