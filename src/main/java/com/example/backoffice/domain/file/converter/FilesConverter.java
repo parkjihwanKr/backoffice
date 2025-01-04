@@ -2,7 +2,6 @@ package com.example.backoffice.domain.file.converter;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.event.entity.Events;
-import com.example.backoffice.domain.expense.entity.Expense;
 import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.Members;
@@ -42,16 +41,6 @@ public class FilesConverter {
                 .url(url)
                 .member(event.getMember())
                 .event(event)
-                .board(null)
-                .build();
-    }
-
-    public static Files toEntityForExpense(
-            String url, Expense expense, Members owner){
-        return Files.builder()
-                .url(url)
-                .member(owner)
-                .event(null)
                 .board(null)
                 .build();
     }
