@@ -3,7 +3,6 @@ package com.example.backoffice.domain.vacation.converter;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.vacation.dto.VacationDateRangeDto;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
-import com.example.backoffice.domain.vacation.entity.VacationPeriod;
 import com.example.backoffice.domain.vacation.entity.VacationType;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
@@ -106,19 +105,19 @@ public class VacationsConverter {
     public static List<VacationsResponseDto.ReadMonthDto> toReadMonthByHrManager(
             List<Vacations> vacationList){
         return vacationList.stream().map(
-            vacation -> VacationsResponseDto.ReadMonthDto.builder()
-                    .vacationId(vacation.getId())
-                    .vacationType(vacation.getVacationType())
-                    .department(vacation.getOnVacationMember().getDepartment())
-                    .onVacationMemberName(vacation.getOnVacationMember().getMemberName())
-                    .title(vacation.getTitle())
-                    .isAccepted(vacation.getIsAccepted())
-                    .urgentReason(vacation.getUrgentReason())
-                    .startDate(vacation.getStartDate())
-                    .endDate(vacation.getEndDate())
-                    .createdAt(vacation.getCreatedAt())
-                    .modifiedAt(vacation.getModifiedAt())
-                    .build()
+                vacation -> VacationsResponseDto.ReadMonthDto.builder()
+                        .vacationId(vacation.getId())
+                        .vacationType(vacation.getVacationType())
+                        .department(vacation.getOnVacationMember().getDepartment())
+                        .onVacationMemberName(vacation.getOnVacationMember().getMemberName())
+                        .title(vacation.getTitle())
+                        .isAccepted(vacation.getIsAccepted())
+                        .urgentReason(vacation.getUrgentReason())
+                        .startDate(vacation.getStartDate())
+                        .endDate(vacation.getEndDate())
+                        .createdAt(vacation.getCreatedAt())
+                        .modifiedAt(vacation.getModifiedAt())
+                        .build()
         ).collect(Collectors.toList());
     }
 

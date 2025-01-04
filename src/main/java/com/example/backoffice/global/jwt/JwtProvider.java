@@ -137,12 +137,20 @@ public class JwtProvider {
 
     // getUsernameFromRemovedJwtToken
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            log.warn("Token has expired: {}", e.getMessage());
+            return e.getClaims().getSubject(); // 만료된 토큰에서도 Subject 추출
+        } catch (Exception e) {
+            log.error("Error parsing token: {}", e.getMessage());
+            throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+        }
     }
 
     // getAccessTokenFromHeader
@@ -164,8 +172,9 @@ public class JwtProvider {
         // refresh token : Bearer tokenValue
         System.out.println("refresh token : "+refreshToken);
         String refreshTokenValue = removeBearerPrefix(refreshToken);
-
+        // ExpiredJwtException
         String memberName = getUsernameFromToken(refreshTokenValue);
+
         String redisKey = REFRESH_TOKEN_HEADER+" : "+memberName;
         String redisValue = tokenRedisProvider.getRefreshTokenValue(redisKey);
 
@@ -184,11 +193,17 @@ public class JwtProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims;
+        try {
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰에서도 Claims를 추출
+            claims = e.getClaims();
+        }
 
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORIZATION_KEY).toString().split(","))

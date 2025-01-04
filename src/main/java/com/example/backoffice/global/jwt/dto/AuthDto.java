@@ -13,8 +13,11 @@ public class AuthDto {
     private String name;
     private String department;
     private String position;
+    private String profileImageUrl;
 
-    public static AuthDto of(Long id, String name, String department, String position){
-        return new AuthDto(id, name, department, position);
+    public static AuthDto of(
+            Long id, String name, String department,
+            String position, String profileImageUrl){
+        return new AuthDto(id, name, department, position, profileImageUrl);
     }
 }
