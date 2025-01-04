@@ -108,7 +108,7 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PatchMapping("/members/{memberId}/profileImage")
+    @PatchMapping("/members/{memberId}/profile-image")
     public ResponseEntity<MembersResponseDto.UpdateOneForProfileImageDto> updateOneForProfileImage(
             @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -119,7 +119,7 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @DeleteMapping("/members/{memberId}/profileImage")
+    @DeleteMapping("/members/{memberId}/profile-image")
     public ResponseEntity<MembersResponseDto.DeleteOneForProfileImageDto> deleteOneForProfileImage(
             @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {

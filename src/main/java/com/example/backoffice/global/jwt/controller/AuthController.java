@@ -42,7 +42,8 @@ public class AuthController {
                 loginMember.getId(),
                 loginMember.getName(),
                 loginMember.getDepartment().getDepartment(),
-                loginMember.getPosition().getPosition());
+                loginMember.getPosition().getPosition(),
+                loginMember.getProfileImageUrl());
 
         JwtStatus status = jwtProvider.validateToken(accessToken);
         return switch (status) {

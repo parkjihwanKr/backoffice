@@ -48,23 +48,29 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if(!requestUrl.equals(CHECK_REFRESH_TOKEN_URL)){
-            String accessTokenValue = jwtProvider.getJwtFromHeader(request);
-            JwtStatus jwtStatus = validateToken(accessTokenValue);
-            switch (jwtStatus) {
-                case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
-                case ACCESS -> successValidatedToken(accessTokenValue);
-                case EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.EXPIRED_JWT_TOKEN);
+        try {
+            if (!requestUrl.equals(CHECK_REFRESH_TOKEN_URL)) {
+                String accessTokenValue = jwtProvider.getJwtFromHeader(request);
+                JwtStatus jwtStatus = validateToken(accessTokenValue);
+
+                switch (jwtStatus) {
+                    case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+                    case ACCESS -> successValidatedToken(accessTokenValue);
+                    case EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.EXPIRED_JWT_TOKEN);
+                }
+            } else {
+                String refreshTokenValue = jwtProvider.getRefreshTokenFromHeader(request);
+                JwtStatus jwtStatus = validateToken(refreshTokenValue);
+
+                switch (jwtStatus) {
+                    case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+                    case ACCESS, EXPIRED -> makeNewAccessToken(refreshTokenValue, response);
+                }
             }
-        }else{
-            String refreshTokenValue
-                    = jwtProvider.getRefreshTokenFromHeader(request);
-            JwtStatus jwtStatus = validateToken(refreshTokenValue);
-            switch (jwtStatus) {
-                case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
-                case ACCESS, EXPIRED -> makeNewAccessToken(refreshTokenValue, response);
-                /*case EXPIRED -> makeNewAccessToken(refreshTokenValue, response);*/
-            }
+        } catch (JwtCustomException e) {
+            log.error("JWT Validation Error: {}", e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            return;
         }
 
         filterChain.doFilter(request, response);
@@ -90,7 +96,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         SecurityContextHolder.setContext(securityContext);
     }
 
-    // Refresh Token이 멀쩡할 시 새로 발급
     private void makeNewAccessToken(String refreshTokenValue, HttpServletResponse response) throws UnsupportedEncodingException {
         // Refresh Token에서 인증 정보 추출
         Authentication authentication = jwtProvider.getAuthentication(refreshTokenValue);
@@ -123,6 +128,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     .build();
 
             response.addHeader("Set-Cookie", refreshCookie.toString());
+
+            System.out.println(
+                    redisKey + " / "+
+                            Math.toIntExact(jwtProvider.getRefreshTokenExpiration())
+                                    + " / "+refreshTokenValue);
+            tokenRedisProvider.deleteToken(redisKey);
+            tokenRedisProvider.saveToken(
+                    redisKey, Math.toIntExact(
+                            jwtProvider.getRefreshTokenExpiration()),
+                    refreshTokenValue);
 
             System.out.println("accessCookie : "+accessCookie);
             System.out.println("refreshCookie : "+refreshCookie);
