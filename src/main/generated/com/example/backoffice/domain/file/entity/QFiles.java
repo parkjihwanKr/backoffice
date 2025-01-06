@@ -31,8 +31,6 @@ public class QFiles extends EntityPathBase<Files> {
 
     public final com.example.backoffice.domain.event.entity.QEvents event;
 
-    public final com.example.backoffice.domain.expense.entity.QExpense expense;
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final com.example.backoffice.domain.member.entity.QMembers member;
@@ -62,7 +60,6 @@ public class QFiles extends EntityPathBase<Files> {
         super(type, metadata, inits);
         this.board = inits.isInitialized("board") ? new com.example.backoffice.domain.board.entity.QBoards(forProperty("board"), inits.get("board")) : null;
         this.event = inits.isInitialized("event") ? new com.example.backoffice.domain.event.entity.QEvents(forProperty("event"), inits.get("event")) : null;
-        this.expense = inits.isInitialized("expense") ? new com.example.backoffice.domain.expense.entity.QExpense(forProperty("expense"), inits.get("expense")) : null;
         this.member = inits.isInitialized("member") ? new com.example.backoffice.domain.member.entity.QMembers(forProperty("member")) : null;
     }
 

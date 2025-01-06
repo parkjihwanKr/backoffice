@@ -5,12 +5,10 @@ import com.example.backoffice.global.exception.DateUtilException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import lombok.Getter;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAdjusters;
 
 import static com.example.backoffice.global.common.DateTimeFormatters.DATE_FORMATTER;
 
@@ -151,6 +149,12 @@ public class DateTimeUtils {
                 year.intValue(), month.intValue(), day.intValue(), 0, 0, 0);
     }
 
+    public static LocalDateTime atEndOfDay(Long year, Long month, Long day){
+        validateYearAndMonth(year, month);
+        return LocalDateTime.of(
+                year.intValue(), month.intValue(), day.intValue(), 23, 59, 59);
+    }
+
     public static boolean isInDateRange(DateRange dateRange) {
         return (today.isEqual(dateRange.getStartDate()) || today.isAfter(dateRange.getStartDate()))
                 && (today.isBefore(dateRange.getEndDate()) || today.isEqual(dateRange.getEndDate()));
@@ -199,5 +203,22 @@ public class DateTimeUtils {
 
     public static LocalDateTime getStartTimeOfHalfDay(int year, int month, int day){
         return LocalDateTime.of(year, month, day, 12, 59, 59);
+    }
+
+    public static LocalDateTime getFirstDayOfMonth(){
+        return LocalDateTime.now().withDayOfMonth(1);
+    }
+
+    public static LocalDateTime getFirstMonday(LocalDateTime firstDayOfMonth){
+        return firstDayOfMonth.plusDays(
+                (8 - firstDayOfMonth.getDayOfWeek().getValue()) % 7);
+    }
+
+    public static LocalDateTime findSecondMondayOfMonth(LocalDateTime firstMonday){
+        if (firstMonday.getDayOfMonth() <= 7) {
+            return firstMonday;
+        } else {
+            return firstMonday.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        }
     }
 }
