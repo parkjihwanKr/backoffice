@@ -42,12 +42,6 @@ public class AuditLogConverter {
             case AuditLogType.eventLabel.CHANGE_BOARD_FILE -> AuditLogType.CHANGE_BOARD_FILE;
             case AuditLogType.eventLabel.CHANGE_EVENT -> AuditLogType.CHANGE_EVENT;
             case AuditLogType.eventLabel.CHANGE_SECURITY_SETTINGS -> AuditLogType.CHANGE_SECURITY_SETTINGS;
-            case AuditLogType.eventLabel.CREATE_EXPENSE_REPORT -> AuditLogType.CREATE_EXPENSE_REPORT;
-            case AuditLogType.eventLabel.UPDATE_EXPENSE_REPORT -> AuditLogType.UPDATE_EXPENSE_REPORT;
-            case AuditLogType.eventLabel.UPDATE_EXPENSE_REPORT_STATUS -> AuditLogType.UPDATE_EXPENSE_REPORT_STATUS;
-            case AuditLogType.eventLabel.DELETE_EXPENSE_REPORT -> AuditLogType.DELETE_EXPENSE_REPORT;
-            case AuditLogType.eventLabel.READ_EXPENSE_REPORT -> AuditLogType.READ_EXPENSE_REPORT;
-            case AuditLogType.eventLabel.EXPENSE_REPORT_ERROR -> AuditLogType.EXPENSE_REPORT_ERROR;
             default -> throw new AuditLogCustomException(GlobalExceptionCode.INVALID_VALUE);
         };
     }

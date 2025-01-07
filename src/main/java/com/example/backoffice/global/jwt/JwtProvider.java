@@ -4,7 +4,7 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.dto.TokenDto;
-import com.example.backoffice.global.redis.TokenRedisProvider;
+import com.example.backoffice.global.redis.RefreshTokenRepository;
 import com.example.backoffice.global.security.MemberDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -51,7 +51,7 @@ public class JwtProvider {
 
     private final MemberDetailsServiceImpl memberDetailsService;
 
-    private final TokenRedisProvider tokenRedisProvider;
+    private final RefreshTokenRepository tokenRedisProvider;
 
     @Value("${jwt.secret}")
     private String secretKey;

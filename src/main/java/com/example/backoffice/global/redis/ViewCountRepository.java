@@ -4,7 +4,6 @@ import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JsonCustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -12,15 +11,13 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
-public class ViewCountRedisProvider {
-    public static final String memberIdPrefix = "memberId:";
-    public static final String boardIdPrefix = "boardId:";
+public class ViewCountRepository {
 
     private final ObjectMapper objectMapper;
     @Qualifier("redisTemplateForViewCount")
     private final RedisTemplate<String, Object> redisTemplateForViewCount;
 
-    public ViewCountRedisProvider (
+    public ViewCountRepository(
             ObjectMapper objectMapper,
             @Qualifier("redisTemplateForViewCount") RedisTemplate<String, Object> redisTemplateForViewCount){
         this.objectMapper = objectMapper;
@@ -115,6 +112,6 @@ public class ViewCountRedisProvider {
     }
 
     private String getBoardKeyPattern(Long domainId){
-        return boardIdPrefix+domainId+":*";
+        return RedisProvider.BOARD_ID_PREFIX+domainId+":*";
     }
 }

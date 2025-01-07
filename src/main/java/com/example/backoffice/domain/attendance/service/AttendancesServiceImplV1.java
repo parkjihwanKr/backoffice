@@ -337,9 +337,9 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     @Transactional
     public void delete(List<Long> allMemberIdList){
         LocalDateTime startOfDeletion
-                = DateTimeUtils.getToday().minusYears(2);
+                = DateTimeUtils.getToday().minusYears(2).minusMonths(1);
         LocalDateTime endOfDeletion
-                = DateTimeUtils.getToday().minusYears(1).minusSeconds(1);
+                = DateTimeUtils.getToday().minusYears(2).minusMinutes(1);
         attendancesRepository.deleteBeforeTwoYear(
                 allMemberIdList, startOfDeletion, endOfDeletion);
     }

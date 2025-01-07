@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class CachedMemberAttendanceRedisProvider {
     // database 2 : cachedMemberAttendance
     private final ObjectMapper objectMapper;
-    private static final String KEY_PREFIX = "memberId : ";
 
     private final RedisTemplate<String, Object> redisTemplateForCached;
 
@@ -33,7 +32,7 @@ public class CachedMemberAttendanceRedisProvider {
     }
 
     public <T> void saveOne(Long memberId, DateRange value, String description) {
-        String key = KEY_PREFIX + memberId + ", "+description;
+        String key = RedisProvider.MEMBER_ID_PREFIX + memberId + ", "+description;
         String valueString = serializeValue(value);
 
         Long ttl = DateTimeUtils.calculateMinutesFromTodayToEndDate(value.getEndDate());
@@ -46,7 +45,7 @@ public class CachedMemberAttendanceRedisProvider {
 
     // 키에 해당하는 value 조회
     public <T> T getValue(Long memberId, Class<T> valueType) {
-        String key = KEY_PREFIX + memberId;
+        String key = RedisProvider.MEMBER_ID_PREFIX + memberId;
         String value = (String) redisTemplateForCached.opsForValue().get(key);
 
         if (Objects.isNull(value)) {
@@ -61,7 +60,8 @@ public class CachedMemberAttendanceRedisProvider {
     }
 
     public Map<String, String> getAllRawValues() {
-        Set<String> keys = redisTemplateForCached.keys(KEY_PREFIX + "*");
+        Set<String> keys = redisTemplateForCached.keys(
+                RedisProvider.MEMBER_ID_PREFIX + "*");
         Map<String, String> allValues = new HashMap<>();
 
         if (keys != null) {

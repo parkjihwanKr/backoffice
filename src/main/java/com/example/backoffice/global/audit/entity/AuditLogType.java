@@ -22,12 +22,6 @@ public enum AuditLogType {
     CHANGE_BOARD_FILE(eventLabel.CHANGE_BOARD_FILE),
     CHANGE_EVENT(eventLabel.CHANGE_EVENT),
     CHANGE_SECURITY_SETTINGS(eventLabel.CHANGE_SECURITY_SETTINGS),
-    CREATE_EXPENSE_REPORT(eventLabel.CREATE_EXPENSE_REPORT),
-    UPDATE_EXPENSE_REPORT_STATUS(eventLabel.UPDATE_EXPENSE_REPORT_STATUS),
-    UPDATE_EXPENSE_REPORT(eventLabel.UPDATE_EXPENSE_REPORT),
-    DELETE_EXPENSE_REPORT(eventLabel.DELETE_EXPENSE_REPORT),
-    READ_EXPENSE_REPORT(eventLabel.READ_EXPENSE_REPORT),
-    EXPENSE_REPORT_ERROR(eventLabel.EXPENSE_REPORT_ERROR),
     ;
 
     private final String label;
@@ -55,11 +49,5 @@ public enum AuditLogType {
         public static final String CHANGE_BOARD_FILE = "CHANGE_BOARD_FILE";
         public static final String CHANGE_EVENT = "CHANGE_EVENT";
         public static final String CHANGE_SECURITY_SETTINGS = "CHANGE_SECURITY_SETTINGS";
-        public static final String CREATE_EXPENSE_REPORT = "CREATE_EXPENSE_REPORT";
-        public static final String UPDATE_EXPENSE_REPORT = "UPDATE_EXPENSE_REPORT";
-        public static final String UPDATE_EXPENSE_REPORT_STATUS = "UPDATE_EXPENSE_REPORT_STATUS";
-        public static final String DELETE_EXPENSE_REPORT = "DELETE_EXPENSE_REPORT";
-        public static final String READ_EXPENSE_REPORT = "READ_EXPENSE_REPORT";
-        public static final String EXPENSE_REPORT_ERROR = "EXPENSE_REPORT_ERROR";
     }
 }

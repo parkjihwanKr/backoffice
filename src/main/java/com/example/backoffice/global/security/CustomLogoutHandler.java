@@ -4,8 +4,7 @@ import com.example.backoffice.global.exception.AuthenticationCustomException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.JwtProvider;
-import com.example.backoffice.global.jwt.JwtStatus;
-import com.example.backoffice.global.redis.TokenRedisProvider;
+import com.example.backoffice.global.redis.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,16 +13,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Enumeration;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j(topic = "Logout process")
 public class CustomLogoutHandler implements LogoutHandler {
 
     private final JwtProvider jwtProvider;
-    private final TokenRedisProvider tokenRedisProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final CookieUtil cookieUtil;
 
     @Override
@@ -49,9 +45,9 @@ public class CustomLogoutHandler implements LogoutHandler {
                     = JwtProvider.REFRESH_TOKEN_HEADER + " : " + authMemberName;
 
             // validateToken을 통해 ACCESS가 아니면 예외 발생하기에 따로 검증 하지 않음.
-            if (tokenRedisProvider.getRefreshTokenValue(redisTokenKey) != null) {
+            if (refreshTokenRepository.getRefreshTokenValue(redisTokenKey) != null) {
                 // 4. 보안을 위해 로그아웃하면 refreshToken 삭제
-                tokenRedisProvider.deleteToken(redisTokenKey);
+                refreshTokenRepository.deleteToken(redisTokenKey);
                 log.info("delete refresh token success!");
 
                 // 5. 쿠키 삭제
