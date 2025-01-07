@@ -51,41 +51,13 @@ public class Attendances extends CommonEntity {
     public void updateCheckOut(
             LocalDateTime checkoutTime, String description,
             AttendanceStatus attendanceStatus){
-        this.checkInTime = checkoutTime;
+        this.checkOutTime = checkoutTime;
         this.description = description;
         this.attendanceStatus = attendanceStatus;
     }
 
-    public void updateOneForToday(
-            AttendanceStatus requestedAttendanceStatus,
-            String description,
-            LocalDateTime checkInTime){
-        this.attendanceStatus = requestedAttendanceStatus;
-        this.description = description;
-        this.checkInTime = checkInTime;
-        this.checkOutTime = null;
-    }
-
-    public void updateOneForBeforeToday (
-            AttendanceStatus requestedAttendanceStatus,
-            String description,
-            LocalDateTime checkInTime, LocalDateTime checkOutTime){
-        this.attendanceStatus = requestedAttendanceStatus;
-        this.description = description;
-        this.checkInTime = checkInTime;
-        this.checkOutTime = checkOutTime;
-    }
-
-    public void updateOneForOutside(
-            AttendanceStatus requestedAttendanceStatus,
-            String description){
-        this.attendanceStatus = requestedAttendanceStatus;
-        this.description = description;
-    }
-
-    public void updateOneForHalfDay(
-            AttendanceStatus requestedAttendanceStatus,
-            String description,
+    public void update(
+            AttendanceStatus requestedAttendanceStatus, String description,
             LocalDateTime checkInTime, LocalDateTime checkOutTime){
         this.attendanceStatus = requestedAttendanceStatus;
         this.description = description;

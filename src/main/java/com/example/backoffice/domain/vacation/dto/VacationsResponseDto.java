@@ -45,6 +45,7 @@ public class VacationsResponseDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private VacationType vacationType;
+        private Boolean urgent;
     }
 
     @Getter
@@ -55,6 +56,7 @@ public class VacationsResponseDto {
         private Long vacationId;
         private String onVacationMemberName;
         private String title;
+        private Boolean urgent;
         private String urgentReason;
         private Boolean isAccepted;
         private MemberDepartment department;
@@ -82,7 +84,7 @@ public class VacationsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UpdateOneForAdminDto {
+    public static class UpdateOneByAdminDto {
         private Long vacationId;
         private String acceptedVacationMemberName;
         private Boolean isAccepted;
@@ -98,5 +100,19 @@ public class VacationsResponseDto {
         private Boolean isAccepted;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadSummaryOneDto{
+        private Long vacationId;
+        private String onVacationMemberName;
+        private VacationType vacationType;
+        private Boolean isAccepted;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private String urgentReason;
     }
 }

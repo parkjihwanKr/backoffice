@@ -1,11 +1,13 @@
 package com.example.backoffice.domain.attendance.dto;
 
 import com.example.backoffice.domain.attendance.entity.AttendanceStatus;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -52,6 +54,7 @@ public class AttendancesResponseDto {
         private String memberName;
         private LocalDateTime checkInTime;
         private LocalDateTime checkOutTime;
+        private LocalDateTime createdAt;
         private AttendanceStatus attendanceStatus;
         private String description;
     }
@@ -62,9 +65,12 @@ public class AttendancesResponseDto {
     @AllArgsConstructor
     public static class UpdateAttendancesStatusDto {
         private Long attendanceId;
+        private Long memberId;
         private String memberName;
         private AttendanceStatus attendanceStatus;
         private String description;
+        private LocalDateTime checkInTime;
+        private LocalDateTime checkOutTime;
     }
 
     @Getter
@@ -89,5 +95,42 @@ public class AttendancesResponseDto {
         private Integer outOfOfficeCount;
         private Integer lateCount;
         private Integer halfDayCount;
+        private Integer holidayCount;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadScheduledRecordDto {
+        private Integer index;
+        private Long memberId;
+        private String memberName;
+        private MemberDepartment department;
+        private String description;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadSummaryOneDto {
+        private String memberName;
+        private Long attendanceId;
+        private LocalDateTime createdAt;
+        private AttendanceStatus attendanceStatus;
+        private LocalDateTime checkInTime;
+        private LocalDateTime checkOutTime;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReadTodayOneDto {
+        private Long attendanceId;
+        private AttendanceStatus attendanceStatus;
     }
 }

@@ -46,7 +46,7 @@ public class MemberAspect {
                 MemberDepartment.HR, MemberPosition.INTERN);
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForSalary(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForSalaryByAdmin(..))")
     public void logAfterUpdateSalary(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         MembersRequestDto.UpdateOneForSalaryDto requestDto =
@@ -63,7 +63,7 @@ public class MemberAspect {
                 loginMember.getDepartment(), loginMember.getPosition());
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.deleteOne(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.deleteOneByAdmin(..))")
     public void logAfterDeleteMember(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName() + "님이 회원 탈퇴하셨습니다.";
@@ -75,7 +75,7 @@ public class MemberAspect {
                 loginMember.getDepartment(), loginMember.getPosition());
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForAttribute(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForAttributeByAdmin(..))")
     public void logAfterUpdateMemberAttribute(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
 

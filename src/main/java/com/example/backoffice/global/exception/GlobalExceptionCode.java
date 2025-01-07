@@ -19,12 +19,16 @@ public enum GlobalExceptionCode {
     AWS_S3_FILE_DELETE_FAIL(HttpStatus.BAD_REQUEST, "S3-004", "파일 삭제를 실패하셨습니다."),
 
     // Validate JWT Token
-    INVALID_TOKEN_VALUE(HttpStatus.BAD_REQUEST, "JWT-001", "JWT 토큰 값이 유효하지 않습니다."),
-    UNAUTHORIZED_REFRESH_TOKEN_VALUE(HttpStatus.UNAUTHORIZED, "JWT-002", "JWT Refresh 토큰값이 유효하지 않습니다."),
-    INVALID_SIGNATURE(HttpStatus.BAD_REQUEST, "JWT-003", "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다."),
-    EXPIRED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "JWT-004", "Expired JWT token, 만료된 JWT token 입니다."),
-    UNSUPPORTED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "JWT-005", "Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다."),
-    MISSING_TOKEN(HttpStatus.BAD_REQUEST, "JWT-006", "요청에 JWT token이 포함되지 않습니다."),
+    INVALID_TOKEN_VALUE(HttpStatus.UNAUTHORIZED, "JWT-001", "JWT 토큰 값이 유효하지 않습니다."),
+    INVALID_SIGNATURE(HttpStatus.BAD_REQUEST, "JWT-002", "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다."),
+    EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "JWT-003", "Expired JWT token, 만료된 JWT token 입니다."),
+    UNSUPPORTED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "JWT-004", "Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다."),
+    MISSING_TOKEN(HttpStatus.UNAUTHORIZED, "JWT-005", "요청에 JWT token이 포함되지 않습니다."),
+    NOT_EXIST_JWT_STATUS(HttpStatus.BAD_REQUEST, "JWT-006", "존재하지 않는 JWT STATUS입니다."),
+    TOKEN_VALUE_IS_NULL(HttpStatus.BAD_REQUEST, "JWT-007", "토큰 값이 null입니다."),
+    NOT_FOUND_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "JWT-008",
+            "Refresh Token이 Redis에 존재하지 않습니다." +
+                    "다시 로그인해주세요."),
 
     // Authentcation
     NOT_MATCHED_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "AUTH-001", "해당 인증 정보가 일치하지 않습니다."),
@@ -51,6 +55,7 @@ public enum GlobalExceptionCode {
     NOT_EXIST_MONTH(HttpStatus.BAD_REQUEST,"DATE-004", "존재하지 않은 달입니다."),
     INVALID_YEAR(HttpStatus.BAD_REQUEST,"DATE-005", "알맞지 않은 년도를 요청하셨습니다."),
     INVALID_MONTH(HttpStatus.BAD_REQUEST,"DATE-006", "알맞지 않은 달을 요청하셨습니다."),
+    BEFORE_TODAY(HttpStatus.BAD_REQUEST,"DATE-007", "오늘 이전의 날을 설정하셨습니다."),
     ;
 
     private final HttpStatus httpStatus;

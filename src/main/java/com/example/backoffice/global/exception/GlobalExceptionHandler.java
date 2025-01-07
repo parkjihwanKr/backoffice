@@ -1,6 +1,9 @@
 package com.example.backoffice.global.exception;
 
+import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
+import com.example.backoffice.domain.event.exception.EventsCustomException;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.domain.reaction.exception.ReactionsCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +40,48 @@ public class GlobalExceptionHandler {
     // JWT TOKEN 관련 커스텀 예외 처리
     @ExceptionHandler(JwtCustomException.class)
     public ResponseEntity<CommonResponseDto<String>> handleJwtException(JwtCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    // 근태 관련 커스텀 예외 처리
+    @ExceptionHandler(AttendancesCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleAttendanceException(AttendancesCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    // DateUtils 관련 커스텀 예외 처리
+    @ExceptionHandler(DateUtilException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleDateException(DateUtilException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(EventsCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleEventsException(EventsCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(ReactionsCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleReactionsException(ReactionsCustomException ex) {
         CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
                 ex.getErrorCode(),  // 에러 코드
                 ex.getMessage(),    // 에러 메시지

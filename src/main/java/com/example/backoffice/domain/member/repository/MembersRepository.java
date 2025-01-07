@@ -46,4 +46,9 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     List<Members> findAllByDepartmentAndMemberName(
             MemberDepartment department, String memberName);
+
+    Optional<Members> findByIdAndDepartment(
+            Long memberId, MemberDepartment department);
+
+    Boolean existsByMemberName(String memberName);
 }

@@ -13,7 +13,7 @@ public class NotificationsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateForAdminDto {
+    public static class CreateByAdminDto {
         private String message;
     }
 
@@ -21,7 +21,7 @@ public class NotificationsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateFilteredForAdminDto {
+    public static class CreateFilteredByAdminDto {
         private String message;
         private List<Long> excludedMemberIdList;
         private List<String> excludedMemberDepartment;

@@ -26,10 +26,10 @@ public class AuditLogController {
     @GetMapping("/auditLogs/filtered")
     public ResponseEntity<Page<AuditLogResponseDto.ReadOneDto>> readFiltered(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestParam(required = false) String memberName,
-            @RequestParam(required = false) String auditType,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
+            @RequestParam(name = "memberName", required = false) String memberName,
+            @RequestParam(name = "auditType", required = false) String auditType,
+            @RequestParam(name = "startDate", required = false) String startDate,
+            @RequestParam(name = "endDate", required = false) String endDate,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         Page<AuditLogResponseDto.ReadOneDto> responseDtoList
                 = auditLogService.readFiltered(

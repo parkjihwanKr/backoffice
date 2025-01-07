@@ -53,7 +53,7 @@ public class VacationsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeleteOneForAdminDto {
+    public static class DeleteOneByAdminDto {
         private String reason;
     }
 }

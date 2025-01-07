@@ -152,15 +152,12 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadOneForVacationDto{
-        private Long vacationId;
+    public static class ReadCompanySummaryOneDto {
+        private Long eventId;
         private String title;
-        private String description;
         private EventType eventType;
-        private MemberDepartment department;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
-        private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
+        private MemberDepartment department;
     }
 }

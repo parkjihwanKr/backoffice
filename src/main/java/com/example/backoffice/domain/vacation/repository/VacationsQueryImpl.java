@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,12 +61,10 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
     }
 
     @Override
-    public List<Vacations> findAllByEndDateBefore(LocalDateTime now) {
-        LocalDateTime endOfYesterday = now.minusDays(1).withHour(23).withMinute(59).withSecond(59);
-
+    public List<Vacations> findAllBetweenYesterday(LocalDateTime endOfYesterday) {
         return jpaQueryFactory
                 .selectFrom(qVacations)
-                .where(qVacations.endDate.before(endOfYesterday)) // 어제까지 끝난 모든 휴가 찾기
+                .where(qVacations.endDate.eq(endOfYesterday))
                 .fetch();
     }
 
@@ -140,6 +139,18 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
                         isAccepted(isAccepted),
                         isUrgent(urgent),
                         filterByDepartment(memberDepartment))
+                .fetch();
+    }
+
+    @Override
+    public List<Vacations> findVacationsBetweenOrderByCreatedAtDesc(
+            Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
+        return jpaQueryFactory
+                .selectFrom(qVacations)
+                .where(
+                        qVacations.onVacationMember.id.eq(memberId),
+                        vacationDateOverlap(startDate, endDate))
+                .orderBy(qVacations.createdAt.desc())
                 .fetch();
     }
 }

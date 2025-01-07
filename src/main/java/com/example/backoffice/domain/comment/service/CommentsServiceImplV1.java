@@ -26,6 +26,7 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
     public CommentsResponseDto.CreateCommentDto createComment(
             CommentsRequestDto.CreateCommentDto requestDto,
             Long boardId, Members member) {
+        isBlankContent(requestDto.getContent());
         Boards board = boardsService.findById(boardId);
         Comments comment = CommentsConverter.toEntity(requestDto, board, member);
 
@@ -40,16 +41,17 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
     public CommentsResponseDto.UpdateCommentDto updateComment(
             Long boardId, Long commentId,
             CommentsRequestDto.UpdateCommentDto requestDto,
-            Members member){
+            Members loginMember){
+        isBlankContent(requestDto.getContent());
         Boards board = boardsService.findById(boardId);
         Comments comment = findById(commentId);
 
         isMatchedBoard(comment, board);
-        isMatchedMember(comment, member);
+        isMatchedMember(comment, loginMember);
 
         comment.update(requestDto.getContent());
 
-        return CommentsConverter.toUpdateCommentDto(comment, member);
+        return CommentsConverter.toUpdateCommentDto(comment, loginMember);
     }
 
     @Override
@@ -69,6 +71,7 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
     public CommentsResponseDto.CreateReplyDto createReply(
             Long boardId, Long commentId,
             CommentsRequestDto.CreateReplyDto requestDto, Members member){
+        isBlankContent(requestDto.getContent());
         Boards board = boardsService.findById(boardId);
         Comments parent = findById(commentId);
 
@@ -85,6 +88,7 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
     public CommentsResponseDto.UpdateReplyDto updateReply(
             Long commentId, Long replyId,
             CommentsRequestDto.UpdateReplyDto requestDto, Members member){
+        isBlankContent(requestDto.getContent());
         Comments comment = findById(commentId);
         Comments reply = findById(replyId);
 
@@ -131,6 +135,12 @@ public class CommentsServiceImplV1 implements CommentsServiceV1 {
     private void isMatchedComment(Comments comment, Comments reply){
         if(comment.getId().equals(reply.getId())){
             throw new CommentsCustomException(CommentsExceptionCode.IS_COMMENT);
+        }
+    }
+
+    private void isBlankContent(String content){
+        if(content.isEmpty()){
+            throw new CommentsCustomException(CommentsExceptionCode.IS_EMPTY_COMMENT_CONTENT);
         }
     }
 }

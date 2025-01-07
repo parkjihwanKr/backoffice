@@ -16,7 +16,8 @@ import static com.example.backoffice.global.common.DateTimeFormatters.DATE_FORMA
 
 public class DateTimeUtils {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER
+            = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Getter
     private static final LocalDateTime todayCheckInTime =
@@ -28,6 +29,9 @@ public class DateTimeUtils {
     // 하루마다 갱신되는 캐싱 데이터
     private static LocalDateTime today;
     private static LocalDateTime tomorrow;
+
+    // 0초 접미사 상수
+    public static final String suffixZeroSeconds = ":00";
 
     // 현재 시점(LocalDateTime) 반환
     public static LocalDateTime getCurrentDateTime() {
@@ -46,14 +50,6 @@ public class DateTimeUtils {
     public static LocalDateTime parse(String dateTimeStr) {
         try {
             return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
-        } catch (DateTimeParseException e) {
-            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
-        }
-    }
-
-    public static LocalDate parseToLocalDate(String dateTimeStr){
-        try {
-            return LocalDate.parse(dateTimeStr, DATE_FORMATTER); // DATE_FORMATTER는 "yyyy-MM-dd" 형식
         } catch (DateTimeParseException e) {
             throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
         }
@@ -115,9 +111,33 @@ public class DateTimeUtils {
         return time.isBefore(getTodayCheckOutTime());
     }
 
+    public static boolean isBetweenTodayCheckOutTime(LocalDateTime checkOutTime) {
+        LocalDateTime startRange = getTodayCheckOutTime().minusMinutes(30);
+        LocalDateTime endRange = getTodayCheckOutTime().plusHours(1);
+
+        // checkOutTime이 범위 내에 있는지 확인
+        return !checkOutTime.isBefore(startRange) && !checkOutTime.isAfter(endRange);
+    }
+
     public static boolean isWeekday() {
         LocalDate today = getToday().toLocalDate();
         return today.getDayOfWeek().getValue() >= 1 && today.getDayOfWeek().getValue() <= 5;
+    }
+
+    public static boolean isToday(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+        LocalDate todayDate = getToday().toLocalDate();
+        return dateTime.toLocalDate().isEqual(todayDate);
+    }
+
+    public static boolean isBeforeToday(LocalDateTime dateTime) {
+        return dateTime.isBefore(getToday()) ? true : false;
+    }
+
+    public static boolean isAfterToday(LocalDateTime dateTime) {
+        return dateTime.isAfter(getTomorrow()) ? true : false;
     }
 
     public static Long calculateMinutesFromTodayToEndDate(LocalDateTime endDate){
@@ -144,5 +164,40 @@ public class DateTimeUtils {
         if (month < 1 || month > 12) {
             throw new DateUtilException(GlobalExceptionCode.INVALID_MONTH);
         }
+    }
+
+    public static boolean isHoliday(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+
+        // LocalDate로 변환
+        LocalDate date = dateTime.toLocalDate();
+
+        // 주말(토요일/일요일)인지 확인
+        int dayOfWeek = date.getDayOfWeek().getValue(); // 월(1) ~ 일(7)
+        if (dayOfWeek == 6 || dayOfWeek == 7) {
+            return true; // 토요일 또는 일요일
+        }
+
+        return false; // 평일
+    }
+
+    public static DateRange setWeek(LocalDateTime today){
+        LocalDate todayToLocalDate = today.toLocalDate();
+        int dayOfWeek = todayToLocalDate.getDayOfWeek().getValue();
+
+        return switch (dayOfWeek) {
+            case 1, 2, 3, 4, 5, 6, 7 -> new DateRange(
+                    today.minusDays(dayOfWeek - 1),
+                    today.plusDays(7 - dayOfWeek));
+            default ->
+                    throw new DateUtilException(
+                            GlobalExceptionCode.NOT_PARSE_DATE);
+        };
+    }
+
+    public static LocalDateTime getStartTimeOfHalfDay(int year, int month, int day){
+        return LocalDateTime.of(year, month, day, 12, 59, 59);
     }
 }

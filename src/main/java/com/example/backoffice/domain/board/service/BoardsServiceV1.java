@@ -1,12 +1,14 @@
 package com.example.backoffice.domain.board.service;
 
+import com.example.backoffice.domain.board.dto.BoardsResponseDto;
 import com.example.backoffice.domain.board.entity.BoardType;
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
+import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 
 public interface BoardsServiceV1 {
@@ -60,7 +62,7 @@ public interface BoardsServiceV1 {
      * @param boardId 게시글 ID
      * @param department 부서 이름
      * @return 해당 게시글
-     * @throws BoardsCustomException 게시글이 존재하지 않을 경우 예외 발생
+     * @throws BoardsCustomException {@link BoardsExceptionCode#NOT_FOUND_BOARD} 게시글이 존재하지 않을 경우 예외 발생
      */
     Boards findByIdAndDepartment(Long boardId, MemberDepartment department);
 
@@ -69,7 +71,7 @@ public interface BoardsServiceV1 {
      *
      * @param boardId 게시글 ID
      * @return 해당 게시글
-     * @throws BoardsCustomException 게시글이 존재하지 않을 경우 예외 발생
+     * @throws BoardsCustomException {@link BoardsExceptionCode#NOT_FOUND_BOARD} 게시글이 존재하지 않을 경우 예외 발생
      */
     Boards findById(Long boardId);
 
@@ -80,4 +82,17 @@ public interface BoardsServiceV1 {
      * @throws BoardsCustomException 게시글이 존재하지 않을 경우 예외 발생
      */
     void deleteById(Long boardId);
+
+    /**
+     * 게시글 타입에 따른 게시글 3개 조회
+     * @param boardType : 게시글 타입
+     * @return 게시글 타입에 따른 게시글 3개
+     */
+    List<Boards> findThreeByCreatedAtDesc(BoardType boardType);
+
+    List<BoardsResponseDto.ReadSummaryOneDto> getGeneralBoardDtoList(
+            Members loginMember);
+
+    List<BoardsResponseDto.ReadSummaryOneDto> getDepartmentBoardDtoList(
+            Members loginMember);
 }

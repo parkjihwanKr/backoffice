@@ -5,6 +5,7 @@ import com.example.backoffice.domain.attendance.entity.AttendanceStatus;
 import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
 import com.example.backoffice.domain.attendance.exception.AttendancesExceptionCode;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,6 +29,33 @@ public class AttendancesConverter {
                 .member(member)
                 .build();
     }
+
+    public static Attendances toEntity(
+            Members member, AttendanceStatus attendanceStatus,
+            LocalDateTime checkInTime, LocalDateTime checkOutTime){
+        return Attendances.builder()
+                // 초기에 생성되는 status는 결석, 휴가, 휴일
+                .attendanceStatus(attendanceStatus)
+                .checkInTime(checkInTime)
+                .checkOutTime(checkOutTime)
+                .description("스케줄러에 의한 하루 근태 생성")
+                .member(member)
+                .build();
+    }
+
+    public static Attendances toEntity(
+            Members member, AttendanceStatus attendanceStatus,
+            String description, LocalDateTime checkInTime, LocalDateTime checkOutTime){
+        return Attendances.builder()
+                // 초기에 생성되는 status는 결석, 휴가, 휴일
+                .attendanceStatus(attendanceStatus)
+                .checkInTime(checkInTime)
+                .checkOutTime(checkOutTime)
+                .description(description)
+                .member(member)
+                .build();
+    }
+
 
     public static Attendances toEntityForAdmin(
             Members member, LocalDateTime checkInTime,
@@ -71,10 +99,12 @@ public class AttendancesConverter {
         return AttendancesResponseDto.ReadOneDto.builder()
                 .attendanceId(attendance.getId())
                 .memberId(attendance.getMember().getId())
+                .memberName(attendance.getMember().getMemberName())
                 .description(attendance.getDescription())
                 .attendanceStatus(attendance.getAttendanceStatus())
                 .checkInTime(attendance.getCheckInTime())
                 .checkOutTime(attendance.getCheckOutTime())
+                .createdAt(attendance.getCreatedAt())
                 .build();
     }
 
@@ -82,9 +112,12 @@ public class AttendancesConverter {
             Attendances attendance){
         return AttendancesResponseDto.UpdateAttendancesStatusDto.builder()
                 .attendanceId(attendance.getId())
+                .memberId(attendance.getMember().getId())
                 .attendanceStatus(attendance.getAttendanceStatus())
                 .description(attendance.getDescription())
                 .memberName(attendance.getMember().getMemberName())
+                .checkInTime(attendance.getCheckInTime())
+                .checkOutTime(attendance.getCheckOutTime())
                 .build();
     }
 
@@ -150,6 +183,9 @@ public class AttendancesConverter {
                     int halfDayCount = (int) dailyAttendances.stream()
                             .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HALF_DAY)
                             .count();
+                    int holidayCount = (int) dailyAttendances.stream()
+                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HOLIDAY)
+                            .count();
 
                     // ReadMonthlyDto 생성
                     return AttendancesResponseDto.ReadMonthlyDto.builder()
@@ -160,6 +196,7 @@ public class AttendancesConverter {
                             .lateCount(lateCount)
                             .halfDayCount(halfDayCount)
                             .outOfOfficeCount(outOfOfficeCount)
+                            .holidayCount(holidayCount)
                             .build();
                 }).toList();
 
@@ -189,5 +226,50 @@ public class AttendancesConverter {
                 attendancePage.getPageable(),
                 attendancePage.getTotalElements()
         );
+    }
+
+    public static AttendancesResponseDto.ReadScheduledRecordDto toReadScheduleRecordDto(
+            int index, Long memberId, String memberName, MemberDepartment department,
+            String description, LocalDateTime startDate, LocalDateTime endDate){
+        return AttendancesResponseDto.ReadScheduledRecordDto.builder()
+                .index(index)
+                .memberId(memberId)
+                .memberName(memberName)
+                .department(department)
+                .description(description)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
+    }
+
+    public static List<AttendancesResponseDto.ReadSummaryOneDto> toReadSummaryListDto(
+            List<Attendances> personalAttendanceList){
+        List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceDtoList = new ArrayList<>();
+        for(int i = 0; i<personalAttendanceList.size(); i++){
+            personalAttendanceDtoList.add(
+                    AttendancesConverter.toReadSummaryOneDto(
+                            personalAttendanceList.get(i)));
+        }
+        return personalAttendanceDtoList;
+    }
+
+    public static AttendancesResponseDto.ReadSummaryOneDto toReadSummaryOneDto(
+            Attendances attendance){
+        return AttendancesResponseDto.ReadSummaryOneDto.builder()
+                .attendanceId(attendance.getId())
+                .checkInTime(attendance.getCheckInTime())
+                .checkOutTime(attendance.getCheckOutTime())
+                .memberName(attendance.getMember().getMemberName())
+                .attendanceStatus(attendance.getAttendanceStatus())
+                .createdAt(attendance.getCreatedAt())
+                .build();
+    }
+
+    public static AttendancesResponseDto.ReadTodayOneDto toReadTodayOneDto(
+            Attendances attendance){
+        return AttendancesResponseDto.ReadTodayOneDto.builder()
+                .attendanceId(attendance.getId())
+                .attendanceStatus(attendance.getAttendanceStatus())
+                .build();
     }
 }

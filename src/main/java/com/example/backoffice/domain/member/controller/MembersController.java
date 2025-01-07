@@ -35,9 +35,21 @@ public class MembersController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @GetMapping("/check-available-memberName")
+    public ResponseEntity<CommonResponse<MembersResponseDto.ReadAvailableMemberNameDto>> checkAvailableMemberName(
+            @RequestParam(name = "memberName") String memberName){
+        MembersResponseDto.ReadAvailableMemberNameDto responseDto
+                = membersServiceFacade.checkAvailableMemberName(memberName);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
+                        200, "해당 아이디는 사용 가능합니다.", responseDto
+                )
+        );
+    }
+
     @GetMapping("/members/{memberId}")
     public ResponseEntity<MembersResponseDto.ReadOneDetailsDto> readOne(
-            @PathVariable Long memberId,
+            @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         MembersResponseDto.ReadOneDetailsDto responseDto
                 = membersServiceFacade.readOne(
@@ -46,37 +58,36 @@ public class MembersController {
     }
 
     @GetMapping("/admin/members/filtered")
-    public ResponseEntity<Page<MembersResponseDto.ReadOneDto>> readForHrManager(
-            @RequestParam(required = false) String department,
-            @RequestParam(required = false) String position,
+    public ResponseEntity<Page<MembersResponseDto.ReadOneDto>> readByAdmin(
+            @RequestParam(name = "department", required = false) String department,
+            @RequestParam(name = "position", required = false) String position,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 10) Pageable pageable){
         Page<MembersResponseDto.ReadOneDto> responseDtoList
-                = membersServiceFacade.readForHrManager(
+                = membersServiceFacade.readByAdmin(
                         department, position, memberDetails.getMembers(), pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     @PatchMapping("/members/{memberId}/profile")
     public ResponseEntity<MembersResponseDto.UpdateOneDto> updateOne(
-            @PathVariable Long memberId,
-            @RequestPart(value = "data") MembersRequestDto.UpdateOneDto requestDto,
-            @RequestPart(value = "file") MultipartFile multipartFile,
+            @PathVariable(name = "memberId") Long memberId,
+            @RequestBody MembersRequestDto.UpdateOneDto requestDto,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         MembersResponseDto.UpdateOneDto responseDto
                 = membersServiceFacade.updateOne(
-                        memberId, memberDetails.getMembers(), multipartFile, requestDto);
+                        memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PatchMapping("/members/{memberId}/attribute")
-    public ResponseEntity<CommonResponse<MembersResponseDto.UpdateOneForAttributeDto>> updateOneForAttribute(
-            @PathVariable Long memberId,
+    public ResponseEntity<CommonResponse<MembersResponseDto.UpdateOneForAttributeDto>> updateOneForAttributeByAdmin(
+            @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestPart(value = "data") MembersRequestDto.UpdateOneForAttributeDto requestDto,
             @RequestPart(value = "file", required = false) MultipartFile multipartFile){
         MembersResponseDto.UpdateOneForAttributeDto responseDto =
-                membersServiceFacade.updateOneForAttribute(
+                membersServiceFacade.updateOneForAttributeByAdmin(
                         memberId, memberDetails.getMembers(), requestDto, multipartFile);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
@@ -87,29 +98,31 @@ public class MembersController {
 
     // 급여 변경
     @PatchMapping("/members/{memberId}/attribute/salary")
-    public ResponseEntity<MembersResponseDto.UpdateOneForSalaryDto> updateOneForSalary(
-            @PathVariable Long memberId,
+    public ResponseEntity<MembersResponseDto.UpdateOneForSalaryDto> updateOneForSalaryByAdmin(
+            @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody MembersRequestDto.UpdateOneForSalaryDto requestDto){
         MembersResponseDto.UpdateOneForSalaryDto responseDto =
-                membersServiceFacade.updateOneForSalary(
+                membersServiceFacade.updateOneForSalaryByAdmin(
                         memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PatchMapping("/members/{memberId}/profileImage")
+    @PatchMapping("/members/{memberId}/profile-image")
     public ResponseEntity<MembersResponseDto.UpdateOneForProfileImageDto> updateOneForProfileImage(
-            @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestParam("file")MultipartFile image){
+            @PathVariable(name = "memberId") Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestParam(name = "file")MultipartFile image){
         MembersResponseDto.UpdateOneForProfileImageDto responseDto =
                 membersServiceFacade.updateOneForProfileImage(
                         memberId, memberDetails.getMembers(), image);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @DeleteMapping("/members/{memberId}/profileImage")
+    @DeleteMapping("/members/{memberId}/profile-image")
     public ResponseEntity<MembersResponseDto.DeleteOneForProfileImageDto> deleteOneForProfileImage(
-            @PathVariable Long memberId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+            @PathVariable(name = "memberId") Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         MembersResponseDto.DeleteOneForProfileImageDto responseDto=
                 membersServiceFacade.deleteOneForProfileImage(
                         memberId, memberDetails.getMembers());
@@ -117,10 +130,10 @@ public class MembersController {
     }
 
     @DeleteMapping("/members/{memberId}")
-    public ResponseEntity<CommonResponse<Void>> deleteOne(
-            @PathVariable Long memberId,
+    public ResponseEntity<CommonResponse<Void>> deleteOneByAdmin(
+            @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        membersServiceFacade.deleteOne(memberId, memberDetails.getMembers());
+        membersServiceFacade.deleteOneByAdmin(memberId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "회원 삭제")
         );
@@ -128,7 +141,7 @@ public class MembersController {
 
     @GetMapping("/members/{memberId}/vacations")
     public ResponseEntity<MembersResponseDto.ReadOneForVacationListDto> readOneForVacationList(
-            @PathVariable Long memberId,
+            @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         MembersResponseDto.ReadOneForVacationListDto responseDto
                 = membersServiceFacade.readOneForVacationList(memberId, memberDetails.getMembers());
@@ -136,12 +149,12 @@ public class MembersController {
     }
 
     @PatchMapping("/members/{memberId}/vacations")
-    public ResponseEntity<MembersResponseDto.UpdateOneForVacationDto> updateOneForVacation(
-            @PathVariable Long memberId,
+    public ResponseEntity<MembersResponseDto.UpdateOneForVacationDto> updateMemberVacationByAdmin(
+            @PathVariable(name = "memberId") Long memberId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody MembersRequestDto.UpdateOneForVacationDto requestDto){
         MembersResponseDto.UpdateOneForVacationDto responseDto
-                = membersServiceFacade.updateOneForVacation(
+                = membersServiceFacade.updateMemberVacationByAdmin(
                         memberId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -152,5 +165,15 @@ public class MembersController {
         List<MembersResponseDto.ReadNameDto> responseList
                 = membersServiceFacade.readNameList(memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
+    }
+
+    @GetMapping("/members/{memberId}/profile-image")
+    public ResponseEntity<MembersResponseDto.ReadOneForProfileImageDto> readOneForProfileImage(
+            @PathVariable(name = "memberId") Long memberId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        MembersResponseDto.ReadOneForProfileImageDto responseDto
+                = membersServiceFacade.readOneForProfileImage(
+                        memberId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }

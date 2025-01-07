@@ -22,26 +22,54 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class S3Util {
 
-    /*
-    S3에서는 수정하는 방법이 없음
-    */
-
     private final AmazonS3Client amazonS3Client;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String uploadImage(MultipartFile image) {
-        return uploadFileOrImage(image);
-    }
-
     public String uploadFile(MultipartFile file) {
-        return uploadFileOrImage(file);
+        try {
+            String filename = createUUIDFile(file);
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+            amazonS3Client.putObject(bucket, filename, file.getInputStream(), metadata);
+
+            // pjhawss3buckect
+            log.info(
+                    "s3 서비스에 파일을 등록했습니다. : "
+                            +amazonS3Client.getUrl(bucket, filename).toString());
+            return amazonS3Client.getUrl(bucket, filename).toString();
+        } catch (IOException e) {
+            throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_UPLOAD_FAIL);
+        }
     }
 
-    // fileUrl 형식 : https://pjhawss3bucket.s3.ap-northeast-2.amazonaws.com/eba046ba-6b29-463e-9649-ad75486e05b5_ec2.png
+    public String uploadMemberProfile(MultipartFile file, Long memberId) {
+        try {
+            // 랜덤 UUID를 만듦.
+            String filename = createUUIDFile(file);
+
+            // s3 경로 설정(멤버마다 다른 위치의 프로필 사진을 가지고 있어야함.)
+            String s3Key = String.format("members/%s/profiles/%s", memberId, filename);
+
+            // 메타 데이터 설정
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+
+            // s3 버킷에 해당 이미지를 넣음.
+            amazonS3Client.putObject(bucket, s3Key, file.getInputStream(), metadata);
+
+            // 로그 출력 및 업로드된 파일 URL 반환
+            return amazonS3Client.getUrl(bucket, s3Key).toString();
+        } catch (IOException e) {
+            throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_UPLOAD_FAIL);
+        }
+    }
+
     public void removeFile(String fileUrl) {
-        // System.out.println(fileUrl);
         try {
             // URL 디코딩
             String decodedUrl = URLDecoder.decode(fileUrl, StandardCharsets.UTF_8);
@@ -61,22 +89,12 @@ public class S3Util {
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, imageName));
     }
 
-    private String uploadFileOrImage(MultipartFile file) {
-        try {
-            if (Objects.requireNonNull(file.getOriginalFilename()).isBlank()) {
-                throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_NAME_IS_BLANK);
-            }
-            String uuid = UUID.randomUUID().toString();
-            String filename = uuid + "_" + file.getOriginalFilename();
-            ObjectMetadata metadata = new ObjectMetadata();
-
-            metadata.setContentType(file.getContentType());
-            metadata.setContentLength(file.getSize());
-            amazonS3Client.putObject(bucket, filename, file.getInputStream(), metadata);
-
-            return amazonS3Client.getUrl(bucket, filename).toString();
-        } catch (IOException e) {
-            throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_UPLOAD_FAIL);
+    private String createUUIDFile(MultipartFile file){
+        if (Objects.requireNonNull(file.getOriginalFilename()).isBlank()) {
+            throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_NAME_IS_BLANK);
         }
+
+        String uuid = UUID.randomUUID().toString();
+        return uuid + "_" + file.getOriginalFilename();
     }
 }

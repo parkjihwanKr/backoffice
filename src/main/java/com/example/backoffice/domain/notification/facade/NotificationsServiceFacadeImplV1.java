@@ -43,13 +43,14 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
     @Override
     @Transactional
     public NotificationsResponseDto.ReadOneDto readOne(
-            Long memberId, String notificationId, Members member){
+            Long memberId, String notificationId, Members loginMember){
         // 1. 로그인 사용자와 일치하는지
-        membersService.matchLoginMember(member, memberId);
+        membersService.matchLoginMember(loginMember, memberId);
 
         // 2. 해당 알림이 존재하는지
         Notifications notification
-                = notificationsService.findByIdAndToMemberName(notificationId, member.getMemberName());
+                = notificationsService.findByIdAndToMemberName(
+                        notificationId, loginMember.getMemberName());
         notification.isRead();
 
         MemberPosition fromMemberPosition
@@ -61,31 +62,12 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
         return NotificationsConverter.toReadOneDto(notification, fromMemberPosition);
     }
 
-    @Override
-    @Transactional
-    public List<String> delete(
-            Long memberId, NotificationsRequestDto.DeleteDto requestDto,
-            Members member){
-        // 1. 로그인 사용자와 일치하는지
-        membersService.matchLoginMember(member, memberId);
-        // 2. 해당 알림이 존재하는지
-        List<String> deleteList = new ArrayList<>();
-        for (String id : requestDto.getNotificationIds()) {
-            String notificationId
-                    = notificationsService.findById(id).getId();
-            deleteList.add(notificationId);
-            notificationsService.deleteById(notificationId);
-
-        }
-
-        return deleteList;
-    }
-
     // CEO의 특별 권한
     @Override
     @Transactional
-    public void createForAdmin(
-            String memberName, NotificationsRequestDto.CreateForAdminDto requestDto){
+    public void createByAdmin(
+            String memberName, NotificationsRequestDto.CreateByAdminDto requestDto){
+        // 1. 해당 멤버가 CEO인지
         Members ceo = membersService.findByPosition(MemberPosition.CEO);
         validateCurrentMember(ceo.getId(), memberName);
 
@@ -104,9 +86,9 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
 
     @Override
     @Transactional
-    public void createFilteredForAdmin(
+    public void createFilteredByAdmin(
             String adminName,
-            NotificationsRequestDto.CreateFilteredForAdminDto requestDto){
+            NotificationsRequestDto.CreateFilteredByAdminDto requestDto){
         // 0. adminName으로 해당 멤버의 객체 정보를 가져옴
         Members admin = membersService.findCeoByMemberName(adminName);
 
@@ -159,38 +141,8 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Page<NotificationsResponseDto.ReadDto> readUnread(
-            Long memberId, Members member, Pageable pageable){
-        // 1. 로그인 사용자와 일치하는지
-        Members matchedMember
-                = membersService.matchLoginMember(member, memberId);
-
-        Page<Notifications> notificationPage
-                = notificationsService.findByToMemberNameAndIsRead(
-                matchedMember.getMemberName(), false, pageable);
-
-        return NotificationsConverter.toReadDto(notificationPage);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<NotificationsResponseDto.ReadDto> readRead(
-            Long memberId, Members member, Pageable pageable){
-        // 1. 로그인 사용자와 일치하는지
-        Members matchedMember
-                = membersService.matchLoginMember(member, memberId);
-
-        Page<Notifications> notificationPage
-                = notificationsService.findByToMemberNameAndIsRead(
-                matchedMember.getMemberName(), true, pageable);
-
-        return NotificationsConverter.toReadDto(notificationPage);
-    }
-
-    @Override
     @Transactional
-    public List<NotificationsResponseDto.ReadAllDto> readAll(
+    public List<NotificationsResponseDto.ReadAllDto> changeIsReadTrue(
             Long memberId, Members member){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
@@ -206,6 +158,25 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
         notificationsService.saveAll(notificationList);
 
         return NotificationsConverter.toReadAllDto(notificationList);
+    }
+
+    @Override
+    @Transactional
+    public List<String> delete(
+            Long memberId, NotificationsRequestDto.DeleteDto requestDto,
+            Members member){
+        // 1. 로그인 사용자와 일치하는지
+        membersService.matchLoginMember(member, memberId);
+        // 2. 해당 알림이 존재하는지
+        List<String> deleteList = new ArrayList<>();
+        for (String id : requestDto.getNotificationIds()) {
+            String notificationId
+                    = notificationsService.findById(id).getId();
+            deleteList.add(notificationId);
+            notificationsService.deleteById(notificationId);
+
+        }
+        return deleteList;
     }
 
     private void validateCurrentMember(Long memberId, String ceoName){
