@@ -221,6 +221,14 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                 yield notificationRepository.save(
                         toEntity(notificationData, notificationMessage, domainType));
             }
+            case REBOOT_SERVER -> {
+                String notificationMessage
+                        = notificationData.getFromMember().getMemberName()+"님이 "
+                        +notificationData.getToMember().getMemberName() + "님에게 "
+                        +notificationData.getMessage();
+                yield notificationRepository.save(
+                        toEntity(notificationData, notificationMessage, domainType));
+            }
             default -> throw new NotificationsCustomException(
                     NotificationsExceptionCode.NOT_MATCHED_NOTIFICATION_TYPE);
         };

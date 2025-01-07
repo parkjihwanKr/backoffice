@@ -20,4 +20,11 @@ public class VacationPeriod {
         return (today.isEqual(startDate) || today.isAfter(startDate)) &&
                 (today.isEqual(endDate) || today.isBefore(endDate));
     }
+
+    public boolean isEmpty(){
+        if(startDate == null && endDate == null){
+            return true;
+        }
+        return false;
+    }
 }

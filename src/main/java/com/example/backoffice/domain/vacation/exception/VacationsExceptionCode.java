@@ -42,6 +42,9 @@ public enum VacationsExceptionCode {
             HttpStatus.BAD_REQUEST, "VACATION-025",
             "해당 휴가는 신청이 된 상태입니다." +
                     " 삭제하고 싶으시다면 관리자를 찾아가주세요."),
+    NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY(
+            HttpStatus.INTERNAL_SERVER_ERROR, "VACATION-026",
+            "휴가 정정 기간이 아직 설정되지 않았습니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -76,7 +76,7 @@ public class AttendancesController {
             @RequestParam(name = "attendanceStatus", required = false) String attendanceStatus,
             @RequestParam(name = "checkInRange", required = false) @Valid DateRange checkInRange,
             @RequestParam(name = "checkOutRange", required = false) @Valid DateRange checkOutRange,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC)Pageable pageable){
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 7)Pageable pageable){
         Page<AttendancesResponseDto.ReadOneDto> responseDtoPage
                 = attendancesService.readForAdmin(
                 memberName, attendanceStatus, checkInRange,

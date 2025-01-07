@@ -32,6 +32,16 @@ public class VacationsController {
                         responseDto, "성공적으로 휴가 신청 기간이 변경되었습니다.", 200));
     }
 
+    // 멤버 개인이 휴가 정정 기간을 조회
+    @GetMapping("/vacations/update-period")
+    public ResponseEntity<VacationsResponseDto.UpdatePeriodDto> readUpcomingUpdateVacationPeriod(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        VacationsResponseDto.UpdatePeriodDto responseDto
+                = vacationsServiceFacade.readUpcomingUpdateVacationPeriod(
+                        memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
     // 멤버 개인 휴가 생성
     @PostMapping("/vacations")
     public ResponseEntity<CommonResponseDto<VacationsResponseDto.CreateOneDto>> createOneByMember(

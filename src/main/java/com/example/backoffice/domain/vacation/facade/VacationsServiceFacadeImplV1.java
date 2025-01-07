@@ -5,8 +5,9 @@ import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
+import com.example.backoffice.domain.notification.entity.NotificationData;
 import com.example.backoffice.domain.notification.entity.NotificationType;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
+import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.domain.vacation.converter.VacationsConverter;
 import com.example.backoffice.domain.vacation.dto.VacationDateRangeDto;
 import com.example.backoffice.domain.vacation.dto.VacationsRequestDto;
@@ -24,25 +25,33 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     private final MembersServiceV1 membersService;
-    private final NotificationsServiceFacadeV1 notificationsServiceFacade;
+    private final NotificationsServiceV1 notificationsService;
     private final VacationsServiceV1 vacationsService;
-    private final VacationPeriodHolder vacationPeriodHolder;
+    private final VacationPeriodProvider vacationPeriodProvider;
 
-    // 휴가 관련 피드백 : 생성할 때, 승인이 될 시에, 잔여 휴가 일 변경
-    // 날짜가 시작 날이 토요일/ 일요일은 안됨, 마지막일 또한 토요일/ 일요일은 안됨.
     @Override
     public VacationsResponseDto.UpdatePeriodDto updatePeriodByAdmin(
             Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto){
         validateUpdatePermission(loginMember);
 
-        LocalDateTime newStartDate = DateTimeUtils.parse(requestDto.getStartDate());
-        LocalDateTime newEndDate = DateTimeUtils.parse(requestDto.getEndDate());
+        // key VacationPeriod:2025:1
+        String key = vacationPeriodProvider.createKey(
+                (long)DateTimeUtils.getToday().getYear(),
+                (long)DateTimeUtils.getToday().getMonthValue());
+        if(vacationsService.existPeriod(key)){
+            vacationsService.deletePeriodByKey(key);
+        }
+        LocalDateTime newStartDate
+                = DateTimeUtils.parse(requestDto.getStartDate());
+        LocalDateTime newEndDate
+                = DateTimeUtils.parse(requestDto.getEndDate());
 
         // 현재 월을 기준으로 검증
         LocalDateTime now = DateTimeUtils.getCurrentDateTime();
@@ -59,21 +68,74 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
             throw new VacationsCustomException(VacationsExceptionCode.END_DATE_BEFORE_START_DATE);
         }
 
-        vacationPeriodHolder.setVacationPeriod(newStartDate, newEndDate);
+        vacationPeriodProvider.setVacationPeriod(newStartDate, newEndDate);
 
         List<Members> memberList = membersService.findAll();
 
         for(Members member : memberList){
-            notificationsServiceFacade.createOne(
+            notificationsService.generateEntityAndSendMessage(
                     NotificationsConverter.toNotificationData(
                             member, loginMember, null, null, null, null,
                             "변경된 휴가 신청 기간 안내입니다 : "
-                                    +vacationPeriodHolder.getVacationPeriod().getStartDate() + " ~ "
-                                    +vacationPeriodHolder.getVacationPeriod().getEndDate()),
+                                    +vacationPeriodProvider.getVacationPeriod().getStartDate() + " ~ "
+                                    +vacationPeriodProvider.getVacationPeriod().getEndDate()),
                     NotificationType.UPDATE_VACATION_PERIOD);
         }
 
+        Long ttlMinutes
+                = DateTimeUtils.calculateMinutesFromTodayToEndDate(
+                        DateTimeUtils.getEndDayOfMonth(
+                                (long)now.getYear(), (long)now.getMonthValue()));
+        String values = vacationPeriodProvider.createValues(
+                vacationPeriodProvider.getVacationPeriod().getStartDate().getDayOfMonth(),
+                vacationPeriodProvider.getVacationPeriod().getEndDate().getDayOfMonth());
+
+        vacationsService.savePeriod(key, Math.toIntExact(ttlMinutes), values);
         return VacationsConverter.toUpdatePeriodDto(newStartDate, newEndDate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public VacationsResponseDto.UpdatePeriodDto readUpcomingUpdateVacationPeriod(
+            Members loginMember) {
+        membersService.findById(loginMember.getId());
+
+        if(!vacationPeriodProvider.getVacationPeriod().isEmpty()){
+            LocalDateTime startDate = vacationPeriodProvider.getVacationPeriod().getStartDate();
+            LocalDateTime endDate = vacationPeriodProvider.getVacationPeriod().getEndDate();
+
+            return VacationsConverter.toUpdatePeriodDto(startDate, endDate);
+        }else {
+            String key = vacationPeriodProvider.createKey(
+                    (long)DateTimeUtils.getCurrentDateTime().getYear(),
+                    (long)DateTimeUtils.getCurrentDateTime().getMonthValue());
+            if(vacationsService.existPeriod(key)){
+                String value = vacationsService.getValueByKey(key);
+
+                LocalDateTime upcomingUpdateVacationPeriodStartDay =
+                        vacationPeriodProvider.calculateUpcomingStartDate(key, value);
+                LocalDateTime upcomingUpdateVacationPeriodEndDay =
+                        vacationPeriodProvider.calculateUpcomingEndDate(key, value);
+                vacationPeriodProvider.setVacationPeriod(
+                        upcomingUpdateVacationPeriodStartDay,
+                        upcomingUpdateVacationPeriodEndDay);
+                return VacationsConverter.toUpdatePeriodDto(
+                        upcomingUpdateVacationPeriodStartDay,
+                        upcomingUpdateVacationPeriodEndDay);
+            }
+            String message
+                    = VacationsExceptionCode
+                    .NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY
+                    .getMessage();
+            notificationsService.generateEntityAndSendMessage(
+                    notificationsService.toNotificationData(
+                            membersService.findItManager(), membersService.findByPosition(MemberPosition.CEO),
+                            null, null, null, null, message
+                    ), NotificationType.URGENT_SERVER_ERROR);
+
+            throw new VacationsCustomException(
+                    VacationsExceptionCode.NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY);
+        }
     }
 
     @Override
@@ -170,7 +232,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 ? vacation.getOnVacationMember().getMemberName() + "님의 휴가가 승인되었습니다."
                 : vacation.getOnVacationMember().getMemberName() + "님의 휴가가 미승인되었습니다.";
 
-        notificationsServiceFacade.createOne(
+        notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
                         loginMember, vacation.getOnVacationMember(),
                         null, null, null, null,
@@ -266,7 +328,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
             Members loginMember){
         membersService.findHRManagerOrCEO(loginMember);
         Vacations vacation = vacationsService.findById(vacationId);
-        notificationsServiceFacade.createOne(
+        notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
                         loginMember, vacation.getOnVacationMember(),
                         null, null, null, null,
@@ -323,9 +385,11 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         }
 
         // 6. 휴가 신청 가능 기간 검증 (validateVacationRequestPeriod 내용 통합)
-        VacationPeriod allowedVacationPeriod = vacationPeriodHolder.getVacationPeriod();
+        VacationPeriod allowedVacationPeriod
+                = vacationPeriodProvider.getVacationPeriod();
         if (!allowedVacationPeriod.isWithinAllowedPeriod(now)) {
-            throw new VacationsCustomException(VacationsExceptionCode.OUT_OF_VACATION_REQUEST_PERIOD);
+            throw new VacationsCustomException(
+                    VacationsExceptionCode.OUT_OF_VACATION_REQUEST_PERIOD);
         }
 
         // 7. 다음 달의 휴가만 신청 가능
@@ -361,14 +425,14 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
 
         // 2. 긴급하지 않을 때, 신청 날짜에 맞춰서 신청해야하는 로직 추가
         LocalDateTime nextMonth = null;
-        if(vacationPeriodHolder.getVacationPeriod().getStartDate().getMonthValue() == 12){
+        if(vacationPeriodProvider.getVacationPeriod().getStartDate().getMonthValue() == 12){
             nextMonth = LocalDateTime.of(
-                    vacationPeriodHolder.getVacationPeriod().getStartDate().getYear() + 1, 1,
+                    vacationPeriodProvider.getVacationPeriod().getStartDate().getYear() + 1, 1,
                     1, 0, 0, 0);
         }else{
             nextMonth = LocalDateTime.of(
-                    vacationPeriodHolder.getVacationPeriod().getStartDate().getYear(),
-                    vacationPeriodHolder.getVacationPeriod().getStartDate().getMonthValue() + 1,
+                    vacationPeriodProvider.getVacationPeriod().getStartDate().getYear(),
+                    vacationPeriodProvider.getVacationPeriod().getStartDate().getMonthValue() + 1,
                     1, 0, 0, 0);
         }
         LocalDateTime nextMonthStart = nextMonth;
@@ -381,7 +445,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
 
     private void sendUrgentOneByHrManager(Members loginMember) {
         Members hrManager = membersService.findHRManager();
-        notificationsServiceFacade.createOne(
+        notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
                         hrManager, loginMember, null, null, null, null, null),
                 NotificationType.URGENT_VACATION);
