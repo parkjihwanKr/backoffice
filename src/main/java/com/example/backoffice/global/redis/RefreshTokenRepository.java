@@ -12,14 +12,14 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class TokenRedisProvider {
+public class RefreshTokenRepository {
     private final ObjectMapper objectMapper;
 
     // database 0 : jwt token -> refreshToken
     @Qualifier("redisTemplateForToken")
     private final RedisTemplate<String, Object> redisTemplateForToken;
 
-    public TokenRedisProvider (
+    public RefreshTokenRepository(
             ObjectMapper objectMapper,
             @Qualifier("redisTemplateForToken") RedisTemplate<String, Object> redisTemplateForToken){
         this.objectMapper = objectMapper;

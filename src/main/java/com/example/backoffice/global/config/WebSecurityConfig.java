@@ -4,7 +4,7 @@ import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.JwtAuthenticationFilter;
 import com.example.backoffice.global.jwt.JwtAuthorizationFilter;
 import com.example.backoffice.global.jwt.JwtProvider;
-import com.example.backoffice.global.redis.TokenRedisProvider;
+import com.example.backoffice.global.redis.RefreshTokenRepository;
 import com.example.backoffice.global.security.CustomLogoutHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.Arrays;
 public class WebSecurityConfig {
 
     private final JwtProvider jwtProvider;
-    private final TokenRedisProvider tokenRedisProvider;
+    private final RefreshTokenRepository tokenRedisProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomLogoutHandler customLogoutHandler;
     private final CookieUtil cookieUtil;

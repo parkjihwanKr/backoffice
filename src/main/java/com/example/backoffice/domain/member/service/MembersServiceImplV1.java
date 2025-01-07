@@ -296,7 +296,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
             MemberPosition position, MemberDepartment department){
         return membersRepository.findByPositionAndDepartment(
                 position, department).orElseThrow(
-                        ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 
     @Override

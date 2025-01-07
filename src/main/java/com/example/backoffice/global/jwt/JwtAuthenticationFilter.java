@@ -3,7 +3,7 @@ package com.example.backoffice.global.jwt;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.jwt.dto.TokenDto;
-import com.example.backoffice.global.redis.TokenRedisProvider;
+import com.example.backoffice.global.redis.RefreshTokenRepository;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -21,10 +21,10 @@ import java.io.IOException;
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtProvider jwtProvider;
-    private final TokenRedisProvider tokenRedisProvider;
+    private final RefreshTokenRepository tokenRedisProvider;
     private final CookieUtil cookieUtil;
     public JwtAuthenticationFilter(
-            JwtProvider jwtProvider, TokenRedisProvider tokenRedisProvider,
+            JwtProvider jwtProvider, RefreshTokenRepository tokenRedisProvider,
             CookieUtil cookieUtil) {
         this.jwtProvider = jwtProvider;
         this.tokenRedisProvider = tokenRedisProvider;

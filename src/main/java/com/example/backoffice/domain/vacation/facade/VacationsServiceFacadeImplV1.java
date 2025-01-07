@@ -316,7 +316,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         // 3-3 department가 null이면 모든 부서의 값을 가져온 상태로 리턴
         List<Vacations> vacationList
                 = vacationsService.findFilteredVacationsOnMonth(
-                        startDayOfMonth, endDayOfMonth, isAccepted, urgent, memberDepartment);
+                startDayOfMonth, endDayOfMonth, isAccepted, urgent, memberDepartment);
 
         return VacationsConverter.toReadMonthByHrManager(vacationList);
     }

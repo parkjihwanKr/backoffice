@@ -88,21 +88,15 @@ public class VacationPeriodInitializer {
             // application-local.yml
             LocalDateTime today = DateTimeUtils.getToday();
             vacationPeriodProvider.setVacationPeriod(
-                    VacationPeriod.builder()
-                            .startDate(today)
-                            .endDate(DateTimeUtils.getEndDayOfMonth(
+                            today,
+                            DateTimeUtils.getEndDayOfMonth(
                                     (long) today.getYear(),
-                                    (long) today.getMonthValue()))
-                            .build()
-            );
+                                    (long) today.getMonthValue()));
         }else{
             // application-prod.yml
             vacationPeriodProvider.setVacationPeriod(
-                    VacationPeriod.builder()
-                            .startDate(upcomingUpdateVacationPeriodStartDay)
-                            .endDate(upcomingUpdateVacationPeriodEndDay)
-                            .build()
-            );
+                    upcomingUpdateVacationPeriodStartDay,
+                    upcomingUpdateVacationPeriodEndDay);
         }
     }
 

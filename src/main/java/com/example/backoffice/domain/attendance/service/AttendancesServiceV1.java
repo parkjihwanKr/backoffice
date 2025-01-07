@@ -126,8 +126,7 @@ public interface AttendancesServiceV1 {
             AttendancesRequestDto.CreateOneDto requestDto, Members loginMember);
 
     /**
-     * 스케줄러에 의한 오래된 근태 기록을 삭제
-     *
+     * 월간 스케줄러에 의한 오래된 근태 기록을 삭제
      * @param allMemberIdList 삭제할 멤버 ID 리스트
      */
     void delete(List<Long> allMemberIdList);

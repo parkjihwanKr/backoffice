@@ -1,5 +1,8 @@
 package com.example.backoffice.global.scheduler;
 
+import com.example.backoffice.domain.attendance.entity.Attendances;
+import com.example.backoffice.domain.attendance.service.AttendancesServiceV1;
+import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodProvider;
 import com.example.backoffice.global.date.DateTimeUtils;
@@ -12,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ import java.time.LocalDateTime;
 public class MonthlyScheduler implements SchedulerTask{
 
     private final MembersServiceV1 membersService;
+    private final AttendancesServiceV1 attendancesService;
     private final VacationPeriodProvider vacationPeriodProvider;
     private final UpdateVacationPeriodRepository vacationPeriodRepository;
 
@@ -26,6 +31,7 @@ public class MonthlyScheduler implements SchedulerTask{
     public void execute(){
         updateRemainingVacationDays();
         configureVacationRequestPeriod();
+        deleteBeforeTwoYearAttendanceList();
     }
 
     private void updateRemainingVacationDays() {
@@ -63,5 +69,11 @@ public class MonthlyScheduler implements SchedulerTask{
         }catch (JsonProcessingException e) {
             throw new JsonCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
         }
+    }
+
+    private void deleteBeforeTwoYearAttendanceList(){
+        List<Members> memberList = membersService.findAll();
+        List<Long> memberIdList = memberList.stream().map(Members::getId).toList();
+        attendancesService.delete(memberIdList);
     }
 }
