@@ -21,6 +21,7 @@ public enum NotificationType {
     UPDATE_EXPENSE_REPORT(Domain.UPDATE_EXPENSE_REPORT),
     ALL_NOTIFICATIONS(Domain.ALL_NOTIFICATIONS),
     CREATE_ATTENDANCES_MANUALLY(Domain.CREATE_ATTENDANCES_MANUALLY),
+    REBOOT_SERVER(Domain.REBOOT_SERVER),
     ;
 
     private final String domain;
@@ -48,5 +49,6 @@ public enum NotificationType {
         public static final String UPDATE_EXPENSE_REPORT = "UPDATE_EXPENSE_REPORT";
         public static final String ALL_NOTIFICATIONS = "ALL_NOTIFICATIONS";
         public static final String CREATE_ATTENDANCES_MANUALLY = "CREATE_ATTENDANCES_MANUALLY";
+        public static final String REBOOT_SERVER = "REBOOT_SERVER";
     }
 }

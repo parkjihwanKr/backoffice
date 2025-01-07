@@ -325,4 +325,10 @@ public interface MembersServiceV1 {
      * 멤버를 찾을 수 없는 경우
      */
     Members findByIdAndDepartment(Long memberId, MemberDepartment department);
+
+    /**
+     * IT MANAGER 조회
+     * @return IT MANAGER || null
+     */
+    Members findItManager();
 }

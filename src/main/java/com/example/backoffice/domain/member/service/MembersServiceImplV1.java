@@ -361,4 +361,11 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
         return membersRepository.findByIdAndDepartment(memberId, department).orElseThrow(
                 ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findItManager() {
+        return membersRepository.findByPositionAndDepartment(
+                        MemberPosition.MANAGER, MemberDepartment.IT).orElseGet(null);
+    }
 }

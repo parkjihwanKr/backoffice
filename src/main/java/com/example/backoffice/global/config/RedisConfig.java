@@ -13,6 +13,14 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
+
+    /**
+     * database 0 : refresh token repository
+     * database 1 : board view count
+     * database 2 : upcoming member attendance
+     * database 3 : monthly update vacation period
+     */
+
     @Value("${spring.data.redis.port}")
     private Integer port;
 
@@ -23,7 +31,6 @@ public class RedisConfig {
     public JedisConnectionFactory redisConnectionFactoryForToken() {
         RedisStandaloneConfiguration config
                 = new RedisStandaloneConfiguration(host, port);
-        // refreshToken 데이터베이스
         config.setDatabase(0);
         return new JedisConnectionFactory(config);
     }
@@ -32,7 +39,6 @@ public class RedisConfig {
     public JedisConnectionFactory redisConnectionFactoryForViewCount() {
         RedisStandaloneConfiguration config
                 = new RedisStandaloneConfiguration(host, port);
-        // viewCount 데이터베이스
         config.setDatabase(1);
         return new JedisConnectionFactory(config);
     }
@@ -41,8 +47,15 @@ public class RedisConfig {
     public JedisConnectionFactory redisConnectionFactoryForCachedMemberAttendance() {
         RedisStandaloneConfiguration config
                 = new RedisStandaloneConfiguration(host, port);
-        // cachedMemberAttendance 데이터베이스
         config.setDatabase(2);
+        return new JedisConnectionFactory(config);
+    }
+
+    @Bean
+    public JedisConnectionFactory redisConnectionFactoryForVacationPeriod() {
+        RedisStandaloneConfiguration config
+                = new RedisStandaloneConfiguration(host, port);
+        config.setDatabase(3);
         return new JedisConnectionFactory(config);
     }
 
@@ -78,4 +91,16 @@ public class RedisConfig {
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;
     }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplateForVacationPeriod(
+            @Qualifier("redisConnectionFactoryForVacationPeriod")
+            JedisConnectionFactory redisConnectionFactoryForVacationPeriod) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactoryForVacationPeriod);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return template;
+    }
+
 }

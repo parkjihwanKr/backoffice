@@ -24,7 +24,6 @@ public class FilesConverter {
                 .member(member)
                 .board(null)
                 .event(null)
-                .expense(null)
                 .build();
     }
     public static Files toEntityForBoards(String url, Boards board) {

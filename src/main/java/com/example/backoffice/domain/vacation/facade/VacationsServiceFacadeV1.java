@@ -68,6 +68,16 @@ public interface VacationsServiceFacadeV1 {
     VacationsResponseDto.UpdatePeriodDto updatePeriodByAdmin(
             Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto);
 
+
+    /**
+     * 멤버가 휴가 정정 기간 조회
+     * @param loginMember : 로그인 멤버
+     * @return {@link VacationsResponseDto.UpdatePeriodDto}
+     * 해당하는 년, 월의 휴가 정정 기간 시작일과 마지막일
+     */
+    VacationsResponseDto.UpdatePeriodDto readUpcomingUpdateVacationPeriod(
+            Members loginMember);
+
     /**
      * 휴가 생성
      * @param loginMember : 로그인 멤버
