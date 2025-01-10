@@ -164,7 +164,9 @@ public class AttendancesConverter {
         );
 
         // 총 페이지 수를 날짜 구간에 따라 동적으로 계산
-        int fixedTotalPages = (int) dateRanges.stream().filter(range -> !range.isEmpty()).count();
+        int fixedTotalPages
+                = (int) dateRanges.stream().filter(
+                        range -> !range.isEmpty()).count();
 
         // 페이지 번호 유효성 검증
         if (pageNumber < 0 || pageNumber >= fixedTotalPages) {
@@ -235,7 +237,7 @@ public class AttendancesConverter {
                 .map(attendance -> AttendancesResponseDto.ReadOneDto.builder()
                         .attendanceId(attendance.getId())
                         .memberId(attendance.getMember().getId())
-                        .memberName(attendance.getMember().getName())
+                        .memberName(attendance.getMember().getMemberName())
                         .checkInTime(attendance.getCheckInTime())
                         .checkOutTime(attendance.getCheckOutTime())
                         .attendanceStatus(attendance.getAttendanceStatus())

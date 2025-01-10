@@ -2,6 +2,7 @@ package com.example.backoffice.domain.attendance.service;
 
 import com.example.backoffice.domain.attendance.dto.AttendancesRequestDto;
 import com.example.backoffice.domain.attendance.dto.AttendancesResponseDto;
+import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.DateRange;
 import org.springframework.data.domain.Page;
@@ -212,4 +213,9 @@ public interface AttendancesServiceV1 {
      */
     AttendancesResponseDto.ReadTodayOneDto readTodayOne(
             Long memberId, Members loginMember);
+
+    /**
+    * 스케줄러를 통한 어제의 근태 기록들의 상태를 보고 알맞게 해당 근태 기록 수정
+     */
+    void updateYesterdayAttendanceList();
 }

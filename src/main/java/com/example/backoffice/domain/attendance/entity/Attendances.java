@@ -64,4 +64,10 @@ public class Attendances extends CommonEntity {
         this.checkInTime = checkInTime;
         this.checkOutTime = checkOutTime;
     }
+
+    public void updateDescriptionAndStatus(
+            String description, AttendanceStatus status){
+        this.attendanceStatus = status;
+        this.description = description;
+    }
 }

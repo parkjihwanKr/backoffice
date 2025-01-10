@@ -368,4 +368,11 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
         return membersRepository.findByPositionAndDepartment(
                         MemberPosition.MANAGER, MemberDepartment.IT).orElseGet(null);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findCeo() {
+        return membersRepository.findByPosition(MemberPosition.CEO).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+    }
 }

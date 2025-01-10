@@ -331,4 +331,10 @@ public interface MembersServiceV1 {
      * @return IT MANAGER || null
      */
     Members findItManager();
+
+    /**
+     * CEO 조회
+     * @return CEO || null
+     */
+    Members findCeo();
 }
