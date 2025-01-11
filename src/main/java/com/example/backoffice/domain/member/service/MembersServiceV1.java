@@ -105,35 +105,12 @@ public interface MembersServiceV1 {
     Members findAuditManagerOrCeo(Long memberId);
 
     /**
-     * Finance Manager || CEO 조회
-     * @param memberId : 조회할 멤버 아이디
-     * @return :Audit Manager || CEO
-     */
-    Members findByFinanceManagerOrCeo(Long memberId);
-
-    /**
-     * Finance Manager 조회
-     * @return  Finance Manager
-     */
-    Members findByFinanceManager();
-
-    /**
      * 요청받은 부서, 멤버를 제외한 리스트를 조회
      * @param excludedDepartmentList 제외할 부서 리스트
      * @param excludedIdList 제외할 멤버 아이디 리스트
      * @return 제외한 부서, 멤버를 제외한 부서, 멤버 이름 맵
      */
     Map<String, MemberDepartment> findMemberNameListExcludingDepartmentListAndIdList(
-            List<MemberDepartment> excludedDepartmentList,
-            List<Long> excludedIdList);
-
-    /**
-     * 요청 받은 부서와 멤버 아이디 리스트를 제외한 멤버 리스트 조회
-     * @param excludedDepartmentList 제외할 부서 리스트
-     * @param excludedIdList 제외할 멤버 ID 리스트
-     * @return 조회된 멤버 리스트
-     */
-    List<Members> findByDepartmentNotInAndIdNotIn(
             List<MemberDepartment> excludedDepartmentList,
             List<Long> excludedIdList);
 
@@ -262,13 +239,6 @@ public interface MembersServiceV1 {
      */
     Page<Members> findAllByDepartmentAndPosition(
             MemberDepartment department, MemberPosition position, Pageable pageable);
-
-    /**
-     * CEO 또는 특정 부서의 매니저를 조회
-     * @param department 부서 정보
-     * @return 매니저 멤버
-     */
-    Members findDepartmentManager(MemberDepartment department);
 
     /**
      * 멤버 이름이 존재하는지 확인합니다.

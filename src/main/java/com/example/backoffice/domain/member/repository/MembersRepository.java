@@ -45,4 +45,8 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
             Long memberId, MemberDepartment department);
 
     Boolean existsByMemberName(String memberName);
+
+    List<Members> findByDepartmentNotIn(List<MemberDepartment> excludedDepartmentList);
+
+    List<Members> findByIdNotIn(List<Long> excludedIdList);
 }
