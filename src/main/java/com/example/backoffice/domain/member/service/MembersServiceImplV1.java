@@ -3,7 +3,6 @@ package com.example.backoffice.domain.member.service;
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
-import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
@@ -18,12 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Member;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -85,15 +82,6 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Transactional(readOnly = true)
     public List<Members> findAllById(List<Long> memberIdList){
         return membersRepository.findAllById(memberIdList);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Members> findByDepartmentNotInAndIdNotIn(
-            List<MemberDepartment> excludedDepartmentList,
-            List<Long> excludedIdList){
-        return membersRepository.findByDepartmentNotInAndIdNotIn(
-                excludedDepartmentList, excludedIdList);
     }
 
     @Override
@@ -200,32 +188,6 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByFinanceManagerOrCeo(Long memberId) {
-        Members financeManager
-                = findByPositionAndDepartment(
-                        MemberPosition.MANAGER, MemberDepartment.FINANCE);
-        if(financeManager != null){
-            return financeManager;
-        }
-        return findByPosition(MemberPosition.CEO);
-    }
-
-    // 존재하지 않다면 ceo를 찾아야함
-    @Override
-    @Transactional(readOnly = true)
-    public Members findByFinanceManager(){
-        return membersRepository.findByPositionAndDepartment(
-                MemberPosition.MANAGER, MemberDepartment.FINANCE).orElse(null);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Members findDepartmentManager(MemberDepartment department){
-        return findByPositionAndDepartment(MemberPosition.MANAGER, department);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Members matchLoginMember(Members member, Long memberId){
         if(!member.getId().equals(memberId)){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_INFO);
@@ -244,15 +206,23 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
             throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
         }
 
-        for (Members members : memberList) {
-            System.out.println("member : "+members.getMemberName());
-        }
-        List<Members> memberListExcludingDepartmentAndId
-                = findByDepartmentNotInAndIdNotIn(excludedDepartmentList, excludedIdList);
+        List<Members> memberListExcludingDepartmentAndId = null;
 
-        for (Members members : memberListExcludingDepartmentAndId) {
-            System.out.println("sending member : "+members.getMemberName());
+        if (excludedDepartmentList.isEmpty() && excludedIdList.isEmpty()) {
+            memberListExcludingDepartmentAndId = membersRepository.findAll();
+        } else if (excludedIdList.isEmpty()) {
+            memberListExcludingDepartmentAndId
+                    = membersRepository.findByDepartmentNotIn(
+                            excludedDepartmentList);
+        } else if (excludedDepartmentList.isEmpty()) {
+            memberListExcludingDepartmentAndId
+                    = membersRepository.findByIdNotIn(excludedIdList);
+        } else {
+            memberListExcludingDepartmentAndId
+                    = membersRepository.findByDepartmentNotInAndIdNotIn(
+                            excludedDepartmentList, excludedIdList);
         }
+
         Map<String, MemberDepartment> memberNameMap = new HashMap<>();
 
         for(Members member : memberListExcludingDepartmentAndId){
