@@ -45,6 +45,17 @@ public enum AttendancesExceptionCode {
     EXIST_CHECKOUT_TIME(
             HttpStatus.BAD_REQUEST, "ATTENDANCES-012",
             "퇴근 요청을 이미 하셨습니다."),
+    EXIST_VACATION(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-013",
+            "해당 멤버는 해당 날짜에 휴가를 나간 상태입니다. "+
+                    "아니라면 관리자에게 문의해주세요"),
+    NOT_CHANGE_ATTENDANCES_STATUS_VACATION(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-014",
+            "해당 멤버는 휴가를 나가지 않았기에 휴가 상태로 변경할 수 없습니다."+
+                    "아니라면 관리자에게 문의해주세요"),
+    NOT_EXIST_ATTENDANCE_PAGE(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-015",
+            "해당하는 페이지에 근태 기록이 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -244,8 +244,15 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
             throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
         }
 
+        for (Members members : memberList) {
+            System.out.println("member : "+members.getMemberName());
+        }
         List<Members> memberListExcludingDepartmentAndId
                 = findByDepartmentNotInAndIdNotIn(excludedDepartmentList, excludedIdList);
+
+        for (Members members : memberListExcludingDepartmentAndId) {
+            System.out.println("sending member : "+members.getMemberName());
+        }
         Map<String, MemberDepartment> memberNameMap = new HashMap<>();
 
         for(Members member : memberListExcludingDepartmentAndId){
@@ -367,5 +374,12 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     public Members findItManager() {
         return membersRepository.findByPositionAndDepartment(
                         MemberPosition.MANAGER, MemberDepartment.IT).orElseGet(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Members findCeo() {
+        return membersRepository.findByPosition(MemberPosition.CEO).orElseThrow(
+                ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
 }

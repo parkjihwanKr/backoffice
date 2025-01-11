@@ -1,5 +1,6 @@
 package com.example.backoffice.global.scheduler;
 
+import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.attendance.service.AttendancesServiceV1;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
@@ -37,6 +38,7 @@ public class DailyScheduler implements SchedulerTask{
         sendNotificationForUnCompletedEvaluationMember();
         updateMemberOnVacation();
         createAttendances();
+        updateYesterdayAttendanceStatus();
     }
 
     private void refreshCachedDateData(){
@@ -86,5 +88,9 @@ public class DailyScheduler implements SchedulerTask{
         }else{
             attendancesService.create(false);
         }
+    }
+
+    private void updateYesterdayAttendanceStatus(){
+        attendancesService.updateYesterdayAttendanceList();
     }
 }

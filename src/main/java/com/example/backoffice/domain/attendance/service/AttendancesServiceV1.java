@@ -2,6 +2,7 @@ package com.example.backoffice.domain.attendance.service;
 
 import com.example.backoffice.domain.attendance.dto.AttendancesRequestDto;
 import com.example.backoffice.domain.attendance.dto.AttendancesResponseDto;
+import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.DateRange;
 import org.springframework.data.domain.Page;
@@ -127,9 +128,8 @@ public interface AttendancesServiceV1 {
 
     /**
      * 월간 스케줄러에 의한 오래된 근태 기록을 삭제
-     * @param allMemberIdList 삭제할 멤버 ID 리스트
      */
-    void delete(List<Long> allMemberIdList);
+    void delete();
 
     /**
      * 관리자가 전산 오류로 인한 근태 기록을 삭제
@@ -212,4 +212,9 @@ public interface AttendancesServiceV1 {
      */
     AttendancesResponseDto.ReadTodayOneDto readTodayOne(
             Long memberId, Members loginMember);
+
+    /**
+    * 스케줄러를 통한 어제의 근태 기록들의 상태를 보고 알맞게 해당 근태 기록 수정
+     */
+    void updateYesterdayAttendanceList();
 }

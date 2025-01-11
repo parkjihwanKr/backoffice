@@ -2,7 +2,6 @@ package com.example.backoffice.domain.member.repository;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
-import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +20,6 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
     List<Members> findByDepartmentNotInAndIdNotIn(
             List<MemberDepartment> excludedDepartmentList, List<Long> excludedIdList);
 
-    Optional<Members> findByIdAndRoleAndDepartment(
-            Long memberId, MemberRole role, MemberDepartment department);
-
     Optional<Members> findByPositionAndDepartment(
             MemberPosition position, MemberDepartment department);
 
@@ -31,8 +27,6 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
             MemberDepartment department, MemberPosition position, Pageable pageable);
 
     List<Members> findAllByDepartment(MemberDepartment department);
-
-    List<Members> findAllByPosition(MemberPosition position);
 
     List<Members> findAllByIdNotIn(Collection<Long> ids);
 

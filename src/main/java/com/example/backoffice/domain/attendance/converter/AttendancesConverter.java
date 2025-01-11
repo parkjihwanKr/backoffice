@@ -9,10 +9,12 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,21 +48,6 @@ public class AttendancesConverter {
     public static Attendances toEntity(
             Members member, AttendanceStatus attendanceStatus,
             String description, LocalDateTime checkInTime, LocalDateTime checkOutTime){
-        return Attendances.builder()
-                // 초기에 생성되는 status는 결석, 휴가, 휴일
-                .attendanceStatus(attendanceStatus)
-                .checkInTime(checkInTime)
-                .checkOutTime(checkOutTime)
-                .description(description)
-                .member(member)
-                .build();
-    }
-
-
-    public static Attendances toEntityForAdmin(
-            Members member, LocalDateTime checkInTime,
-            LocalDateTime checkOutTime, AttendanceStatus attendanceStatus,
-            String description){
         return Attendances.builder()
                 // 초기에 생성되는 status는 결석, 휴가, 휴일
                 .attendanceStatus(attendanceStatus)
@@ -149,60 +136,98 @@ public class AttendancesConverter {
     }
 
     public static Page<AttendancesResponseDto.ReadMonthlyDto> toReadFilteredMonthlyDto(
-            Page<Attendances> attendancePage) {
+            List<Attendances> attendanceList, int pageNumber) {
 
         // 날짜별로 그룹화하여 각 날짜의 근태 요약 정보를 생성
-        Map<LocalDate, List<Attendances>> groupedByDate =
-                attendancePage.getContent().stream()
-                        .collect(Collectors.groupingBy(
-                                attendance -> attendance.getCreatedAt().toLocalDate() // 날짜 기준으로 그룹화
-                        ));
+        Map<LocalDate, List<Attendances>> groupedByDate = attendanceList.stream()
+                .collect(Collectors.groupingBy(
+                        attendance -> attendance.getCreatedAt().toLocalDate()
+                ));
 
-        // 그룹화된 데이터를 이용해 ReadMonthlyDto 리스트 생성
+        // 날짜를 정렬하여 구간 생성
+        List<LocalDate> sortedDates = groupedByDate.keySet().stream()
+                .sorted()
+                .toList();
+
+        // 날짜 범위를 구간별로 나눔
+        List<List<LocalDate>> dateRanges = Arrays.asList(
+                sortedDates.stream().filter(
+                        date -> date.getDayOfMonth() <= 7).toList(),
+                sortedDates.stream().filter(
+                        date -> date.getDayOfMonth() >= 8 && date.getDayOfMonth() <= 14).toList(),
+                sortedDates.stream().filter(
+                        date -> date.getDayOfMonth() >= 15 && date.getDayOfMonth() <= 21).toList(),
+                sortedDates.stream().filter(
+                        date -> date.getDayOfMonth() >= 22 && date.getDayOfMonth() <= 28).toList(),
+                sortedDates.stream().filter(
+                        date -> date.getDayOfMonth() >= 29).toList()
+        );
+
+        // 총 페이지 수를 날짜 구간에 따라 동적으로 계산
+        int fixedTotalPages
+                = (int) dateRanges.stream().filter(
+                        range -> !range.isEmpty()).count();
+
+        // 페이지 번호 유효성 검증
+        if (pageNumber < 0 || pageNumber >= fixedTotalPages) {
+            throw new AttendancesCustomException(
+                    AttendancesExceptionCode.NOT_EXIST_ATTENDANCE_PAGE);
+        }
+
+        // 페이지에 해당하는 날짜 그룹 선택
+        List<LocalDate> selectedDates = dateRanges.get(pageNumber);
+
+        // 선택된 날짜에 해당하는 데이터를 필터링
         List<AttendancesResponseDto.ReadMonthlyDto> monthlyDtoList = groupedByDate.entrySet().stream()
+                .filter(entry -> selectedDates.contains(entry.getKey())) // 선택된 날짜만 포함
                 .map(entry -> {
                     LocalDate date = entry.getKey();
                     List<Attendances> dailyAttendances = entry.getValue();
 
                     // 각 상태별 카운트 계산
-                    int absentCount = (int) dailyAttendances.stream()
-                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ABSENT)
-                            .count();
-                    int onTimeCount = (int) dailyAttendances.stream()
-                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ON_TIME)
-                            .count();
-                    int onVacationCount = (int) dailyAttendances.stream()
-                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.VACATION)
-                            .count();
-                    int outOfOfficeCount = (int) dailyAttendances.stream()
-                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.OUT_OF_OFFICE)
-                            .count();
-                    int lateCount = (int) dailyAttendances.stream()
-                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.LATE)
-                            .count();
-                    int halfDayCount = (int) dailyAttendances.stream()
-                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HALF_DAY)
-                            .count();
-                    int holidayCount = (int) dailyAttendances.stream()
-                            .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HOLIDAY)
-                            .count();
-
-                    // ReadMonthlyDto 생성
                     return AttendancesResponseDto.ReadMonthlyDto.builder()
-                            .createdAt(date.atStartOfDay()) // 해당 날짜의 시작 시간
-                            .absentCount(absentCount)
-                            .onTimeCount(onTimeCount)
-                            .onVacationCount(onVacationCount)
-                            .lateCount(lateCount)
-                            .halfDayCount(halfDayCount)
-                            .outOfOfficeCount(outOfOfficeCount)
-                            .holidayCount(holidayCount)
+                            .createdAt(date.atStartOfDay())
+                            .absentCount((int) dailyAttendances.stream()
+                                    .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ABSENT)
+                                    .count())
+                            .onTimeCount((int) dailyAttendances.stream()
+                                    .filter(att -> att.getAttendanceStatus() == AttendanceStatus.ON_TIME)
+                                    .count())
+                            .onVacationCount((int) dailyAttendances.stream()
+                                    .filter(att -> att.getAttendanceStatus() == AttendanceStatus.VACATION)
+                                    .count())
+                            .lateCount((int) dailyAttendances.stream()
+                                    .filter(att -> att.getAttendanceStatus() == AttendanceStatus.LATE)
+                                    .count())
+                            .halfDayCount((int) dailyAttendances.stream()
+                                    .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HALF_DAY)
+                                    .count())
+                            .outOfOfficeCount((int) dailyAttendances.stream()
+                                    .filter(att -> att.getAttendanceStatus() == AttendanceStatus.OUT_OF_OFFICE)
+                                    .count())
+                            .holidayCount((int) dailyAttendances.stream()
+                                    .filter(att -> att.getAttendanceStatus() == AttendanceStatus.HOLIDAY)
+                                    .count())
                             .build();
                 }).toList();
 
-        // PageImpl 객체로 변환하여 반환
-        return new PageImpl<>(monthlyDtoList, attendancePage.getPageable(), attendancePage.getTotalElements());
+        // 페이지 크기 계산: 한 날짜의 멤버 수 * 선택된 날짜 수
+        int membersPerDay = groupedByDate.isEmpty() ? 0 : groupedByDate.values().iterator().next().size();
+        int pageSize = membersPerDay * selectedDates.size();
+
+        // 전체 요소 수
+        long totalElements = attendanceList.size();
+
+        // PageImpl 객체 생성
+        Page<AttendancesResponseDto.ReadMonthlyDto> customPage = new PageImpl<>(
+                monthlyDtoList,
+                PageRequest.of(pageNumber, pageSize),
+                totalElements
+        );
+
+        return customPage;
     }
+
 
     public static Page<AttendancesResponseDto.ReadOneDto> toReadFilteredDailyDto(
             Page<Attendances> attendancePage) {
@@ -212,7 +237,7 @@ public class AttendancesConverter {
                 .map(attendance -> AttendancesResponseDto.ReadOneDto.builder()
                         .attendanceId(attendance.getId())
                         .memberId(attendance.getMember().getId())
-                        .memberName(attendance.getMember().getName())
+                        .memberName(attendance.getMember().getMemberName())
                         .checkInTime(attendance.getCheckInTime())
                         .checkOutTime(attendance.getCheckOutTime())
                         .attendanceStatus(attendance.getAttendanceStatus())

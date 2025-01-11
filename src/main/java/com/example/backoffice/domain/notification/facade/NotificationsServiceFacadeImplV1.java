@@ -121,7 +121,6 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                 notificationsService.sendNotificationForUser(memberName, notification);
             }
         });
-
         notificationsService.saveAll(notificationList);
     }
 

@@ -37,7 +37,7 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
 
     @Override
     @Transactional(readOnly = true)
-    public List<Attendances> findFiltered(
+    public List<Attendances> findFilteredByMember(
             Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
 
         // startDate : year:month:01T00:00:00
@@ -73,13 +73,11 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
     @Override
     @Transactional
     public void deleteBeforeTwoYear(
-            List<Long> allMemberIdList,
             LocalDateTime startOfDeletion, LocalDateTime endOfDeletion){
         jpaQueryFactory
                 .delete(qAttendance)
                 .where(
-                        qAttendance.member.id.in(allMemberIdList)
-                                .and(qAttendance.createdAt.between(startOfDeletion, endOfDeletion))
+                        (qAttendance.createdAt.between(startOfDeletion, endOfDeletion))
                 )
                 .execute();
     }
@@ -120,26 +118,30 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
         query.executeUpdate();
     }
 
-    /*@Override
-    @Transactional
-    public void saveManually(Long memberId, LocalDateTime customCreatedAt, Attendances attendance) {
-        jpaQueryFactory.insert(qAttendance)
-                .columns(qAttendance.member.id, qAttendance.attendanceStatus, qAttendance.description,
-                        qAttendance.checkInTime, qAttendance.checkOutTime, qAttendance.createdAt)
-                .values(
-                        memberId, // Member 엔티티 대신 ID만 사용
-                        attendance.getAttendanceStatus(),
-                        attendance.getDescription(),
-                        attendance.getCheckInTime(),
-                        attendance.getCheckOutTime(),
-                        customCreatedAt
-                )
-                .execute();
-    }*/
+    @Override
+    @Transactional(readOnly = true)
+    public List<Attendances> findAllFilteredByAdmin(
+            List<Long> memberIdList, LocalDateTime customStartDay,
+            LocalDateTime customEndDay) {
+
+        // BooleanBuilder를 사용해 필터 조건 생성
+        BooleanBuilder builder = new BooleanBuilder();
+        if (memberIdList != null && !memberIdList.isEmpty()) {
+            builder.and(qAttendance.member.id.in(memberIdList));
+        }
+
+        builder.and(qAttendance.createdAt.between(customStartDay, customEndDay));
+
+        // Query 실행
+        return jpaQueryFactory
+                .selectFrom(qAttendance)
+                .where(builder)
+                .fetch();
+    }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Attendances> findAllFiltered(
+    public Page<Attendances> findAllFilteredByAdmin(
             List<Long> memberIdList, LocalDateTime customStartDay,
             LocalDateTime customEndDay, Pageable pageable) {
 
