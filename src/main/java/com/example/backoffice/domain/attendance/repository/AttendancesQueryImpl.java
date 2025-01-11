@@ -37,7 +37,7 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
 
     @Override
     @Transactional(readOnly = true)
-    public List<Attendances> findFiltered(
+    public List<Attendances> findFilteredByMember(
             Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
 
         // startDate : year:month:01T00:00:00
@@ -73,13 +73,11 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
     @Override
     @Transactional
     public void deleteBeforeTwoYear(
-            List<Long> allMemberIdList,
             LocalDateTime startOfDeletion, LocalDateTime endOfDeletion){
         jpaQueryFactory
                 .delete(qAttendance)
                 .where(
-                        qAttendance.member.id.in(allMemberIdList)
-                                .and(qAttendance.createdAt.between(startOfDeletion, endOfDeletion))
+                        (qAttendance.createdAt.between(startOfDeletion, endOfDeletion))
                 )
                 .execute();
     }
@@ -122,7 +120,7 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
 
     @Override
     @Transactional(readOnly = true)
-    public List<Attendances> findAllFiltered(
+    public List<Attendances> findAllFilteredByAdmin(
             List<Long> memberIdList, LocalDateTime customStartDay,
             LocalDateTime customEndDay) {
 
@@ -143,7 +141,7 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Attendances> findAllFiltered(
+    public Page<Attendances> findAllFilteredByAdmin(
             List<Long> memberIdList, LocalDateTime customStartDay,
             LocalDateTime customEndDay, Pageable pageable) {
 

@@ -244,8 +244,15 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
             throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_IDS);
         }
 
+        for (Members members : memberList) {
+            System.out.println("member : "+members.getMemberName());
+        }
         List<Members> memberListExcludingDepartmentAndId
                 = findByDepartmentNotInAndIdNotIn(excludedDepartmentList, excludedIdList);
+
+        for (Members members : memberListExcludingDepartmentAndId) {
+            System.out.println("sending member : "+members.getMemberName());
+        }
         Map<String, MemberDepartment> memberNameMap = new HashMap<>();
 
         for(Members member : memberListExcludingDepartmentAndId){

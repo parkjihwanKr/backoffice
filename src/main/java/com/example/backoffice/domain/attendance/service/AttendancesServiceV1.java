@@ -128,9 +128,8 @@ public interface AttendancesServiceV1 {
 
     /**
      * 월간 스케줄러에 의한 오래된 근태 기록을 삭제
-     * @param allMemberIdList 삭제할 멤버 ID 리스트
      */
-    void delete(List<Long> allMemberIdList);
+    void delete();
 
     /**
      * 관리자가 전산 오류로 인한 근태 기록을 삭제

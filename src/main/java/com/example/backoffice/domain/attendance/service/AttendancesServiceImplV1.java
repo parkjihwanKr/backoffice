@@ -156,7 +156,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         // 4. 동적 필터링된 데이터 조회
         List<Attendances> memberAttendanceList
-                = attendancesRepository.findFiltered(memberId, startDate, endDate);
+                = attendancesRepository.findFilteredByMember(memberId, startDate, endDate);
 
         // 5. DTO 반환
         return AttendancesConverter.toReadFilteredDto(memberAttendanceList);
@@ -338,13 +338,12 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional
-    public void delete(List<Long> allMemberIdList){
+    public void delete(){
         LocalDateTime startOfDeletion
                 = DateTimeUtils.getToday().minusYears(2).minusMonths(1);
         LocalDateTime endOfDeletion
                 = DateTimeUtils.getToday().minusYears(2).minusMinutes(1);
-        attendancesRepository.deleteBeforeTwoYear(
-                allMemberIdList, startOfDeletion, endOfDeletion);
+        attendancesRepository.deleteBeforeTwoYear(startOfDeletion, endOfDeletion);
     }
 
     @Override
@@ -385,7 +384,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         // 4. 근태 기록 필터링
         List<Attendances> attendanceList
-                = attendancesRepository.findAllFiltered(
+                = attendancesRepository.findAllFilteredByAdmin(
                         memberIdList, yearMonthStartDay, yearMonthEndDay);
 
         // 5. 응답 반환
@@ -413,7 +412,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         // 4. 근태 기록 필터링
         Page<Attendances> attendancePage
-                = attendancesRepository.findAllFiltered(
+                = attendancesRepository.findAllFilteredByAdmin(
                 memberIdList, customStartDay, customEndDay, pageable);
 
         // 5. 응답 반환
@@ -475,7 +474,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         DateRange attendanceDateRange
                 = DateTimeUtils.setWeek(DateTimeUtils.getToday());
         List<Attendances> personalAttendanceList
-                = attendancesRepository.findFiltered(
+                = attendancesRepository.findFilteredByMember(
                         loginMember.getId(), attendanceDateRange.getStartDate(),
                 attendanceDateRange.getEndDate());
 

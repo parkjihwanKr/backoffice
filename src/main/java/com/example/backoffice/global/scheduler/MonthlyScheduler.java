@@ -72,8 +72,6 @@ public class MonthlyScheduler implements SchedulerTask{
     }
 
     private void deleteBeforeTwoYearAttendanceList(){
-        List<Members> memberList = membersService.findAll();
-        List<Long> memberIdList = memberList.stream().map(Members::getId).toList();
-        attendancesService.delete(memberIdList);
+        attendancesService.delete();
     }
 }
