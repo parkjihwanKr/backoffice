@@ -235,7 +235,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Transactional(readOnly = true)
     public Members findCeoByMemberName(String memberName){
         Members ceo = membersRepository.findByMemberName(memberName).orElseThrow(
-                ()-> new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_MEMBER_NAME));
+                ()-> new MembersCustomException(MembersExceptionCode.DUPLICATED_MEMBER_NAME));
         if(!ceo.getPosition().equals(MemberPosition.CEO)){
             throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
         }

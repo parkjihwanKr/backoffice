@@ -223,12 +223,12 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         // 2. 바꾸려는 휴가가 있는지?
         Vacations vacation = vacationsService.findById(vacationId);
 
-        // 3. isAccepted 변경
+        // 3. isAccepted 변경 false / update -> true
         Boolean initialIsAccepted = vacation.getIsAccepted();
         vacation.updateIsAccepted(!initialIsAccepted);
 
         // 4. 알림 메시지를 isAccepted 상태에 따라 변경
-        String notificationMessage = initialIsAccepted
+        String notificationMessage = vacation.getIsAccepted()
                 ? vacation.getOnVacationMember().getMemberName() + "님의 휴가가 승인되었습니다."
                 : vacation.getOnVacationMember().getMemberName() + "님의 휴가가 미승인되었습니다.";
 

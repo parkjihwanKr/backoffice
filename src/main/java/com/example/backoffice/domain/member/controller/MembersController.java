@@ -62,7 +62,7 @@ public class MembersController {
             @RequestParam(name = "department", required = false) String department,
             @RequestParam(name = "position", required = false) String position,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 10) Pageable pageable){
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable){
         Page<MembersResponseDto.ReadOneDto> responseDtoList
                 = membersServiceFacade.readByAdmin(
                         department, position, memberDetails.getMembers(), pageable);

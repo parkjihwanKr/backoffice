@@ -2,13 +2,21 @@ package com.example.backoffice.global.exception;
 
 import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
+import com.example.backoffice.domain.file.exception.FilesCustomException;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.reaction.exception.ReactionsCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.global.dto.CommonResponseDto;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -88,6 +96,45 @@ public class GlobalExceptionHandler {
                 ex.getHttpStatus().value()  // 상태 코드 설정
         );
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(FilesCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleFilesException(
+            FilesCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleConstraintViolationException(
+            ConstraintViolationException ex) {
+
+        // 에러 메시지를 수집
+        Map<String, String> errorMap = new HashMap<>();
+        final String ERROR_KEY = "AUTH-ERROR";
+
+        // ConstraintViolation의 메시지를 스트림으로 처리하여 병합
+        String errorMessages = ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .reduce((msg1, msg2) -> msg1 + ", " + msg2)
+                .orElse("Validation error occurred.");
+
+        errorMap.put(ERROR_KEY, errorMessages);
+
+        // CommonResponseDto를 생성
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ERROR_KEY,
+                errorMessages,
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        // ResponseEntity로 반환
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     /* 그 외의 일반적인 예외 처리

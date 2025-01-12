@@ -6,6 +6,7 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,18 +21,16 @@ public class MembersRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneDto{
-        //@Pattern(regexp = "^[a-zA-Z0-9]{4,}$", message = "password는 최소 4자 이상이며 알파벳 대소문자(a~z, A~Z), 숫자(0~9)로 구성되어야 합니다.")
+        @Size(min = 8, max = 16, message = "비밀번호는 8자 이상 16자 이하로 입력해주세요.")
         private String password;
 
-        //@Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,6}$", message = "유효한 이메일 주소를 입력하세요.")
-        private String email;
+        @Size(min = 8, max = 16, message = "비밀번호 확인은 8자 이상 16자 이하로 입력해주세요.")
+        private String passwordConfirm;
 
+        private String email;
         private String name;
         private String memberName;
-        // private String email;
         private String address;
-        // private String password;
-        private String passwordConfirm;
         private String contact;
     }
 
