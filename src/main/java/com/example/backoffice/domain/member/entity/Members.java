@@ -6,6 +6,10 @@ import com.example.backoffice.domain.favorite.entity.Favorites;
 import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,22 +36,37 @@ public class Members extends CommonEntity {
 
     // 접속 아이디
     @Column(unique = true)
+    @Pattern(
+            regexp = "^[a-z0-9]{8,16}$",
+            message = "아이디는 8자 이상 16자 이하의 소문자 알파벳와 숫자으로만 구성되어야 합니다."
+    )
     private String memberName;
 
     @Column
+    @NotBlank(message = "비밀번호는 필수 입력 항목입니다.")
+    @Size(min = 60, message = "비밀번호 해시값은 최소 60자 이상이어야 합니다.")
     private String password;
 
     @Column(unique = true)
+    @Email(message = "유효한 이메일 주소를 입력해주세요.")
+    @Pattern(
+            regexp = "^[a-zA-Z0-9._%+-]+@(naver\\.com|gmail\\.com)$",
+            message = "이메일은 naver.com 또는 gmail.com 도메인만 허용됩니다."
+    )
     private String email;
+
+    @Column(unique = true)
+    @Pattern(
+            regexp = "^010-\\d{4}-\\d{4}$",
+            message = "연락처는 '010-****-****' 형식이어야 합니다."
+    )
+    private String contact;
 
     @Column
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
     private String address;
-
-    @Column(unique = true)
-    private String contact;
 
     private String profileImageUrl;
 

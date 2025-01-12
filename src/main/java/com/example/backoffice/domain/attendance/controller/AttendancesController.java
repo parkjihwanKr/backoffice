@@ -103,7 +103,7 @@ public class AttendancesController {
             @RequestParam(name = "memeberName", required = false) String memberName,
             @RequestParam(name = "year") Long year, @RequestParam(name = "month")Long month,
             @RequestParam(name = "day") Long day,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC, size = 20) Pageable pageable,
+            @PageableDefault(sort = "memberId", direction = Sort.Direction.ASC, size = 20) Pageable pageable,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         Page<AttendancesResponseDto.ReadOneDto> responseDtoPage
                 = attendancesService.readFilteredByDailyForAdmin(

@@ -37,24 +37,12 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     private final VacationsServiceV1 vacationsService;
     private final PasswordEncoder passwordEncoder;
 
-    // 해당 부분 지워야함
-    @PostConstruct
-    public void createOneForAdmin(){
-        if(membersService.existsById(1L)){
-            return;
-        }
-        String rawPassword = "12341234";
-        String bcrytPassword = passwordEncoder.encode(rawPassword);
-        Members mainAdmin = MembersConverter.toAdminEntity(bcrytPassword);
-        membersService.save(mainAdmin);
-    }
-
     // 타당성 검사 추가
     @Override
     @Transactional
     public MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto){
-
+        System.out.println(requestDto.getPassword() + " / "+requestDto.getPasswordConfirm());
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
@@ -67,13 +55,14 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
                     = findExceptionType(requestDto, duplicatedInfoMember);
             switch (exceptionType) {
                 case EMAIL
-                        -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_EMAIL);
+                        -> throw new MembersCustomException(
+                                MembersExceptionCode.DUPLICATED_EMAIL);
                 case ADDRESS
-                        -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_ADDRESS);
+                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_ADDRESS);
                 case MEMBER_NAME
-                        -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_MEMBER_NAME);
+                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_MEMBER_NAME);
                 case CONTACT
-                        -> throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
+                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_CONTACT);
                 case NULL
                         -> throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_EXCEPTION_TYPE);
             }
@@ -88,12 +77,16 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @Transactional(readOnly = true)
     public MembersResponseDto.ReadAvailableMemberNameDto checkAvailableMemberName(
-            String memberName){
-        if(membersService.isExistMemberName(memberName)){
+            String requestedMemberName){
+        if (!requestedMemberName.matches("^[a-z0-9]{8,16}$")) {
+            throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_NAME);
+        }
+
+        if(membersService.isExistMemberName(requestedMemberName)){
             throw new MembersCustomException(
                     MembersExceptionCode.EXISTS_MEMBER);
         }
-        return MembersConverter.toReadAvailableMemberNameDto(true, memberName);
+        return MembersConverter.toReadAvailableMemberNameDto(true, requestedMemberName);
     }
 
     @Override
@@ -165,16 +158,21 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }
+        // 데이터 베이스 제약 조건까지 넘어가지 않도록 먼저 오류 설정
+        if(requestDto.getIntroduction().length() > 500){
+            throw new MembersCustomException(MembersExceptionCode.MAX_LENGTH_500);
+        }
+
         // 3. 요청dto의 contact가 나를 제외한 db에 존재하는 모든 멤버의 연락처와 같으면 안됨
         // 4. 요청dto의 email이 나를 제외한 db에 존재하는 모든 멤버의 이메일과 같으면 안됨
         List<Members> memberListExceptLoginMember
                 = membersService.findAllExceptLoginMember(matchedMember.getId());
         for(Members member : memberListExceptLoginMember){
             if(requestDto.getEmail().equals(member.getEmail())){
-                throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_EMAIL);
+                throw new MembersCustomException(MembersExceptionCode.DUPLICATED_EMAIL);
             }
             if(requestDto.getContact().equals(member.getContact())){
-                throw new MembersCustomException(MembersExceptionCode.MATCHED_MEMBER_INFO_CONTACT);
+                throw new MembersCustomException(MembersExceptionCode.DUPLICATED_CONTACT);
             }
         }
 
@@ -186,12 +184,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         return MembersConverter.toUpdateOneDto(matchedMember);
     }
 
-    // 직원의 부서, 직위, 급여 등등 변경
-    // 해당 변경 사항은 메인 어드민이거나 인사부장 제외하고는 인사 발령을 건드릴 수 없다.
-    // 인사 부장은 메인 어드민, 각 부서의 부장의 직위를 변경할 수 없다.
-    // 즉, 인사 부장은 메인 어드민을 제외한 각 부서의 직원들의 직책은 변경할 수 있다.
-    // ex) IT MANAGER -> SALES MANAGER
-    // 메인 어드민은 모든 직원의 직책, 직위를 변경할 수 있다.
     @Override
     @Transactional
     public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttributeByAdmin(

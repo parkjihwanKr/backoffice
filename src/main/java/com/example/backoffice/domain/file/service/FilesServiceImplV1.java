@@ -34,11 +34,15 @@ public class FilesServiceImplV1 implements FilesServiceV1 {
     @Override
     @Transactional
     public String createOneForMemberRole(MultipartFile file, Members member) {
-        String originalFilename = file.getOriginalFilename();
-        String uuidOriginalFilename = UUID.randomUUID() + "_" + originalFilename;
-        Files image = FilesConverter.toEntityForMemberRole(uuidOriginalFilename, member);
-        filesRepository.save(image);
-        return s3Util.uploadFile(file);
+        try {
+            String originalFilename = file.getOriginalFilename();
+            String uuidOriginalFilename = UUID.randomUUID() + "_" + originalFilename;
+            Files image = FilesConverter.toEntityForMemberRole(uuidOriginalFilename, member);
+            filesRepository.save(image);
+            return s3Util.uploadFile(file);
+        }catch (NullPointerException e) {
+            throw new FilesCustomException(FilesExceptionCode.NEED_FILE);
+        }
     }
 
     @Override

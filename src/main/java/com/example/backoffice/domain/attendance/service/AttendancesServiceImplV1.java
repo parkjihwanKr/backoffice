@@ -785,7 +785,6 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                     .atTime(0, 0, 0);
 
             switch (status) {
-                // absent, holiday, vacation은 또 분기해서 처리 예정
                 case ON_TIME, OUT_OF_OFFICE, ABSENT, HOLIDAY, VACATION ->
                         handleAttendance(
                                 member, status, description,
@@ -813,7 +812,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         LocalDateTime todayCheckOutTime = DateTimeUtils.getTodayCheckOutTime();
 
         switch (status) {
-            case ON_TIME, OUT_OF_OFFICE ->
+            case ON_TIME, OUT_OF_OFFICE, ABSENT, HOLIDAY, VACATION ->
                     handleAttendance(
                             member, status, description,
                             todayCheckInTime, todayCheckOutTime,
@@ -821,15 +820,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             case LATE ->
                     handleAttendance(
                             member, status, description,
-                            todayCheckInTime.plusMinutes(1),
-                            todayCheckOutTime, DateTimeUtils.getToday(),
-                            null);
-            case ABSENT, HOLIDAY, VACATION ->
-                    handleAttendance(
-                            member, status, description,
-                            todayCheckInTime, null
-                            , DateTimeUtils.getToday(),
-                            null);
+                            todayCheckInTime.plusMinutes(1), todayCheckOutTime,
+                            DateTimeUtils.getToday(), null);
             case HALF_DAY ->
                     handleAttendance(
                             member, status, description,
