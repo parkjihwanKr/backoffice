@@ -57,6 +57,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
         log.info("successfulAuthentication()");
+
+        String origin = request.getHeader("Origin"); // 요청의 출처
+        String referer = request.getHeader("Referer"); // 요청 발생 경로
+
+        log.info("Request Origin: " + origin);
+        log.info("Request Referer: " + referer);
+
+        // 서버에서 수신한 요청 URL
+        String serverRequestURL = request.getRequestURL().toString(); // 전체 URL
+        String serverRequestURI = request.getRequestURI(); // URI 부분
+
+        log.info("Server received request URL: " + serverRequestURL);
+        log.info("Server received request URI: " + serverRequestURI);
+
         String username = ((MemberDetailsImpl) authResult.getPrincipal()).getUsername();
         MemberRole role = ((MemberDetailsImpl) authResult.getPrincipal()).getMembers().getRole();
 
@@ -108,6 +122,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // JSON 응답 보내기
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+
+
         try {
             response.getWriter().write("{\"status\":\"success\"}");
         } catch (IOException e) {
