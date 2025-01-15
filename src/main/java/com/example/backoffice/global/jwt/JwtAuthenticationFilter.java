@@ -67,7 +67,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 서버에서 수신한 요청 URL
         String serverRequestURL = request.getRequestURL().toString(); // 전체 URL
         String serverRequestURI = request.getRequestURI(); // URI 부분
-
         log.info("Server received request URL: " + serverRequestURL);
         log.info("Server received request URI: " + serverRequestURI);
 
