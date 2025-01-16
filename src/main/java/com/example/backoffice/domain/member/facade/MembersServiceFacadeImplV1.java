@@ -15,6 +15,7 @@ import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,28 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     private final NotificationsServiceV1 notificationsService;
     private final VacationsServiceV1 vacationsService;
     private final PasswordEncoder passwordEncoder;
+
+    @PostConstruct
+    private void createMainAdminAccount(){
+        String bcrytPassword = passwordEncoder.encode("22222222");
+        membersService.save(
+                Members.builder()
+                        .role(MemberRole.MAIN_ADMIN)
+                        .position(MemberPosition.CEO)
+                        .department(MemberDepartment.HR)
+                        .name("admin1234")
+                        .memberName("admin1234")
+                        .onVacation(false)
+                        .salary(100000000L)
+                        .id(1L)
+                        .loveCount(5L)
+                        .introduction("admin이다")
+                        .password(bcrytPassword)
+                        .contact("010-1234-1111")
+                        .remainingVacationDays(4)
+                        .build()
+        );
+    }
 
     // 타당성 검사 추가
     @Override

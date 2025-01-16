@@ -8,6 +8,7 @@ import com.example.backoffice.global.redis.RefreshTokenRepository;
 import com.example.backoffice.global.security.CustomLogoutHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,9 @@ import java.util.Arrays;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
+    @Value("${server.port}")
+    private String deploymentPort;
 
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository tokenRedisProvider;
@@ -76,7 +80,7 @@ public class WebSecurityConfig {
                                     Arrays.asList(
                                             "http://localhost:3000",
                                             "http://backofficefront.s3-website.ap-northeast-2.amazonaws.com",
-                                            "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com:8082"));
+                                            "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com"+deploymentPort));
                             // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
                             // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
