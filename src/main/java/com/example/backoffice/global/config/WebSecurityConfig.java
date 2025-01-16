@@ -75,7 +75,8 @@ public class WebSecurityConfig {
                             configuration.setAllowedOriginPatterns(
                                     Arrays.asList(
                                             "http://localhost:3000",
-                                            "http://backofficefront.s3-website.ap-northeast-2.amazonaws.com"));
+                                            "http://backofficefront.s3-website.ap-northeast-2.amazonaws.com",
+                                            "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com:8082"));
                             // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
                             // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
