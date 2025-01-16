@@ -2,6 +2,7 @@ package com.example.backoffice.global.config;
 
 import com.example.backoffice.global.jwt.interceptor.JwtChannelInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -13,6 +14,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Value("${server.port}")
+    private String deploymentPort;
 
     private final JwtChannelInterceptor jwtChannelInterceptor;
 
@@ -32,7 +36,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins(
                         "http://localhost:3000", "http://localhost:8080",
                         "http://backofficefront.s3-website.ap-northeast-2.amazonaws.com",
-                        "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com")
+                        "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com:"+ deploymentPort)
                 // ec2 서버도 추가해야함
                 .withSockJS();
     }

@@ -1,18 +1,10 @@
 package com.example.backoffice.domain.member.dto;
 
-import com.example.backoffice.domain.member.entity.MemberDepartment;
-import com.example.backoffice.domain.member.entity.MemberPosition;
-import com.example.backoffice.domain.member.entity.MemberRole;
-import com.example.backoffice.domain.member.entity.Members;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.aspectj.weaver.Member;
-import org.springframework.web.multipart.MultipartFile;
 
 public class MembersRequestDto {
 

@@ -81,6 +81,7 @@ public class DailyScheduler implements SchedulerTask{
         }
     }
 
+    // 여기가 에러가 나는듯
     private void createAttendances(){
         // 평일
         if(DateTimeUtils.isWeekday()){

@@ -13,30 +13,11 @@ import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import org.springframework.data.domain.Page;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MembersConverter {
 
-    public static Members toAdminEntity(String bcrytPassword){
-        return Members.builder()
-                .memberName("admin")
-                .name("admin")
-                .loveCount(0L)
-                .role(MemberRole.MAIN_ADMIN)
-                .email("admin@test.com")
-                .address("admin시 admin동")
-                .introduction("admin이다")
-                .department(MemberDepartment.HR)
-                .password(bcrytPassword)
-                .contact("010-0000-0000")
-                .position(MemberPosition.CEO)
-                .remainingVacationDays(4)
-                .onVacation(false)
-                .salary(200000000L)
-                .build();
-    }
     public static Members toEntity(
             MembersRequestDto.CreateOneDto requestDto, String bcryptPassword) {
         return Members.builder()
