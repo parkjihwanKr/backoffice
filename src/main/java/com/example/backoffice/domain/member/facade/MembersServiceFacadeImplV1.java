@@ -37,28 +37,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     private final VacationsServiceV1 vacationsService;
     private final PasswordEncoder passwordEncoder;
 
-    @PostConstruct
-    private void createMainAdminAccount(){
-        String bcrytPassword = passwordEncoder.encode("22222222");
-        membersService.save(
-                Members.builder()
-                        .role(MemberRole.MAIN_ADMIN)
-                        .position(MemberPosition.CEO)
-                        .department(MemberDepartment.HR)
-                        .name("admin1234")
-                        .memberName("admin1234")
-                        .onVacation(false)
-                        .salary(100000000L)
-                        .id(1L)
-                        .loveCount(5L)
-                        .introduction("admin이다")
-                        .password(bcrytPassword)
-                        .contact("010-1234-1111")
-                        .remainingVacationDays(4)
-                        .build()
-        );
-    }
-
     // 타당성 검사 추가
     @Override
     @Transactional
