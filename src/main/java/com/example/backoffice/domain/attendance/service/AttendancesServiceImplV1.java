@@ -559,8 +559,9 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 = membersService.findAll().stream().map(Members::getId).toList();
         LocalDateTime yesterday = DateTimeUtils.getToday().minusDays(1);
         for(Long memberId : memberIdList){
-            Attendances yesterdayAttendance = attendancesRepository.findByMemberIdAndCreatedDate(
-                    memberId, yesterday.toLocalDate()).orElseGet(null);
+            Attendances yesterdayAttendance
+                    = attendancesRepository.findByMemberIdAndCreatedDate(
+                            memberId, yesterday.toLocalDate()).orElse(null);
             if(yesterdayAttendance != null){
                 String defaultMessage = "스케줄러에 의한 근태 기록 처리가 되었습니다.";
                 switch (yesterdayAttendance.getAttendanceStatus()) {
