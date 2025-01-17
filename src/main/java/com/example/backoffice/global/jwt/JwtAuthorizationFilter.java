@@ -32,7 +32,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         return requestUrl.startsWith("/ws")
                 || requestUrl.equals("/api/v1/signup")
                 || requestUrl.equals("/api/v1/login")
-                || requestUrl.equals("/api/v1/check-available-memberName");
+                || requestUrl.equals("/api/v1/check-available-memberName")
+                || requestUrl.startsWith("/swagger-ui")
+                || requestUrl.startsWith("/v3/api-docs");
     }
 
     @Override
@@ -43,6 +45,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // 특정 경로는 무시하고 진행
         if (isExcludedUrl(requestUrl)) {
+            log.info("Excluded URL, skipping filter: {}", requestUrl);
             filterChain.doFilter(request, response);
             return;
         }

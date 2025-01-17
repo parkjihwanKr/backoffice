@@ -78,7 +78,7 @@ public class WebSecurityConfig {
                             // production 환경에선 ec2 서버의 도메인 또는 router53에서 산 도메인을 적어서 열어줘야함
                             configuration.setAllowedOriginPatterns(
                                     Arrays.asList(
-                                            "http://localhost:3000",
+                                            "http://localhost:3000", "http://localhost:8080",
                                             "http://baegobiseu.com.s3-website.ap-northeast-2.amazonaws.com",
                                             "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com"+deploymentPort));
                             // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
@@ -95,6 +95,7 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/websocket", "/ws/**",
                                 "/api/v1/login","/api/v1/signup",
+                                "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/check-available-memberName").permitAll()
                         .anyRequest().authenticated()
                 )
