@@ -15,7 +15,6 @@ import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -379,17 +378,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             return MembersExceptionEnum.MEMBER_NAME;
         }
         return MembersExceptionEnum.NULL;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public MembersResponseDto.ReadOneForProfileImageDto readOneForProfileImage(
-            Long memberId, Members loginMember){
-        Members foundMember
-                = membersService.matchLoginMember(loginMember, memberId);
-
-        return MembersConverter.toReadOneForProfileImageDto(
-                foundMember.getProfileImageUrl(), memberId);
     }
 
     public MemberRole checkedRole(String role){

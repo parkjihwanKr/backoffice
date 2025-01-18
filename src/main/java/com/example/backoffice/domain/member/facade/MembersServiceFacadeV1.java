@@ -4,10 +4,10 @@ import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 
 import java.util.List;
 
@@ -19,13 +19,13 @@ public interface MembersServiceFacadeV1 {
      * @return 생성된 멤버의 기본적인 정보
      * @throws MembersCustomException {@link MembersExceptionCode#NOT_MATCHED_PASSWORD}
      * 비밀번호와 비밀번호 확인이 일치하지 않을 경우
-     * @throws MembersCustomException {@link MembersExceptionCode#MATCHED_MEMBER_INFO_EMAIL}
+     * @throws MembersCustomException {@link MembersExceptionCode#DUPLICATED_EMAIL}
      * 이미 등록된 이메일이 존재하는 경우
-     * @throws MembersCustomException {@link MembersExceptionCode#MATCHED_MEMBER_INFO_ADDRESS}
+     * @throws MembersCustomException {@link MembersExceptionCode#DUPLICATED_ADDRESS}
      * 이미 등록된 주소가 존재하는 경우
-     * @throws MembersCustomException {@link MembersExceptionCode#MATCHED_MEMBER_INFO_MEMBER_NAME}
+     * @throws MembersCustomException {@link MembersExceptionCode#DUPLICATED_MEMBER_NAME}
      * 이미 등록된 이름이 존재하는 경우
-     * @throws MembersCustomException {@link MembersExceptionCode#MATCHED_MEMBER_INFO_CONTACT}
+     * @throws MembersCustomException {@link MembersExceptionCode#DUPLICATED_CONTACT}
      * 이미 등록된 연락처가 존재하는 경우
      * @throws MembersCustomException {@link MembersExceptionCode#NOT_FOUND_EXCEPTION_TYPE}
      * 예외 타입을 찾을 수 없는 경우
@@ -40,6 +40,8 @@ public interface MembersServiceFacadeV1 {
      * @return 생성이 가능한지의 여부를 알려주는 응답 DTO
      * @throws MembersCustomException {@link MembersExceptionCode#EXISTS_MEMBER}
      * 이미 존재하는 멤버 이름일 경우
+     * @throws MembersCustomException {@link MembersExceptionCode#INVALID_MEMBER_NAME}
+     * 소문자 알파벳 또는 숫자인 문자가 8개 이상이거나 16이하가 아닌 경우
      */
     MembersResponseDto.ReadAvailableMemberNameDto checkAvailableMemberName(
             String memberName);
@@ -78,9 +80,9 @@ public interface MembersServiceFacadeV1 {
      * @return : 수정이 된 멤버 정보 응답 DTO
      * @throws MembersCustomException {@link MembersExceptionCode#NOT_MATCHED_MEMBER_NAME}
      * 멤버 이름이 일치하지 않을 경우
-     * @throws MembersCustomException {@link MembersExceptionCode#MATCHED_MEMBER_INFO_EMAIL}
+     * @throws MembersCustomException
      * 이메일이 중복될 경우
-     * @throws MembersCustomException {@link MembersExceptionCode#MATCHED_MEMBER_INFO_CONTACT}
+     * @throws MembersCustomException {@link MembersExceptionCode#DUPLICATED_CONTACT}
      * 연락처가 중복될 경우
      */
     MembersResponseDto.UpdateOneDto updateOne(
@@ -180,14 +182,4 @@ public interface MembersServiceFacadeV1 {
      * @return 멤버 이름 리스트 응답 DTO
      */
     List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember);
-
-    /**
-     * 멤버의 프로필 이미지 조회
-     * @param memberId : 조회하려는 멤버 아이디
-     * @param loginMember : 로그인 멤버
-     * @return 해당하는 멤버의 프로필 이미지 응답 DTO
-     * @throws MembersCustomException {@link MembersExceptionCode#NOT_EXISTS_PROFILE_IMAGE}
-     */
-    MembersResponseDto.ReadOneForProfileImageDto readOneForProfileImage(
-            Long memberId, Members loginMember);
 }
