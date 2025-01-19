@@ -33,7 +33,7 @@ public interface AttendancesQuery {
      * @param pageable : createdAt 오름차순, size = 7
      * @return 필터링된 근태 기록 페이지
      */
-    Page<Attendances> findFilteredForAdmin(
+    Page<Attendances> findFilteredByAdmin(
             Long foundMemberId, AttendanceStatus attendanceStatus,
             LocalDateTime checkInStartTime, LocalDateTime checkInEndTime,
             LocalDateTime checkOutStartTime, LocalDateTime checkOutEndTime,

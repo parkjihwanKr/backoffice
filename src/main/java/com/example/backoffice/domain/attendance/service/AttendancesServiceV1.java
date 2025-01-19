@@ -2,14 +2,13 @@ package com.example.backoffice.domain.attendance.service;
 
 import com.example.backoffice.domain.attendance.dto.AttendancesRequestDto;
 import com.example.backoffice.domain.attendance.dto.AttendancesResponseDto;
-import com.example.backoffice.domain.attendance.entity.Attendances;
+import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.global.common.DateRange;
+import com.example.backoffice.global.exception.DateUtilException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
-import com.example.backoffice.domain.member.exception.MembersCustomException;
-import com.example.backoffice.global.exception.DateUtilException;
 
 import java.util.List;
 
@@ -94,7 +93,7 @@ public interface AttendancesServiceV1 {
      * @throws MembersCustomException 관리 권한이 없는 경우
      * @throws DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
-    Page<AttendancesResponseDto.ReadOneDto> readForAdmin(
+    Page<AttendancesResponseDto.ReadOneDto> readPageByAdmin(
             String memberName, String attendanceStatus,
             DateRange checkInRange, DateRange checkOutRange,
             Members loginMember, Pageable pageable);
@@ -110,7 +109,7 @@ public interface AttendancesServiceV1 {
      * @throws MembersCustomException 관리 권한이 없는 경우
      * @throws AttendancesCustomException 근태 상태가 동일한 경우
      */
-    AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusForAdmin(
+    AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusByAdmin(
             Long memberId, Long attendanceId, Members loginMember,
             AttendancesRequestDto.UpdateAttendanceStatusDto requestDto);
 
@@ -123,7 +122,7 @@ public interface AttendancesServiceV1 {
      * @throws MembersCustomException 관리 권한이 없는 경우
      * @throws DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
-    AttendancesResponseDto.CreateOneDto createOneForAdmin(
+    AttendancesResponseDto.CreateOneDto createOneByAdmin(
             AttendancesRequestDto.CreateOneDto requestDto, Members loginMember);
 
     /**
@@ -138,20 +137,8 @@ public interface AttendancesServiceV1 {
      * @param loginMember 로그인 사용자
      * @throws MembersCustomException 관리 권한이 없는 경우
      */
-    void deleteForAdmin(
+    void deleteByAdmin(
             List<Long> deleteAttendanceIdList, Members loginMember);
-
-    /**
-     * 관리자가 전산 오류로 인해 근태 기록을 수동 생성
-     *
-     * @param requestDto 근태 기록 수동 생성 요청 DTO
-     * @param loginMember 로그인 사용자
-     * @return 생성된 근태 기록 정보
-     * @throws MembersCustomException 관리 권한이 없는 경우
-     * @throws AttendancesCustomException 중복된 근태 기록이 존재하는 경우
-     *//*
-    AttendancesResponseDto.CreateOneDto createOneManuallyForAdmin(
-            AttendancesRequestDto.CreateOneManuallyForAdminDto requestDto, Members loginMember);*/
 
     /**
      * 관리자를 위한 모든 멤버의 월간 근태 기록 조회
@@ -165,7 +152,7 @@ public interface AttendancesServiceV1 {
      * @throws MembersCustomException 관리 권한이 없는 경우
      * @throws DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
-    Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyForAdmin(
+    Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyByAdmin(
             String department, Long year, Long month,
             Pageable pageable, Members loginMember);
 
@@ -183,7 +170,7 @@ public interface AttendancesServiceV1 {
      * @throws MembersCustomException 관리 권한이 없는 경우
      * @throws DateUtilException 유효하지 않은 날짜 범위가 전달된 경우
      */
-    Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyForAdmin(
+    Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyByAdmin(
             String department, String memberName, Long year, Long month, Long day,
             Pageable pageable, Members loginMember);
 
@@ -193,7 +180,7 @@ public interface AttendancesServiceV1 {
      * @param loginMember : 로그인 멤버
      * @return 필터링된 예정된 근태 기록
      */
-    List<AttendancesResponseDto.ReadScheduledRecordDto> readScheduledRecord(
+    List<AttendancesResponseDto.ReadScheduledRecordDto> readScheduledRecordByAdmin(
             String department, Members loginMember);
 
     /**
