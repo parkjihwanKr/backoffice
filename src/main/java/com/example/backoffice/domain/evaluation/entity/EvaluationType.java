@@ -15,6 +15,6 @@ public enum EvaluationType {
 
     public static class EvaluationLabelType{
         public static String COMPANY = "EVALUATIONS_COMPANY";
-        public static String DEPARTMENT = "EVALUAIONS_DEPARTMENT";
+        public static String DEPARTMENT = "EVALUATIONS_DEPARTMENT";
     }
 }

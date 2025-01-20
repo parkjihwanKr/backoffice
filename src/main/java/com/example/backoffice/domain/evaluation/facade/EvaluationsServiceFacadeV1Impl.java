@@ -8,7 +8,6 @@ import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
 import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
-import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
@@ -42,12 +41,14 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
     @Override
     @Transactional
-    public EvaluationsResponseDto.CreateOneForDepartmentDto createOneForDepartment(
+    public EvaluationsResponseDto.CreateOneForDepartmentDto createOneDepartmentType(
             Members loginMember, EvaluationsRequestDto.CreateOneForDepartmentDto requestDto){
 
         // 1. 적절한 부서에서 설문 조사를 만들었는지?
-        MemberDepartment department = membersService.findDepartment(requestDto.getDepartment());
-        matchDepartmentManager(department, loginMember.getDepartment(), loginMember.getPosition());
+        MemberDepartment department
+                = membersService.findDepartment(requestDto.getDepartment());
+        matchDepartmentManager(
+                department, loginMember.getDepartment(), loginMember.getPosition());
 
         // 2. 요청한 날짜가 시작, 마감 날짜가 분기에 따라 잘 나뉘었는지?
         Integer quarter
@@ -61,8 +62,6 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
             title = year+"년 "+quarter+"분기 부서 설문조사";
         }
 
-        // 한 평가에 여럿 멤버, 한 멤버에 여럿 평가 가능. 다대다인데?
-        // 일단 부서에 대한 평가를 부서원들에게 전달해야하니까 이건 맞음
         List<Members> memberList = membersService.findAllByDepartment(department);
 
         Evaluations evaluation
@@ -82,7 +81,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
     @Override
     @Transactional
-    public EvaluationsResponseDto.CreateOneForCompanyDto createOneForCompany(
+    public EvaluationsResponseDto.CreateOneForCompanyDto createOneCompanyType(
             Members loginMember, EvaluationsRequestDto.CreateOneForCompanyDto requestDto){
         // 1. 인사부장과 일치하는 인물인지? 또는 ceo인지?
         matchHRManagerOrCEO(loginMember.getDepartment(), loginMember.getPosition());
@@ -117,7 +116,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
     @Override
     @Transactional(readOnly = true)
-    public EvaluationsResponseDto.ReadOneForDepartmentDto readOneForDepartment(
+    public EvaluationsResponseDto.ReadOneForDepartmentDto readOneDepartmentType(
             Integer year, Integer quarter, Long evaluationId, Members loginMember){
         Evaluations evaluation
                 = evaluationsService.findByIdAndEvaluationType(
@@ -135,14 +134,12 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
     @Override
     @Transactional(readOnly = true)
-    public EvaluationsResponseDto.ReadOneForCompanyDto readOneForCompany(
+    public EvaluationsResponseDto.ReadOneForCompanyDto readOneCompanyType(
             Integer year, Long evaluationId, Members loginMember){
 
         Evaluations evaluation
                 = evaluationsService.findByIdAndEvaluationType(
                 evaluationId, EvaluationType.COMPANY);
-
-        // membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationId);
 
         return EvaluationsConverter.toReadOneForCompanyDto(
                 evaluationId, evaluation.getTitle(), evaluation.getDescription(), evaluation.getYear(),
@@ -151,7 +148,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
     @Override
     @Transactional
-    public EvaluationsResponseDto.UpdateOneForDepartmentDto updateOneForDepartment(
+    public EvaluationsResponseDto.UpdateOneForDepartmentDto updateOneDepartmentType(
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto){
         Evaluations evaluation
@@ -189,7 +186,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
     @Override
     @Transactional
-    public EvaluationsResponseDto.UpdateOneForCompanyDto updateOneForCompany(
+    public EvaluationsResponseDto.UpdateOneForCompanyDto updateOneCompanyType(
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.UpdateOneForCompanyDto requestDto){
         // 1. 존재하는 평가인지?
