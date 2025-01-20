@@ -37,7 +37,6 @@ public interface BoardsServiceFacadeV1 {
      * @param requestDto 게시글 생성에 필요한 요청 데이터 {@link BoardsRequestDto.CreateOneDto}
      * @param files 첨부 파일 리스트
      * @return 생성된 게시글의 정보 {@link BoardsResponseDto.CreateOneDto}
-     * @see BoardsServiceFacadeV1#createOneForDepartment(String, Members, BoardsRequestDto.CreateOneDto, List)
      */
     BoardsResponseDto.CreateOneDto createOneGeneralType(
             Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
