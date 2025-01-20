@@ -104,7 +104,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     @Override
     @Transactional
-    public Page<MembersResponseDto.ReadOneDto> readByAdmin(
+    public Page<MembersResponseDto.ReadOneSummaryDto> readByAdmin(
             String department, String position,
             Members loginMember, Pageable pageable) {
 

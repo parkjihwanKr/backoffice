@@ -68,7 +68,7 @@ public interface MembersServiceFacadeV1 {
      * @throws MembersCustomException {@link MembersExceptionCode#RESTRICTED_ACCESS_MEMBER}
      * 접근 권한이 없을 경우
      */
-    Page<MembersResponseDto.ReadOneDto> readByAdmin(
+    Page<MembersResponseDto.ReadOneSummaryDto> readByAdmin(
             String department, String position,
             Members loginMember, Pageable pageable);
 

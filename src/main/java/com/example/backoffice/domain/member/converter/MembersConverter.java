@@ -49,8 +49,8 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.ReadOneDto toReadOneDto(Members member){
-        return MembersResponseDto.ReadOneDto.builder()
+    public static MembersResponseDto.ReadOneSummaryDto toReadOneSummaryDto(Members member){
+        return MembersResponseDto.ReadOneSummaryDto.builder()
                 .memberId(member.getId())
                 .email(member.getEmail())
                 .address(member.getAddress())
@@ -152,9 +152,9 @@ public class MembersConverter {
                 .build();
     }
 
-    public static Page<MembersResponseDto.ReadOneDto> toReadDtoForHrManager(
+    public static Page<MembersResponseDto.ReadOneSummaryDto> toReadDtoForHrManager(
             Page<Members> memberPage){
-        return memberPage.map(MembersConverter::toReadOneDto);
+        return memberPage.map(MembersConverter::toReadOneSummaryDto);
     }
 
     public static MembersResponseDto.UpdateOneForVacationDto toUpdateOneForVacationDto(

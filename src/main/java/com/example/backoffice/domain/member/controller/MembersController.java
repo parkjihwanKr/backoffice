@@ -79,7 +79,7 @@ public class MembersController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "해당하는 아이디의 멤버 정보 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MembersResponseDto.ReadOneDto.class))),
+                            schema = @Schema(implementation = MembersResponseDto.ReadOneDetailsDto.class))),
             @ApiResponse(responseCode = "400", description = "해당 멤버의 상세 정보",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class))),
@@ -96,23 +96,25 @@ public class MembersController {
     }
 
     @GetMapping("/admin/members/filtered")
-    @Operation(summary = "요약된 멤버들의 정보 조회", description = "관리자에 의한 멤버들의 요약된 정보 조회할 수 있습니다.")
+    @Operation(summary = "요약된 멤버들의 정보 조회",
+            description = "관리자에 의한 멤버들의 요약된 정보 조회할 수 있습니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "관리자에 의한 멤버들의 요약된 정보 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = MembersResponseDto.ReadOneDto.class)))),
+                            array = @ArraySchema(schema = @Schema(
+                                    implementation = MembersResponseDto.ReadOneSummaryDto.class)))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class))),
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<Page<MembersResponseDto.ReadOneDto>> readByAdmin(
+    public ResponseEntity<Page<MembersResponseDto.ReadOneSummaryDto>> readByAdmin(
             @RequestParam(name = "department", required = false) String department,
             @RequestParam(name = "position", required = false) String position,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable){
-        Page<MembersResponseDto.ReadOneDto> responseDtoList
+        Page<MembersResponseDto.ReadOneSummaryDto> responseDtoList
                 = membersServiceFacade.readByAdmin(
                         department, position, memberDetails.getMembers(), pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
