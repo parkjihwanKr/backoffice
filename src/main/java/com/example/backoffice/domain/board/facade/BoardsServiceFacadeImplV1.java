@@ -26,7 +26,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -40,7 +42,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BoardsResponseDto.ReadAllDto> readAll(Pageable pageable) {
+    public Page<BoardsResponseDto.ReadAllDto> readPageGeneralType(Pageable pageable) {
         // 1. 중요한 게시글(isImportant == true)을 ModifiedAt 기준으로 내림차순 정렬하여 가져옵니다.
         List<Boards> importantBoardsByModifiedAt
                 = boardsService.findByIsImportantTrueAndBoardTypeOrderByModifiedAtDesc(
@@ -85,7 +87,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     @Override
     @Transactional(readOnly = true)
-    public BoardsResponseDto.ReadOneDto readOne(Long boardId, Members loginMember){
+    public BoardsResponseDto.ReadOneDto readOneGeneralType(Long boardId, Members loginMember){
         Boards board = boardsService.findById(boardId);
         if(!board.getBoardType().equals(BoardType.GENERAL)){
             throw new BoardsCustomException(BoardsExceptionCode.NOT_GENERAL_BOARD);
@@ -113,7 +115,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     @Override
     @Transactional
-    public BoardsResponseDto.CreateOneDto createOne(
+    public BoardsResponseDto.CreateOneDto createOneGeneralType(
             Members loginMember, BoardsRequestDto.CreateOneDto requestDto,
             List<MultipartFile> files){
         // 만들 자격 추가 : 전체 게시판을 만들 수 있는 인원은 권한이 admin이거나 main_admin만 가능
@@ -129,7 +131,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     @Override
     @Transactional
-    public BoardsResponseDto.UpdateOneDto updateOne(
+    public BoardsResponseDto.UpdateOneDto updateOneGeneralType(
             Long boardId, Members loginMember,
             BoardsRequestDto.UpdateOneDto requestDto,
             List<MultipartFile> files){
@@ -157,7 +159,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     @Override
     @Transactional
-    public BoardsResponseDto.CreateOneDto createOneForDepartment(
+    public BoardsResponseDto.CreateOneDto createOneDepartmentType(
             String department, Members loginMember,
             BoardsRequestDto.CreateOneDto requestDto, List<MultipartFile> files){
 
@@ -183,7 +185,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
     // 모든 멤버가 접근은 가능하되, 자기가 포함되어진 부서가 아닌 멤버에게는 읽기만 허용
     @Override
     @Transactional(readOnly = true)
-    public Page<BoardsResponseDto.ReadAllDto> readAllForDepartment(
+    public Page<BoardsResponseDto.ReadAllDto> readPageDepartmentType(
             String departmentName, Members loginMember, Pageable pageable){
         // 1. 부서에 해당하는 게시글 모두 조회
         MemberDepartment department = MembersConverter.toDepartment(departmentName);
@@ -218,7 +220,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     @Override
     @Transactional(readOnly = true)
-    public BoardsResponseDto.ReadOneDto readOneForDepartment(
+    public BoardsResponseDto.ReadOneDto readOneDepartmentType(
             String departmentName, Long boardId, Members loginMember){
         MemberDepartment department = MembersConverter.toDepartment(departmentName);
 
