@@ -8,8 +8,6 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.memberAnswer.service.MembersAnswersServiceV1;
-import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
-import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluationsServiceV1;
 import com.example.backoffice.domain.question.converter.QuestionsConverter;
 import com.example.backoffice.domain.question.dto.QuestionsRequestDto;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;

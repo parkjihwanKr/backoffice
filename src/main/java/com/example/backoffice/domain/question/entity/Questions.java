@@ -3,7 +3,6 @@ package com.example.backoffice.domain.question.entity;
 import com.example.backoffice.domain.answer.entity.Answers;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

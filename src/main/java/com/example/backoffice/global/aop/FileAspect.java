@@ -2,7 +2,6 @@ package com.example.backoffice.global.aop;
 
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.audit.entity.AuditLogType;
-import com.example.backoffice.global.audit.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
