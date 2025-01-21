@@ -7,7 +7,6 @@ import com.example.backoffice.domain.reaction.entity.Reactions;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ReactionsRepository extends JpaRepository<Reactions, Long> {
 
