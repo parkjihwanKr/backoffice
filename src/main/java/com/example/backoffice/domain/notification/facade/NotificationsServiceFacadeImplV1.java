@@ -141,7 +141,7 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
 
     @Override
     @Transactional
-    public List<NotificationsResponseDto.ReadAllDto> changeIsReadTrue(
+    public List<NotificationsResponseDto.ReadSummaryOneDto> changeIsReadTrue(
             Long memberId, Members member){
         // 1. 로그인 사용자와 일치하는지
         Members matchedMember
