@@ -3,9 +3,9 @@ package com.example.backoffice.domain.event.service;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
-import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
 import com.example.backoffice.domain.event.exception.EventsExceptionCode;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
 
 import java.time.LocalDateTime;
 import java.util.List;
