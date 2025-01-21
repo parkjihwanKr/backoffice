@@ -22,14 +22,14 @@ public interface EventsServiceFacadeV1 {
      * 부서 일정 생성
      * @param department : 생성하려는 일정의 부서
      * @param loginMember : 로그인 멤버
-     * @param requestDto {@link EventsResponseDto.CreateOneForDepartmentEventDto}
+     * @param requestDto {@link EventsRequestDto.CreateOneDepartmentTypeDto}
      * @param files : 첨부할 파일 (선택 사항, null 가능)
-     * @return {@link EventsResponseDto.CreateOneForDepartmentEventDto}
+     * @return {@link EventsResponseDto.CreateOneDepartmentTypeDto}
      * 부서 일정 생성 응답 DTO
      */
-    EventsResponseDto.CreateOneForDepartmentEventDto createOneForDepartmentEvent(
+    EventsResponseDto.CreateOneDepartmentTypeDto createOneDepartmentType(
             String department, Members loginMember,
-            EventsRequestDto.CreateOneForDepartmentEventDto requestDto,
+            EventsRequestDto.CreateOneDepartmentTypeDto requestDto,
             List<MultipartFile> files);
 
     /**
@@ -38,13 +38,13 @@ public interface EventsServiceFacadeV1 {
      * @param year : 조회하고 싶은 년도
      * @param month : 조회하고 싶은 월
      * @param loginMember : 로그인 멤버
-     * @return {@link EventsResponseDto.ReadOneForDepartmentEventDto}
+     * @return {@link EventsResponseDto.ReadOneDepartmentTypeDto}
      * 부서 한 달 일정 조회 응답 DTO
      * @throws EventsCustomException
      * {@link EventsExceptionCode#NO_PERMISSION_TO_READ_EVENT}
      * 로그인한 사용자가 조회하려는 일정의 아이디와 일치하지 않는 경우
      */
-    List<EventsResponseDto.ReadOneForDepartmentEventDto> readForDepartmentMonthEvent(
+    List<EventsResponseDto.ReadOneDepartmentTypeDto> readForDepartmentMonthEvent(
         String department, Long year, Long month, Members loginMember);
 
     /**
@@ -52,17 +52,17 @@ public interface EventsServiceFacadeV1 {
      * @param department : 수정하려는 일정의 부서
      * @param eventId : 수정할 일정 아이디
      * @param loginMember : 로그인 멤버
-     * @param requestDto {@link EventsRequestDto.UpdateOneForDepartmentEventDto}
+     * @param requestDto {@link EventsRequestDto.UpdateOneDepartmentTypeDto}
      * @param files : 첨부하려는 파일 (선택 사항, null 가능)
-     * @return {@link EventsResponseDto.UpdateOneForDepartmentEventDto}
+     * @return {@link EventsResponseDto.UpdateOneDepartmentTypeDto}
      * 부서 일정 하나 수정 응답 DTO
      * @throws EventsCustomException
      * {@link EventsExceptionCode#NO_PERMISSION_TO_READ_EVENT}
      * 로그인한 사용자가 조회하려는 일정의 아이디와 일치하지 않는 경우
      */
-    EventsResponseDto.UpdateOneForDepartmentEventDto updateOneForDepartmentEvent(
+    EventsResponseDto.UpdateOneDepartmentTypeDto updateOneDepartmentType(
             String department, Long eventId, Members loginMember,
-            EventsRequestDto.UpdateOneForDepartmentEventDto requestDto,
+            EventsRequestDto.UpdateOneDepartmentTypeDto requestDto,
             List<MultipartFile> files);
 
     /**
@@ -75,7 +75,7 @@ public interface EventsServiceFacadeV1 {
      * 로그인한 멤버가 삭제하려는 일정을 삭제할 수 없는 권한일 경우
      * 일정을 만든 사람 또는 직위가 사장인 경우만 삭제가 가능
      */
-    void deleteOneForDepartmentEvent(String department, Long eventId, Members loginMember);
+    void deleteOneDepartmentType(String department, Long eventId, Members loginMember);
 
     /**
      * 멤버 일정 조회
@@ -83,11 +83,11 @@ public interface EventsServiceFacadeV1 {
      * @param year : 조회하려는 년도
      * @param month : 조회하려는 달
      * @param loginMember : 로그인 멤버
-     * @return {@link EventsResponseDto.ReadOneForMemberScheduleDto}
+     * @return {@link EventsResponseDto.ReadOnePersonalScheduleDto}
      * 멤버 일정 조회 응답 DTO
      * Vacation, Event의 일부 정보가 둘 다 들어가 있는 응답 DTO
      */
-    List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberSchedule(
+    List<EventsResponseDto.ReadOnePersonalScheduleDto> readMonthlyPersonalSchedule(
             Long memberId, Long year, Long month, Members loginMember);
 
     /**
@@ -97,14 +97,14 @@ public interface EventsServiceFacadeV1 {
      * @param month : 조회할 월
      * @param day : 조회할 일
      * @param loginMember : 로그인 멤버
-     * @return {@link EventsResponseDto.ReadOneForMemberScheduleDto}
+     * @return {@link EventsResponseDto.ReadOnePersonalScheduleDto}
      * 멤버 일정 하루 조회 응답 DTO
      * Vacation, Event 도메인의 정보가 하나에 들어가 있음.
      * @throws EventsCustomException
      * {@link EventsExceptionCode#NO_PERMISSION_TO_READ_EVENT}
      * 로그인한 사용자가 조회하려는 일정의 아이디와 일치하지 않는 경우
      */
-    List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberDaySchedule(
+    List<EventsResponseDto.ReadOnePersonalScheduleDto> readDailyPersonalSchedule(
             Long memberId, Long year, Long month, Long day, Members loginMember);
 
 }

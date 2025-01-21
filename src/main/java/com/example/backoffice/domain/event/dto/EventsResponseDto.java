@@ -4,6 +4,7 @@ import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.vacation.entity.VacationType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,37 +19,9 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateOneForCompanyEventDto {
-        private Long eventId;
-        private String title;
-        private String description;
-        private List<FilesResponseDto.ReadOneDto> fileUrlList;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
-        private LocalDateTime createdAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ReadOneForCompanyEventDto {
-        private Long eventId;
-        private String title;
-        private String description;
-        private MemberDepartment department;
-        private List<FilesResponseDto.ReadOneDto> fileUrlList;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
-        private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CreateOneForDepartmentEventDto {
+    @Schema(name = "EventsResponseDto.CreateOneDepartmentTypeDto",
+            description = "부서 타입 일정 하나 생성 요청 DTO")
+    public static class CreateOneDepartmentTypeDto {
         private Long eventId;
         private String title;
         private String description;
@@ -64,23 +37,9 @@ public class EventsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class UpdateOneForCompanyEventDto {
-        private Long eventId;
-        private String title;
-        private String description;
-        private MemberDepartment department;
-        private List<FilesResponseDto.ReadOneDto> fileUrlList;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
-        private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ReadOneForDepartmentEventDto {
+    @Schema(name = "EventsResponseDto.ReadOneDepartmentTypeDto",
+            description = "부서 타입 일정 하나 조회 요청 DTO")
+    public static class ReadOneDepartmentTypeDto {
         private Long eventId;
         private String title;
         private String description;
@@ -96,7 +55,9 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateOneForDepartmentEventDto {
+    @Schema(name = "EventsResponseDto.UpdateOneDepartmentTypeDto",
+            description = "부서 타입 일정 하나 수정 요청 DTO")
+    public static class UpdateOneDepartmentTypeDto {
         private Long eventId;
         private String title;
         private String description;
@@ -112,7 +73,9 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadOneForMemberScheduleDto {
+    @Schema(name = "EventsResponseDto.ReadOnePersonalScheduleDto",
+            description = "개인 일정 하나 조회 요청 DTO")
+    public static class ReadOnePersonalScheduleDto {
         private Long eventId;
         private Long vacationId;
         private String title;
@@ -132,7 +95,9 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadOneForEventDto{
+    @Schema(name = "EventsResponseDto.ReadOneAllTypeDto",
+            description = "개인과 부서을 통합한 일정 하나 조회 요청 DTO")
+    public static class ReadOneAllTypeDto{
         private Long eventId;
         private Long vacationId;
         private String title;
@@ -152,6 +117,8 @@ public class EventsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "EventsResponseDto.ReadCompanySummaryOneDto",
+            description = "요약된 회사 일정 조회 요청 DTO")
     public static class ReadCompanySummaryOneDto {
         private Long eventId;
         private String title;
