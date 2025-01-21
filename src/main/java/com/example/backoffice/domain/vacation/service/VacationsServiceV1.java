@@ -2,10 +2,10 @@ package com.example.backoffice.domain.vacation.service;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
+import com.example.backoffice.domain.vacation.entity.VacationPeriodProvider;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsExceptionCode;
-import com.example.backoffice.domain.vacation.entity.VacationPeriodProvider;
 
 import java.time.LocalDateTime;
 import java.util.List;
