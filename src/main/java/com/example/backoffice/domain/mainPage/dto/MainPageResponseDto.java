@@ -6,6 +6,7 @@ import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.Vacations;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(name = "MainPageResponseDto",
+        description = "메인 페이지 응답 DTO")
 public class MainPageResponseDto {
 
     private List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList;
