@@ -1,7 +1,5 @@
 package com.example.backoffice.domain.favorite.controller;
 
-import com.example.backoffice.domain.board.dto.BoardsResponseDto;
-import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.favorite.dto.FavoritesRequestDto;
 import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
 import com.example.backoffice.domain.favorite.service.FavoritesServiceV1;
