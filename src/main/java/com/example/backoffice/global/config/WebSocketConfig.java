@@ -18,6 +18,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${server.port}")
     private String deploymentPort;
 
+    @Value("${cookie.secure}")
+    private Boolean isSecure;
+
     private final JwtChannelInterceptor jwtChannelInterceptor;
 
     @Override
@@ -32,13 +35,27 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 브라우저 CROS 이슈
         System.out.println("Web Socket endpoint registered");
-        registry.addEndpoint("/ws")
-                .setAllowedOrigins(
-                        "http://localhost:3000", "http://localhost:8080",
-                        "http://backofficefront.s3-website.ap-northeast-2.amazonaws.com",
-                        "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com:"+ deploymentPort)
-                // ec2 서버도 추가해야함
-                .withSockJS();
+        // 로컬
+        if(!isSecure){
+            registry.addEndpoint("/ws")
+                    .setAllowedOrigins(
+                            "http://localhost:3000", "http://localhost:8080",
+                            "http://backofficefront.s3-website.ap-northeast-2.amazonaws.com",
+                            "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com:"+ deploymentPort,
+                            "https://baegobiseu.com")
+                    // ec2 서버도 추가해야함
+                    .withSockJS();
+        }else{
+            // 배포
+            registry.addEndpoint("/wss")
+                    .setAllowedOrigins(
+                            "http://localhost:3000", "http://localhost:8080",
+                            "http://backofficefront.s3-website.ap-northeast-2.amazonaws.com",
+                            "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com:"+ deploymentPort,
+                            "https://baegobiseu.com")
+                    // ec2 서버도 추가해야함
+                    .withSockJS();
+        }
     }
 
     @Override

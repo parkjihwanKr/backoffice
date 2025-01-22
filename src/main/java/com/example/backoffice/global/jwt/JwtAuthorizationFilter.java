@@ -32,6 +32,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private boolean isExcludedUrl(String requestUrl) {
         // 필터링을 건너뛰는 경로를 명시적으로 정의
         return requestUrl.startsWith("/ws")
+                || requestUrl.equals("/wss")
                 || requestUrl.equals("/api/v1/signup")
                 || requestUrl.equals("/api/v1/login")
                 || requestUrl.equals("/api/v1/check-available-memberName")

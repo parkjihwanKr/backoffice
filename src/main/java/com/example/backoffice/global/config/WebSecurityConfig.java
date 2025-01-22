@@ -92,7 +92,7 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(
-                                "/websocket", "/ws/**",
+                                "/websocket", "/ws/**", "/wss/**",
                                 "/api/v1/login","/api/v1/signup",
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/check-available-memberName",
