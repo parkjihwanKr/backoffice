@@ -74,17 +74,14 @@ public class WebSecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(request -> {
                             CorsConfiguration configuration = new CorsConfiguration();
-                            // local 환경 테스트를 위한 임시 허용,
-                            // production 환경에선 ec2 서버의 도메인 또는 router53에서 산 도메인을 적어서 열어줘야함
+
                             configuration.setAllowedOriginPatterns(
                                     Arrays.asList(
                                             "http://localhost:3000", "http://localhost:8080",
                                             "http://api.baegobiseu.com",
                                             "http://baegobiseu.com.s3-website.ap-northeast-2.amazonaws.com",
                                             "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com"+deploymentPort,
-                                            "https://api.baegobiseu.com/", "https://baegobiseu.com/"));
-                            // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-                            // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
+                                            "https://api.baegobiseu.com", "https://baegobiseu.com"));
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
                             configuration.setAllowedHeaders(Arrays.asList("Authorization", "refreshToken", "Cache-Control", "Content-Type"));
                             configuration.setAllowCredentials(true);
