@@ -37,7 +37,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || requestUrl.equals("/api/v1/check-available-memberName")
                 || requestUrl.startsWith("/swagger-ui")
                 || requestUrl.startsWith("/v3/api-docs")
-                || requestUrl.startsWith("/api/v1/health-check");
+                || requestUrl.startsWith("/health-check");
     }
 
     @Override
