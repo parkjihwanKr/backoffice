@@ -15,6 +15,7 @@ public class LoadBalancerController {
 
     @GetMapping
     public ResponseEntity<CommonResponseDto<Void>> healthCheck(){
+        System.out.println("Load Balancer checking....");
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         null,
