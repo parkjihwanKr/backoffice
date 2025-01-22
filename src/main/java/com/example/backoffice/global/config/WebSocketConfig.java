@@ -42,7 +42,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             "http://localhost:3000", "http://localhost:8080",
                             "http://backofficefront.s3-website.ap-northeast-2.amazonaws.com",
                             "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com:"+ deploymentPort,
-                            "https://baegobiseu.com")
+                            "https://baegobiseu.com", "https://api.baegobiseu.com")
                     // ec2 서버도 추가해야함
                     .withSockJS();
         }else{
