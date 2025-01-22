@@ -96,7 +96,7 @@ public class WebSecurityConfig {
                                 "/api/v1/login","/api/v1/signup",
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/check-available-memberName",
-                                "/health-check").permitAll()
+                                "/api/v1/health-check").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout
