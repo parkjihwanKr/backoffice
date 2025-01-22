@@ -81,7 +81,8 @@ public class WebSecurityConfig {
                                             "http://localhost:3000", "http://localhost:8080",
                                             "http://api.baegobiseu.com",
                                             "http://baegobiseu.com.s3-website.ap-northeast-2.amazonaws.com",
-                                            "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com"+deploymentPort));
+                                            "http://ec2-43-203-200-198.ap-northeast-2.compute.amazonaws.com"+deploymentPort,
+                                            "https://api.baegobiseu.com/", "https://baegobiseu.com/"));
                             // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
                             // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
