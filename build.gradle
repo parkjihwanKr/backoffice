@@ -21,6 +21,10 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	tomcatVersion = '10.1.14'
+}
+
 dependencies {
 
 	// jwt
@@ -81,6 +85,12 @@ dependencies {
 
 	// swagger UI
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+	// tomcat
+	implementation('org.springframework.boot:spring-boot-starter-web') {
+		exclude group: 'org.apache.tomcat.embed', module: 'tomcat-embed-core'
+	}
+	implementation "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}"
 }
 
 /*
