@@ -22,7 +22,7 @@ repositories {
 }
 
 ext {
-	tomcatVersion = '10.1.14'
+	tomcatVersion = '10.1.34'
 }
 
 dependencies {

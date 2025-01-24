@@ -8,10 +8,10 @@ RUN apt update && apt install -y \
     libtcnative-1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Tomcat 10.1.14 설치 (Spring Boot 내장 톰캣 버전과 일치)
-RUN curl -v -O https://downloads.apache.org/tomcat/tomcat-10/v10.1.14/bin/apache-tomcat-10.1.14.tar.gz && \
-    tar -zxvf apache-tomcat-10.1.14.tar.gz -C /opt && \
-    mv /opt/apache-tomcat-10.1.14 /opt/tomcat
+# Tomcat 10.1.3 설치 (Spring Boot 내장 톰캣 버전과 일치)
+RUN curl -v -O https://downloads.apache.org/tomcat/tomcat-10/v10.1.34/bin/apache-tomcat-10.1.34.tar.gz && \
+    tar -zxvf apache-tomcat-10.1.34.tar.gz -C /opt && \
+    mv /opt/apache-tomcat-10.1.34 /opt/tomcat
 
 # Tomcat Native Library 환경변수 설정
 ENV LD_LIBRARY_PATH="/usr/lib:$LD_LIBRARY_PATH"
