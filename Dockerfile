@@ -9,7 +9,7 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Tomcat 10.1.14 설치 (Spring Boot 내장 톰캣 버전과 일치)
-RUN curl -O https://downloads.apache.org/tomcat/tomcat-10/v10.1.14/bin/apache-tomcat-10.1.14.tar.gz && \
+RUN curl -v -O https://downloads.apache.org/tomcat/tomcat-10/v10.1.14/bin/apache-tomcat-10.1.14.tar.gz && \
     tar -zxvf apache-tomcat-10.1.14.tar.gz -C /opt && \
     mv /opt/apache-tomcat-10.1.14 /opt/tomcat
 
