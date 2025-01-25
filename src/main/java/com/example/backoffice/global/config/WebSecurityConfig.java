@@ -94,7 +94,9 @@ public class WebSecurityConfig {
                                 "/api/v1/login","/api/v1/signup",
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/check-available-memberName",
-                                "/api/v1/health-check").permitAll()
+                                "/api/v1/health-check",
+                                "https://baegobiseu.com/auth/login",
+                                "https://baegobiseu.com/auth/signup").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout
