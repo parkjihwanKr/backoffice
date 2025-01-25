@@ -31,17 +31,6 @@ services:
     networks:
       - baegobiseu_network
 
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    networks:
-      - baegobiseu_network
-    depends_on:
-      - baegobiseu
-
 networks:
   baegobiseu_network:
     name: baegobiseu_network
