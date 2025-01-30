@@ -34,7 +34,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 브라우저 CROS 이슈
-        System.out.println("Web Socket endpoint registered");
         // 로컬
         if(!isSecure){
             registry.addEndpoint("/ws")

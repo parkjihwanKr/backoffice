@@ -31,7 +31,7 @@ public class CookieUtil {
                     .secure(this.isSecure) // 로컬 환경에서는 false, 프로덕션에서는 true로 설정
                     .path("/") // 쿠키가 적용될 경로
                     .maxAge(maxAgeSeconds) // 쿠키의 유효 기간 설정 (초 단위)
-                    .sameSite("Strict") // CSRF 보호를 위한 SameSite 설정
+                    .sameSite("Secure") // CSRF 보호를 위한 SameSite 설정
                     .build();
         }
     }

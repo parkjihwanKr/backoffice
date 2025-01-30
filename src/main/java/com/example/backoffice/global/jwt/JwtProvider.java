@@ -170,7 +170,6 @@ public class JwtProvider {
     public String getRefreshTokenFromHeader(HttpServletRequest request){
         String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
         // refresh token : Bearer tokenValue
-        System.out.println("refresh token : "+refreshToken);
         String refreshTokenValue = removeBearerPrefix(refreshToken);
         // ExpiredJwtException
         String memberName = getUsernameFromToken(refreshTokenValue);

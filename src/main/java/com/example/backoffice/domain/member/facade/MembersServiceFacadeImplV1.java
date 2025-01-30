@@ -41,7 +41,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional
     public MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto){
-        System.out.println(requestDto.getPassword() + " / "+requestDto.getPasswordConfirm());
         if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
         }

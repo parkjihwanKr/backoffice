@@ -83,6 +83,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
 
         // Refresh Token Cookie settings
+        ResponseCookie refreshTokenCookie = null;
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
 
         // java.lang.NullPointerException: Cannot invoke "Object.toString()" because the return value of "org.springframework.data.redis.core.ValueOperations.get(Object)" is null
@@ -90,13 +91,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         boolean existRefreshToken
                 = tokenRedisProvider.existsByKey(redisKey);
         if(!existRefreshToken){
-            ResponseCookie refreshTokenCookie
+            refreshTokenCookie
                     = cookieUtil.createCookie(
                     JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
                     jwtProvider.getRefreshTokenExpiration());
             response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
-            System.out.println("refreshTokenCookie : "+refreshTokenCookie.toString());
             tokenRedisProvider.saveToken(
                     refreshTokenCookie.getName()+ " : " + username,
                     Math.toIntExact(
@@ -105,7 +105,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }else{
             String redisValue
                     = tokenRedisProvider.getRefreshTokenValue(redisKey);
-            ResponseCookie refreshTokenCookie
+            refreshTokenCookie
                     = cookieUtil.createCookie(
                             JwtProvider.REFRESH_TOKEN_HEADER,
                     redisValue, jwtProvider.getRefreshTokenExpiration());
@@ -115,8 +115,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // logging response Header
         log.info("Set-Cookie : "+accessTokenCookie.toString());
 
-        log.info("AccessToken : " + tokenDto.getAccessToken());
-        log.info("RefreshToken : " + tokenDto.getRefreshToken());
+        log.info("AccessToken : " + accessTokenCookie);
+        log.info("RefreshToken : " + refreshTokenCookie);
 
         // JSON 응답 보내기
         response.setContentType("application/json");
