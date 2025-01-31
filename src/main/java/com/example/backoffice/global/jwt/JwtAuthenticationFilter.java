@@ -102,10 +102,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }else {
             String redisValue
                     = tokenRedisProvider.getRefreshTokenValue(redisKey);
+            log.info("redisValue : "+redisValue);
             if (redisValue != null) {  // 가져온 값이 null이 아닐 때만 쿠키 생성
                 refreshCookie = cookieUtil.createCookie(
                         JwtProvider.REFRESH_TOKEN_HEADER, redisValue,
                         jwtProvider.getRefreshTokenExpiration());
+                log.info("refreshCookie converts String Object : "+refreshCookie.toString());
             }else{
                 throw new JwtCustomException(GlobalExceptionCode.TOKEN_VALUE_IS_NULL);
             }
@@ -124,9 +126,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         log.info("=== Response Headers ===");
+        int index = 1;
         Collection<String> headerNames = response.getHeaderNames();
         for (String headerName : headerNames) {
-            log.info(headerName + " : " + response.getHeader(headerName));
+            log.info(index + " : "+headerName + " : " + response.getHeader(headerName));
+            index++;
         }
 
         log.info("AccessToken : " + accessCookie.getValue());
