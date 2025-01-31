@@ -17,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Collection;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -76,11 +77,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         TokenDto tokenDto = jwtProvider.createToken(username, role);
 
         // Access Token Cookie settings
-        ResponseCookie accessTokenCookie
+/*        ResponseCookie accessTokenCookie
                 = cookieUtil.createCookie(
                         JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
                 jwtProvider.getAccessTokenExpiration());
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());*/
+        response.addCookie(cookieUtil.createCookie(
+                JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
+                jwtProvider.getAccessTokenExpiration()));
 
         // Refresh Token Cookie settings
         ResponseCookie refreshTokenCookie = null;
@@ -91,11 +95,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         boolean existRefreshToken
                 = tokenRedisProvider.existsByKey(redisKey);
         if(!existRefreshToken){
-            refreshTokenCookie
+            response.addCookie(cookieUtil.createCookie(
+                    JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
+                    jwtProvider.getRefreshTokenExpiration()));
+/*            refreshTokenCookie
                     = cookieUtil.createCookie(
                     JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
                     jwtProvider.getRefreshTokenExpiration());
-            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+            response.addHeader("Set-Cookie", refreshTokenCookie.toString());*/
 
             tokenRedisProvider.saveToken(
                     refreshTokenCookie.getName()+ " : " + username,
@@ -105,18 +112,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }else{
             String redisValue
                     = tokenRedisProvider.getRefreshTokenValue(redisKey);
-            refreshTokenCookie
+            response.addCookie(
+                    cookieUtil.createCookie(
+                            JwtProvider.REFRESH_TOKEN_HEADER,
+                            redisValue, jwtProvider.getRefreshTokenExpiration()));
+/*          refreshTokenCookie
                     = cookieUtil.createCookie(
                             JwtProvider.REFRESH_TOKEN_HEADER,
                     redisValue, jwtProvider.getRefreshTokenExpiration());
-            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+            response.addHeader("Set-Cookie", refreshTokenCookie.toString());*/
         }
 
         // logging response Header
-        log.info("Set-Cookie : "+accessTokenCookie.toString());
-
-        log.info("AccessToken : " + accessTokenCookie);
-        log.info("RefreshToken : " + refreshTokenCookie);
+        // log.info("RefreshToken : " + refreshTokenCookie);
 
         // JSON 응답 보내기
         response.setContentType("application/json");
@@ -129,7 +137,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             e.printStackTrace();
         }
 
-        log.info(response.toString());
+        log.info("=== Response Headers ===");
+        Collection<String> headerNames = response.getHeaderNames();
+        for (String headerName : headerNames) {
+            log.info(headerName + " : " + response.getHeader(headerName));
+        }
     }
 
     @Override
