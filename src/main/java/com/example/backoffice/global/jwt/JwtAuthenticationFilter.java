@@ -127,8 +127,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                     cookie.getName(), cookie.getValue(), cookie.getMaxAge());
             response.addCookie(cookie);
         }
-/*        response.addCookie(accessCookie);
-        response.addCookie(refreshCookie);*/
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -146,8 +145,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             index++;
         }
 
-        log.info("AccessToken : " + accessCookie.getValue());
-        log.info("RefreshToken : " + refreshCookie.getValue());
+        Collection<String> cookies = response.getHeaders("Set-Cookie");
+        for (String cookie : cookies) {
+            log.info("Set-Cookie Header: " + cookie);
+        }
     }
 
     @Override
