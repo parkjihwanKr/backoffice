@@ -13,29 +13,26 @@ public class CookieUtil {
     @Value("${cookie.secure}")
     private boolean isSecure;
 
-    public Cookie createCookie(
+    public ResponseCookie createCookie(
             String name, String value, long maxAgeSeconds){
-        ResponseCookie responseCookie = null;
         if(!isSecure){
             // local test success
-            responseCookie = ResponseCookie.from(name, value)
+            return ResponseCookie.from(name, value)
                     .httpOnly(false)        // 로컬 환경에서 httpOnly 또한 false로 변경
                     .secure(this.isSecure) // 로컬 환경에서는 false, 프로덕션에서는 true로 설정
                     .path("/") // 쿠키가 적용될 경로
                     .maxAge(maxAgeSeconds) // 쿠키의 유효 기간 설정 (초 단위)
                     .sameSite("Lax") // CSRF 보호를 위한 SameSite 설정
                     .build();
-            return convertToServletCookie(responseCookie);
         }else {
             // production
-            responseCookie = ResponseCookie.from(name, value)
+            return ResponseCookie.from(name, value)
                     .httpOnly(true)
                     .secure(this.isSecure) // 로컬 환경에서는 false, 프로덕션에서는 true로 설정
                     .path("/") // 쿠키가 적용될 경로
                     .maxAge(maxAgeSeconds) // 쿠키의 유효 기간 설정 (초 단위)
                     .sameSite("None")// CSRF 보호를 위한 SameSite 설정
                     .build();
-            return convertToServletCookie(responseCookie);
         }
     }
 
@@ -69,14 +66,5 @@ public class CookieUtil {
             }
         }
         return null;
-    }
-
-    private Cookie convertToServletCookie(ResponseCookie responseCookie) {
-        Cookie servletCookie = new Cookie(responseCookie.getName(), responseCookie.getValue());
-        servletCookie.setHttpOnly(responseCookie.isHttpOnly());
-        servletCookie.setSecure(responseCookie.isSecure());
-        servletCookie.setPath(responseCookie.getPath());
-        servletCookie.setMaxAge((int) responseCookie.getMaxAge().getSeconds());
-        return servletCookie;
     }
 }

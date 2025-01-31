@@ -13,6 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -79,13 +80,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         TokenDto tokenDto = jwtProvider.createToken(username, role);
 
         // Access Token Cookie settings
-        Cookie accessCookie = cookieUtil.createCookie(
+        ResponseCookie accessCookie = cookieUtil.createCookie(
                 JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
                 jwtProvider.getAccessTokenExpiration());
 
         log.info("Created Access Token Cookie: Name = {}, Value = {}, Max-Age = {}",
                 accessCookie.getName(), accessCookie.getValue(), accessCookie.getMaxAge());
-        Cookie refreshCookie = null;
+        ResponseCookie refreshCookie = null;
         // Refresh Token Cookie settings
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
 
@@ -120,14 +121,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         // JSON 응답 보내기
-        Cookie[] cookieList = new Cookie[] { accessCookie, refreshCookie };
-        for(Cookie cookie : cookieList){
-            log.info("cookie(first cookie is access, second cookie is refresh) " +
-                            " Name = {}, Value = {}, Max-Age = {}",
-                    cookie.getName(), cookie.getValue(), cookie.getMaxAge());
-            response.addCookie(cookie);
-        }
-
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -135,14 +130,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             response.getWriter().write("{\"status\":\"success\"}");
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        log.info("=== Response Headers ===");
-        int index = 1;
-        Collection<String> headerNames = response.getHeaderNames();
-        for (String headerName : headerNames) {
-            log.info(index + " : "+headerName + " : " + response.getHeader(headerName));
-            index++;
         }
 
         Collection<String> cookies = response.getHeaders("Set-Cookie");
