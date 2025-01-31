@@ -120,8 +120,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         // JSON 응답 보내기
-        response.addCookie(accessCookie);
-        response.addCookie(refreshCookie);
+        Cookie[] cookieList = new Cookie[] { accessCookie, refreshCookie };
+        for(Cookie cookie : cookieList){
+            response.addCookie(cookie);
+        }
+/*        response.addCookie(accessCookie);
+        response.addCookie(refreshCookie);*/
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
