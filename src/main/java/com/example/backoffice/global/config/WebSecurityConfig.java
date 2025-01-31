@@ -108,7 +108,6 @@ public class WebSecurityConfig {
                         })
                 )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
         ;
         // 필터 순서 조정
         http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

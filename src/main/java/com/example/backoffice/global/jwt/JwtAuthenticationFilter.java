@@ -13,7 +13,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -90,16 +89,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         boolean existRefreshToken
                 = tokenRedisProvider.existsByKey(redisKey);
         if(!existRefreshToken){
-            response.addCookie(cookieUtil.createCookie(
-                    JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
-                    jwtProvider.getRefreshTokenExpiration()));
-            Cookie newRefreshToken
+            refreshCookie
                     = cookieUtil.createCookie(
                             JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
                     jwtProvider.getRefreshTokenExpiration());
 
             tokenRedisProvider.saveToken(
-                    newRefreshToken.getName()+ " : " + username,
+                    refreshCookie.getName()+ " : " + username,
                     Math.toIntExact(
                             jwtProvider.getRefreshTokenExpiration()),
                     tokenDto.getRefreshToken());
