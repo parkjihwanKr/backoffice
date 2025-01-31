@@ -140,11 +140,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         log.info("AccessToken : " + accessCookie.getValue());
-        if (refreshCookie != null) {
-            log.info("RefreshToken : " + refreshCookie.getValue());
-        } else {
-            log.info("RefreshToken was not added to response (Null Value)");
-        }
+        log.info("RefreshToken : " + refreshCookie.getValue());
     }
 
     @Override
