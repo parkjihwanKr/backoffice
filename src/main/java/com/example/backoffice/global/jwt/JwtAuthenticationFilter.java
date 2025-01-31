@@ -128,6 +128,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        log.info(response.toString());
     }
 
     @Override
