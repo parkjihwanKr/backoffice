@@ -82,6 +82,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Cookie accessCookie = cookieUtil.createCookie(
                 JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
                 jwtProvider.getAccessTokenExpiration());
+
+        log.info("Created Access Token Cookie: Name = {}, Value = {}, Max-Age = {}",
+                accessCookie.getName(), accessCookie.getValue(), accessCookie.getMaxAge());
         Cookie refreshCookie = null;
         // Refresh Token Cookie settings
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
@@ -94,6 +97,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
                     jwtProvider.getRefreshTokenExpiration());
 
+            log.info("Created Refresh Token Cookie: Name = {}, Value = {}, Max-Age = {}",
+                    refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getMaxAge());
+
             tokenRedisProvider.saveToken(
                     refreshCookie.getName()+ " : " + username,
                     Math.toIntExact(
@@ -102,12 +108,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }else {
             String redisValue
                     = tokenRedisProvider.getRefreshTokenValue(redisKey);
-            log.info("redisValue : "+redisValue);
             if (redisValue != null) {  // 가져온 값이 null이 아닐 때만 쿠키 생성
                 refreshCookie = cookieUtil.createCookie(
                         JwtProvider.REFRESH_TOKEN_HEADER, redisValue,
                         jwtProvider.getRefreshTokenExpiration());
-                log.info("refreshCookie converts String Object : "+refreshCookie.toString());
+                log.info("redisValue is not null!, therefore... Created Refresh Token Cookie: Name = {}, Value = {}, Max-Age = {}",
+                        refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getMaxAge());
             }else{
                 throw new JwtCustomException(GlobalExceptionCode.TOKEN_VALUE_IS_NULL);
             }
