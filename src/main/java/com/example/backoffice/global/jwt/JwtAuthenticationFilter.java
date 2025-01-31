@@ -122,6 +122,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // JSON 응답 보내기
         Cookie[] cookieList = new Cookie[] { accessCookie, refreshCookie };
         for(Cookie cookie : cookieList){
+            log.info("cookie(first cookie is access, second cookie is refresh) : "+cookie);
             response.addCookie(cookie);
         }
 /*        response.addCookie(accessCookie);
