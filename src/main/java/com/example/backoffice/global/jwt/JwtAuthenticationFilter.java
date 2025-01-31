@@ -2,11 +2,14 @@ package com.example.backoffice.global.jwt;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.dto.TokenDto;
 import com.example.backoffice.global.redis.RefreshTokenRepository;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -77,59 +80,46 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         TokenDto tokenDto = jwtProvider.createToken(username, role);
 
         // Access Token Cookie settings
-/*        ResponseCookie accessTokenCookie
-                = cookieUtil.createCookie(
-                        JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
-                jwtProvider.getAccessTokenExpiration());
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());*/
-        response.addCookie(cookieUtil.createCookie(
+        Cookie accessCookie = cookieUtil.createCookie(
                 JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
-                jwtProvider.getAccessTokenExpiration()));
-
+                jwtProvider.getAccessTokenExpiration());
+        Cookie refreshCookie = null;
         // Refresh Token Cookie settings
-        ResponseCookie refreshTokenCookie = null;
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
 
-        // java.lang.NullPointerException: Cannot invoke "Object.toString()" because the return value of "org.springframework.data.redis.core.ValueOperations.get(Object)" is null
-        // at com.example.backoffice.global.redis.TokenRedisProvider.existsByUsername(TokenRedisProvider.java:59) ~[main/:na]
         boolean existRefreshToken
                 = tokenRedisProvider.existsByKey(redisKey);
         if(!existRefreshToken){
             response.addCookie(cookieUtil.createCookie(
                     JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
                     jwtProvider.getRefreshTokenExpiration()));
-/*            refreshTokenCookie
+            Cookie newRefreshToken
                     = cookieUtil.createCookie(
-                    JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
+                            JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
                     jwtProvider.getRefreshTokenExpiration());
-            response.addHeader("Set-Cookie", refreshTokenCookie.toString());*/
 
             tokenRedisProvider.saveToken(
-                    refreshTokenCookie.getName()+ " : " + username,
+                    newRefreshToken.getName()+ " : " + username,
                     Math.toIntExact(
                             jwtProvider.getRefreshTokenExpiration()),
                     tokenDto.getRefreshToken());
-        }else{
+        }else {
             String redisValue
                     = tokenRedisProvider.getRefreshTokenValue(redisKey);
-            response.addCookie(
-                    cookieUtil.createCookie(
-                            JwtProvider.REFRESH_TOKEN_HEADER,
-                            redisValue, jwtProvider.getRefreshTokenExpiration()));
-/*          refreshTokenCookie
-                    = cookieUtil.createCookie(
-                            JwtProvider.REFRESH_TOKEN_HEADER,
-                    redisValue, jwtProvider.getRefreshTokenExpiration());
-            response.addHeader("Set-Cookie", refreshTokenCookie.toString());*/
+            if (redisValue != null) {  // 가져온 값이 null이 아닐 때만 쿠키 생성
+                refreshCookie = cookieUtil.createCookie(
+                        JwtProvider.REFRESH_TOKEN_HEADER, redisValue,
+                        jwtProvider.getRefreshTokenExpiration());
+            }else{
+                throw new JwtCustomException(GlobalExceptionCode.TOKEN_VALUE_IS_NULL);
+            }
         }
 
-        // logging response Header
-        // log.info("RefreshToken : " + refreshTokenCookie);
-
         // JSON 응답 보내기
+        response.addCookie(accessCookie);
+        response.addCookie(refreshCookie);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
 
         try {
             response.getWriter().write("{\"status\":\"success\"}");
@@ -141,6 +131,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Collection<String> headerNames = response.getHeaderNames();
         for (String headerName : headerNames) {
             log.info(headerName + " : " + response.getHeader(headerName));
+        }
+
+        log.info("AccessToken : " + accessCookie.getValue());
+        if (refreshCookie != null) {
+            log.info("RefreshToken : " + refreshCookie.getValue());
+        } else {
+            log.info("RefreshToken was not added to response (Null Value)");
         }
     }
 
