@@ -120,6 +120,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             }
         }
 
+        // SameSite 로그 추가
+        log.info(
+                "accessToken : {}, Samesite : {}",
+                accessCookie.getName(), accessCookie.getSameSite());
+
+        log.info(
+                "refreshToken : {}, Samesite : {}",
+                refreshCookie.getName(), refreshCookie.getSameSite());
+
         // JSON 응답 보내기
         response.addHeader("Set-Cookie", accessCookie.toString());
         response.addHeader("Set-Cookie", refreshCookie.toString());
@@ -131,15 +140,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // SameSite 로그 추가
-        log.info(
-                "accessToken : {}, Samesite : {}",
-                accessCookie.getName(), accessCookie.getSameSite());
-
-        log.info(
-                "refreshToken : {}, Samesite : {}",
-                refreshCookie.getName(), refreshCookie.getSameSite());
     }
 
     @Override
