@@ -133,11 +133,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         log.info(
-                "accessToken : {}, Samsite : {}",
+                "accessToken : {}, Samesite : {}",
                 accessCookie.getName(), accessCookie.getSameSite());
 
         log.info(
-                "refreshToken : {}, Samsite : {}",
+                "refreshToken : {}, Samesite : {}",
                 refreshCookie.getName(), refreshCookie.getSameSite());
     }
 

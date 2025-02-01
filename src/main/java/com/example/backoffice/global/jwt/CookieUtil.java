@@ -12,7 +12,6 @@ public class CookieUtil {
 
     @Value("${cookie.secure}")
     private boolean isSecure;
-
     public ResponseCookie createCookie(
             String name, String value, long maxAgeSeconds){
         if(!isSecure){
