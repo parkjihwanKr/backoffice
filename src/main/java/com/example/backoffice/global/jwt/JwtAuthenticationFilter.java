@@ -132,10 +132,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             e.printStackTrace();
         }
 
-        Collection<String> cookies = response.getHeaders("Set-Cookie");
-        for (String cookie : cookies) {
-            log.info("Set-Cookie Header: " + cookie);
-        }
+        log.info(
+                "accessToken : {}, Samsite : {}",
+                accessCookie.getName(), accessCookie.getSameSite());
+
+        log.info(
+                "refreshToken : {}, Samsite : {}",
+                refreshCookie.getName(), refreshCookie.getSameSite());
     }
 
     @Override
