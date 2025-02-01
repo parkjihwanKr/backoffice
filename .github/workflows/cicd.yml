@@ -63,7 +63,7 @@ jobs:
 
       - name: Docker Image Build And Push
         run: |
-          docker build -f Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest .
+          docker build --no-cache -f Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/backoffice:latest
 
       - name: Copy docker-compose.yml to EC2
