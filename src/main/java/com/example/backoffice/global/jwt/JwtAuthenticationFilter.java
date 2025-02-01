@@ -84,8 +84,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
                 jwtProvider.getAccessTokenExpiration());
 
-        log.info("Created Access Token Cookie: Name = {}, Value = {}, Max-Age = {}",
-                accessCookie.getName(), accessCookie.getValue(), accessCookie.getMaxAge());
+        log.info("Created Access Token Cookie: Name = {}, Value = {}, Max-Age = {}, SameSite = {}",
+                accessCookie.getName(), accessCookie.getValue(), accessCookie.getMaxAge(), accessCookie.getSameSite());
         ResponseCookie refreshCookie = null;
         // Refresh Token Cookie settings
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
@@ -98,8 +98,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
                     jwtProvider.getRefreshTokenExpiration());
 
-            log.info("Created Refresh Token Cookie: Name = {}, Value = {}, Max-Age = {}",
-                    refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getMaxAge());
+            log.info("Created Refresh Token Cookie: Name = {}, Value = {}, Max-Age = {}, SameSite = {}",
+                    refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getMaxAge(), refreshCookie.getSameSite());
 
             tokenRedisProvider.saveToken(
                     refreshCookie.getName()+ " : " + username,
@@ -119,15 +119,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new JwtCustomException(GlobalExceptionCode.TOKEN_VALUE_IS_NULL);
             }
         }
-
-        // SameSite 로그 추가
-        log.info(
-                "accessToken : {}, Samesite : {}",
-                accessCookie.getName(), accessCookie.getSameSite());
-
-        log.info(
-                "refreshToken : {}, Samesite : {}",
-                refreshCookie.getName(), refreshCookie.getSameSite());
 
         // JSON 응답 보내기
         response.addHeader("Set-Cookie", accessCookie.toString());
