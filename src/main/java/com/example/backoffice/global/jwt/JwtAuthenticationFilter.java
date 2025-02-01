@@ -132,6 +132,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             e.printStackTrace();
         }
 
+        // SameSite 로그 추가
         log.info(
                 "accessToken : {}, Samesite : {}",
                 accessCookie.getName(), accessCookie.getSameSite());
