@@ -92,7 +92,7 @@ jobs:
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/backoffice || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backoffice
             sudo docker-compose down
-            sudo docker-compose up -d --build --no-cache  # 캐시 무시하고 재빌드
+            sudo docker-compose up -d --build --no-cache
             sudo docker image prune -f
 
 # 테스트 v1
