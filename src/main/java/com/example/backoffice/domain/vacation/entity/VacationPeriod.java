@@ -2,7 +2,6 @@ package com.example.backoffice.domain.vacation.entity;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 

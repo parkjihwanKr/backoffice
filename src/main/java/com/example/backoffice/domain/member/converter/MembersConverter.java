@@ -13,30 +13,11 @@ import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import org.springframework.data.domain.Page;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MembersConverter {
 
-    public static Members toAdminEntity(String bcrytPassword){
-        return Members.builder()
-                .memberName("admin")
-                .name("admin")
-                .loveCount(0L)
-                .role(MemberRole.MAIN_ADMIN)
-                .email("admin@test.com")
-                .address("admin시 admin동")
-                .introduction("admin이다")
-                .department(MemberDepartment.HR)
-                .password(bcrytPassword)
-                .contact("010-0000-0000")
-                .position(MemberPosition.CEO)
-                .remainingVacationDays(4)
-                .onVacation(false)
-                .salary(200000000L)
-                .build();
-    }
     public static Members toEntity(
             MembersRequestDto.CreateOneDto requestDto, String bcryptPassword) {
         return Members.builder()
@@ -68,8 +49,8 @@ public class MembersConverter {
                 .build();
     }
 
-    public static MembersResponseDto.ReadOneDto toReadOneDto(Members member){
-        return MembersResponseDto.ReadOneDto.builder()
+    public static MembersResponseDto.ReadOneSummaryDto toReadOneSummaryDto(Members member){
+        return MembersResponseDto.ReadOneSummaryDto.builder()
                 .memberId(member.getId())
                 .email(member.getEmail())
                 .address(member.getAddress())
@@ -171,9 +152,9 @@ public class MembersConverter {
                 .build();
     }
 
-    public static Page<MembersResponseDto.ReadOneDto> toReadDtoForHrManager(
+    public static Page<MembersResponseDto.ReadOneSummaryDto> toReadDtoForHrManager(
             Page<Members> memberPage){
-        return memberPage.map(MembersConverter::toReadOneDto);
+        return memberPage.map(MembersConverter::toReadOneSummaryDto);
     }
 
     public static MembersResponseDto.UpdateOneForVacationDto toUpdateOneForVacationDto(
@@ -195,14 +176,6 @@ public class MembersConverter {
                         .position(member.getPosition())
                         .build())
                 .collect(Collectors.toList());
-    }
-
-    public static MembersResponseDto.ReadOneForProfileImageDto toReadOneForProfileImageDto(
-            String profileImageUrl, Long memberId){
-        return MembersResponseDto.ReadOneForProfileImageDto.builder()
-                .memberId(memberId)
-                .profileImageUrl(profileImageUrl)
-                .build();
     }
 
     public static MemberRole toRole(String roleName){

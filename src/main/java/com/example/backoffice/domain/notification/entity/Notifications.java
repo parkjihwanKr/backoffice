@@ -2,8 +2,6 @@ package com.example.backoffice.domain.notification.entity;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

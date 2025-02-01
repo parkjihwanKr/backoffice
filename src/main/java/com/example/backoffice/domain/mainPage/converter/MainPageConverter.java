@@ -1,11 +1,8 @@
 package com.example.backoffice.domain.mainPage.converter;
 
 import com.example.backoffice.domain.attendance.dto.AttendancesResponseDto;
-import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.board.dto.BoardsResponseDto;
-import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.event.dto.EventsResponseDto;
-import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
 import com.example.backoffice.domain.mainPage.dto.MainPageResponseDto;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;

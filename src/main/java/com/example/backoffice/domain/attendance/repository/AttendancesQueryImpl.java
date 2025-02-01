@@ -16,8 +16,8 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +55,7 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Attendances> findFilteredForAdmin(
+    public Page<Attendances> findFilteredByAdmin(
             Long foundMemberId, AttendanceStatus attendanceStatus,
             LocalDateTime checkInStartTime, LocalDateTime checkInEndTime,
             LocalDateTime checkOutStartTime, LocalDateTime checkOutEndTime,

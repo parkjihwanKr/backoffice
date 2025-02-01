@@ -7,7 +7,6 @@ import com.example.backoffice.domain.answer.exception.AnswersExceptionCode;
 import com.example.backoffice.domain.answer.repository.AnswersRepository;
 import com.example.backoffice.domain.question.dto.QuestionsRequestDto;
 import com.example.backoffice.domain.question.entity.Questions;
-import com.example.backoffice.domain.question.entity.QuestionsType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

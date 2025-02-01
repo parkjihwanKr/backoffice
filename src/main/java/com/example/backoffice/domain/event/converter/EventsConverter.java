@@ -9,12 +9,10 @@ import com.example.backoffice.domain.file.dto.FilesResponseDto;
 import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.vacation.converter.VacationsConverter;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.global.common.DateRange;
 
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,12 +45,12 @@ public class EventsConverter {
                 .build();
     }
 
-    public static EventsResponseDto.CreateOneForDepartmentEventDto toCreateOneForDepartmentDto(Events event){
+    public static EventsResponseDto.CreateOneDepartmentTypeDto toCreateOneForDepartmentDto(Events event){
         List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
         for(Files file : event.getFileList()) {
             fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
         }
-        return EventsResponseDto.CreateOneForDepartmentEventDto.builder()
+        return EventsResponseDto.CreateOneDepartmentTypeDto.builder()
             .eventId(event.getId())
             .title(event.getTitle())
             .description(event.getDescription())
@@ -65,9 +63,9 @@ public class EventsConverter {
             .build();
     }
 
-    public static List<EventsResponseDto.ReadOneForDepartmentEventDto> toReadForDepartmentMonthEventDto(
+    public static List<EventsResponseDto.ReadOneDepartmentTypeDto> toReadForDepartmentMonthEventDto(
             List<Events> eventList){
-        List<EventsResponseDto.ReadOneForDepartmentEventDto> eventResponseDtoList = new ArrayList<>();
+        List<EventsResponseDto.ReadOneDepartmentTypeDto> eventResponseDtoList = new ArrayList<>();
         for (Events event : eventList) {
             List<String> fileResponseDtoList = new ArrayList<>();
             for(Files file : event.getFileList()){
@@ -75,7 +73,7 @@ public class EventsConverter {
             }
 
             eventResponseDtoList.add(
-                    EventsResponseDto.ReadOneForDepartmentEventDto.builder()
+                    EventsResponseDto.ReadOneDepartmentTypeDto.builder()
                             .eventId(event.getId())
                             .title(event.getTitle())
                             .description(event.getDescription())
@@ -91,13 +89,13 @@ public class EventsConverter {
         return eventResponseDtoList;
     }
 
-    public static EventsResponseDto.UpdateOneForDepartmentEventDto toUpdateOneForDepartmentEventDto(
+    public static EventsResponseDto.UpdateOneDepartmentTypeDto toUpdateOneForDepartmentEventDto(
             Events event){
         List<FilesResponseDto.ReadOneDto> fileResponseDtoList = new ArrayList<>();
         for (Files file : event.getFileList()){
             fileResponseDtoList.add(FilesConverter.toReadOneDto(file));
         }
-        return EventsResponseDto.UpdateOneForDepartmentEventDto.builder()
+        return EventsResponseDto.UpdateOneDepartmentTypeDto.builder()
                 .eventId(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
@@ -110,14 +108,14 @@ public class EventsConverter {
                 .build();
     }
 
-    public static List<EventsResponseDto.ReadOneForMemberScheduleDto> toReadOneForMemberScheduleDto(
-            List<EventsResponseDto.ReadOneForEventDto> departmentEventList){
-        List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList = new ArrayList<>();
+    public static List<EventsResponseDto.ReadOnePersonalScheduleDto> toReadOneForMemberScheduleDto(
+            List<EventsResponseDto.ReadOneAllTypeDto> departmentEventList){
+        List<EventsResponseDto.ReadOnePersonalScheduleDto> responseDtoList = new ArrayList<>();
         for (int i =0; i<departmentEventList.size(); i++){
-            EventsResponseDto.ReadOneForEventDto eventResponseDto = departmentEventList.get(i);
+            EventsResponseDto.ReadOneAllTypeDto eventResponseDto = departmentEventList.get(i);
            if(departmentEventList.get(i).getEventType() == EventType.DEPARTMENT){
                responseDtoList.add(
-                       EventsResponseDto.ReadOneForMemberScheduleDto.builder()
+                       EventsResponseDto.ReadOnePersonalScheduleDto.builder()
                                .eventId(eventResponseDto.getEventId())
                                .vacationId(null)
                                .vacationType(null)
@@ -134,7 +132,7 @@ public class EventsConverter {
                                .build());
            }else if(departmentEventList.get(i).getEventType() == EventType.VACATION){
                responseDtoList.add(
-                       EventsResponseDto.ReadOneForMemberScheduleDto.builder()
+                       EventsResponseDto.ReadOnePersonalScheduleDto.builder()
                                .eventId(null)
                                .vacationId(eventResponseDto.getVacationId())
                                .department(eventResponseDto.getDepartment())
@@ -153,10 +151,10 @@ public class EventsConverter {
         return responseDtoList;
     }
 
-    public static List<EventsResponseDto.ReadOneForEventDto> toEventResponseDtoListForEvent(List<Events> eventList){
+    public static List<EventsResponseDto.ReadOneAllTypeDto> toEventResponseDtoListForEvent(List<Events> eventList){
         return eventList.stream().map(
                 (event ->
-                        EventsResponseDto.ReadOneForEventDto.builder()
+                        EventsResponseDto.ReadOneAllTypeDto.builder()
                                 .eventId(event.getId())
                                 .title(event.getTitle())
                                 .eventType(EventType.DEPARTMENT)
@@ -181,11 +179,11 @@ public class EventsConverter {
         ).collect(Collectors.toList());
     }
 
-    public static List<EventsResponseDto.ReadOneForEventDto> toEventResponseDtoListForVacation(
+    public static List<EventsResponseDto.ReadOneAllTypeDto> toEventResponseDtoListForVacation(
             List<Vacations> vacationList){
         return vacationList.stream().map(
                 (vacation ->
-                        EventsResponseDto.ReadOneForEventDto.builder()
+                        EventsResponseDto.ReadOneAllTypeDto.builder()
                                 .vacationId(vacation.getId())
                                 .title(vacation.getTitle())
                                 .eventType(EventType.VACATION)

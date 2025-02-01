@@ -8,6 +8,7 @@ import com.example.backoffice.global.redis.RefreshTokenRepository;
 import com.example.backoffice.global.security.CustomLogoutHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,9 @@ import java.util.Arrays;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
+    @Value("${server.port}")
+    private String deploymentPort;
 
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository tokenRedisProvider;
@@ -70,11 +74,12 @@ public class WebSecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(request -> {
                             CorsConfiguration configuration = new CorsConfiguration();
-                            // local 환경 테스트를 위한 임시 허용,
-                            // production 환경에선 ec2 서버의 도메인 또는 router53에서 산 도메인을 적어서 열어줘야함
-                            configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000"));
-                            // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-                            // configuration.setAllowedOrigins(Arrays.asList("http://example.com"));
+
+                            configuration.setAllowedOriginPatterns(
+                                    Arrays.asList(
+                                            "http://localhost:3000", "http://localhost:8080",
+                                            "http://api.baegobiseu.com",
+                                            "https://api.baegobiseu.com", "https://baegobiseu.com"));
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
                             configuration.setAllowedHeaders(Arrays.asList("Authorization", "refreshToken", "Cache-Control", "Content-Type"));
                             configuration.setAllowCredentials(true);
@@ -85,9 +90,13 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(
-                                "/websocket", "/ws/**",
+                                "/websocket", "/ws/**", "/wss/**",
                                 "/api/v1/login","/api/v1/signup",
-                                "/api/v1/check-available-memberName").permitAll()
+                                "/swagger-ui/**", "/v3/api-docs/**",
+                                "/api/v1/check-available-memberName",
+                                "/api/v1/health-check",
+                                "https://baegobiseu.com/auth/login",
+                                "https://baegobiseu.com/auth/signup").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout((logout) -> logout
@@ -99,7 +108,6 @@ public class WebSecurityConfig {
                         })
                 )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
         ;
         // 필터 순서 조정
         http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

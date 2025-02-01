@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.notification.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,8 @@ public class NotificationsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "NotificationsRequestDto.CreateByAdminDto",
+            description = "관리자에 의해 만들어질 알림 요청 DTO")
     public static class CreateByAdminDto {
         private String message;
     }
@@ -21,6 +24,8 @@ public class NotificationsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "NotificationsRequestDto.CreateByAdminDto",
+            description = "관리자에 의해 특정 인원들에게 보내지는 알림 요청 DTO")
     public static class CreateFilteredByAdminDto {
         private String message;
         private List<Long> excludedMemberIdList;
@@ -31,6 +36,8 @@ public class NotificationsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "NotificationsRequestDto.DeleteDto",
+            description = "삭제할 알림 아이디 리스트 요청 DTO")
     public static class DeleteDto {
         private List<String> notificationIds;
     }

@@ -12,9 +12,7 @@ import com.example.backoffice.domain.notification.entity.NotificationType;
 import com.example.backoffice.domain.notification.entity.Notifications;
 import org.springframework.data.domain.Page;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NotificationsConverter {
@@ -76,10 +74,10 @@ public class NotificationsConverter {
                         .build());
     }
 
-    public static List<NotificationsResponseDto.ReadAllDto> toReadAllDto(
+    public static List<NotificationsResponseDto.ReadSummaryOneDto> toReadAllDto(
             List<Notifications> notificationList) {
         return notificationList.stream()
-                .map(notification -> NotificationsResponseDto.ReadAllDto.builder()
+                .map(notification -> NotificationsResponseDto.ReadSummaryOneDto.builder()
                         .notificationId(notification.getId())
                         .toMemberName(notification.getToMemberName())
                         .fromMemberName(notification.getFromMemberName())

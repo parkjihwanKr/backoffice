@@ -1,7 +1,5 @@
 package com.example.backoffice.domain.memberEvaluation.service;
 
-import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
-import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
 import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.domain.memberEvaluation.exception.MembersEvaluationsCustomException;
 import com.example.backoffice.domain.memberEvaluation.exception.MembersEvaluationsExceptionCode;

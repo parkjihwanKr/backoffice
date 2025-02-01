@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.question.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,8 @@ public class QuestionsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "QuestionsRequestDto.CreateAllDto",
+            description = "질문 리스트 생성 요청 DTO")
     public static class CreateAllDto {
         private List<CreateOneDto> questionList;
     }
@@ -21,6 +24,8 @@ public class QuestionsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "QuestionsRequestDto.CreateOneDto",
+            description = "질문 하나 생성 요청 DTO")
     public static class CreateOneDto {
         // 1. 객관식, 2. 주관식
         private String questionType;
@@ -35,6 +40,8 @@ public class QuestionsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "QuestionsRequestDto.UpdateOneDto",
+            description = "질문 하나 수정 요청 DTO")
     public static class UpdateOneDto{
         private String changeQuestionText;
         private String changeQuestionType;
@@ -45,6 +52,8 @@ public class QuestionsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "QuestionsRequestDto.UpdateOneForOrderDto",
+            description = "질문 순서 수정 요청 DTO")
     public static class UpdateOneForOrderDto {
         private Long updatedNumber;
     }
@@ -53,23 +62,18 @@ public class QuestionsRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "QuestionsRequestDto.DeleteDto",
+            description = "질문 삭제 요청 DTO")
     public static class DeleteDto{
         private List<Long> questionNumberList;
     }
 
-    /*@Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class SubmitAllDto {
-
-        private List<QuestionsResponseDto.SubmitOneDto> submitOneDtoList;
-    }
-*/
     @Getter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema(name = "QuestionsRequestDto.SubmitOneDto",
+            description = "설문조사 작성자가 질문 하나 제출 요청 DTO")
     public static class SubmitOneDto {
         private Long questionNumber;
         private String shortAnswer;

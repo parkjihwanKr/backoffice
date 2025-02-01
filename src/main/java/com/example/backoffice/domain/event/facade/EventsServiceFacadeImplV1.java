@@ -38,9 +38,9 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
-    public EventsResponseDto.CreateOneForDepartmentEventDto createOneForDepartmentEvent(
+    public EventsResponseDto.CreateOneDepartmentTypeDto createOneDepartmentType(
             String department, Members loginMember,
-            EventsRequestDto.CreateOneForDepartmentEventDto requestDto,
+            EventsRequestDto.CreateOneDepartmentTypeDto requestDto,
             List<MultipartFile> files){
         membersService.findById(loginMember.getId());
 
@@ -71,7 +71,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventsResponseDto.ReadOneForDepartmentEventDto> readForDepartmentMonthEvent(
+    public List<EventsResponseDto.ReadOneDepartmentTypeDto> readForDepartmentMonthEvent(
             String department, Long year, Long month, Members loginMember){
         // 1. 로그인 멤버가 자기가 속하지 않은 부서에 들어오고자 하면 에러
         if (!loginMember.getDepartment().getDepartment().equals(department)){
@@ -88,9 +88,9 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
-    public EventsResponseDto.UpdateOneForDepartmentEventDto updateOneForDepartmentEvent(
+    public EventsResponseDto.UpdateOneDepartmentTypeDto updateOneDepartmentType(
             String department, Long eventId, Members loginMember,
-            EventsRequestDto.UpdateOneForDepartmentEventDto requestDto,
+            EventsRequestDto.UpdateOneDepartmentTypeDto requestDto,
             List<MultipartFile> files){
         // 1. 일정 존재?
         Events event = eventsService.findById(eventId);
@@ -131,7 +131,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
-    public void deleteOneForDepartmentEvent(String department, Long eventId, Members loginMember){
+    public void deleteOneDepartmentType(String department, Long eventId, Members loginMember){
         // 로그인한 유저가 유효한지 검증
         membersService.findById(loginMember.getId());
 
@@ -148,7 +148,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
         eventsService.deleteById(eventId);
     }
 
-    public List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberSchedule(
+    public List<EventsResponseDto.ReadOnePersonalScheduleDto> readMonthlyPersonalSchedule(
             Long memberId, Long year, Long month, Members loginMember) {
         // 멤버 검증 로직
         if (!memberId.equals(loginMember.getId())) {
@@ -166,7 +166,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                         year.intValue(), month.intValue(),
                 yearMonth.lengthOfMonth(), 23, 59, 59);
 
-        List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList = new ArrayList<>();
+        List<EventsResponseDto.ReadOnePersonalScheduleDto> responseDtoList = new ArrayList<>();
 
         // 해당 부서의 모든 일정 조회
         List<Events> departmentEventList
@@ -190,7 +190,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
     @Override
     @Transactional
-    public List<EventsResponseDto.ReadOneForMemberScheduleDto> readForMemberDaySchedule(
+    public List<EventsResponseDto.ReadOnePersonalScheduleDto> readDailyPersonalSchedule(
             Long memberId, Long year, Long month, Long day, Members loginMember) {
 
         // 로그인한 사용자가 자신의 일정을 확인하는 것만 허용
@@ -214,7 +214,7 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                         memberId, true, startDate, endDate);
 
         // 3. 결과 리스트 통합
-        List<EventsResponseDto.ReadOneForMemberScheduleDto> responseDtoList = new ArrayList<>();
+        List<EventsResponseDto.ReadOnePersonalScheduleDto> responseDtoList = new ArrayList<>();
 
         responseDtoList.addAll(
                 EventsConverter.toReadOneForMemberScheduleDto(

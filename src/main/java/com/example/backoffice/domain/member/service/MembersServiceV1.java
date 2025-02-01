@@ -2,13 +2,12 @@ package com.example.backoffice.domain.member.service;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
-import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.global.scheduler.ScheduledEventType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.example.backoffice.domain.member.exception.MembersCustomException;
-import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 
 import java.util.List;
 import java.util.Map;

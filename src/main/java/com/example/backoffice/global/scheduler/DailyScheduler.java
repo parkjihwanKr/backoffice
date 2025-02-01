@@ -1,6 +1,5 @@
 package com.example.backoffice.global.scheduler;
 
-import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.attendance.service.AttendancesServiceV1;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
@@ -18,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -81,6 +79,7 @@ public class DailyScheduler implements SchedulerTask{
         }
     }
 
+    // 여기가 에러가 나는듯
     private void createAttendances(){
         // 평일
         if(DateTimeUtils.isWeekday()){

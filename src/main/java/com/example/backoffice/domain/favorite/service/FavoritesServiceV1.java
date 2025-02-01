@@ -4,8 +4,8 @@ import com.example.backoffice.domain.favorite.dto.FavoritesRequestDto;
 import com.example.backoffice.domain.favorite.dto.FavoritesResponseDto;
 import com.example.backoffice.domain.favorite.entity.Favorites;
 import com.example.backoffice.domain.favorite.exception.FavoritesCustomException;
-import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.favorite.exception.FavoritesExceptionCode;
+import com.example.backoffice.domain.member.entity.Members;
 
 import java.util.List;
 

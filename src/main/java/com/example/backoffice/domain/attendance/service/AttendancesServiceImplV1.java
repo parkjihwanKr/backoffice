@@ -124,7 +124,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             throw new AttendancesCustomException(AttendancesExceptionCode.IS_HOLIDAY);
         }
 
-        // 정시 출근, 지각, 결석(결석인데 체크하는 건 이상함)
+        // 이전 상태에 따라 다른 근태 상태로 조정
+        // ex) 조퇴 -> 정시 출근 상태 변경의 방지를 위해
         AttendanceStatus beforeCheckOutStatus = attendance.getAttendanceStatus();
         AttendanceStatus afterCheckOutStatus
                 = validateAndDetermineCheckOutStatus(
@@ -183,7 +184,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AttendancesResponseDto.ReadOneDto> readForAdmin(
+    public Page<AttendancesResponseDto.ReadOneDto> readPageByAdmin(
             String memberName, String attendanceStatus,
             DateRange checkInRange, DateRange checkOutRange,
             Members loginMember, Pageable pageable){
@@ -209,7 +210,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 : null;
 
         // 5. 필터링된 데이터 조회
-        Page<Attendances> memberAttendancePage = attendancesRepository.findFilteredForAdmin(
+        Page<Attendances> memberAttendancePage = attendancesRepository.findFilteredByAdmin(
                 foundMember.getId(),
                 attdStatus,
                 checkInRange != null ? checkInRange.getStartDate() : null,
@@ -223,7 +224,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional
-    public AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusForAdmin(
+    public AttendancesResponseDto.UpdateAttendancesStatusDto updateOneStatusByAdmin(
             Long memberId, Long attendanceId, Members loginMember,
             AttendancesRequestDto.UpdateAttendanceStatusDto requestDto) {
 
@@ -273,7 +274,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional
-    public AttendancesResponseDto.CreateOneDto createOneForAdmin(
+    public AttendancesResponseDto.CreateOneDto createOneByAdmin(
             AttendancesRequestDto.CreateOneDto requestDto, Members loginMember) {
         // 1. 근태 기록을 만들 수 있는 사람인지?
         validateAccess(loginMember);
@@ -348,7 +349,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional
-    public void deleteForAdmin(
+    public void deleteByAdmin(
             List<Long> deleteAttendanceIdList, Members loginMember){
         // 1. 접근할 수 있는 권한이 있는지?
         validateAccess(loginMember);
@@ -366,7 +367,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyForAdmin(
+    public Page<AttendancesResponseDto.ReadMonthlyDto> readFilteredByMonthlyByAdmin(
             String department, Long year, Long month,
             Pageable pageable, Members loginMember) {
 
@@ -393,7 +394,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyForAdmin(
+    public Page<AttendancesResponseDto.ReadOneDto> readFilteredByDailyByAdmin(
             String department, String memberName, Long year, Long month, Long day,
             Pageable pageable, Members loginMember) {
         // 1. 해당 월의 시작일과 마지막 일 계산
@@ -420,7 +421,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     }
 
     @Transactional(readOnly = true)
-    public List<AttendancesResponseDto.ReadScheduledRecordDto> readScheduledRecord(
+    public List<AttendancesResponseDto.ReadScheduledRecordDto> readScheduledRecordByAdmin(
             String department, Members loginMember) {
         // 1. 권한 검증
         if (!membersService.isManagerOrCeo(loginMember)) {
@@ -542,7 +543,12 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             return beforeCheckOutStatus;
         }
 
-        // 4. 퇴근 시간이 유효한 시간은 오후 5시 반부터 7시까지로 고정
+        // 4. 정시 출근에 일찍 퇴근을 눌렀을 경우
+        if (!DateTimeUtils.isWithinHours(checkInTime, checkOutTime, 8)) {
+            return AttendanceStatus.HALF_DAY;
+        }
+
+        // 5. 퇴근 시간이 유효한 시간은 오후 5시 반부터 7시까지로 고정
         if(!DateTimeUtils.isBetweenTodayCheckOutTime(checkOutTime)){
             throw new AttendancesCustomException(
                     AttendancesExceptionCode.CHECK_OUT_TIME_OUTSIDE_WORK_HOURS);
@@ -559,8 +565,9 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                 = membersService.findAll().stream().map(Members::getId).toList();
         LocalDateTime yesterday = DateTimeUtils.getToday().minusDays(1);
         for(Long memberId : memberIdList){
-            Attendances yesterdayAttendance = attendancesRepository.findByMemberIdAndCreatedDate(
-                    memberId, yesterday.toLocalDate()).orElseGet(null);
+            Attendances yesterdayAttendance
+                    = attendancesRepository.findByMemberIdAndCreatedDate(
+                            memberId, yesterday.toLocalDate()).orElse(null);
             if(yesterdayAttendance != null){
                 String defaultMessage = "스케줄러에 의한 근태 기록 처리가 되었습니다.";
                 switch (yesterdayAttendance.getAttendanceStatus()) {

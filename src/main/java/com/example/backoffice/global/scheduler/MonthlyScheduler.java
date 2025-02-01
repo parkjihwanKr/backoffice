@@ -1,8 +1,6 @@
 package com.example.backoffice.global.scheduler;
 
-import com.example.backoffice.domain.attendance.entity.Attendances;
 import com.example.backoffice.domain.attendance.service.AttendancesServiceV1;
-import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodProvider;
 import com.example.backoffice.global.date.DateTimeUtils;
@@ -15,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor

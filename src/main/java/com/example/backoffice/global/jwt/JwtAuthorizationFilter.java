@@ -1,8 +1,10 @@
 package com.example.backoffice.global.jwt;
 
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.redis.RefreshTokenRepository;
+import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,9 +32,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private boolean isExcludedUrl(String requestUrl) {
         // 필터링을 건너뛰는 경로를 명시적으로 정의
         return requestUrl.startsWith("/ws")
+                || requestUrl.equals("/wss")
                 || requestUrl.equals("/api/v1/signup")
                 || requestUrl.equals("/api/v1/login")
-                || requestUrl.equals("/api/v1/check-available-memberName");
+                || requestUrl.equals("/api/v1/check-available-memberName")
+                || requestUrl.startsWith("/swagger-ui")
+                || requestUrl.startsWith("/v3/api-docs")
+                || requestUrl.startsWith("/api/v1/health-check");
     }
 
     @Override
@@ -43,6 +49,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // 특정 경로는 무시하고 진행
         if (isExcludedUrl(requestUrl)) {
+            log.info("Excluded URL, skipping filter: {}", requestUrl);
             filterChain.doFilter(request, response);
             return;
         }
@@ -107,8 +114,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
         // Redis에 해당 Refresh Token이 존재하는지 검증
         if (refreshTokenRepository.existsByKey(redisKey)) {
+            MemberRole role
+                    = ((MemberDetailsImpl) authentication.getPrincipal()).getMembers().getRole();
+
             // 새 Access Token 생성
-            String newAccessToken = jwtProvider.createToken(username, null).getAccessToken();
+            String newAccessToken = jwtProvider.createToken(username, role).getAccessToken();
             String accessToken = URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");
 
             // Access Token을 Response Cookie에 설정

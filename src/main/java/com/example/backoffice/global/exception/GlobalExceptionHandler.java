@@ -1,9 +1,15 @@
 package com.example.backoffice.global.exception;
 
+import com.example.backoffice.domain.answer.exception.AnswersCustomException;
 import com.example.backoffice.domain.attendance.exception.AttendancesCustomException;
+import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
 import com.example.backoffice.domain.event.exception.EventsCustomException;
+import com.example.backoffice.domain.favorite.exception.FavoritesCustomException;
 import com.example.backoffice.domain.file.exception.FilesCustomException;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.domain.memberEvaluation.exception.MembersEvaluationsCustomException;
+import com.example.backoffice.domain.notification.exception.NotificationsCustomException;
+import com.example.backoffice.domain.question.exception.QuestionsCustomException;
 import com.example.backoffice.domain.reaction.exception.ReactionsCustomException;
 import com.example.backoffice.domain.vacation.exception.VacationsCustomException;
 import com.example.backoffice.global.dto.CommonResponseDto;
@@ -15,7 +21,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -109,6 +114,72 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
 
+    @ExceptionHandler(AnswersCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleAnswersException(
+            AnswersCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(EvaluationsCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleEvaluationsException(
+            EvaluationsCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(MembersEvaluationsCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleMembersEvaluationsException(
+            MembersEvaluationsCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(QuestionsCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleQuestionsException(
+            QuestionsCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(FavoritesCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleFavoritesException(
+            FavoritesCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(NotificationsCustomException.class)
+    public ResponseEntity<CommonResponseDto<String>> handleNotificationsException(
+            NotificationsCustomException ex) {
+        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
+                ex.getErrorCode(),  // 에러 코드
+                ex.getMessage(),    // 에러 메시지
+                ex.getHttpStatus().value()  // 상태 코드 설정
+        );
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<CommonResponseDto<String>> handleConstraintViolationException(
             ConstraintViolationException ex) {
@@ -137,29 +208,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    /* 그 외의 일반적인 예외 처리
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponseDto<Void>> handleGlobalException(Exception ex) {
-        // 에러 응답 생성
-        CommonResponseDto<Void> errorResponse = new CommonResponseDto<>(
-                null,  // 데이터는 null로 설정
-                ex.getMessage(),  // 예외 메시지
-                HttpStatus.INTERNAL_SERVER_ERROR.value()  // 500 상태 코드
-        );
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);  // 상태 코드로 응답
-    }
-
-    // 그 외의 일반적인 예외 처리
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<CommonResponseDto<String>> handleNullPointerException(NullPointerException ex) {
-        // 에러 응답 생성
-        CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
-                "NULL-001",  // 데이터는 null로 설정
-                "입력칸을 채워주세요!",  // 예외 메시지
-                HttpStatus.BAD_REQUEST.value()
-        );
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);  // 상태 코드로 응답
-    }*/
 }

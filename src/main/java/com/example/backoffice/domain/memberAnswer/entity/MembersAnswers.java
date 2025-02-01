@@ -1,7 +1,6 @@
 package com.example.backoffice.domain.memberAnswer.entity;
 
 import com.example.backoffice.domain.answer.entity.Answers;
-import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.question.entity.Questions;
 import jakarta.persistence.*;

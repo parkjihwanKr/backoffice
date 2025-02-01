@@ -10,8 +10,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAdjusters;
 
-import static com.example.backoffice.global.common.DateTimeFormatters.DATE_FORMATTER;
-
 public class DateTimeUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER

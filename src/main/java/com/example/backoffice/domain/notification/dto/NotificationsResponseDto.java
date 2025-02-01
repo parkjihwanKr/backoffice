@@ -2,16 +2,14 @@ package com.example.backoffice.domain.notification.dto;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
-import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.notification.entity.NotificationType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 
 public class NotificationsResponseDto {
 
@@ -20,6 +18,8 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "NotificationsResponseDto.CreateOneDto",
+            description = "알림 하나 생성 응답 DTO")
     public static class CreateOneDto {
         private String notificationId;
         private String message;
@@ -30,25 +30,12 @@ public class NotificationsResponseDto {
         private LocalDateTime createdAt;
     }
 
-    // # testing
-    /*// 어드민의 전체 알림 발송
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateForAdminDto {
-        private List<String> notificationIdList;
-        private String message;
-        private String fromMemberName;
-        private List<String> toMemberNameList;
-        private Set<MemberDepartment> toMemberDepartmentSet;
-        private MemberRole fromAdminRole;
-    }*/
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Schema(name = "NotificationsResponseDto.ReadOneDto",
+            description = "알림 하나 조회 응답 DTO")
     public static class ReadOneDto {
         private String notificationId;
         private String toMemberName;
@@ -65,6 +52,8 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "NotificationsResponseDto.ReadDto",
+            description = "알림 조회 응답 DTO")
     public static class ReadDto {
         private String notificationId;
         private String toMemberName;
@@ -79,7 +68,9 @@ public class NotificationsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadAllDto {
+    @Schema(name = "NotificationsResponseDto.ReadSummaryOneDto",
+            description = "요약된 알림 하나 조회 응답 DTO")
+    public static class ReadSummaryOneDto {
         private String notificationId;
         private String toMemberName;
         private String fromMemberName;

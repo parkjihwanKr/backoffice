@@ -73,10 +73,10 @@ public interface NotificationsServiceFacadeV1 {
      * 모든 알림 리스트를 '읽음' 상태로 변경
      * @param memberId : 해당 멤버 아이디
      * @param loginMember : 로그인 멤버
-     * @return {@link NotificationsResponseDto.ReadAllDto}
+     * @return {@link NotificationsResponseDto.ReadSummaryOneDto}
      * 모든 알림 리스트를 '읽음' 상태로 변경 응답 DTO
      */
-    List<NotificationsResponseDto.ReadAllDto> changeIsReadTrue(Long memberId, Members loginMember);
+    List<NotificationsResponseDto.ReadSummaryOneDto> changeIsReadTrue(Long memberId, Members loginMember);
 
     /**
      * 조건에 맞는 알림들을 삭제

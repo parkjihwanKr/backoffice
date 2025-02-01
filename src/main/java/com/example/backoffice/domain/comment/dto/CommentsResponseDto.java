@@ -3,6 +3,7 @@ package com.example.backoffice.domain.comment.dto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "CommentsResponseDto.ReadBoardCommentsDto",
+            description = "게시글 댓글 조회 응답 DTO")
     public static class ReadBoardCommentsDto{
         private Long boardId;
         private Long commentId;
@@ -34,6 +37,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "CommentsResponseDto.CreateCommentDto",
+            description = "게시글 댓글 생성 응답 DTO")
     public static class CreateCommentDto{
         private Long commentId;
         private String author;
@@ -48,6 +53,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "CommentsResponseDto.UpdateCommentDto",
+            description = "게시글 댓글 수정 응답 DTO")
     public static class UpdateCommentDto{
         private Long commentId;
         private String author;
@@ -61,6 +68,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "CommentsResponseDto.ReadCommentRepliesDto",
+            description = "댓글 답글 조회 응답 DTO")
     public static class ReadCommentRepliesDto {
         private Long commentId;
         private Long replyId;
@@ -78,6 +87,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "CommentsResponseDto.CreateReplyDto ",
+            description = "답글 생성 응답 DTO")
     public static class CreateReplyDto {
         private Long replyId;
         private String content;
@@ -92,6 +103,8 @@ public class CommentsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "CommentsResponseDto.CreateReplyDto ",
+            description = "답글 수정 응답 DTO")
     public static class UpdateReplyDto {
         private Long commentId;
         private Long replyId;

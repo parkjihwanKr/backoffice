@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.vacation.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,8 @@ public class VacationsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "VacationsRequestDto.UpdatePeriodDto",
+            description = "휴가 신청 기간 요청 DTO")
     public static class UpdatePeriodDto {
         private String startDate;
         private String endDate;
@@ -21,6 +24,8 @@ public class VacationsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "VacationsRequestDto.CreateOneDto",
+            description = "멤버 휴가 생성 요청 DTO")
     public static class CreateOneDto {
         private String title;
         @NotNull
@@ -29,7 +34,6 @@ public class VacationsRequestDto {
         private String endDate;
         @NotNull
         private Boolean urgent;
-        // urgent를 true로 체크한 사람에 한정해서 사유를 적어야함.
         private String urgentReason;
         private String vacationType;
     }
@@ -38,6 +42,8 @@ public class VacationsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "VacationsRequestDto.UpdateOneDto",
+            description = "멤버 휴가 수정 요청 DTO")
     public static class UpdateOneDto {
         private String title;
         @NotNull
@@ -53,6 +59,8 @@ public class VacationsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "VacationsRequestDto.DeleteOneByAdminDto",
+            description = "관리자에 의한 멤버의 휴가 삭제 요청 DTO")
     public static class DeleteOneByAdminDto {
         private String reason;
     }

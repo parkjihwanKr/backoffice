@@ -5,6 +5,13 @@ import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.facade.VacationsServiceFacadeV1;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +23,24 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
+@Tag(name = "Vacations API", description = "휴가 API")
 public class VacationsController {
 
     private final VacationsServiceFacadeV1 vacationsServiceFacade;
-
-    // 이례적인 휴가 신청 날짜 추가 (= 회사 내부의 사정이 생겼을 때 / 기존에 신청하던 날짜가 추석 일때)
+    
     @PatchMapping("/vacations/update-period")
+    @Operation(summary = "월별 휴가 신청 기간 수정",
+            description = "인사 부장 또는 사장에 의해 이례적으로 휴가 신청 기간이 변경할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "월별 휴가 신청 기간 수정 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<CommonResponseDto<VacationsResponseDto.UpdatePeriodDto>> updatePeriodByAdmin(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody VacationsRequestDto.UpdatePeriodDto requestDto){
@@ -32,8 +51,19 @@ public class VacationsController {
                         responseDto, "성공적으로 휴가 신청 기간이 변경되었습니다.", 200));
     }
 
-    // 멤버 개인이 휴가 정정 기간을 조회
     @GetMapping("/vacations/update-period")
+    @Operation(summary = "월별 휴가 신청 기간 조회",
+            description = "로그인한 사용자는 휴가 신청 기간의 상세정보를 조회할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "월별 휴가 신청 기간 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = VacationsResponseDto.UpdatePeriodDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<VacationsResponseDto.UpdatePeriodDto> readUpcomingUpdateVacationPeriod(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         VacationsResponseDto.UpdatePeriodDto responseDto
@@ -41,9 +71,20 @@ public class VacationsController {
                         memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
-
-    // 멤버 개인 휴가 생성
+    
     @PostMapping("/vacations")
+    @Operation(summary = "휴가 생성",
+            description = "로그인한 사용자는 유효한 날짜의 휴가를 신청할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "휴가 신청 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<CommonResponseDto<VacationsResponseDto.CreateOneDto>> createOneByMember(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody VacationsRequestDto.CreateOneDto requestDto){
@@ -55,9 +96,19 @@ public class VacationsController {
                         responseDto, message, 200));
     }
 
-    // readDay, readDayForAdmin 없음.
-    // 관리자가 아닌 자기 자신의 휴가 일정을 조회
     @GetMapping("/vacations/{vacationId}")
+    @Operation(summary = "휴가 조회",
+            description = "로그인한 사용자는 특정날에 신청한 휴가를 조회할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "휴가 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = VacationsResponseDto.ReadDayDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<VacationsResponseDto.ReadDayDto> readDayByMember(
             @PathVariable Long vacationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
@@ -66,8 +117,19 @@ public class VacationsController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 개인 휴가 일정 부분 수정
     @PatchMapping("/vacations/{vacationId}")
+    @Operation(summary = "휴가 신청 수정",
+            description = "로그인한 사용자는 승인 신청이 나지 않은 자신의 휴가를 수정할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "휴가 신청 수정 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = VacationsResponseDto.UpdateOneDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<VacationsResponseDto.UpdateOneDto> updateOneByMember(
             @PathVariable Long vacationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
@@ -79,6 +141,18 @@ public class VacationsController {
 
     // 회사원들의 휴가를 적용 여부를 변경
     @PatchMapping("/admin/vacations/{vacationId}")
+    @Operation(summary = "관리자에 의한 휴가 신청 수정",
+            description = "인사 부장 또는 사장이 멤버들의 휴가 신청을 승인 또는 거부 할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "관리자에 의한 휴가 신청 수정 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<CommonResponseDto<VacationsResponseDto.UpdateOneByAdminDto>> updateOneByAdmin(
             @PathVariable Long vacationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
@@ -93,6 +167,18 @@ public class VacationsController {
 
     // 개인 휴가 일정 부분 삭제
     @DeleteMapping("/vacations/{vacationId}")
+    @Operation(summary = "휴가 신청 삭제",
+            description = "로그인한 사용자는 승인 신청이 나지 않은 자신의 휴가를 삭제할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "휴가 신청 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<CommonResponseDto<Void>> deleteOneByMember(
             @PathVariable Long vacationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
@@ -107,6 +193,19 @@ public class VacationsController {
     // 특정 달의 필터링된 휴가 상황 모두 조회
     // readByHrManager
     @GetMapping("/vacations/years/{year}/months/{month}/filtered")
+    @Operation(summary = "필터링된 월별 휴가 리스트 조회",
+            description = "인사부장 또는 사장은 요약된 월별 멤버들의 휴가 리스트를 조회할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "필터링된 월별 휴가 리스트 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(
+                                    implementation = VacationsResponseDto.ReadMonthDto.class)))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<List<VacationsResponseDto.ReadMonthDto>> readByHrManager(
             @PathVariable Long year, @PathVariable Long month,
             @RequestParam(name = "isAccepted", required = false) Boolean isAccepted,
@@ -120,6 +219,18 @@ public class VacationsController {
     }
 
     @DeleteMapping("/admin/vacations/{vacationId}")
+    @Operation(summary = "관리자에 의한 멤버 휴가 삭제",
+            description = "인사 부장 또는 사장은 특정 사유로 적어서 해당 멤버에게 휴가를 삭제할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "관리자에 의한 멤버 휴가 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(mediaType = "application/json")),
+    })
     public ResponseEntity<CommonResponseDto<Void>> deleteOneByHrManager(
             @PathVariable Long vacationId,
             @RequestBody VacationsRequestDto.DeleteOneByAdminDto requestDto,

@@ -2,11 +2,14 @@ package com.example.backoffice.global.jwt;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.dto.TokenDto;
 import com.example.backoffice.global.redis.RefreshTokenRepository;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Collection;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -57,62 +61,84 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
         log.info("successfulAuthentication()");
+
+        String origin = request.getHeader("Origin"); // 요청의 출처
+        String referer = request.getHeader("Referer"); // 요청 발생 경로
+
+        log.info("Request Origin: " + origin);
+        log.info("Request Referer: " + referer);
+
+        // 서버에서 수신한 요청 URL
+        String serverRequestURL = request.getRequestURL().toString(); // 전체 URL
+        String serverRequestURI = request.getRequestURI(); // URI 부분
+        log.info("Server received request URL: " + serverRequestURL);
+        log.info("Server received request URI: " + serverRequestURI);
+
         String username = ((MemberDetailsImpl) authResult.getPrincipal()).getUsername();
         MemberRole role = ((MemberDetailsImpl) authResult.getPrincipal()).getMembers().getRole();
 
         TokenDto tokenDto = jwtProvider.createToken(username, role);
 
         // Access Token Cookie settings
-        ResponseCookie accessTokenCookie
-                = cookieUtil.createCookie(
-                        JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
+        ResponseCookie accessCookie = cookieUtil.createCookie(
+                JwtProvider.ACCESS_TOKEN_HEADER, tokenDto.getAccessToken(),
                 jwtProvider.getAccessTokenExpiration());
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
 
+        log.info("Created Access Token Cookie: Name = {}, Value = {}, Max-Age = {}",
+                accessCookie.getName(), accessCookie.getValue(), accessCookie.getMaxAge());
+        ResponseCookie refreshCookie = null;
         // Refresh Token Cookie settings
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
 
-        // java.lang.NullPointerException: Cannot invoke "Object.toString()" because the return value of "org.springframework.data.redis.core.ValueOperations.get(Object)" is null
-        // at com.example.backoffice.global.redis.TokenRedisProvider.existsByUsername(TokenRedisProvider.java:59) ~[main/:na]
         boolean existRefreshToken
                 = tokenRedisProvider.existsByKey(redisKey);
         if(!existRefreshToken){
-            ResponseCookie refreshTokenCookie
+            refreshCookie
                     = cookieUtil.createCookie(
-                    JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
+                            JwtProvider.REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken(),
                     jwtProvider.getRefreshTokenExpiration());
-            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
-            System.out.println("refreshTokenCookie : "+refreshTokenCookie.toString());
+            log.info("Created Refresh Token Cookie: Name = {}, Value = {}, Max-Age = {}",
+                    refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getMaxAge());
+
             tokenRedisProvider.saveToken(
-                    refreshTokenCookie.getName()+ " : " + username,
+                    refreshCookie.getName()+ " : " + username,
                     Math.toIntExact(
                             jwtProvider.getRefreshTokenExpiration()),
                     tokenDto.getRefreshToken());
-        }else{
+        }else {
             String redisValue
                     = tokenRedisProvider.getRefreshTokenValue(redisKey);
-            ResponseCookie refreshTokenCookie
-                    = cookieUtil.createCookie(
-                            JwtProvider.REFRESH_TOKEN_HEADER,
-                    redisValue, jwtProvider.getRefreshTokenExpiration());
-            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+            if (redisValue != null) {  // 가져온 값이 null이 아닐 때만 쿠키 생성
+                refreshCookie = cookieUtil.createCookie(
+                        JwtProvider.REFRESH_TOKEN_HEADER, redisValue,
+                        jwtProvider.getRefreshTokenExpiration());
+                log.info("redisValue is not null!, therefore... Created Refresh Token Cookie: Name = {}, Value = {}, Max-Age = {}",
+                        refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getMaxAge());
+            }else{
+                throw new JwtCustomException(GlobalExceptionCode.TOKEN_VALUE_IS_NULL);
+            }
         }
 
-        // logging response Header
-        log.info("Set-Cookie : "+accessTokenCookie.toString());
-
-        log.info("AccessToken : " + tokenDto.getAccessToken());
-        log.info("RefreshToken : " + tokenDto.getRefreshToken());
-
         // JSON 응답 보내기
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+
         try {
             response.getWriter().write("{\"status\":\"success\"}");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        log.info(
+                "accessToken : {}, Samesite : {}",
+                accessCookie.getName(), accessCookie.getSameSite());
+
+        log.info(
+                "refreshToken : {}, Samesite : {}",
+                refreshCookie.getName(), refreshCookie.getSameSite());
     }
 
     @Override
