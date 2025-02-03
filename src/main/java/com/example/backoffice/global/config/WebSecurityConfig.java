@@ -75,15 +75,17 @@ public class WebSecurityConfig {
                         .configurationSource(request -> {
                             CorsConfiguration configuration = new CorsConfiguration();
 
-                            configuration.setAllowedOriginPatterns(
+                            // 테스트를 위한 임시로 접근 url을 모두 허용
+                            configuration.setAllowedOrigins(Arrays.asList("*"));
+                            /*configuration.setAllowedOriginPatterns(
                                     Arrays.asList(
                                             "http://localhost:3000", "http://localhost:8080",
                                             "http://api.baegobiseu.com",
-                                            "https://api.baegobiseu.com", "https://baegobiseu.com"));
+                                            "https://api.baegobiseu.com", "https://baegobiseu.com"));*/
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
                             configuration.setAllowedHeaders(Arrays.asList("Authorization", "refreshToken", "Cache-Control", "Content-Type"));
                             configuration.setAllowCredentials(true);
-                            configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
+                            configuration.setExposedHeaders(Arrays.asList("Authorization","Set-Cookie"));
 
                             return configuration;
                         })
