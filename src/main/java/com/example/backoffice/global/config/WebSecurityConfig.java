@@ -60,7 +60,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtProvider, tokenRedisProvider);
+        return new JwtAuthorizationFilter(cookieUtil, jwtProvider, tokenRedisProvider);
     }
 
     @Bean
