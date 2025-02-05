@@ -166,6 +166,12 @@ public class JwtProvider {
         return removeBearerPrefix(accessToken);
     }
 
+    public String getCookieFromHeader(HttpServletRequest req){
+        Cookie[] cookies = req.getCookies();
+
+        return null;
+    }
+
     // getRefreshTokenFromHeader
     public String getRefreshTokenFromHeader(HttpServletRequest request){
         String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);

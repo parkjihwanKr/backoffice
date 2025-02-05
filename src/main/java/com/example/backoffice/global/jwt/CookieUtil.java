@@ -1,5 +1,7 @@
 package com.example.backoffice.global.jwt;
 
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.JwtCustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +14,10 @@ public class CookieUtil {
 
     @Value("${cookie.secure}")
     private boolean isSecure;
+
+    public static final String ACCESS_TOKEN_KEY = "accessToken";
+    public static final String REFRESH_TOKEN_KEY = "refreshToken";
+
     public ResponseCookie createCookie(
             String name, String value, long maxAgeSeconds){
         if(!isSecure){
@@ -66,5 +72,23 @@ public class CookieUtil {
             }
         }
         return null;
+    }
+
+    public String getJwtTokenFromCookie(HttpServletRequest request, boolean isAccessToken){
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if(isAccessToken){
+                    if (ACCESS_TOKEN_KEY.equals(cookie.getName())) {
+                        return cookie.getValue();
+                    }
+                }else{
+                    if (REFRESH_TOKEN_KEY.equals(cookie.getName())) {
+                        return cookie.getValue();
+                    }
+                }
+            }
+        }
+        throw new JwtCustomException(GlobalExceptionCode.MISSING_TOKEN);
     }
 }
