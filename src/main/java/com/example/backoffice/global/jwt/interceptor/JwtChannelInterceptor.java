@@ -2,9 +2,11 @@ package com.example.backoffice.global.jwt.interceptor;
 
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
+import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.JwtProvider;
 import com.example.backoffice.global.jwt.JwtStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -23,9 +25,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JwtChannelInterceptor implements ChannelInterceptor {
 
     private final JwtProvider jwtProvider;
+    private final CookieUtil cookieUtil;
 
-    public JwtChannelInterceptor(JwtProvider jwtProvider) {
+    @Value("${cookie.secure}")
+    private boolean isProduction;
+
+    public JwtChannelInterceptor(
+            JwtProvider jwtProvider, CookieUtil cookieUtil) {
         this.jwtProvider = jwtProvider;
+        this.cookieUtil = cookieUtil;
     }
 
     // 세션 유지 맵
@@ -48,7 +56,12 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             // CONNECT 요청 시 JWT 인증 처리
-            String bearerToken = accessor.getFirstNativeHeader(JwtProvider.AUTHORIZATION_HEADER);
+            String bearerToken = null;
+            if(!isProduction){
+                bearerToken = accessor.getFirstNativeHeader(JwtProvider.AUTHORIZATION_HEADER);
+            }else{
+                bearerToken = accessor.getFirstNativeHeader(CookieUtil.ACCESS_TOKEN_KEY);
+            }
             String tokenValue = jwtProvider.removeBearerPrefix(bearerToken);
 
             if (tokenValue != null) {

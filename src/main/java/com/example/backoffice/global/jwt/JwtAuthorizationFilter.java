@@ -63,7 +63,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         if(!isProductionStatus){
             try {
-                String accessTokenValue = jwtProvider.getJwtFromHeader(request);
+                String accessTokenValue
+                        = cookieUtil.getJwtTokenFromCookie(request, true);
                 JwtStatus jwtStatus = validateToken(accessTokenValue);
 
                 switch (jwtStatus) {
