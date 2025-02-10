@@ -25,6 +25,11 @@ public class AuthController {
         return ResponseEntity.ok(new CommonResponseDto<>(authResponseDto, "인증 절차에 성공하였습니다.", 200));
     }
 
+    @GetMapping("/access-token")
+    public ResponseEntity<CommonResponseDto<AuthDto>> checkAccessToken(){
+        return null;
+    }
+
     @GetMapping("/refresh-token")
     public ResponseEntity<CommonResponseDto<AuthDto>> checkRefreshToken(Authentication authentication) {
         MemberDetailsImpl memberDetails = (MemberDetailsImpl) authentication.getPrincipal();

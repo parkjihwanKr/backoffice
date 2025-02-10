@@ -5,8 +5,10 @@ import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.JwtProvider;
 import com.example.backoffice.global.jwt.JwtStatus;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -17,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,13 +59,12 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             // CONNECT 요청 시 JWT 인증 처리
-            String bearerToken = null;
-            if(!isProduction){
-                bearerToken = accessor.getFirstNativeHeader(JwtProvider.AUTHORIZATION_HEADER);
-            }else{
-                bearerToken = accessor.getFirstNativeHeader(CookieUtil.ACCESS_TOKEN_KEY);
-            }
-            String tokenValue = jwtProvider.removeBearerPrefix(bearerToken);
+            HttpServletRequest request
+                    = ((ServletServerHttpRequest)accessor.getHeader("simpHttpRequest"))
+                    .getServletRequest();
+            String tokenValue = cookieUtil.getCookieValue(request, "accessToken");
+            /*String bearerToken = accessor.getFirstNativeHeader(CookieUtil.ACCESS_TOKEN_KEY);
+            String tokenValue = jwtProvider.removeBearerPrefix(bearerToken);*/
 
             if (tokenValue != null) {
                 JwtStatus status = jwtProvider.validateToken(tokenValue);
