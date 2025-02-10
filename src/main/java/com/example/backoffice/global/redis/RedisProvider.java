@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 public class RedisProvider {
     public static final String MEMBER_ID_PREFIX = "memberId:";
     public static final String BOARD_ID_PREFIX = "boardId:";
+    public static final String REFRESH_TOKEN_PREFIX = "refreshToken : ";
+
     private final ObjectMapper objectMapper;
 
     // JSON 직렬화

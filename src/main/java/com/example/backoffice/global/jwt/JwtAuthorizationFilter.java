@@ -38,6 +38,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     // 필터를 무시할 api 또는 websocket
     private boolean isExcludedUrl(String requestUrl) {
         // 필터링을 건너뛰는 경로를 명시적으로 정의
+        // accessToken 검증 로직 : access-token은 해당 필터와
+        // 다른 로직이 존재함으로 Controller에서 처리
         return requestUrl.startsWith("/ws")
                 || requestUrl.equals("/wss")
                 || requestUrl.equals("/api/v1/signup")
@@ -45,7 +47,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || requestUrl.equals("/api/v1/check-available-memberName")
                 || requestUrl.startsWith("/swagger-ui")
                 || requestUrl.startsWith("/v3/api-docs")
-                || requestUrl.startsWith("/api/v1/health-check");
+                || requestUrl.startsWith("/api/v1/health-check")
+                || requestUrl.startsWith("/api/v1/access-token");
     }
 
     @Override
