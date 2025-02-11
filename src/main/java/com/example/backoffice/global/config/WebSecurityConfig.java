@@ -96,6 +96,7 @@ public class WebSecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/check-available-memberName",
                                 "/api/v1/health-check",
+                                "/api/v1/access-token",
                                 "https://baegobiseu.com/auth/login",
                                 "https://baegobiseu.com/auth/signup").permitAll()
                         .anyRequest().authenticated()

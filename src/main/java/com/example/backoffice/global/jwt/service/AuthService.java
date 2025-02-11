@@ -1,6 +1,5 @@
 package com.example.backoffice.global.jwt.service;
 
-import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
@@ -13,17 +12,16 @@ import com.example.backoffice.global.redis.RedisProvider;
 import com.example.backoffice.global.redis.RefreshTokenRepository;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.Token;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 
 @Service
+@Slf4j(topic = "AuthService ")
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -41,63 +39,83 @@ public class AuthService {
         );
     }
 
-    public List<String> getAccessToken(
-            String accessToken, String refreshToken) throws UnsupportedEncodingException {
-        if(accessToken == null){
+    public List<String> getToken(String accessTokenValue, String refreshTokenValue){
+        if(accessTokenValue == null || refreshTokenValue == null){
             throw new JwtCustomException(GlobalExceptionCode.TOKEN_VALUE_IS_NULL);
         }
-        String accessTokenValue
-                = jwtProvider.removeBearerPrefix(accessToken);
-        JwtStatus accessTokenStatus
-                = jwtProvider.validateToken(accessTokenValue);
-        String newAccessToken = null;
-        switch (accessTokenStatus) {
-            case ACCESS ->
-                newAccessToken = makeNewAccessToken(accessToken);
-            case EXPIRED -> {
-                String name = getClaim(accessToken).getSubject();
-                newAccessToken = checkRefreshToken(name, refreshToken);
-            }
+
+        JwtStatus accessStatus = jwtProvider.validateToken(accessTokenValue);
+        switch (accessStatus) {
             case FAIL ->
                     throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+            case ACCESS, EXPIRED -> {
+                return checkRefreshToken(accessStatus, accessTokenValue, refreshTokenValue);
+            }
+            default -> throw new JwtCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
         }
-        String accessCookie = cookieUtil.createCookie(
-                "accessToken", newAccessToken,
-                jwtProvider.getAccessTokenExpiration()).toString();
-        return List.of(newAccessToken, accessCookie);
     }
 
-    private String checkRefreshToken(
-            String name, String refreshToken) throws UnsupportedEncodingException{
-        if(refreshToken == null){
-            throw new JwtCustomException(GlobalExceptionCode.TOKEN_VALUE_IS_NULL);
+    private List<String> checkRefreshToken(JwtStatus accessStatus, String accessTokenValue, String refreshTokenValue){
+        JwtStatus refreshStatus = jwtProvider.validateToken(refreshTokenValue);
+        switch (refreshStatus){
+            case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+            case ACCESS -> {
+                if(accessStatus.equals(JwtStatus.ACCESS)){
+                    ResponseCookie accessCookie = cookieUtil.createCookie(
+                            JwtProvider.ACCESS_TOKEN_HEADER, accessTokenValue, 0L);
+                    ResponseCookie refreshCookie = cookieUtil.createCookie(
+                            JwtProvider.REFRESH_TOKEN_HEADER, refreshTokenValue, 0L);
+                    return List.of(
+                            accessTokenValue,
+                            accessCookie.toString(), refreshCookie.toString());
+                }
+                if(accessStatus.equals(JwtStatus.EXPIRED)){
+                    String newAccessTokenValue = makeNewAccessToken(refreshTokenValue);
+                    ResponseCookie accessCookie = cookieUtil.createCookie(
+                            JwtProvider.ACCESS_TOKEN_HEADER, newAccessTokenValue, 0L);
+                    ResponseCookie refreshCookie = cookieUtil.createCookie(
+                            JwtProvider.REFRESH_TOKEN_HEADER, refreshTokenValue, 0L);
+                    return List.of(
+                            newAccessTokenValue,
+                            accessCookie.toString(), refreshCookie.toString());
+                }
+                throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+            }
+            case EXPIRED -> {
+                return makeNewJwtTokenList(refreshTokenValue);
+            }
+            default -> throw new JwtCustomException(GlobalExceptionCode.MISSING_TOKEN);
         }
+    }
 
-        JwtStatus refreshTokenStatus = jwtProvider.validateToken(refreshToken);
-        if (refreshTokenStatus == JwtStatus.FAIL) {
+    private List<String> makeNewJwtTokenList(String refreshTokenValue){
+        Claims claim = getClaim(refreshTokenValue);
+        TokenDto tokenList = jwtProvider.createToken(
+                claim.getSubject(), claim.get("auth", MemberRole.class));
+        ResponseCookie accessCookie = cookieUtil.createCookie(
+                JwtProvider.ACCESS_TOKEN_HEADER, tokenList.getAccessToken(), 0L);
+        ResponseCookie refreshCookie = cookieUtil.createCookie(
+                JwtProvider.REFRESH_TOKEN_HEADER, tokenList.getRefreshToken(), 0L);
+        return List.of(
+                tokenList.getAccessToken(), accessCookie.toString(),
+                refreshCookie.toString());
+    }
+
+    private String makeNewAccessToken(String refreshTokenValue){
+        Claims claim = getClaim(refreshTokenValue);
+        TokenDto token = jwtProvider.createAccessToken(
+                claim.getSubject(), claim.get("auth", MemberRole.class));
+        return token.getAccessToken();
+    }
+
+    private Claims getClaim(String refreshTokenValue){
+        Claims claim = jwtProvider.getUserInfoFromToken(refreshTokenValue);
+        String storedRefreshTokenValue
+                = refreshTokenRepository.getRefreshTokenValue(
+                RedisProvider.REFRESH_TOKEN_PREFIX+claim.getSubject());
+        if(refreshTokenValue.equals(storedRefreshTokenValue)){
             throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
         }
-
-        String savedRefreshToken
-                = refreshTokenRepository.getRefreshTokenValue(
-                        RedisProvider.REFRESH_TOKEN_PREFIX+name);
-        if (!savedRefreshToken.equals(refreshToken)) {
-            throw new JwtCustomException(GlobalExceptionCode.UNAUTHORIZED);
-        }
-        return makeNewAccessToken(refreshToken);
-    }
-
-    private Claims getClaim(String jwtToken){
-        return jwtProvider.getUserInfoFromToken(jwtToken);
-    }
-
-    private String makeNewAccessToken(String jwtToken) throws UnsupportedEncodingException{
-        String name = getClaim(jwtToken).getSubject();  // sub 값 가져오기
-        String role = getClaim(jwtToken).get("auth", String.class);  // auth 값 가져오기
-        MemberRole memberRole = MembersConverter.toRole(role);
-
-        return URLEncoder.encode(
-                jwtProvider.createToken(name, memberRole).getAccessToken(),
-                "utf-8").replaceAll("\\+", "%20");
+        return claim;
     }
 }

@@ -1,18 +1,18 @@
 package com.example.backoffice.global.jwt.controller;
 
 import com.example.backoffice.global.dto.CommonResponseDto;
-import com.example.backoffice.global.jwt.JwtProvider;
 import com.example.backoffice.global.jwt.dto.AuthDto;
 import com.example.backoffice.global.jwt.service.AuthService;
-import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
@@ -31,16 +31,23 @@ public class AuthController {
 
     @GetMapping("/access-token")
     public ResponseEntity<CommonResponseDto<String>> getAccessToken(
-            @CookieValue(name = "accessToken", required = false) String accessToken,
-            @CookieValue(name = "refreshToken", required = false) String refreshToken,
-            HttpServletResponse response) throws UnsupportedEncodingException {
-        List<String> accessTokenList
-                = authService.getAccessToken(accessToken, refreshToken);
+            @CookieValue(name = "accessToken", required = false) String accessTokenValue,
+            @CookieValue(name = "refreshToken", required = false) String refreshTokenValue,
+            HttpServletResponse response){
+        System.out.println("진입!");
+        List<String> tokenList
+                = authService.getToken(accessTokenValue, refreshTokenValue);
 
-        response.addHeader("Set-Cookie", accessTokenList.get(1));
+        // accessToken, refreshToken
+        response.addHeader("Set-Cookie", tokenList.get(1));
+        response.addHeader("Set-Cookie", tokenList.get(2));
+        for(String token : tokenList){
+            System.out.println("my server token : "+token);
+        }
+        System.out.println("성공!");
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
-                        accessTokenList.get(0),
+                        tokenList.get(0),
                         "정상적으로 액세스 토큰을 가져왔습니다.",
                         200));
     }

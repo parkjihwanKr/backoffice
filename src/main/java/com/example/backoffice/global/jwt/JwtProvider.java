@@ -63,6 +63,19 @@ public class JwtProvider {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
+    public TokenDto createAccessToken(String username, MemberRole role) {
+        Date now = new Date();
+        String accessToken = Jwts.builder()
+                .setSubject(username)
+                .claim(AUTHORIZATION_KEY, role)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + accessTokenExpiration))
+                .signWith(key, signatureAlgorithm)
+                .compact();
+
+        return TokenDto.of(accessToken);
+    }
+
     public TokenDto createToken(String username, MemberRole role) {
         Date now = new Date();
         String accessToken = Jwts.builder()
