@@ -32,19 +32,9 @@ public class AuthController {
     @GetMapping("/access-token")
     public ResponseEntity<CommonResponseDto<String>> getAccessToken(
             @CookieValue(name = "accessToken", required = false) String accessTokenValue,
-            @CookieValue(name = "refreshToken", required = false) String refreshTokenValue,
-            HttpServletResponse response){
-        System.out.println("진입!");
+            @CookieValue(name = "refreshToken", required = false) String refreshTokenValue){
         List<String> tokenList
                 = authService.getToken(accessTokenValue, refreshTokenValue);
-
-        // accessToken, refreshToken
-        response.addHeader("Set-Cookie", tokenList.get(1));
-        response.addHeader("Set-Cookie", tokenList.get(2));
-        for(String token : tokenList){
-            System.out.println("my server token : "+token);
-        }
-        System.out.println("성공!");
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         tokenList.get(0),
