@@ -81,7 +81,6 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
                             null, null, requestDto.getMessage()
                     ), NotificationType.ALL_NOTIFICATIONS);
         }
-
     }
 
     @Override

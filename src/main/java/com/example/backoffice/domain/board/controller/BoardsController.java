@@ -133,10 +133,10 @@ public class BoardsController {
     }
 
     @DeleteMapping("/boards/{boardId}")
-    @Operation(summary = "전체 타입 게시글 한 개 삭제",
+    @Operation(summary = "모든 타입의 게시글 한 개 삭제",
             description = "자신이 만든 전체 타입의 게시글을 삭제할 수 있다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "전체 타입 게시글 한 개 삭제 성공",
+            @ApiResponse(responseCode = "200", description = "모든 타입의 게시글 한 개 삭제 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",

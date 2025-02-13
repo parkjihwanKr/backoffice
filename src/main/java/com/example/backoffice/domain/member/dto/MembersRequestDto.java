@@ -94,7 +94,7 @@ public class MembersRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(name = "MembersRequestDto.UpdateOneForSalaryDto",
+    @Schema(name = "MembersRequestDto.UpdateOneForVacationDto",
             description = "관리자의 특정 멤버 휴가 일 수 수정 요청 DTO")
     public static class UpdateOneForVacationDto{
         private Integer vacationDays;
