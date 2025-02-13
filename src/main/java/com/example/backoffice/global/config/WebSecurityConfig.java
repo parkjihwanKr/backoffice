@@ -60,7 +60,7 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtProvider, tokenRedisProvider);
+        return new JwtAuthorizationFilter(cookieUtil, jwtProvider, tokenRedisProvider);
     }
 
     @Bean
@@ -75,6 +75,7 @@ public class WebSecurityConfig {
                         .configurationSource(request -> {
                             CorsConfiguration configuration = new CorsConfiguration();
 
+                            // 테스트를 위한 임시로 접근 url을 모두 허용
                             configuration.setAllowedOriginPatterns(
                                     Arrays.asList(
                                             "http://localhost:3000", "http://localhost:8080",
@@ -83,7 +84,7 @@ public class WebSecurityConfig {
                             configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
                             configuration.setAllowedHeaders(Arrays.asList("Authorization", "refreshToken", "Cache-Control", "Content-Type"));
                             configuration.setAllowCredentials(true);
-                            configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
+                            configuration.setExposedHeaders(Arrays.asList("Authorization","Set-Cookie"));
 
                             return configuration;
                         })
@@ -95,6 +96,7 @@ public class WebSecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/check-available-memberName",
                                 "/api/v1/health-check",
+                                "/api/v1/access-token",
                                 "https://baegobiseu.com/auth/login",
                                 "https://baegobiseu.com/auth/signup").permitAll()
                         .anyRequest().authenticated()

@@ -15,9 +15,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    @Value("${server.port}")
-    private String deploymentPort;
-
     @Value("${cookie.secure}")
     private Boolean isSecure;
 

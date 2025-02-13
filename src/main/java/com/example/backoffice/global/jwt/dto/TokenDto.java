@@ -12,6 +12,10 @@ public class TokenDto {
     private String accessToken;
     private String refreshToken;
 
+    public static TokenDto of(String accessToken) {
+        return new TokenDto(accessToken, null);
+    }
+
     public static TokenDto of(String accessToken, String refreshToken) {
         return new TokenDto(accessToken, refreshToken);
     }

@@ -1,5 +1,7 @@
 package com.example.backoffice.global.jwt;
 
+import com.example.backoffice.global.exception.GlobalExceptionCode;
+import com.example.backoffice.global.exception.JwtCustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +14,10 @@ public class CookieUtil {
 
     @Value("${cookie.secure}")
     private boolean isSecure;
+
+    public static final String ACCESS_TOKEN_KEY = "accessToken";
+    public static final String REFRESH_TOKEN_KEY = "refreshToken";
+
     public ResponseCookie createCookie(
             String name, String value, long maxAgeSeconds){
         if(!isSecure){
@@ -30,7 +36,8 @@ public class CookieUtil {
                     .secure(this.isSecure) // 로컬 환경에서는 false, 프로덕션에서는 true로 설정
                     .path("/") // 쿠키가 적용될 경로
                     .maxAge(maxAgeSeconds) // 쿠키의 유효 기간 설정 (초 단위)
-                    .sameSite("None")// CSRF 보호를 위한 SameSite 설정
+                    .domain(".baegobiseu.com")
+                    .sameSite("Strict")// CSRF 보호를 위한 SameSite 설정
                     .build();
         }
     }
@@ -65,5 +72,23 @@ public class CookieUtil {
             }
         }
         return null;
+    }
+
+    public String getJwtTokenFromCookie(HttpServletRequest request, boolean isAccessToken){
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if(isAccessToken){
+                    if (ACCESS_TOKEN_KEY.equals(cookie.getName())) {
+                        return cookie.getValue();
+                    }
+                }else{
+                    if (REFRESH_TOKEN_KEY.equals(cookie.getName())) {
+                        return cookie.getValue();
+                    }
+                }
+            }
+        }
+        throw new JwtCustomException(GlobalExceptionCode.MISSING_TOKEN);
     }
 }
