@@ -8,8 +8,6 @@ import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.memberAnswer.service.MembersAnswersServiceV1;
-import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
-import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluationsServiceV1;
 import com.example.backoffice.domain.question.converter.QuestionsConverter;
 import com.example.backoffice.domain.question.dto.QuestionsRequestDto;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
@@ -74,8 +72,8 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
 
             responseDtoList.add(
                     QuestionsConverter.toCreateOneDto(
-                            question.getQuestionText(), question.getQuestionsType(),
-                            questionsNumber, answerList));
+                            question.getId(), question.getQuestionText(),
+                            question.getQuestionsType(), questionsNumber, answerList));
             questionsNumber++;
         }
 
@@ -148,7 +146,7 @@ public class QuestionsServiceV1Impl implements QuestionsServiceV1{
         updatedQuestion.updateForChangedOrder(beforeUpdatedNumber);
 
         return QuestionsConverter.toUpdateOneForChangedOrderDto(
-                beforeUpdatedNumber, requestDto.getUpdatedNumber(),
+                questionId, beforeUpdatedNumber, requestDto.getUpdatedNumber(),
                 question.getQuestionText(), question.getQuestionsType(),
                 question.getMultipleChoiceAnswerList());
     }

@@ -27,8 +27,9 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     @Override
     @Transactional(readOnly = true)
     public Evaluations findById(Long evaluationId){
-        return evaluationsRepository.findById(evaluationId).orElseThrow(
-                ()-> new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS));
+        return evaluationsRepository.findById(evaluationId)
+                .orElseThrow(()-> new EvaluationsCustomException(
+                        EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS));
     }
 
     @Override
@@ -41,9 +42,10 @@ public class EvaluationsServiceV1Impl implements EvaluationsServiceV1{
     @Transactional(readOnly = true)
     public Evaluations findByIdAndEvaluationType(
             Long evaluationId, EvaluationType evaluationType){
-        return evaluationsRepository.findByIdAndEvaluationType(evaluationId, evaluationType).orElseThrow(
-                ()-> new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS)
-        );
+        return evaluationsRepository.findByIdAndEvaluationType(
+                evaluationId, evaluationType).orElseThrow(
+                        ()-> new EvaluationsCustomException(
+                                EvaluationsExceptionCode.NOT_FOUND_EVALUATIONS));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.file.entity;
 
 import com.example.backoffice.domain.board.entity.Boards;
+import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
@@ -31,4 +32,8 @@ public class Files extends CommonEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boards_id")
     private Boards board;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "events_id")
+    private Events event;
 }

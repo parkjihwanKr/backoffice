@@ -1,6 +1,8 @@
 package com.example.backoffice.global.aop;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.audit.entity.AuditLogType;
 import com.example.backoffice.global.audit.service.AuditLogService;
@@ -30,10 +32,6 @@ public class MemberAspect {
     @AfterThrowing : 메서드가 예외 처리가 된 후
     */
 
-    // 로그인, 로그아웃 로직은 직접 로깅 -> private, protected 메서드이기에
-    // 해당 방법이 일관성, 가독성을 떨어트리고 유지 보수까지 엉망으로 한다는 것 앎.
-    // AOP를 지울 지 고민 중.
-
     // JoinPoint @Param MembersRequestDto.CreateMembersRequestDto requestDto
     @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.createOneForSignup(..))")
     public void logAfterSignup(JoinPoint joinPoint) {
@@ -43,10 +41,12 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogService.save(AuditLogType.SIGNUP, requestDto.getMemberName(), message);
+        commonAspect.auditLogServiceSave(
+                AuditLogType.SIGNUP, requestDto.getMemberName(), message,
+                MemberDepartment.HR, MemberPosition.INTERN);
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForSalary(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForSalaryByAdmin(..))")
     public void logAfterUpdateSalary(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         MembersRequestDto.UpdateOneForSalaryDto requestDto =
@@ -58,12 +58,12 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogService.save(
-                AuditLogType.CHANGE_MEMBER_SALARY,
-                loginMember.getMemberName(), message);
+        commonAspect.auditLogServiceSave(
+                AuditLogType.CHANGE_MEMBER_SALARY, loginMember.getMemberName(), message,
+                loginMember.getDepartment(), loginMember.getPosition());
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.deleteOne(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.deleteOneByAdmin(..))")
     public void logAfterDeleteMember(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
         String message = loginMember.getMemberName() + "님이 회원 탈퇴하셨습니다.";
@@ -71,31 +71,31 @@ public class MemberAspect {
         commonAspect.getLogMessage(message);
 
         auditLogService.save(
-                AuditLogType.DELETE_MEMBER, loginMember.getMemberName(), message);
+                AuditLogType.DELETE_MEMBER, loginMember.getMemberName(), message,
+                loginMember.getDepartment(), loginMember.getPosition());
     }
 
-    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForAttribute(..))")
+    @AfterReturning(pointcut = "execution(* com.example.backoffice.domain.member.facade.MembersServiceFacadeImplV1.updateOneForAttributeByAdmin(..))")
     public void logAfterUpdateMemberAttribute(JoinPoint joinPoint) {
         Members loginMember = (Members) joinPoint.getArgs()[1];
+
         MembersRequestDto.UpdateOneForAttributeDto requestDto =
                 (MembersRequestDto.UpdateOneForAttributeDto) joinPoint.getArgs()[2];
 
-        if (requestDto.getSalary() != null
-                && requestDto.getPosition() != null && requestDto.getDepartment() != null) {
+        if (requestDto.getPosition() != null && requestDto.getDepartment() != null) {
             String message = loginMember.getMemberName()
                     + "님이 "
                     + requestDto.getMemberName()
-                    + "님의 급여, 부서, 직책을 "
-                    + requestDto.getSalary() + ", "
+                    + "님의 부서, 직책을 "
                     + requestDto.getDepartment() + ", "
                     + requestDto.getPosition()
                     + "로 변경하였습니다.";
 
             commonAspect.getLogMessage(message);
 
-            auditLogService.save(
-                    AuditLogType.CHANGE_MEMBER_ATTRIBUTE,
-                    loginMember.getMemberName(), message);
+            commonAspect.auditLogServiceSave(
+                    AuditLogType.CHANGE_MEMBER_ATTRIBUTE, loginMember.getMemberName(), message,
+                    loginMember.getDepartment(), loginMember.getPosition());
         }
     }
 
@@ -107,8 +107,8 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        auditLogService.save(
-                AuditLogType.UPLOAD_MEMBER_FILE,
-                loginMember.getMemberName(), message);
+        commonAspect.auditLogServiceSave(
+                AuditLogType.UPLOAD_MEMBER_FILE, loginMember.getMemberName(), message,
+                loginMember.getDepartment(), loginMember.getPosition());
     }
 }

@@ -1,5 +1,7 @@
 package com.example.backoffice.domain.reaction.dto;
 
+import com.example.backoffice.domain.reaction.entity.Emoji;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +15,11 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateMemberReactionResponseDto {
-        private String fromMemberName;
+    @Schema(name = "ReactionsResponseDto.CreateOneForMemberDto",
+            description = "멤버 리액션 생성 응답 DTO")
+    public static class CreateOneForMemberDto {
+        private Long reactionId;
+        private String reactorName;
         private String toMemberName;
         private String emoji;
         private LocalDateTime createdAt;
@@ -24,13 +29,16 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateBoardReactionResponseDto {
+    @Schema(name = "ReactionsResponseDto.CreateOneForBoardDto",
+            description = "게시글 리액션 생성 응답 DTO")
+    public static class CreateOneForBoardDto {
+        private Long reactionId;
         private String boardTitle;
         private String boardContent;
         private Long likeCount;
         private Long unLikeCount;
         private Long viewCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
     }
 
@@ -38,11 +46,55 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateCommentReactionResponseDto {
-        private String commentContent;
+    @Schema(name = "ReactionsResponseDto.ReadOneForBoardDto",
+            description = "게시글 리액션 조회 응답 DTO")
+    public static class ReadOneForBoardDto {
+        private Long reactionId;
+        private Long reactorId;
+        private String reactorName;
+        private Emoji emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(name = "ReactionsResponseDto.ReadOneForCommentDto",
+            description = "댓글 리액션 조회 응답 DTO")
+    public static class ReadOneForCommentDto {
+        private Long commentId;
+        private Long reactionId;
+        private Long reactorId;
+        private String reactorName;
+        private Emoji emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(name = "ReactionsResponseDto.ReadOneForReplyDto",
+            description = "대댓글 리액션 조회 응답 DTO")
+    public static class ReadOneForReplyDto {
+        private Long commentId;
+        private Long replyId;
+        private Long reactionId;
+        private Long reactorId;
+        private String reactorName;
+        private Emoji emoji;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(name = "ReactionsResponseDto.CreateOneForCommentDto",
+            description = "댓글 리액션 생성 응답 DTO")
+    public static class CreateOneForCommentDto {
+        private Long reactionId;
+        private String content;
         private Long likeCount;
-        private Long unLikeCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
     }
 
@@ -50,11 +102,13 @@ public class ReactionsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateReplyReactionResponseDto {
-        private String replyContent;
+    @Schema(name = "ReactionsResponseDto.CreateOneForReplyDto",
+            description = "대댓글 리액션 생성 응답 DTO")
+    public static class CreateOneForReplyDto {
+        private Long reactionId;
+        private String content;
         private Long likeCount;
-        private Long unLikeCount;
-        private String fromMemberName;
+        private String reactorName;
         private String emoji;
     }
 }

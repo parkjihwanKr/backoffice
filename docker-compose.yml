@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  baegobiseu:
+    image: ${DOCKERHUB_USERNAME}/backoffice:latest
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - redis
+      - mongodb
+    networks:
+      - baegobiseu_network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - baegobiseu_network
+
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - baegobiseu_network
+
+networks:
+  baegobiseu_network:
+    name: baegobiseu_network
+
+volumes:
+  redis_data:
+  mongodb_data:
+
+#docker-compose.yml 누락되어서 서버에 올라간 에러 해결

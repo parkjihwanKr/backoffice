@@ -9,10 +9,19 @@ public enum NotificationType {
     COMMENT(Domain.COMMENT),
     REPLY(Domain.REPLY),
     EVENT(Domain.EVENT),
-    URGENT_VACATION_EVENT(Domain.URGENT_VACATION_EVENT),
+    URGENT_VACATION(Domain.URGENT_VACATION),
     URGENT_SERVER_ERROR(Domain.URGENT_SERVER_ERROR),
     EVALUATION(Domain.EVALUATION),
     UPDATE_EVALUATION(Domain.UPDATE_EVALUATION),
+    UPDATE_VACATION_PERIOD(Domain.UPDATE_VACATION_PERIOD),
+    IS_ACCEPTED_VACATION(Domain.IS_ACCEPTED_VACATION),
+    DELETE_VACATION_FOR_ADMIN(Domain.DELETE_VACATION_FOR_ADMIN),
+    CREATE_EXPENSE_REPORT(Domain.CREATE_EXPENSE_REPORT),
+    UPDATE_EXPENSE_REPORT_STATUS(Domain.UPDATE_EXPENSE_REPORT_STATUS),
+    UPDATE_EXPENSE_REPORT(Domain.UPDATE_EXPENSE_REPORT),
+    ALL_NOTIFICATIONS(Domain.ALL_NOTIFICATIONS),
+    CREATE_ATTENDANCES_MANUALLY(Domain.CREATE_ATTENDANCES_MANUALLY),
+    REBOOT_SERVER(Domain.REBOOT_SERVER),
     ;
 
     private final String domain;
@@ -28,9 +37,18 @@ public enum NotificationType {
         public static final String COMMENT = "COMMENT";
         public static final String REPLY = "REPLY";
         public static final String EVENT = "EVENT";
-        public static final String URGENT_VACATION_EVENT = "VACATION EVENT";
+        public static final String URGENT_VACATION = "URGENT_VACATION";
         public static final String URGENT_SERVER_ERROR = "URGENT_SERVER_ERROR";
         public static final String EVALUATION = "EVALUATION";
         public static final String UPDATE_EVALUATION = "UPDATE_EVALUATION";
+        public static final String UPDATE_VACATION_PERIOD = "UPDATE_VACATION_PERIOD";
+        public static final String IS_ACCEPTED_VACATION = "IS_ACCEPTED_VACATION";
+        public static final String DELETE_VACATION_FOR_ADMIN = "DELETE_VACATION_FOR_ADMIN";
+        public static final String CREATE_EXPENSE_REPORT = "CREATE_EXPENSE_REPORT";
+        public static final String UPDATE_EXPENSE_REPORT_STATUS = "UPDATE_EXPENSE_REPORT_STATUS";
+        public static final String UPDATE_EXPENSE_REPORT = "UPDATE_EXPENSE_REPORT";
+        public static final String ALL_NOTIFICATIONS = "ALL_NOTIFICATIONS";
+        public static final String CREATE_ATTENDANCES_MANUALLY = "CREATE_ATTENDANCES_MANUALLY";
+        public static final String REBOOT_SERVER = "REBOOT_SERVER";
     }
 }

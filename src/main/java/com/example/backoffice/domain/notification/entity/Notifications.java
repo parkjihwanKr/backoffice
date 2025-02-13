@@ -1,13 +1,15 @@
 package com.example.backoffice.domain.notification.entity;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
-import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -15,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "notifications")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notifications extends CommonEntity {
+public class Notifications{
 
     @Id
     private String id;
@@ -28,11 +30,17 @@ public class Notifications extends CommonEntity {
 
     private String message;
 
-    @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
 
-    @Enumerated(EnumType.STRING)
     private MemberDepartment fromMemberDepartment;
+
+    @CreatedDate
+    @Field("created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Field("modified_at")
+    private LocalDateTime modifiedAt;
 
     public void isRead() {
         this.isRead = true;

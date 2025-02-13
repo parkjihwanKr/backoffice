@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.event.entity;
 
+import com.example.backoffice.domain.file.entity.Files;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.global.common.CommonEntity;
@@ -10,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Table(name = "events")
@@ -39,6 +42,10 @@ public class Events extends CommonEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Members member;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Files> fileList = new ArrayList<>();
 
     // entity method
     public void update(

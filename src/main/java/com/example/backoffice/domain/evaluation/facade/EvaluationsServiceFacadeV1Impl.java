@@ -8,7 +8,6 @@ import com.example.backoffice.domain.evaluation.entity.Evaluations;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
 import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
 import com.example.backoffice.domain.evaluation.service.EvaluationsServiceV1;
-import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
@@ -42,12 +41,14 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
     @Override
     @Transactional
-    public EvaluationsResponseDto.CreateOneForDepartmentDto createOneForDepartment(
+    public EvaluationsResponseDto.CreateOneForDepartmentDto createOneDepartmentType(
             Members loginMember, EvaluationsRequestDto.CreateOneForDepartmentDto requestDto){
 
         // 1. 적절한 부서에서 설문 조사를 만들었는지?
-        MemberDepartment department = MembersConverter.toDepartment(requestDto.getDepartment());
-        matchDepartmentManager(department, loginMember.getDepartment(), loginMember.getPosition());
+        MemberDepartment department
+                = membersService.findDepartment(requestDto.getDepartment());
+        matchDepartmentManager(
+                department, loginMember.getDepartment(), loginMember.getPosition());
 
         // 2. 요청한 날짜가 시작, 마감 날짜가 분기에 따라 잘 나뉘었는지?
         Integer quarter
@@ -61,8 +62,6 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
             title = year+"년 "+quarter+"분기 부서 설문조사";
         }
 
-        // 한 평가에 여럿 멤버, 한 멤버에 여럿 평가 가능. 다대다인데?
-        // 일단 부서에 대한 평가를 부서원들에게 전달해야하니까 이건 맞음
         List<Members> memberList = membersService.findAllByDepartment(department);
 
         Evaluations evaluation
@@ -76,13 +75,13 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
                 loginMember, memberList, title, evaluation, NotificationType.EVALUATION);
 
         return EvaluationsConverter.toCreateOneForDepartmentDto(
-                title, evaluation.getDescription(),loginMember.getMemberName(),
+                evaluation.getId(), title, evaluation.getDescription(),loginMember.getMemberName(),
                 evaluation.getStartDate(), evaluation.getEndDate());
     }
 
     @Override
     @Transactional
-    public EvaluationsResponseDto.CreateOneForCompanyDto createOneForCompany(
+    public EvaluationsResponseDto.CreateOneForCompanyDto createOneCompanyType(
             Members loginMember, EvaluationsRequestDto.CreateOneForCompanyDto requestDto){
         // 1. 인사부장과 일치하는 인물인지? 또는 ceo인지?
         matchHRManagerOrCEO(loginMember.getDepartment(), loginMember.getPosition());
@@ -111,13 +110,13 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
         // 5. responseDto 작성
         return EvaluationsConverter.toCreateOneForCompanyDto(
-                loginMember.getMemberName(), title, evaluation.getDescription(),
+                evaluation.getId(), loginMember.getMemberName(), title, evaluation.getDescription(),
                 evaluation.getStartDate(), evaluation.getEndDate());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public EvaluationsResponseDto.ReadOneForDepartmentDto readOneForDepartment(
+    public EvaluationsResponseDto.ReadOneForDepartmentDto readOneDepartmentType(
             Integer year, Integer quarter, Long evaluationId, Members loginMember){
         Evaluations evaluation
                 = evaluationsService.findByIdAndEvaluationType(
@@ -128,30 +127,28 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
                 loginMember.getPosition());
 
         return EvaluationsConverter.toReadOneForDepartmentDto(
-                evaluation.getTitle(), evaluation.getDescription(),
+                evaluationId, evaluation.getTitle(), evaluation.getDescription(),
                 year, quarter, loginMember.getMemberName(),
                 evaluation.getQuestionList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public EvaluationsResponseDto.ReadOneForCompanyDto readOneForCompany(
+    public EvaluationsResponseDto.ReadOneForCompanyDto readOneCompanyType(
             Integer year, Long evaluationId, Members loginMember){
 
         Evaluations evaluation
                 = evaluationsService.findByIdAndEvaluationType(
                 evaluationId, EvaluationType.COMPANY);
 
-        // membersEvaluationsService.findByMemberIdAndEvaluationId(loginMember.getId(), evaluationId);
-
         return EvaluationsConverter.toReadOneForCompanyDto(
-                evaluation.getTitle(), evaluation.getDescription(), evaluation.getYear(),
+                evaluationId, evaluation.getTitle(), evaluation.getDescription(), evaluation.getYear(),
                 loginMember.getMemberName(), evaluation.getQuestionList());
     }
 
     @Override
     @Transactional
-    public EvaluationsResponseDto.UpdateOneForDepartmentDto updateOneForDepartment(
+    public EvaluationsResponseDto.UpdateOneForDepartmentDto updateOneDepartmentType(
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto){
         Evaluations evaluation
@@ -181,14 +178,15 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
         // 5. 응답 DTO
         return EvaluationsConverter.toUpdateOneForDepartmentDto(
-                evaluation.getDepartment(), evaluation.getTitle(), evaluation.getDescription(),
-                evaluation.getYear(), evaluation.getQuarter(), loginMember.getMemberName(),
+                evaluationId, evaluation.getDepartment(), evaluation.getTitle(),
+                evaluation.getDescription(), evaluation.getYear(),
+                evaluation.getQuarter(), loginMember.getName(),
                 evaluation.getStartDate(), evaluation.getEndDate());
     }
 
     @Override
     @Transactional
-    public EvaluationsResponseDto.UpdateOneForCompanyDto updateOneForCompany(
+    public EvaluationsResponseDto.UpdateOneForCompanyDto updateOneCompanyType(
             Long evaluationId, Members loginMember,
             EvaluationsRequestDto.UpdateOneForCompanyDto requestDto){
         // 1. 존재하는 평가인지?
@@ -219,7 +217,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
 
         // 6. 응답 DTO 생성
         return EvaluationsConverter.toUpdateOneForCompanyDto(
-                evaluation.getTitle(), evaluation.getDescription(),
+                evaluationId, evaluation.getTitle(), evaluation.getDescription(),
                 evaluation.getYear(), evaluation.getStartDate(),
                 evaluation.getEndDate(), loginMember.getMemberName());
     }
@@ -265,7 +263,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
             throw new EvaluationsCustomException(EvaluationsExceptionCode.NOT_INPUT_EVALUATION_CHECKED);
         }
         membersEvaluation.isCompleted(true);
-        return EvaluationsConverter.toSubmitOneDto(loginMember.getMemberName());
+        return EvaluationsConverter.toSubmitOneDto(evaluationId, loginMember.getMemberName());
     }
 
     @Override
@@ -372,7 +370,7 @@ public class EvaluationsServiceFacadeV1Impl implements EvaluationsServiceFacadeV
         switch (notificationType) {
             case EVALUATION, UPDATE_EVALUATION -> {
                 for(Members member : memberList){
-                    notificationsServiceFacade.createNotification(
+                    notificationsServiceFacade.createOne(
                             NotificationsConverter.toNotificationData(
                                     loginMember, member, null, null,
                                     null, null, message),

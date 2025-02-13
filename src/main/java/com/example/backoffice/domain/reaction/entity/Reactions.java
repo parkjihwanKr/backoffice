@@ -44,5 +44,9 @@ public class Reactions extends CommonEntity {
     @JoinColumn(name = "comment_id")
     private Comments comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reply_id")
+    private Comments reply;
+
     // entity method
 }

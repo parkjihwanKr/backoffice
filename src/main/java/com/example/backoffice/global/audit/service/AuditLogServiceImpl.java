@@ -1,42 +1,45 @@
 package com.example.backoffice.global.audit.service;
 
+import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.domain.member.facade.MembersServiceFacadeV1;
+import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.global.audit.converter.AuditLogConverter;
+import com.example.backoffice.global.audit.dto.AuditLogResponseDto;
 import com.example.backoffice.global.audit.entity.AuditLog;
 import com.example.backoffice.global.audit.entity.AuditLogType;
 import com.example.backoffice.global.audit.repository.AuditLogRepository;
+import com.example.backoffice.global.date.DateTimeUtils;
 import com.example.backoffice.global.exception.AuditLogCustomException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class AuditLogServiceImpl implements AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
-    private final MembersServiceFacadeV1 membersServiceFacade;
+    private final MembersServiceV1 membersService;
 
     @Override
     @Transactional
     public void save(
-            AuditLogType auditLogType, String username, String details){
+            AuditLogType auditLogType, String username, String details,
+            MemberDepartment department, MemberPosition position){
         AuditLog auditLog
-                = AuditLogConverter.toEntity(auditLogType, username, details);
+                = AuditLogConverter.toEntity(
+                        auditLogType, username, details,
+                department, position);
         auditLogRepository.save(auditLog);
     }
 
-    // 근데 해당 부분을 관리자에 대한 검증을 해야할까? -> 이거에 대해서 한 번 생각해보기
-    // Controller에서 받는 url이 없음
-    // 즉, 해당 부분은 감사 관리자 또는 메인 관리자에 의한 접근만 가능해야함
-    // 이걸 service 비지니스 로직에서 권한에 대한 확인을 해야하는게 분명한데
-    // 따른 곳에서 권한에 대한 확인을 할 수 있는지 확인 -> 이에 대한 타당성을 명확히 할 것.
-
+    // 상세보기
     @Override
     @Transactional(readOnly = true)
     public AuditLog readOne(String auditLogId){
@@ -44,48 +47,28 @@ public class AuditLogServiceImpl implements AuditLogService {
                 ()-> new AuditLogCustomException(GlobalExceptionCode.NOT_FOUND_AUDIT_LOG));
     }
 
-    // 특정인 조회
     @Override
     @Transactional(readOnly = true)
-    public AuditLog readMemberLog(String memberName){
-        return findByMemberName(memberName);
-    }
+    public Page<AuditLogResponseDto.ReadOneDto> readFiltered(
+            Members loginMember, String memberName, String auditType,
+            String startDate, String endDate, Pageable pageable){
+        // 1. 로그인 멤버가 해당 로그를 볼 수 있는 권한인지?
+        membersService.findAuditManagerOrCeo(loginMember.getId());
 
-    // 부서에 따른 조회
-    @Override
-    @Transactional(readOnly = true)
-    public List<AuditLog> readByDepartment(String department){
-        List<Members> memberList = membersServiceFacade.findAllByDepartment(department);
-        List<AuditLog> auditLogList = new ArrayList<>();
-        for(Members member : memberList){
-            AuditLog auditLog = findByMemberName(member.getMemberName());
-            auditLogList.add(auditLog);
+        // 2. 해당 멤버가 존재하는 사람인지?
+        if(memberName != null){
+            membersService.findByMemberName(memberName);
         }
-        return auditLogList;
-    }
 
-    // 직위에 따른 조회
-    @Override
-    @Transactional
-    public List<AuditLog> readByPosition(String position){
-        List<Members> memberList = membersServiceFacade.findAllByPosition(position);
-        List<AuditLog> auditLogList = new ArrayList<>();
-        for(Members member : memberList){
-            AuditLog auditLog = findByMemberName(member.getMemberName());
-            auditLogList.add(auditLog);
-        }
-        return auditLogList;
-    }
+        // 3. 해당하는 조건에 맞춰진 AuditLog Page 구성
+        AuditLogType auditLogType = (auditType != null) ? AuditLogConverter.toAuditType(auditType) : null;
+        LocalDateTime customStartDate = (startDate != null) ? DateTimeUtils.parse(startDate) : null;
+        LocalDateTime customEndDate = (endDate != null) ? DateTimeUtils.parse(endDate) : null;
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<AuditLog> readAll(){
-        return auditLogRepository.findAll();
-    }
+        Page<AuditLog> auditLogPage
+                = auditLogRepository.findFilteredAuditLogs(
+                        memberName, auditLogType, customStartDate, customEndDate, pageable);
 
-    @Transactional(readOnly = true)
-    public AuditLog findByMemberName(String memberName){
-        return auditLogRepository.findByMemberName(memberName).orElseThrow(
-                ()-> new AuditLogCustomException(GlobalExceptionCode.NOT_FOUND_AUDIT_LOG));
+        return AuditLogConverter.toAuditLogPageDto(auditLogPage);
     }
 }
