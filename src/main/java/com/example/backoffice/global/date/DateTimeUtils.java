@@ -1,5 +1,7 @@
 package com.example.backoffice.global.date;
 
+import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
+import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
 import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.exception.DateUtilException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
@@ -8,6 +10,7 @@ import lombok.Getter;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
 public class DateTimeUtils {
@@ -218,5 +221,21 @@ public class DateTimeUtils {
         } else {
             return firstMonday.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         }
+    }
+
+    public static boolean isYearEqualToNow(LocalDate startDate, LocalDate endDate){
+        int nowYear = getToday().getYear();
+        if(startDate.getYear() != nowYear || endDate.getYear() != nowYear){
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isAtLeastSevenDaysDuration(
+            LocalDate startDate, LocalDate endDate){
+        if (ChronoUnit.DAYS.between(startDate, endDate) < 7) {
+            return false;
+        }
+        return true;
     }
 }

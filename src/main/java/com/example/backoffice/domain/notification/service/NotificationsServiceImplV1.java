@@ -235,9 +235,10 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
         if(domainType.equals(NotificationType.ALL_NOTIFICATIONS)){
             sendBoardCastNotificationForAdmin(
                     notificationData.getToMember().getId(), notification);
+        }else{
+            sendNotificationForUser(
+                    notificationData.getToMember().getMemberName(), notification);
         }
-        sendNotificationForUser(
-                notificationData.getToMember().getMemberName(), notification);
     }
 
     @Override

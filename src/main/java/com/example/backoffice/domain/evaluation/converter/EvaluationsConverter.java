@@ -4,7 +4,12 @@ import com.example.backoffice.domain.answer.entity.Answers;
 import com.example.backoffice.domain.evaluation.dto.EvaluationsResponseDto;
 import com.example.backoffice.domain.evaluation.entity.EvaluationType;
 import com.example.backoffice.domain.evaluation.entity.Evaluations;
+import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
+import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.member.entity.MemberRole;
+import com.example.backoffice.domain.member.exception.MembersCustomException;
+import com.example.backoffice.domain.member.exception.MembersExceptionCode;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
 import com.example.backoffice.domain.question.entity.Questions;
 
@@ -31,35 +36,26 @@ public class EvaluationsConverter {
                 .build();
     }
 
-    public static EvaluationsResponseDto.CreateOneForDepartmentDto toCreateOneForDepartmentDto(
+    public static EvaluationsResponseDto.CreateOneDto toCreateOneDto(
             Long evaluationId, String title, String description, String loginMemberName,
-            LocalDate startDate, LocalDate endDate){
-        return EvaluationsResponseDto.CreateOneForDepartmentDto.builder()
+            LocalDate startDate, LocalDate endDate, EvaluationType evaluationType,
+            MemberDepartment department){
+        return EvaluationsResponseDto.CreateOneDto.builder()
                 .evaluationId(evaluationId)
                 .writerName(loginMemberName)
                 .title(title)
                 .description(description)
                 .startDate(startDate)
                 .endDate(endDate)
+                .evaluationType(evaluationType)
+                .memberDepartment(department)
                 .build();
     }
 
-    public static EvaluationsResponseDto.CreateOneForCompanyDto toCreateOneForCompanyDto(
-            Long evaluationId, String loginMemberName, String title, String description,
-            LocalDate startDate, LocalDate endDate){
-        return EvaluationsResponseDto.CreateOneForCompanyDto.builder()
-                .evaluationId(evaluationId)
-                .writerName(loginMemberName)
-                .title(title)
-                .description(description)
-                .startDate(startDate)
-                .endDate(endDate)
-                .build();
-    }
-
-    public static EvaluationsResponseDto.ReadOneForDepartmentDto toReadOneForDepartmentDto(
+    public static EvaluationsResponseDto.ReadOneDto toReadOneDto(
             Long evaluationId, String title, String description, Integer year,
-            Integer quarter, String writerName, List<Questions> questionList){
+            Integer quarter, String writerName, List<Questions> questionList,
+            EvaluationType evaluationType){
         List<QuestionsResponseDto.ReadOneDto> questionResponseDtoList = new ArrayList<>();
         for(Questions question : questionList){
             List<String> answerList = new ArrayList<>();
@@ -77,50 +73,23 @@ public class EvaluationsConverter {
             );
         }
 
-        return EvaluationsResponseDto.ReadOneForDepartmentDto.builder()
+        return EvaluationsResponseDto.ReadOneDto.builder()
                 .evaluationId(evaluationId)
                 .title(title)
                 .description(description)
                 .year(year)
                 .quarter(quarter)
                 .writerName(writerName)
+                .evaluationType(evaluationType)
                 .questionList(questionResponseDtoList)
                 .build();
     }
 
-    public static EvaluationsResponseDto.ReadOneForCompanyDto toReadOneForCompanyDto(
-            Long evaluationId, String title, String description,
-            Integer year, String writerName, List<Questions> questionList){
-        List<QuestionsResponseDto.ReadOneDto> questionResponseDtoList = new ArrayList<>();
-        for(Questions question : questionList){
-            List<String> answerList = new ArrayList<>();
-            for(Answers answer : question.getMultipleChoiceAnswerList()){
-                answerList.add(answer.getText());
-            }
-            questionResponseDtoList.add(
-                    QuestionsResponseDto.ReadOneDto.builder()
-                            .questionNumber(question.getNumber())
-                            .questionText(question.getQuestionText())
-                            .questionsType(question.getQuestionsType())
-                            .multipleAnswerList(answerList)
-                            .build()
-            );
-        }
-        return EvaluationsResponseDto.ReadOneForCompanyDto.builder()
-                .evaluationId(evaluationId)
-                .title(title)
-                .description(description)
-                .year(year)
-                .writerName(writerName)
-                .questionList(questionResponseDtoList)
-                .build();
-    }
-
-    public static EvaluationsResponseDto.UpdateOneForDepartmentDto toUpdateOneForDepartmentDto(
+    public static EvaluationsResponseDto.UpdateOneDto toUpdateOneDto(
             Long evaluationId, MemberDepartment department, String title, String description,
             Integer year, Integer quarter, String writerName,
             LocalDate startDate, LocalDate endDate){
-        return EvaluationsResponseDto.UpdateOneForDepartmentDto.builder()
+        return EvaluationsResponseDto.UpdateOneDto.builder()
                 .evaluationId(evaluationId)
                 .department(department)
                 .title(title)
@@ -133,20 +102,6 @@ public class EvaluationsConverter {
                 .build();
     }
 
-    public static EvaluationsResponseDto.UpdateOneForCompanyDto toUpdateOneForCompanyDto(
-            Long evaluationId, String title, String description, Integer year,
-            LocalDate startDate, LocalDate endDate, String writerName){
-        return EvaluationsResponseDto.UpdateOneForCompanyDto.builder()
-                .evaluationId(evaluationId)
-                .title(title)
-                .description(description)
-                .year(year)
-                .startDate(startDate)
-                .endDate(endDate)
-                .writerName(writerName)
-                .build();
-    }
-
     public static EvaluationsResponseDto.SubmitOneDto toSubmitOneDto(
             Long evaluationId, String submitterName){
         return EvaluationsResponseDto.SubmitOneDto.builder()
@@ -154,5 +109,14 @@ public class EvaluationsConverter {
                 .createdAt(LocalDateTime.now())
                 .submitterName(submitterName)
                 .build();
+    }
+
+    public static EvaluationType toEvaluationType(String evaluationType){
+        for (EvaluationType type : EvaluationType.values()) {
+            if (type.getLabel().equalsIgnoreCase(evaluationType)) {
+                return type;
+            }
+        }
+        throw new EvaluationsCustomException(EvaluationsExceptionCode.NOT_FOUND_EVALUATION_TYPE);
     }
 }

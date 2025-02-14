@@ -1,5 +1,6 @@
 package com.example.backoffice.domain.evaluation.dto;
 
+import com.example.backoffice.domain.evaluation.entity.EvaluationType;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.question.dto.QuestionsResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,14 +19,16 @@ public class EvaluationsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(name = "EvaluationsResponseDto.CreateOneForDepartmentDto",
+    @Schema(name = "EvaluationsResponseDto.CreateOneDto",
             description = "부서 타입의 설문조사 생성 응답 DTO")
-    public static class CreateOneForDepartmentDto {
+    public static class CreateOneDto {
         private Long evaluationId;
         private String title;
         private String description;
+        private EvaluationType evaluationType;
         // 만든이
         private String writerName;
+        private MemberDepartment memberDepartment;
         private LocalDate startDate;
         private LocalDate endDate;
     }
@@ -34,15 +37,16 @@ public class EvaluationsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(name = "EvaluationsResponseDto.ReadOneForDepartmentDto",
-            description = "부서 타입의 설문조사 조회 응답 DTO")
-    public static class ReadOneForDepartmentDto {
+    @Schema(name = "EvaluationsResponseDto.ReadOneDto",
+            description = "설문조사 조회 응답 DTO")
+    public static class ReadOneDto {
         private Long evaluationId;
         private String writerName;
         private String title;
         private String description;
         private Integer year;
         private Integer quarter;
+        private EvaluationType evaluationType;
         private List<QuestionsResponseDto.ReadOneDto> questionList;
     }
 
@@ -50,9 +54,9 @@ public class EvaluationsResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    @Schema(name = "EvaluationsResponseDto.UpdateOneForDepartmentDto",
-            description = "부서 타입의 설문조사 수정 응답 DTO")
-    public static class UpdateOneForDepartmentDto {
+    @Schema(name = "EvaluationsResponseDto.UpdateOneDto",
+            description = "설문조사 수정 응답 DTO")
+    public static class UpdateOneDto {
         private Long evaluationId;
         private MemberDepartment department;
         private String writerName;
@@ -60,52 +64,6 @@ public class EvaluationsResponseDto {
         private String description;
         private Integer year;
         private Integer quarter;
-        private LocalDate startDate;
-        private LocalDate endDate;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Schema(name = "EvaluationsResponseDto.CreateOneForCompanyDto",
-            description = "회사 타입의 설문조사 생성 응답 DTO")
-    public static class CreateOneForCompanyDto {
-        private Long evaluationId;
-        private String title;
-        private String description;
-        private String writerName;
-        private LocalDate startDate;
-        private LocalDate endDate;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Schema(name = "EvaluationsResponseDto.ReadOneForCompanyDto",
-            description = "회사 타입의 설문조사 조회 응답 DTO")
-    public static class ReadOneForCompanyDto {
-        private Long evaluationId;
-        private String writerName;
-        private String title;
-        private String description;
-        private Integer year;
-        private List<QuestionsResponseDto.ReadOneDto> questionList;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Schema(name = "EvaluationsResponseDto.UpdateOneForCompanyDto",
-            description = "회사 타입의 설문조사 수정 응답 DTO")
-    public static class UpdateOneForCompanyDto {
-        private Long evaluationId;
-        private String writerName;
-        private String title;
-        private String description;
-        private Integer year;
         private LocalDate startDate;
         private LocalDate endDate;
     }
