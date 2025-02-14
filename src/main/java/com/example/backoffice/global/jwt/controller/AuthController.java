@@ -1,6 +1,7 @@
 package com.example.backoffice.global.jwt.controller;
 
 import com.example.backoffice.global.dto.CommonResponseDto;
+import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.dto.AuthDto;
 import com.example.backoffice.global.jwt.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,9 +33,21 @@ public class AuthController {
     @GetMapping("/access-token")
     public ResponseEntity<CommonResponseDto<String>> getAccessToken(
             @CookieValue(name = "accessToken", required = false) String accessTokenValue,
-            @CookieValue(name = "refreshToken", required = false) String refreshTokenValue){
+            @CookieValue(name = "refreshToken", required = false) String refreshTokenValue,
+            HttpServletResponse response){
         List<String> tokenList
                 = authService.getToken(accessTokenValue, refreshTokenValue);
+        if (tokenList.size() == 4){
+            if(tokenList.get(2) == null){
+                response.setHeader(CookieUtil.SET_COOKIE, tokenList.get(3));
+            }else if(tokenList.get(3) == null){
+                response.setHeader(CookieUtil.SET_COOKIE, tokenList.get(2));
+            }else if(tokenList.get(2) != null && tokenList.get(3) != null){
+                response.setHeader(CookieUtil.SET_COOKIE, "");
+                response.addHeader(CookieUtil.SET_COOKIE, tokenList.get(2));
+                response.addHeader(CookieUtil.SET_COOKIE, tokenList.get(3));
+            }
+        }
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponseDto<>(
                         tokenList.get(0),

@@ -14,7 +14,7 @@ public class CookieUtil {
 
     @Value("${cookie.secure}")
     private boolean isSecure;
-
+    public static final String SET_COOKIE = "Set-Cookie";
     public static final String ACCESS_TOKEN_KEY = "accessToken";
     public static final String REFRESH_TOKEN_KEY = "refreshToken";
 
