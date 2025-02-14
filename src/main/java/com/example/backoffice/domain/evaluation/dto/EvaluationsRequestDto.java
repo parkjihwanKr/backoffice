@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class EvaluationsRequestDto {
@@ -17,13 +16,14 @@ public class EvaluationsRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Schema(name = "EvaluationsRequestDto.CreateOneForDepartmentDto",
-            description = "부서 타입의 설문조사 생성 요청 DTO")
-    public static class CreateOneForDepartmentDto{
+            description = "설문조사 생성 요청 DTO")
+    public static class CreateOneDto{
         private String title;
         private String description;
         private String department;
-        private LocalDate startDate;
-        private LocalDate endDate;
+        private String evaluationType;
+        private String startDate;
+        private String endDate;
     }
 
     @Getter
@@ -32,37 +32,11 @@ public class EvaluationsRequestDto {
     @NoArgsConstructor
     @Schema(name = "EvaluationsRequestDto.UpdateOneForDepartmentDto",
             description = "부서 타입의 설문조사 생성 요청 DTO")
-    public static class UpdateOneForDepartmentDto {
+    public static class UpdateOneDto {
         private String title;
         private String description;
-        private LocalDate startDate;
-        private LocalDate endDate;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Schema(name = "EvaluationsRequestDto.CreateOneForCompanyDto",
-            description = "회사 타입의 설문조사 생성 요청 DTO")
-    public static class CreateOneForCompanyDto {
-        private String title;
-        private String description;
-        private LocalDate startDate;
-        private LocalDate endDate;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Schema(name = "EvaluationsRequestDto.UpdateOneForCompanyDto",
-            description = "회사 타입의 설문조사 수정 요청 DTO")
-    public static class UpdateOneForCompanyDto {
-        private String title;
-        private String description;
-        private LocalDate startDate;
-        private LocalDate endDate;
+        private String startDate;
+        private String endDate;
     }
 
     @Getter

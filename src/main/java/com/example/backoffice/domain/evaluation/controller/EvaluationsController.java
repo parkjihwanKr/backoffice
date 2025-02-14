@@ -26,50 +26,51 @@ public class EvaluationsController {
 
     private final EvaluationsServiceFacadeV1 evaluationsServiceFacade;
 
-    @PostMapping("/evaluations-department")
+    @PostMapping("/evaluations")
     @Operation(summary = "부서 설문조사 한 개 생성",
-            description = "로그인한 사용자의 부서와 일치하는 부서 설문조사를 생성할 수 있다.")
+            description = "로그인한 사용자의 부서와 원하는 타입의 설문조사를 생성할 수 있다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "부서 설문조사 한 개 생성 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = EvaluationsResponseDto.CreateOneForDepartmentDto.class))),
+                            schema = @Schema(implementation = EvaluationsResponseDto.CreateOneDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class))),
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<EvaluationsResponseDto.CreateOneForDepartmentDto> createOneDepartmentType(
+    public ResponseEntity<EvaluationsResponseDto.CreateOneDto> createOneDepartmentType(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody EvaluationsRequestDto.CreateOneForDepartmentDto requestDto){
-        EvaluationsResponseDto.CreateOneForDepartmentDto responseDto
-                = evaluationsServiceFacade.createOneDepartmentType(
+            @RequestBody EvaluationsRequestDto.CreateOneDto requestDto){
+        EvaluationsResponseDto.CreateOneDto responseDto
+                = evaluationsServiceFacade.createOne(
                         memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/evaluations-department/{evaluationId}")
+    @GetMapping("/evaluations/{evaluationId}")
     @Operation(summary = "부서 설문조사 한 개 조회",
             description = "로그인한 사용자의 부서와 일치하고 년, 분기를 필터링한 부서 설문조사를 조회할 수 있다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "부서 설문조사 한 개 생성 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = 
-                                    EvaluationsResponseDto.ReadOneForDepartmentDto.class))),
+                                    EvaluationsResponseDto.ReadOneDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class))),
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<EvaluationsResponseDto.ReadOneForDepartmentDto> readOneDepartmentType(
+    public ResponseEntity<EvaluationsResponseDto.ReadOneDto> readOneDepartmentType(
             @RequestParam(name = "year")Integer year,
             @RequestParam(name = "quarter")Integer quarter,
+            @RequestParam(name = "evaluationType", required = false)String evaluationType,
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        EvaluationsResponseDto.ReadOneForDepartmentDto responseDto
-                = evaluationsServiceFacade.readOneDepartmentType(
-                year, quarter, evaluationId, memberDetails.getMembers());
+        EvaluationsResponseDto.ReadOneDto responseDto
+                = evaluationsServiceFacade.readOne(
+                year, quarter, evaluationType, evaluationId, memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
@@ -80,88 +81,19 @@ public class EvaluationsController {
             @ApiResponse(responseCode = "200", description = "부서 설문조사 한 개 수정 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = 
-                                    EvaluationsResponseDto.UpdateOneForDepartmentDto.class))),
+                                    EvaluationsResponseDto.UpdateOneDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class))),
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<EvaluationsResponseDto.UpdateOneForDepartmentDto> updateOneDepartmentType(
+    public ResponseEntity<EvaluationsResponseDto.UpdateOneDto> updateOneDepartmentType(
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody EvaluationsRequestDto.UpdateOneForDepartmentDto requestDto){
-        EvaluationsResponseDto.UpdateOneForDepartmentDto responseDto
-                = evaluationsServiceFacade.updateOneDepartmentType(
-                evaluationId, memberDetails.getMembers(), requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-    
-    @PostMapping("/evaluations-company")
-    @Operation(summary = "회사 설문조사 한 개 생성",
-            description = "인사 부장, 사장만 회사 설문조사를 생성할 수 있다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "부서 설문조사 한 개 생성 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = EvaluationsResponseDto.CreateOneForCompanyDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CommonResponseDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
-                    content = @Content(mediaType = "application/json")),
-    })
-    public ResponseEntity<EvaluationsResponseDto.CreateOneForCompanyDto> createOneCompanyType(
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody EvaluationsRequestDto.CreateOneForCompanyDto requestDto){
-        EvaluationsResponseDto.CreateOneForCompanyDto responseDto
-                = evaluationsServiceFacade.createOneCompanyType(
-                        memberDetails.getMembers(),requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    @GetMapping("/evaluations-company/{evaluationId}")
-    @Operation(summary = "회사 설문조사 한 개 조회",
-            description = "로그인한 사용자는 년도를 필터링한 회사 설문조사를 조회할 수 있다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회사 설문조사 한 개 생성 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation =
-                                    EvaluationsResponseDto.ReadOneForCompanyDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CommonResponseDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
-                    content = @Content(mediaType = "application/json")),
-    })
-    public ResponseEntity<EvaluationsResponseDto.ReadOneForCompanyDto> readOneCompanyType(
-            @RequestParam(name = "year") Integer year, @PathVariable Long evaluationId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        EvaluationsResponseDto.ReadOneForCompanyDto responseDto
-                = evaluationsServiceFacade.readOneCompanyType(
-                        year, evaluationId, memberDetails.getMembers());
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    @PatchMapping("/evaluations-company/{evaluationId}")
-    @Operation(summary = "회사 설문조사 한 개 수정",
-            description = "로그인한 사용자가 만든 회사 설문조사를 수정할 수 있다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회사 설문조사 한 개 수정 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation =
-                                    EvaluationsResponseDto.UpdateOneForCompanyDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CommonResponseDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
-                    content = @Content(mediaType = "application/json")),
-    })
-    public ResponseEntity<EvaluationsResponseDto.UpdateOneForCompanyDto> updateOneCompanyType(
-            @PathVariable Long evaluationId,
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestBody EvaluationsRequestDto.UpdateOneForCompanyDto requestDto){
-        EvaluationsResponseDto.UpdateOneForCompanyDto responseDto
-                = evaluationsServiceFacade.updateOneCompanyType(
+            @RequestBody EvaluationsRequestDto.UpdateOneDto requestDto){
+        EvaluationsResponseDto.UpdateOneDto responseDto
+                = evaluationsServiceFacade.updateOne(
                         evaluationId, memberDetails.getMembers(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
