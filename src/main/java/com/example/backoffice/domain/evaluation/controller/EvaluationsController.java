@@ -27,8 +27,8 @@ public class EvaluationsController {
     private final EvaluationsServiceFacadeV1 evaluationsServiceFacade;
 
     @PostMapping("/evaluations")
-    @Operation(summary = "부서 설문조사 한 개 생성",
-            description = "로그인한 사용자의 부서와 원하는 타입의 설문조사를 생성할 수 있다.")
+    @Operation(summary = "설문조사 한 개 생성",
+            description = "특정 권한이 있는 관리자가 원하는 타입의 설문조사를 생성할 수 있다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "부서 설문조사 한 개 생성 성공",
                     content = @Content(mediaType = "application/json",
@@ -39,7 +39,7 @@ public class EvaluationsController {
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<EvaluationsResponseDto.CreateOneDto> createOneDepartmentType(
+    public ResponseEntity<EvaluationsResponseDto.CreateOneDto> createOne(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EvaluationsRequestDto.CreateOneDto requestDto){
         EvaluationsResponseDto.CreateOneDto responseDto
@@ -49,10 +49,10 @@ public class EvaluationsController {
     }
 
     @GetMapping("/evaluations/{evaluationId}")
-    @Operation(summary = "부서 설문조사 한 개 조회",
-            description = "로그인한 사용자의 부서와 일치하고 년, 분기를 필터링한 부서 설문조사를 조회할 수 있다.")
+    @Operation(summary = "설문조사 한 개 조회",
+            description = "로그인 사용자는 년, 분기, 설문조사 타입을 필터링한 설문조사를 조회할 수 있다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "부서 설문조사 한 개 생성 성공",
+            @ApiResponse(responseCode = "200", description = "설문조사 한 개 조회 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = 
                                     EvaluationsResponseDto.ReadOneDto.class))),
@@ -62,7 +62,7 @@ public class EvaluationsController {
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<EvaluationsResponseDto.ReadOneDto> readOneDepartmentType(
+    public ResponseEntity<EvaluationsResponseDto.ReadOneDto> readOne(
             @RequestParam(name = "year")Integer year,
             @RequestParam(name = "quarter")Integer quarter,
             @RequestParam(name = "evaluationType", required = false)String evaluationType,
@@ -75,10 +75,10 @@ public class EvaluationsController {
     }
 
     @PatchMapping("/evaluations-department/{evaluationId}")
-    @Operation(summary = "부서 설문조사 한 개 수정",
-            description = "로그인한 사용자가 만든 부서 설문조사를 수정할 수 있다.")
+    @Operation(summary = "설문조사 한 개 수정",
+            description = "관리자에 의해 특정 타입의 설문조사를 수정할 수 있다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "부서 설문조사 한 개 수정 성공",
+            @ApiResponse(responseCode = "200", description = "설문조사 한 개 수정 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = 
                                     EvaluationsResponseDto.UpdateOneDto.class))),
@@ -88,7 +88,7 @@ public class EvaluationsController {
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<EvaluationsResponseDto.UpdateOneDto> updateOneDepartmentType(
+    public ResponseEntity<EvaluationsResponseDto.UpdateOneDto> updateOne(
             @PathVariable Long evaluationId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestBody EvaluationsRequestDto.UpdateOneDto requestDto){
@@ -99,8 +99,8 @@ public class EvaluationsController {
     }
 
     @DeleteMapping("/evaluations/{evaluationId}")
-    @Operation(summary = "회사 설문조사 한 개 삭제",
-            description = "로그인한 사용자가 만든 설문조사를 삭제할 수 있다.")
+    @Operation(summary = "설문조사 한 개 삭제",
+            description = "툭정 권한을 가진 사용자가 만든 설문조사를 삭제할 수 있다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회사 설문조사 한 개 수정 성공",
                     content = @Content(mediaType = "application/json",
