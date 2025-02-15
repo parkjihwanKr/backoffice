@@ -63,6 +63,8 @@ public class AuthService {
     // ex , ex -> return accValue, accessCookie.toString(), refreshCookie.toString()
     private List<String> checkRefreshToken(JwtStatus accessStatus, String accessTokenValue, String refreshTokenValue){
         JwtStatus refreshStatus = jwtProvider.validateToken(refreshTokenValue);
+        log.info("accessStatus : "+accessStatus);
+        log.info("refreshStatus : "+refreshStatus);
         switch (refreshStatus){
             case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
             case ACCESS -> {
