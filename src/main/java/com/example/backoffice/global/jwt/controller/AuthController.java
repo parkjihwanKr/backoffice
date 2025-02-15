@@ -37,6 +37,12 @@ public class AuthController {
             HttpServletResponse response){
         List<String> tokenList
                 = authService.getToken(accessTokenValue, refreshTokenValue);
+        for(String tokenValue : tokenList){
+            int index = 0;
+            System.out.println("token index "+index+" : "+tokenValue);
+            index++;
+        }
+
         if (tokenList.size() == 4){
             if(tokenList.get(2) == null){
                 response.setHeader(CookieUtil.SET_COOKIE, tokenList.get(3));
