@@ -1,5 +1,6 @@
 package com.example.backoffice.global.jwt.service;
 
+import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
@@ -122,8 +123,9 @@ public class AuthService {
 
     private String makeNewJwtToken(String tokenValue, boolean isAccessToken){
         Claims claim = getClaim(tokenValue);
-        TokenDto tokenList = jwtProvider.createToken(
-                claim.getSubject(), claim.get("auth", MemberRole.class));
+        String roleString = claim.get("auth", String.class);
+        MemberRole role = MembersConverter.toRole(roleString);
+        TokenDto tokenList = jwtProvider.createToken(claim.getSubject(), role);
         if(isAccessToken){
             return tokenList.getAccessToken();
         }else{
