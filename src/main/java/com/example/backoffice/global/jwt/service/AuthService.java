@@ -80,7 +80,7 @@ public class AuthService {
                             newAccessTokenValue, jwtProvider.getAccessTokenExpiration());
                     return List.of(
                             newAccessTokenValue, refreshTokenValue,
-                            accessCookie.toString(), null);
+                            accessCookie.toString(), "");
                 }
                 throw new JwtCustomException(GlobalExceptionCode.NOT_EXIST_JWT_STATUS);
             }
@@ -93,7 +93,7 @@ public class AuthService {
                             newRefreshTokenValue, jwtProvider.getRefreshTokenExpiration());
                     return List.of(
                             accessTokenValue, newRefreshTokenValue,
-                            null, refreshCookie.toString());
+                            "", refreshCookie.toString());
                 }
                 if(accessStatus.equals(JwtStatus.EXPIRED)){
                     return makeNewJwtTokenList(refreshTokenValue);
@@ -106,8 +106,9 @@ public class AuthService {
 
     private List<String> makeNewJwtTokenList(String refreshTokenValue){
         Claims claim = getClaim(refreshTokenValue);
-        TokenDto tokenList = jwtProvider.createToken(
-                claim.getSubject(), claim.get("auth", MemberRole.class));
+        String roleString = claim.get("auth", String.class);
+        MemberRole role = MembersConverter.toRole(roleString);
+        TokenDto tokenList = jwtProvider.createToken(claim.getSubject(), role);
         refreshTokenRepository.saveToken(
                 RedisProvider.REFRESH_TOKEN_PREFIX,
                 jwtProvider.getRefreshTokenExpiration().intValue() / (60 * 1000),

@@ -44,11 +44,11 @@ public class AuthController {
         }
 
         if (tokenList.size() == 4){
-            if(tokenList.get(2) == null){
+            if(tokenList.get(2).isEmpty()){
                 response.setHeader(CookieUtil.SET_COOKIE, tokenList.get(3));
-            }else if(tokenList.get(3) == null){
+            }else if(tokenList.get(3).isEmpty()){
                 response.setHeader(CookieUtil.SET_COOKIE, tokenList.get(2));
-            }else if(tokenList.get(2) != null && tokenList.get(3) != null){
+            }else if(tokenList.get(2).isEmpty() && tokenList.get(3).isEmpty()){
                 response.setHeader(CookieUtil.SET_COOKIE, "");
                 response.addHeader(CookieUtil.SET_COOKIE, tokenList.get(2));
                 response.addHeader(CookieUtil.SET_COOKIE, tokenList.get(3));
