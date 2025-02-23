@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -24,8 +23,6 @@ public class QMembers extends EntityPathBase<Members> {
 
     public final StringPath address = createString("address");
 
-    public final ListPath<com.example.backoffice.domain.attendance.entity.Attendances, com.example.backoffice.domain.attendance.entity.QAttendances> attendanceList = this.<com.example.backoffice.domain.attendance.entity.Attendances, com.example.backoffice.domain.attendance.entity.QAttendances>createList("attendanceList", com.example.backoffice.domain.attendance.entity.Attendances.class, com.example.backoffice.domain.attendance.entity.QAttendances.class, PathInits.DIRECT2);
-
     public final StringPath contact = createString("contact");
 
     //inherited
@@ -35,10 +32,6 @@ public class QMembers extends EntityPathBase<Members> {
 
     public final StringPath email = createString("email");
 
-    public final ListPath<com.example.backoffice.domain.event.entity.Events, com.example.backoffice.domain.event.entity.QEvents> eventList = this.<com.example.backoffice.domain.event.entity.Events, com.example.backoffice.domain.event.entity.QEvents>createList("eventList", com.example.backoffice.domain.event.entity.Events.class, com.example.backoffice.domain.event.entity.QEvents.class, PathInits.DIRECT2);
-
-    public final ListPath<com.example.backoffice.domain.favorite.entity.Favorites, com.example.backoffice.domain.favorite.entity.QFavorites> favoritieList = this.<com.example.backoffice.domain.favorite.entity.Favorites, com.example.backoffice.domain.favorite.entity.QFavorites>createList("favoritieList", com.example.backoffice.domain.favorite.entity.Favorites.class, com.example.backoffice.domain.favorite.entity.QFavorites.class, PathInits.DIRECT2);
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath introduction = createString("introduction");
@@ -46,8 +39,6 @@ public class QMembers extends EntityPathBase<Members> {
     public final NumberPath<Long> loveCount = createNumber("loveCount", Long.class);
 
     public final StringPath memberName = createString("memberName");
-
-    public final ListPath<com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations, com.example.backoffice.domain.memberEvaluation.entity.QMembersEvaluations> membersEvaluations = this.<com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations, com.example.backoffice.domain.memberEvaluation.entity.QMembersEvaluations>createList("membersEvaluations", com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations.class, com.example.backoffice.domain.memberEvaluation.entity.QMembersEvaluations.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;

@@ -93,22 +93,6 @@ public class Members extends CommonEntity {
     // 휴가 상태
     private Boolean onVacation;
 
-    // relations
-    /*@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reactions> reactionList;*/
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Events> eventList;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Favorites> favoritieList;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MembersEvaluations> membersEvaluations;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attendances> attendanceList;
-
     // entity method
     public void updateMemberInfo(
             String name, String email, String address,
