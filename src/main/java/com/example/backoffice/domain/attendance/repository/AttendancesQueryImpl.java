@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,7 +128,9 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
         // BooleanBuilder를 사용해 필터 조건 생성
         BooleanBuilder builder = new BooleanBuilder();
         if (memberIdList != null && !memberIdList.isEmpty()) {
-            builder.and(qAttendance.member.id.in(memberIdList));
+            Long minMemberId = Collections.min(memberIdList);
+            Long maxMemberId = Collections.max(memberIdList);
+            builder.and(qAttendance.member.id.between(minMemberId, maxMemberId));
         }
 
         builder.and(qAttendance.createdAt.between(customStartDay, customEndDay));
@@ -148,7 +151,9 @@ public class AttendancesQueryImpl extends QuerydslRepositorySupport implements A
         // 1. BooleanBuilder를 사용해 필터 조건 생성
         BooleanBuilder builder = new BooleanBuilder();
         if (memberIdList != null && !memberIdList.isEmpty()) {
-            builder.and(qAttendance.member.id.in(memberIdList));
+            Long minMemberId = Collections.min(memberIdList);
+            Long maxMemberId = Collections.max(memberIdList);
+            builder.and(qAttendance.member.id.between(minMemberId, maxMemberId));
         }
 
         builder.and(qAttendance.createdAt.between(customStartDay, customEndDay));

@@ -9,30 +9,26 @@ import com.example.backoffice.global.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
-@Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
+@Slf4j(topic = "CommonAspectImpl")
 public class CommonAspectImpl implements CommonAspect {
 
     private final AuditLogService auditLogService;
+    private static final long THRESHOLD_MS = 100;
+
     @Override
     public String getCurrentMethodName(JoinPoint joinPoint) {
         return joinPoint.getSignature().getName();
-    }
-
-    @Override
-    public String getLoginMemberName() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            return authentication.getName();
-        }
-        return "anonymousUser";
     }
 
     @Override
@@ -66,4 +62,27 @@ public class CommonAspectImpl implements CommonAspect {
             MemberDepartment department, MemberPosition position){
         auditLogService.save(auditLogType, memberName, message, department, position);
     }
+
+    @Around("execution(* com.example.backoffice.domain..repository..*(..))")
+    public Object logExecutionRepositoryLogicTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        Object result = joinPoint.proceed();
+
+        stopWatch.stop();
+        long executionTime = stopWatch.getTotalTimeMillis();
+
+        if (executionTime > THRESHOLD_MS) {
+            log.warn("SLOW QUERY [{}] executed in {} ms",
+                    joinPoint.getSignature(), executionTime);
+        }else{
+            log.info("your domain {} : ",joinPoint.getSignature());
+            log.info("YOUR QUERY [{}] executed in {} ms",
+                    joinPoint.getSignature().getName(), executionTime);
+        }
+
+        return result;
+    }
+
 }
