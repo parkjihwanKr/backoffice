@@ -107,8 +107,8 @@ public class MemberAspect {
 
         commonAspect.getLogMessage(message);
 
-        commonAspect.auditLogServiceSave(
+        /* commonAspect.auditLogServiceSave(
                 AuditLogType.UPLOAD_MEMBER_FILE, loginMember.getMemberName(), message,
-                loginMember.getDepartment(), loginMember.getPosition());
+                loginMember.getDepartment(), loginMember.getPosition());*/
     }
 }

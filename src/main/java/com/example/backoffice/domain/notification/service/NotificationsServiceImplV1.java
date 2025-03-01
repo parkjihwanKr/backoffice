@@ -12,6 +12,7 @@ import com.example.backoffice.domain.notification.entity.Notifications;
 import com.example.backoffice.domain.notification.exception.NotificationsCustomException;
 import com.example.backoffice.domain.notification.exception.NotificationsExceptionCode;
 import com.example.backoffice.domain.notification.repository.NotificationsRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -221,7 +223,7 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                 yield notificationRepository.save(
                         toEntity(notificationData, notificationMessage, domainType));
             }
-            case REBOOT_SERVER -> {
+            case REBOOT_SERVER, UPCOMING_OUT_OFF_OFFICE_NOTIFICATION -> {
                 String notificationMessage
                         = notificationData.getFromMember().getMemberName()+"님이 "
                         +notificationData.getToMember().getMemberName() + "님에게 "

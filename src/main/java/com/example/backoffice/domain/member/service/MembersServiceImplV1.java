@@ -352,4 +352,10 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
         return membersRepository.findByPosition(MemberPosition.CEO).orElseThrow(
                 ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> findMemberIdList() {
+        return membersRepository.findAllMemberIdList();
+    }
 }

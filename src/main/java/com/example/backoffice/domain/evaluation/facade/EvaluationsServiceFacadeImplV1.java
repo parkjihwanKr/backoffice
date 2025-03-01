@@ -300,8 +300,7 @@ public class EvaluationsServiceFacadeImplV1 implements EvaluationsServiceFacadeV
                 for(Members member : memberList){
                     notificationsService.generateEntityAndSendMessage(
                             NotificationsConverter.toNotificationData(
-                                    loginMember, member, null, null,
-                                    null, null, message),
+                                    loginMember, member, message),
                             notificationType);
 
                     membersEvaluationsService.save(

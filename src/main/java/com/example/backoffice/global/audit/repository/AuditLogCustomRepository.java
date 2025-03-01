@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 
 public interface AuditLogCustomRepository {
-    Page<AuditLog> findFilteredAuditLogs(
+    Page<AuditLog> findFiltered(
             String memberName, AuditLogType auditType,
             LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 }

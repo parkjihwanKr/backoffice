@@ -73,7 +73,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         for(Members member : memberList){
             notificationsService.generateEntityAndSendMessage(
                     NotificationsConverter.toNotificationData(
-                            member, loginMember, null, null, null, null,
+                            member, loginMember,
                             "변경된 휴가 신청 기간 안내입니다 : "
                                     +vacationPeriodProvider.getVacationPeriod().getStartDate() + " ~ "
                                     +vacationPeriodProvider.getVacationPeriod().getEndDate()),
@@ -126,10 +126,10 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                     .NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY
                     .getMessage();
             notificationsService.generateEntityAndSendMessage(
-                    notificationsService.toNotificationData(
-                            membersService.findItManager(), membersService.findByPosition(MemberPosition.CEO),
-                            null, null, null, null, message
-                    ), NotificationType.URGENT_SERVER_ERROR);
+                    NotificationsConverter.toNotificationData(
+                            membersService.findItManager(),
+                            membersService.findByPosition(MemberPosition.CEO),
+                            message), NotificationType.URGENT_SERVER_ERROR);
 
             throw new VacationsCustomException(
                     VacationsExceptionCode.NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY);
@@ -232,9 +232,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
 
         notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
-                        loginMember, vacation.getOnVacationMember(),
-                        null, null, null, null,
-                        notificationMessage),
+                        loginMember, vacation.getOnVacationMember(), notificationMessage),
                 NotificationType.IS_ACCEPTED_VACATION);
 
         // 5. 휴가 가는 사람의 잔여 휴가 일 수 차감
@@ -328,9 +326,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         Vacations vacation = vacationsService.findById(vacationId);
         notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
-                        loginMember, vacation.getOnVacationMember(),
-                        null, null, null, null,
-                        requestDto.getReason()),
+                        loginMember, vacation.getOnVacationMember(), requestDto.getReason()),
                 NotificationType.DELETE_VACATION_FOR_ADMIN);
 
         vacationsService.deleteById(vacationId);
@@ -445,7 +441,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         Members hrManager = membersService.findHRManager();
         notificationsService.generateEntityAndSendMessage(
                 NotificationsConverter.toNotificationData(
-                        hrManager, loginMember, null, null, null, null, null),
+                        hrManager, loginMember, null),
                 NotificationType.URGENT_VACATION);
     }
 

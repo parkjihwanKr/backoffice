@@ -14,6 +14,7 @@ import com.example.backoffice.domain.notification.entity.Notifications;
 import com.example.backoffice.domain.notification.exception.NotificationsCustomException;
 import com.example.backoffice.domain.notification.exception.NotificationsExceptionCode;
 import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -77,8 +78,7 @@ public class NotificationsServiceFacadeImplV1 implements NotificationsServiceFac
         for(Members toMember : memberListExcluedOneList){
             notificationsService.generateEntityAndSendMessage(
                     NotificationsConverter.toNotificationData(
-                          toMember, ceo, null, null,
-                            null, null, requestDto.getMessage()
+                          toMember, ceo, requestDto.getMessage()
                     ), NotificationType.ALL_NOTIFICATIONS);
         }
     }

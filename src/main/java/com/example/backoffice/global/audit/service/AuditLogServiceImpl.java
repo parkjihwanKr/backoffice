@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +68,7 @@ public class AuditLogServiceImpl implements AuditLogService {
         LocalDateTime customEndDate = (endDate != null) ? DateTimeUtils.parse(endDate) : null;
 
         Page<AuditLog> auditLogPage
-                = auditLogRepository.findFilteredAuditLogs(
+                = auditLogRepository.findFiltered(
                         memberName, auditLogType, customStartDate, customEndDate, pageable);
 
         return AuditLogConverter.toAuditLogPageDto(auditLogPage);

@@ -9,10 +9,11 @@ import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.domain.memberEvaluation.service.MembersEvaluationsServiceV1;
 import com.example.backoffice.domain.notification.converter.NotificationsConverter;
 import com.example.backoffice.domain.notification.entity.NotificationType;
-import com.example.backoffice.domain.notification.facade.NotificationsServiceFacadeV1;
+import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import com.example.backoffice.global.date.DateTimeUtils;
+import com.example.backoffice.global.redis.service.RedisBackupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +27,10 @@ public class DailyScheduler implements SchedulerTask{
     private final MembersServiceV1 membersService;
     private final EvaluationsServiceV1 evaluationsService;
     private final MembersEvaluationsServiceV1 membersEvaluationsService;
-    private final NotificationsServiceFacadeV1 notificationsServiceFacade;
+    private final NotificationsServiceV1 notificationsService;
     private final VacationsServiceV1 vacationsService;
     private final AttendancesServiceV1 attendancesService;
+    private final RedisBackupService redisBackupService;
 
     @Override
     public void execute() {
@@ -37,6 +39,8 @@ public class DailyScheduler implements SchedulerTask{
         updateMemberOnVacation();
         createAttendances();
         updateYesterdayAttendanceStatus();
+        sendNotificationForUpcomingAttendance();
+        scheduleRedisBackup();
     }
 
     private void refreshCachedDateData(){
@@ -52,10 +56,9 @@ public class DailyScheduler implements SchedulerTask{
                     .map(MembersEvaluations::getMember).toList();
             for(Members unCompletedEvaluationMember : unCompletedEvaluationMemberList){
                 String message = "설문 조사 마감 7일 전입니다. 신속히 마무리 해주시길 바랍니다.";
-                notificationsServiceFacade.createOne(
+                notificationsService.generateEntityAndSendMessage(
                         NotificationsConverter.toNotificationData(
-                                unCompletedEvaluationMember, membersService.findHRManager(),
-                                null, null, null, null, message),
+                                unCompletedEvaluationMember, membersService.findHRManager(), message),
                         NotificationType.EVALUATION
                 );
             }
@@ -91,5 +94,13 @@ public class DailyScheduler implements SchedulerTask{
 
     private void updateYesterdayAttendanceStatus(){
         attendancesService.updateYesterdayAttendanceList();
+    }
+
+    private void sendNotificationForUpcomingAttendance(){
+        attendancesService.sendNotificationForUpcomingAttendance();
+    }
+
+    public void scheduleRedisBackup() {
+        redisBackupService.backupAllRedisDataToS3();
     }
 }

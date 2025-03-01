@@ -31,6 +31,15 @@ public class NotificationsConverter {
     }
 
     public static NotificationData toNotificationData(
+            Members toMember, Members fromMember, String message) {
+        return NotificationData.builder()
+                .toMember(toMember)
+                .fromMember(fromMember)
+                .message(message)
+                .build();
+    }
+
+    public static NotificationData toNotificationData(
             Members toMember, Members fromMember,
             Boards board, Comments comment, Comments reply, Events event,
             String message) {

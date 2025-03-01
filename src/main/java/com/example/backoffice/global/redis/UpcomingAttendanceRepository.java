@@ -10,21 +10,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class CachedMemberAttendanceRedisProvider {
+public class UpcomingAttendanceRepository {
     // database 2 : cachedMemberAttendance
     private final ObjectMapper objectMapper;
 
     private final RedisTemplate<String, Object> redisTemplateForCached;
 
     // Long, DateRange
-    public CachedMemberAttendanceRedisProvider(
+    public UpcomingAttendanceRepository(
             ObjectMapper objectMapper,
             @Qualifier("redisTemplateForCachedMemberAttendance") RedisTemplate<String, Object> redisTemplateForCached) {
         this.objectMapper = objectMapper;
@@ -97,6 +94,31 @@ public class CachedMemberAttendanceRedisProvider {
             return null;
         }
     }
+
+    public Map<Long, String> getStartDatesByMemberIds(List<Long> memberIdList){
+        // 모든 예정 근태 데이터 가져오기
+        Map<String, String> upcomingAttendanceMap = getAllRawValues();
+        Map<Long, String> memberStartDateMap = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : upcomingAttendanceMap.entrySet()) {
+            String key = entry.getKey();  // 예: "memberId:3, 상하이 외근"
+            String value = entry.getValue(); // 예: "{\"startDate\":\"2025-03-07 09:00:00\",\"endDate\":\"2025-03-14 18:00:00\"}"
+
+            // JSON을 객체로 변환
+            DateRange attendanceData = deserializeValue(value, DateRange.class);
+
+            // key에서 memberId 추출
+            Long memberId = extractMemberIdFromKey(key);
+
+            // memberId가 리스트에 포함된 경우만 처리
+            if (memberId != null && memberIdList.contains(memberId)) {
+                memberStartDateMap.put(memberId, attendanceData.getStartDate().toString());
+            }
+        }
+
+        return memberStartDateMap;
+    }
+
 
     // JSON 직렬화
     private String serializeValue(DateRange value) {

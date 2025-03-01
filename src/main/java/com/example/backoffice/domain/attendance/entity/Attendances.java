@@ -10,7 +10,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Table
+@Table(
+        indexes = {
+                @Index(name = "idx_attendances_member_id", columnList = "member_id"),
+                @Index(name = "idx_attendances_member_created", columnList = "member_id, created_at") // 복합 인덱스 추가
+        }
+)
 @Entity
 @Builder
 @Getter

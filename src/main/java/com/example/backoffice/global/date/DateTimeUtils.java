@@ -1,7 +1,5 @@
 package com.example.backoffice.global.date;
 
-import com.example.backoffice.domain.evaluation.exception.EvaluationsCustomException;
-import com.example.backoffice.domain.evaluation.exception.EvaluationsExceptionCode;
 import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.exception.DateUtilException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
@@ -43,6 +41,10 @@ public class DateTimeUtils {
 
     public static LocalTime getCheckOutTime(){
         return todayCheckOutTime.toLocalTime();
+    }
+
+    public static String getFormattedDate(String dateTime){
+        return dateTime.replace(" ", "T");
     }
 
     // 특정 문자열을 LocalDateTime으로 파싱
@@ -129,6 +131,14 @@ public class DateTimeUtils {
         }
         LocalDate todayDate = getToday().toLocalDate();
         return dateTime.toLocalDate().isEqual(todayDate);
+    }
+
+    public static boolean isTomorrow(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+        }
+        LocalDate tomorrowDate = getTomorrow().toLocalDate();
+        return dateTime.toLocalDate().isEqual(tomorrowDate);
     }
 
     public static boolean isBeforeToday(LocalDateTime dateTime) {

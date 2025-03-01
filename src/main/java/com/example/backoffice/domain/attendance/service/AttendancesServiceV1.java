@@ -204,4 +204,9 @@ public interface AttendancesServiceV1 {
     * 스케줄러를 통한 어제의 근태 기록들의 상태를 보고 알맞게 해당 근태 기록 수정
      */
     void updateYesterdayAttendanceList();
+
+    /**
+     * 내일 예정 되어 있는 근태 기록을 알려줌
+     */
+    void sendNotificationForUpcomingAttendance();
 }

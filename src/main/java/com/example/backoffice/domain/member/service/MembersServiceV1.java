@@ -119,8 +119,6 @@ public interface MembersServiceV1 {
      * @return CEO
      * @throws MembersCustomException {@link MembersExceptionCode#RESTRICTED_ACCESS_MEMBER}
      * 접근 불가능한 멤버
-     * @throws MembersCustomException {@link MembersExceptionCode#MATCHED_MEMBER_INFO_MEMBER_NAME}
-     * 멤버 이름에 매칭하는 멤버 정보가 없음
      */
     Members findCeoByMemberName(String memberName);
 
@@ -306,4 +304,10 @@ public interface MembersServiceV1 {
      * @return CEO || null
      */
     Members findCeo();
+
+    /**
+     * 모든 멤버의 아이디 리스트 조회
+     * @return 모든 멤버의 아이디 리스트 반환
+     */
+    List<Long> findMemberIdList();
 }

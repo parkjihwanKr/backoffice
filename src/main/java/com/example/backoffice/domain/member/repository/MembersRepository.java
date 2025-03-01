@@ -6,6 +6,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,4 +50,7 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
     List<Members> findByDepartmentNotIn(List<MemberDepartment> excludedDepartmentList);
 
     List<Members> findByIdNotIn(List<Long> excludedIdList);
+
+    @Query(value = "SELECT id FROM members", nativeQuery = true)
+    List<Long> findAllMemberIdList();
 }

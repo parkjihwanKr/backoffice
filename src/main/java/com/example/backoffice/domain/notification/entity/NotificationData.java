@@ -23,4 +23,10 @@ public class NotificationData {
     private Comments reply;
     private Events event;
     private String message;
+
+    public NotificationData(Members toMember, Members fromMember, String message){
+        this.toMember = toMember;
+        this.fromMember = fromMember;
+        this.message = message;
+    }
 }

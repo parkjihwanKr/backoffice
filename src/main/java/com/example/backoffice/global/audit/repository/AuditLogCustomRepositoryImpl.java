@@ -21,7 +21,7 @@ public class AuditLogCustomRepositoryImpl implements AuditLogCustomRepository {
     }
 
     @Override
-    public Page<AuditLog> findFilteredAuditLogs(
+    public Page<AuditLog> findFiltered(
             String memberName, AuditLogType auditType,
             LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
 
@@ -45,9 +45,9 @@ public class AuditLogCustomRepositoryImpl implements AuditLogCustomRepository {
         }
 
         // Pageable 처리
-        long count = mongoTemplate.count(query, AuditLog.class);
         List<AuditLog> auditLogs = mongoTemplate.find(query.with(pageable), AuditLog.class);
 
-        return PageableExecutionUtils.getPage(auditLogs, pageable, () -> count);
+        return PageableExecutionUtils.getPage(auditLogs, pageable,
+                () -> auditLogs.size() < pageable.getPageSize() ? auditLogs.size() : mongoTemplate.count(query, AuditLog.class));
     }
 }

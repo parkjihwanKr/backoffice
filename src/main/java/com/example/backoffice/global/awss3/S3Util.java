@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -65,6 +66,23 @@ public class S3Util {
             // 로그 출력 및 업로드된 파일 URL 반환
             return amazonS3Client.getUrl(bucket, s3Key).toString();
         } catch (IOException e) {
+            throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_UPLOAD_FAIL);
+        }
+    }
+
+    public void uploadJsonToS3(String jsonData, String filename) {
+        try {
+            byte[] bytes = jsonData.getBytes(StandardCharsets.UTF_8);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType("application/json");
+            metadata.setContentLength(bytes.length);
+
+            amazonS3Client.putObject(bucket, filename, inputStream, metadata);
+            log.info("JSON 데이터를 S3에 업로드 완료: {}", filename);
+
+        } catch (Exception e) {
             throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_UPLOAD_FAIL);
         }
     }
