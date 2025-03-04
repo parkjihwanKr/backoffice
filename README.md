@@ -52,27 +52,31 @@
         
     - 메인 페이지
         
-        ![메인 페이지v1.png](%EB%A9%94%EC%9D%B8_%ED%8E%98%EC%9D%B4%EC%A7%80v1.png)
+        ![메인 페이지v1](https://github.com/user-attachments/assets/18be500e-e265-4d64-af23-28e9b0519ab5)
+
         
     - 게시글
         - 전체
             
-            ![게시판페이지v1000.png](%EA%B2%8C%EC%8B%9C%ED%8C%90%ED%8E%98%EC%9D%B4%EC%A7%80v1000.png)
-            
-            ![전체게시글v1000.png](%EC%A0%84%EC%B2%B4%EA%B2%8C%EC%8B%9C%EA%B8%80v1000.png)
-            
+            ![전체게시글v1000](https://github.com/user-attachments/assets/ca6baaef-3cc8-45a7-bb9f-fd367b231ebc)
+          
+            ![게시판페이지v1000](https://github.com/user-attachments/assets/b0304412-db19-4103-99f4-98304f4e89cd)
+
         - 부서
             
-            ![게시글부서선택v1000.png](%EA%B2%8C%EC%8B%9C%EA%B8%80%EB%B6%80%EC%84%9C%EC%84%A0%ED%83%9Dv1000.png)
-            
-            ![부서게시글작성v1000.png](%EB%B6%80%EC%84%9C%EA%B2%8C%EC%8B%9C%EA%B8%80%EC%9E%91%EC%84%B1v1000.png)
-            
-            ![세일즈게시글특정조건v1000.png](%EC%84%B8%EC%9D%BC%EC%A6%88%EA%B2%8C%EC%8B%9C%EA%B8%80%ED%8A%B9%EC%A0%95%EC%A1%B0%EA%B1%B4v1000.png)
-            
-            ![세일즈게시글하나조회v1000.png](%EC%84%B8%EC%9D%BC%EC%A6%88%EA%B2%8C%EC%8B%9C%EA%B8%80%ED%95%98%EB%82%98%EC%A1%B0%ED%9A%8Cv1000.png)
-            
-            ![답글작성v1000.png](%EB%8B%B5%EA%B8%80%EC%9E%91%EC%84%B1v1000.png)
-            
+            ![게시글부서선택v1000](https://github.com/user-attachments/assets/670d7ecb-c9a1-4217-bfb4-1439e93242c4)
+          
+            ![세일즈게시글isLocked_false](https://github.com/user-attachments/assets/3244ba92-b32d-4661-b60f-62d3127f24c5)
+          
+            ![세일즈게시글특정조건v1000](https://github.com/user-attachments/assets/608b9a01-f1b3-4b53-a193-bed462902e95)
+          
+            ![부서게시글작성v1000](https://github.com/user-attachments/assets/984de991-588f-4834-860e-31224793ed33)
+          
+            ![세일즈게시글하나조회v1000](https://github.com/user-attachments/assets/df652f7e-81e6-44b8-8db2-e3e7ff6303ca)
+          
+            ![댓글 작성v1000](https://github.com/user-attachments/assets/d252c890-9123-4e9b-a248-8f9421fa54a0)
+            ![답글작성v1000](https://github.com/user-attachments/assets/8c4b6827-2dba-4889-ba8c-722a01975456)
+
 - 일정
     <details>
       <summary>부서</summary>
