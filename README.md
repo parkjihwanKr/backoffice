@@ -331,8 +331,8 @@
                         - 다양한 필터 타입을 지원하여 유연한 데이터 검색 가능하게 합니다.
                             - checkbox, input, selct 타입을 유연하게 사용할 수 있게 합니다.
                         - 사용자가 원하는 조건을 쉽게 선택할 수 있도록 UI를 제공하며, useState를 활용해 상태를 관리함.
-                          <details>
-                          <summary>FilterDropDown</summary>
+                      <details>
+                        <summary>FilterDropDown</summary>
                               
                             ```jsx
                             import React from 'react';
@@ -433,9 +433,9 @@
                             </details>
                             
                     - 테이블 스타일은 한 곳에서 관리하도록 집중하고 일관된 디자인을 할 수 있도록 합니다.
-                        - Table.css
-                            
-                            ```jsx
+                          <details>
+                              <summary>Table.css</summary>
+                              ```jsx
                             .custom-table {
                                 width : 90%;
                                 margin: 0 auto;
@@ -498,13 +498,14 @@
                                 }
                             }
                             ```
-                            
+                      </deatails>                            
+                    
                     - PaginationFooter
                         - 여러 페이지에서 동일한 페이징 UI를 사용할 수 있도록 재사용 가능한 컴포넌트로 구성하여 유지보수성을 향상시켰습니다.
                         - 현재 페이지를 중심으로 최대 5개의 페이지 버튼(이전 2개, 이후 2개)을 노출하는 방식으로 구현하여 가독성을 높힙니다.
-                        - PaginationFooter
-                            
-                            ```jsx
+                      <details>
+                          <summary>PaginationFooter</summary>
+                          ```jsx
                             import React from "react";
                             import "./PaginationFooter.css";
                             
@@ -553,6 +554,7 @@
                             export default PaginationFooter;
                             
                             ```
+                      </details>
                             
             2. 보안
                 - 프로젝트에서 JWT 기반 사용자 인증 적용을 아래와 같은 모듈로 수행합니다.
