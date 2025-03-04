@@ -82,15 +82,16 @@
       ![부서일정표v1000.png](%EB%B6%80%EC%84%9C%EC%9D%BC%EC%A0%95%ED%91%9Cv1000.png)
 
     </details>
-            
-        - 개인
-            
+    <details>
+      <summary>개인</summary>
+        
             ![개인일정v1000.png](%EA%B0%9C%EC%9D%B8%EC%9D%BC%EC%A0%95v1000.png)
             
             ![개인일정선택v1000.png](%EA%B0%9C%EC%9D%B8%EC%9D%BC%EC%A0%95%EC%84%A0%ED%83%9Dv1000.png)
             
             ![휴가신청v1000.png](%ED%9C%B4%EA%B0%80%EC%8B%A0%EC%B2%ADv1000.png)
-            
+
+  </details>
     - 개인 근태 기록
         
         ![개인근태기록페이지v1000_1.png](%EA%B0%9C%EC%9D%B8%EA%B7%BC%ED%83%9C%EA%B8%B0%EB%A1%9D%ED%8E%98%EC%9D%B4%EC%A7%80v1000_1.png)
