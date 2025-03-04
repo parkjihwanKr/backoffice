@@ -66,77 +66,72 @@
             
             ![게시글부서선택v1000](https://github.com/user-attachments/assets/670d7ecb-c9a1-4217-bfb4-1439e93242c4)
           
-            ![세일즈게시글isLocked_false](https://github.com/user-attachments/assets/3244ba92-b32d-4661-b60f-62d3127f24c5)
-          
-            ![세일즈게시글특정조건v1000](https://github.com/user-attachments/assets/608b9a01-f1b3-4b53-a193-bed462902e95)
-          
-            ![부서게시글작성v1000](https://github.com/user-attachments/assets/984de991-588f-4834-860e-31224793ed33)
-          
             ![세일즈게시글하나조회v1000](https://github.com/user-attachments/assets/df652f7e-81e6-44b8-8db2-e3e7ff6303ca)
           
             ![댓글 작성v1000](https://github.com/user-attachments/assets/d252c890-9123-4e9b-a248-8f9421fa54a0)
+          
             ![답글작성v1000](https://github.com/user-attachments/assets/8c4b6827-2dba-4889-ba8c-722a01975456)
 
-- 일정
-    <details>
-      <summary>부서</summary>
-
-      ![일정페이지v1000.png](%EC%9D%BC%EC%A0%95%ED%8E%98%EC%9D%B4%EC%A7%80v1000.png)
-
-      ![일정부서선택v1000.png](%EC%9D%BC%EC%A0%95%EB%B6%80%EC%84%9C%EC%84%A0%ED%83%9Dv1000.png)
-
-      ![부서일정표v1000.png](%EB%B6%80%EC%84%9C%EC%9D%BC%EC%A0%95%ED%91%9Cv1000.png)
-
-    </details>
-    <details>
-      <summary>개인</summary>
+    - 일정
+        - 부서
         
-            ![개인일정v1000.png](%EA%B0%9C%EC%9D%B8%EC%9D%BC%EC%A0%95v1000.png)
-            
-            ![개인일정선택v1000.png](%EA%B0%9C%EC%9D%B8%EC%9D%BC%EC%A0%95%EC%84%A0%ED%83%9Dv1000.png)
-            
-            ![휴가신청v1000.png](%ED%9C%B4%EA%B0%80%EC%8B%A0%EC%B2%ADv1000.png)
+           ![일정페이지v1000](https://github.com/user-attachments/assets/38d7a96f-866d-42ce-b614-bdbbc35cdb56)
 
-  </details>
+            ![부서일정표v1000](https://github.com/user-attachments/assets/814d5125-4226-4f85-9b68-16e61d18fc91)
+
+              
+        - 개인
+        
+            ![개인일정v1000](https://github.com/user-attachments/assets/4d9e871f-052b-431b-98fb-1b0cab10ddd3)
+
+            ![개인일정선택v1000](https://github.com/user-attachments/assets/aa01a6b2-7de7-4f40-accd-6895546bfef1)
+
     - 개인 근태 기록
-        
-        ![개인근태기록페이지v1000_1.png](%EA%B0%9C%EC%9D%B8%EA%B7%BC%ED%83%9C%EA%B8%B0%EB%A1%9D%ED%8E%98%EC%9D%B4%EC%A7%80v1000_1.png)
+
+      [개인근태기록페이지v1000_1](https://github.com/user-attachments/assets/2a91d140-9aaa-49f6-a8d9-2d1bed0be844)
+
         
     - 알림
         - 개인 알림 모달
             
-            ![개인알림페이지v1000.png](%EA%B0%9C%EC%9D%B8%EC%95%8C%EB%A6%BC%ED%8E%98%EC%9D%B4%EC%A7%80v1000.png)
+           ![개인알림페이지v1000](https://github.com/user-attachments/assets/efac99b7-e9db-47d5-b302-d8ec690b8f5a)
+
             
     - 관리자 페이지
         - 휴가
             
-            ![휴가관리v1000.png](%ED%9C%B4%EA%B0%80%EA%B4%80%EB%A6%ACv1000.png)
+          ![휴가관리v1000](https://github.com/user-attachments/assets/9775f366-2ce5-462a-9b16-76cf63e549ac)
+
             
         - 근태
-            
-            ![근태관리v1000.png](%EA%B7%BC%ED%83%9C%EA%B4%80%EB%A6%ACv1000.png)
-            
-            ![당일근태관리v1.png](%EB%8B%B9%EC%9D%BC%EA%B7%BC%ED%83%9C%EA%B4%80%EB%A6%ACv1.png)
+
+          ![근태관리v1000](https://github.com/user-attachments/assets/8e313fa4-6438-454d-bbad-943cb4044a66)
+  
             
         - 알림
             
-            ![1942.png](1942.png)
-            
-            ![1942v2.png](1942v2.png)
-            
-            ![1942v3.png](1942v3.png)
+            ![1942v3](https://github.com/user-attachments/assets/cf9bc277-2240-4d6f-842c-678e17f0ab41)
+          
+            ![1942v2](https://github.com/user-attachments/assets/0f78683b-1060-4562-aa1a-99242ea1e47c)
+
+            ![1942](https://github.com/user-attachments/assets/d5cf7eb9-78dd-4173-8a42-f4245dba0831)
+
+            ![특정알림관리v1000](https://github.com/user-attachments/assets/0d9f4239-663e-4f78-aebf-6336013bf67e)
+
             
         - 인사
             
-            ![인사관리v1.png](%EC%9D%B8%EC%82%AC%EA%B4%80%EB%A6%ACv1.png)
+            ![인사관리v1](https://github.com/user-attachments/assets/4dbae656-063c-4671-a0bf-e7abd56380b6)
+
             
         - 감사
-            
-            ![감사관리v1.png](%EA%B0%90%EC%82%AC%EA%B4%80%EB%A6%ACv1.png)
-            
+             
+            ![감사관리v1](https://github.com/user-attachments/assets/844b3e4f-778b-4878-bd1d-f3b9303a9ba5)
+
     
 6. **Directory 구조**
-    - Directory 구조
+    <details>
+        <summary>디렉토리 구조 보기</summary>
         
         ```
         └─src
@@ -298,11 +293,10 @@
             │  │                  └─security
             │  └─resources
             │      └─static
-        
-        ```
+   </details>
         
     
-7. **Technical Decision**
+8. **Technical Decision**
     - 프론트
         1. 문제 상황
             
