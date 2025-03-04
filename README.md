@@ -44,14 +44,11 @@
     
 5. **UI/UX**
     
-   <details>
-      <summary>로그인/회원가입</summary>
+    - 로그인/회원가입
         
        ![로그인v1000](https://github.com/user-attachments/assets/8ee956b3-d784-46df-8665-a27555b97f74)
 
        ![회원가입v1000](https://github.com/user-attachments/assets/8ce642f6-9217-4978-b06e-c1b9af67285e)
-
-    </details>
         
     - 메인 페이지
         
