@@ -71,14 +71,17 @@
             
             ![답글작성v1000.png](%EB%8B%B5%EA%B8%80%EC%9E%91%EC%84%B1v1000.png)
             
-    - 일정
-        - 부서
-            
-            ![일정페이지v1000.png](%EC%9D%BC%EC%A0%95%ED%8E%98%EC%9D%B4%EC%A7%80v1000.png)
-            
-            ![일정부서선택v1000.png](%EC%9D%BC%EC%A0%95%EB%B6%80%EC%84%9C%EC%84%A0%ED%83%9Dv1000.png)
-            
-            ![부서일정표v1000.png](%EB%B6%80%EC%84%9C%EC%9D%BC%EC%A0%95%ED%91%9Cv1000.png)
+- 일정
+    <details>
+      <summary>부서</summary>
+
+      ![일정페이지v1000.png](%EC%9D%BC%EC%A0%95%ED%8E%98%EC%9D%B4%EC%A7%80v1000.png)
+
+      ![일정부서선택v1000.png](%EC%9D%BC%EC%A0%95%EB%B6%80%EC%84%9C%EC%84%A0%ED%83%9Dv1000.png)
+
+      ![부서일정표v1000.png](%EB%B6%80%EC%84%9C%EC%9D%BC%EC%A0%95%ED%91%9Cv1000.png)
+
+    </details>
             
         - 개인
             
