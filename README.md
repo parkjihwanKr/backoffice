@@ -38,8 +38,7 @@
     5. AWS를 통해 안전한 인프라 구성과 자체적인 알림 서비스, 캐싱 데이터 관리, 감사 관리 데이터베이스를 사용하기에 안정성이 올라갑니다.
     
 4. 서비스 아키텍처
-    
-    ![최종 인프라스트럭처.png](%EC%B5%9C%EC%A2%85_%EC%9D%B8%ED%94%84%EB%9D%BC%EC%8A%A4%ED%8A%B8%EB%9F%AD%EC%B2%98.png)
+    ![서비스아키텍쳐](https://github.com/user-attachments/assets/602044e1-5aa7-461b-b3ec-c59215cd4b27)
     
 5. **UI/UX**
     - 로그인/회원가입
