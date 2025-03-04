@@ -331,8 +331,9 @@
                         - 다양한 필터 타입을 지원하여 유연한 데이터 검색 가능하게 합니다.
                             - checkbox, input, selct 타입을 유연하게 사용할 수 있게 합니다.
                         - 사용자가 원하는 조건을 쉽게 선택할 수 있도록 UI를 제공하며, useState를 활용해 상태를 관리함.
-                        - FilterDropDown
-                            
+                          <details>
+                          <summary>FilterDropDown</summary>
+                              
                             ```jsx
                             import React from 'react';
                             import './FilterDropDown.css';
@@ -429,6 +430,7 @@
                             export default FilterDropDown;
                             
                             ```
+                            </details>
                             
                     - 테이블 스타일은 한 곳에서 관리하도록 집중하고 일관된 디자인을 할 수 있도록 합니다.
                         - Table.css
