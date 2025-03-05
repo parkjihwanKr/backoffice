@@ -39,96 +39,96 @@
     
 4. **서비스 아키텍처**
     
-    ![최종 인프라스트럭처.png](attachment:9e6978fd-8d84-4e02-8608-3b35cfabb4b9:최종_인프라스트럭처.png)
+    ![서비스아키텍쳐](https://github.com/user-attachments/assets/e762c30c-15f8-4118-a9c7-de53bc5b49c6)
+
     
 5. **UI/UX**
     - 로그인/회원가입
-        
-        ![로그인v1000.png](attachment:ace7a375-a37b-4f7a-bb69-7118d9312afe:로그인v1000.png)
-        
-        ![회원가입v1000.png](attachment:efac45de-9857-4293-9a4d-e64bb7224c5b:회원가입v1000.png)
-        
+
+        ![로그인v1000](https://github.com/user-attachments/assets/122f9268-94f3-49c6-88a8-f92bc249e9bc)
+
+        ![회원가입v1000](https://github.com/user-attachments/assets/6edcd03f-bdcb-4823-b4d8-bfa1ba825833)
+
     - 메인 페이지
-        
-        ![메인 페이지v1.png](attachment:7462ad49-759e-46ed-a1ed-d88226818f9d:메인_페이지v1.png)
+
+        ![메인 페이지v1](https://github.com/user-attachments/assets/01cf05dc-acd8-4011-b6d3-c68238b80537)
         
     - 게시글
         - 전체
-            
-            ![게시판페이지v1000.png](attachment:5da3d68b-1d98-4252-bfb3-573bcd6c7777:게시판페이지v1000.png)
-            
-            ![전체게시글v1000.png](attachment:1b2bdde5-841d-4797-8970-d57f345842e0:전체게시글v1000.png)
+
+            ![전체게시글v1000](https://github.com/user-attachments/assets/ff1ac432-7ecb-4969-ad32-af288a40c824)
+
             
         - 부서
             
-            ![게시글부서선택v1000.png](attachment:43963cd1-7af1-4bd2-8870-7f32eba176bc:게시글부서선택v1000.png)
+            ![부서게시글작성v1000](https://github.com/user-attachments/assets/143093e6-ad2b-4d6c-b62e-68404637a2ac)
+
+            ![세일즈게시글하나조회v1000](https://github.com/user-attachments/assets/635ff963-ee62-4d79-9a46-251041ab1fc0)
+           
+            ![댓글 작성v1000](https://github.com/user-attachments/assets/db78c40d-da81-4ddb-a731-878bbc151182)
             
-            ![부서게시글작성v1000.png](attachment:d5a4e901-dd70-4337-852b-63dd5c60b033:부서게시글작성v1000.png)
-            
-            ![세일즈게시글특정조건v1000.png](attachment:51a026a4-4729-4e80-9872-d040d537282f:세일즈게시글특정조건v1000.png)
-            
-            ![세일즈게시글하나조회v1000.png](attachment:8bc00d2f-c09b-4e85-b18f-a08c8c67facf:세일즈게시글하나조회v1000.png)
-            
-            ![답글작성v1000.png](attachment:349da529-8a6c-465a-8a23-700683d6673b:답글작성v1000.png)
-            
+            ![답글작성v1000](https://github.com/user-attachments/assets/3bcc6093-4580-4b9a-a1ca-12013f5acdd7)
+
     - 일정
         - 부서
-            
-            ![일정페이지v1000.png](attachment:95bc9871-371c-4104-b8ba-61bbb790bc89:일정페이지v1000.png)
-            
-            ![일정부서선택v1000.png](attachment:dcb7b8f3-9207-44c1-afc8-3caef980b831:일정부서선택v1000.png)
-            
-            ![부서일정표v1000.png](attachment:3bf6c0c4-8f4b-4c87-9486-4b61e97519aa:부서일정표v1000.png)
+          
+            ![일정페이지v1000](https://github.com/user-attachments/assets/7c5dbcba-1c23-4b16-8130-18ec26ebb221)
+
+            ![부서일정표v1000](https://github.com/user-attachments/assets/1d61e431-1dac-42d1-833f-34790fdaa409)
+
             
         - 개인
             
-            ![개인일정v1000.png](attachment:fb5e1d14-fbe8-4d7a-ba09-f8266a363a4d:개인일정v1000.png)
-            
-            ![개인일정선택v1000.png](attachment:af6e9241-23af-4481-8a53-3f13e5c3e719:개인일정선택v1000.png)
-            
-            ![휴가신청v1000.png](attachment:ed6df140-1e0b-483a-a805-9eaea9189eb9:휴가신청v1000.png)
+            ![개인일정v1000](https://github.com/user-attachments/assets/a196d666-7c7b-4d9a-b6f8-63e8e1b9cbef)
+
+           ![개인일정선택v1000](https://github.com/user-attachments/assets/a91faf67-428b-4813-a54e-66edda25cad3)
+
+            ![휴가신청v1000](https://github.com/user-attachments/assets/4730e041-3a4b-46b1-a50c-e2152b63b50a)
+
             
     - 개인 근태 기록
-        
-        ![개인근태기록페이지v1000_1.png](attachment:19f112c2-2052-43c2-892c-1e7145772173:개인근태기록페이지v1000_1.png)
+
+      ![개인근태기록페이지v1000_1](https://github.com/user-attachments/assets/5419cb48-d5ef-44db-bf3d-37c5bf275e43)
+
         
     - 알림
         - 개인 알림 모달
             
-            ![개인알림페이지v1000.png](attachment:1dc7f6c5-fb1b-44ff-8009-929e7d00bc3c:개인알림페이지v1000.png)
+            ![개인알림페이지v1000](https://github.com/user-attachments/assets/62f5e600-44f3-4be4-864c-829138a94ab0)
+
             
     - 관리자 페이지
         - 휴가
             
-            ![휴가관리v1000.png](attachment:390d1458-deb5-40a2-87c8-b00155fd3b37:휴가관리v1000.png)
-            
+            ![휴가관리v1000](https://github.com/user-attachments/assets/6810f6e8-4054-4e6f-a043-e758f6634e82)
+
         - 근태
             
-            ![근태관리v1000.png](attachment:374d0621-7623-4319-bf76-c8b46c68f7f2:근태관리v1000.png)
-            
-            ![당일근태관리v1.png](attachment:3e479142-63d7-4950-b07b-53f03fbc3c50:당일근태관리v1.png)
+            ![근태관리v1000](https://github.com/user-attachments/assets/308d1c87-ab6c-4c8f-b631-d989210bc685)
+
+            ![당일근태관리v1](https://github.com/user-attachments/assets/16975d4d-9ef7-4493-b538-600f8ea7df65)
             
         - 알림
             
-            ![1942.png](attachment:757703e6-14dc-4f27-8a2e-4ba8a6c37872:1942.png)
-            
-            ![1942v2.png](attachment:3360764b-a350-4e85-aa0f-6b015d715c3c:1942v2.png)
-            
-            ![1942v3.png](attachment:717863b1-f46a-4976-b51e-73deaeca6e93:1942v3.png)
+            ![1942](https://github.com/user-attachments/assets/0df69c76-97f0-4662-9873-8daf53b42055)
+          
+            ![1942v2](https://github.com/user-attachments/assets/8f5736ba-c8eb-403b-8469-12d768340f94)
+
+            ![1942v3](https://github.com/user-attachments/assets/3680f242-e1d2-4aa4-a471-abaed5b90d2f)
             
         - 인사
             
-            ![인사관리v1.png](attachment:b80b63f8-e0c8-48ba-9a5c-491a04d75a8d:인사관리v1.png)
+            ![인사관리v1000](https://github.com/user-attachments/assets/19909905-7ede-4b38-a4d2-d0cae69afc4a)
             
         - 감사
             
-            ![감사관리v1.png](attachment:3257edb5-0f76-42b7-b257-603414d2bb33:감사관리v1.png)
-            
+            ![감사관리v1000](https://github.com/user-attachments/assets/2f71fe94-b575-48d0-b055-9647e2afc0e0)
+
     
-6. API 명세서
-    
-    [BackOffice API 명세서](https://www.notion.so/BackOffice-API-1ad793fd0cc881bc9539c4d124e8b5ff?pvs=21)
-    
+5. API 명세서
+
+   [backoffice_API_명세서_v1.pdf](https://github.com/user-attachments/files/19086861/backoffice_API_._v1.pdf)
+ 
 
 1. **Technical Decision**
     - 프론트
