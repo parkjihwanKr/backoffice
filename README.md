@@ -311,6 +311,7 @@
 
    <details>
        <summary>반복되는 작업 공통화</summary>
+       
     - 문제 상황
         현재 인사 담당자가  매일 출근할 때마다 개별적으로 근태 기록을 생성하고, 휴가가 끝난 멤버의 상태를 직접 변경해야 하는 번거로움이 있음. 또한, 연말이 되면 수작업으로 연간 데이터를 정리해야 하는 문제가 발생. 이를 자동화하여 인사 담당자의 업무 부담을 줄이고, 실수 없이 일관된 처리를 수행할 방법을 모색
     - 도입 이유 
@@ -329,85 +330,86 @@
 
    <details>
        <summary>DB 성능 최적화</summary>
-       1. 다양한 DB
-            1. 문제 상황
-                - 기존 인프라는 MySQL만 사용하고 있었으나, 특정 엔티티의 데이터가 수십만 개 이상이 쌓이면서 밑과 같은 문제가 발생함.
-                1. MySQL에서 특정 엔티티 대상으로 복잡한 조회에 대해서 성능이 급격히 저하됨.
-                2. RefreshToken은 자주 변경되어지는 데이터임으로 MySQL과 맞지 않음.
-                3. 바뀌지 않는 데이터가 Server에 똑같은 SELECT 조회문을 날려 불필요한 API 요청을 줄 일 필요가 있다고 생각함.
-            2. 도입 이유
-                1. MongoDB : 인덱싱 성능이 우수하고, JSON 기반 문서형 저장소가 복잡한 쿼리에 적합
-                2. Redis : TTL 설정 가능, 메모리 기반이므로 빠른 조회 및 삭제 가능
-                3. localStorage & Redis : 서버 부하를 줄이기 위해 Redis와 localStorage를 함께 사용
-            3. 구현 방식
-                1. MongoDB
-                    - MySQL의 경우 인덱스 최적화를 하더라도 JOIN 연산이 많아지면 성능이 떨어짐.
-                    - MongoDB는 JSON 기반 문서형 DB로, 대량 데이터를 효율적으로 저장하고 조회할 수 있음.
-                    - 조회 최적화에 구현 방식을 같이 확인 가능.
-                2. Redis
-                    - Jwt Token을 통한 RefreshToken을 구현함.
-                    - 해당 RefreshToken은 Access Token의 상태에 따라 처리 방식이 변경
-                        - RefreshToken ACCESS
-                            - AccessToken ACCESS : 해당 프로세스 진행
-                            - AccessToken EXPIRED : AccessToken만 재발급, 프로세스 진행
-                            - AccessToken FAIL : 403 에러
-                        - RefreshToken EXPIRED
-                            - AccessToken ACCESS : RefrehsToken만 재발급, 프로세스 진행
-                            - AccessToken EXPIRED : AccessToken, RefreshToken 재발급, 프로세스 진행
-                            - AccessToken FAIL : 403 에러
-                        - FAIL → 403 에러
-                    - 위와 같은 검증을 하고, RefreshToken은 RefreshTokenRepository에 저장
-                    - 이미지 첨부
-                3. CacheData → Client & Redis
-                    1. Client의 localStorage에 저장하는 방식
-                        1. 네트워크 요청 없이 즉시 사용 가능
-                        2. 보안 문제로 인해 중요한 데이터 저장 불가
-                    2. Redis를 활용하여 저장하는 방식
-                        1. 빠른 조회 및 검증 가능
-                        2. 네트워크 요청이 필요하여 localStorage보다는 상대적으로 느림
-                    - 따라서, 덜 중요한 정보는 localStorage에 저장하고, 중요한 정보는 Redis에 저장하는 방식으로 혼합하여 사용
-                    - 이미지 첨부 :
-                        - localStorage :
-                        - 휴가 정정 기간(데이터베이스 2) :
-                        - 예정된 근태 기록(데이터베이스 3) :
-            4. 기대 효과
-                1. 백 만개의 데이터가 존재할 때, MongoDB에서 조회 속도를 약 6~8배 성능을 향상시킬 수 있음. 
-                2. RefreshToken을 Redis를 통한 관리를 하여, 간단하게 TTL 설정하고 XSS, CSRF, MITM과 같은 공격을 방지할 수 있어 안전하게 구성할 수 있음.
-                3.  Redis를 캐시로 활용하여 서버 부하를 줄이고 빠른 응답 속도 제공
-        2. 조회 최적화
-            1. 문제 상황
-                - MySQL : 많은 필터링으로 인하여 쿼리의 복잡도가 올라가고 다른 엔티티와의 연관관계가 복잡해짐으로써 CRUD의 성능에 영향을 미침.
-                - MongoDB : 해당 데이터베이스로 변경했음에도, 조회 속도 개선이 되지 않음.
-            2. 도입 이유
-                1. Indexing : 특정 필드를 하이라이팅하여, 더 빠른 조회 속도를 부여할 수 있게 함.
-                2. Page : 모든 데이터를 반환하는 것이 아닌, 사용자가 요구한 데이터만을 적절히 반환하여, 속도를 높이고자 함.
-                3. 필요한 필드만 SELECT : 모든 엔티티에 대한 조회를 하는 것이 아닌, 반환이 필요한 부분만 SELECT하여, 대용량의 데이터를 효율적으로 조회할 수 있게 함.
-            3. 구현 방식
-                1. Indexing : 
-                    - 특정 엔티티 두 개만 선별해서 작성함. 밑의 ‘DB 성능 최적화’에 상세히 기록함.
-                    1. Attendances
-                        - Index status
-                        - attendancesStatus : 모든 구성원들이 출결 상태에 대한 상태 업데이트가 많이 될 것이라 판단하여, index를 하지 않음
-                        - checkInTime, checkOutTime : 위와 같은 이유로 예상됨.
-                        - memberId : 멤버 아이디는 외래키로 개인 출결, 관리자 페이지의 조회가 많이 일어나면서, 해당 memberId는 생성/수정/삭제의 연산이 일어날 일이 드물다.
-                        - createdAt : createdAt 필드는 해당 출결 날짜에 해당하며, 스케줄러에 의한 Attendances ‘생성’은 매일 일어나고 ‘수정/삭제’는 거의 없지만, 멤버들이 출결 상태/관리자 근태 관리 페이지 조회가 자주 일어나는 것을 감안하면, INDEX 처리가 적절하다고 생각
-                    2. Notifcations 
-                        - toMemberName, fromMemberName : 누가, 누구한테 전달 받았을 지에 대한 정보를 줘야함.
-                        - isRead
-                            - isRead는 isRead = false에 해당하는 알림 조회가 많음
-                            - isRead는 상태 변경이 많지만, 알림 1개당 단 한 번의 상태 변경만 이루어짐.
-                                - 초기 상태는 isRead = false → isRead = true 상태로의 변경만 하기 때문
-                            - Notifications 특성 상, 알림을 조회가 많이 이루어지기에 읽기 최적화가 더 중요함.
-                                - MongoDB 특성상 오버헤드가 일어날 수도 있음.
-                2. 페이징 조회
-                    - 전체 데이터를 가지고 오는 것이 아닌 개발자의 요청에 따른 일부 데이터만 가지고 옴.
-                    - 일부 데이터 요청에 LIMIT, OFFSET, ORDER BY등을 활용하여 조회함.
-                    - 장점
-                        - **조회 성능 향상**: 전체 데이터 조회보다 빠름.
-                        - **메모리 사용량 감소**: 불필요한 데이터 로딩 방지.
-                        - **네트워크 부하 감소**: 클라이언트로 전송하는 데이터가 줄어듦.
-            4. 기대 효과
-                1. 대용량의 데이터를 조회하는 속도가 개선됨.
-                2. 서버에서도 DB에게 필요한 데이터의 필드만 받아서 사용하기에 부하가 줄어듦.
-            5. DB 성능 최적화 (성능 테스트 환경에 따른 결과값)
+       
+   1. 다양한 DB
+        1. 문제 상황
+            - 기존 인프라는 MySQL만 사용하고 있었으나, 특정 엔티티의 데이터가 수십만 개 이상이 쌓이면서 밑과 같은 문제가 발생함.
+            1. MySQL에서 특정 엔티티 대상으로 복잡한 조회에 대해서 성능이 급격히 저하됨.
+            2. RefreshToken은 자주 변경되어지는 데이터임으로 MySQL과 맞지 않음.
+            3. 바뀌지 않는 데이터가 Server에 똑같은 SELECT 조회문을 날려 불필요한 API 요청을 줄 일 필요가 있다고 생각함.
+        2. 도입 이유
+            1. MongoDB : 인덱싱 성능이 우수하고, JSON 기반 문서형 저장소가 복잡한 쿼리에 적합
+            2. Redis : TTL 설정 가능, 메모리 기반이므로 빠른 조회 및 삭제 가능
+            3. localStorage & Redis : 서버 부하를 줄이기 위해 Redis와 localStorage를 함께 사용
+        3. 구현 방식
+            1. MongoDB
+                - MySQL의 경우 인덱스 최적화를 하더라도 JOIN 연산이 많아지면 성능이 떨어짐.
+                - MongoDB는 JSON 기반 문서형 DB로, 대량 데이터를 효율적으로 저장하고 조회할 수 있음.
+                - 조회 최적화에 구현 방식을 같이 확인 가능.
+            2. Redis
+                - Jwt Token을 통한 RefreshToken을 구현함.
+                - 해당 RefreshToken은 Access Token의 상태에 따라 처리 방식이 변경
+                    - RefreshToken ACCESS
+                        - AccessToken ACCESS : 해당 프로세스 진행
+                        - AccessToken EXPIRED : AccessToken만 재발급, 프로세스 진행
+                        - AccessToken FAIL : 403 에러
+                    - RefreshToken EXPIRED
+                        - AccessToken ACCESS : RefrehsToken만 재발급, 프로세스 진행
+                        - AccessToken EXPIRED : AccessToken, RefreshToken 재발급, 프로세스 진행
+                        - AccessToken FAIL : 403 에러
+                    - FAIL → 403 에러
+                - 위와 같은 검증을 하고, RefreshToken은 RefreshTokenRepository에 저장
+                - 이미지 첨부
+            3. CacheData → Client & Redis
+                1. Client의 localStorage에 저장하는 방식
+                    1. 네트워크 요청 없이 즉시 사용 가능
+                    2. 보안 문제로 인해 중요한 데이터 저장 불가
+                2. Redis를 활용하여 저장하는 방식
+                    1. 빠른 조회 및 검증 가능
+                    2. 네트워크 요청이 필요하여 localStorage보다는 상대적으로 느림
+                - 따라서, 덜 중요한 정보는 localStorage에 저장하고, 중요한 정보는 Redis에 저장하는 방식으로 혼합하여 사용
+                - 이미지 첨부 :
+                    - localStorage :
+                    - 휴가 정정 기간(데이터베이스 2) :
+                    - 예정된 근태 기록(데이터베이스 3) :
+        4. 기대 효과
+            1. 백 만개의 데이터가 존재할 때, MongoDB에서 조회 속도를 약 6~8배 성능을 향상시킬 수 있음. 
+            2. RefreshToken을 Redis를 통한 관리를 하여, 간단하게 TTL 설정하고 XSS, CSRF, MITM과 같은 공격을 방지할 수 있어 안전하게 구성할 수 있음.
+            3.  Redis를 캐시로 활용하여 서버 부하를 줄이고 빠른 응답 속도 제공
+    2. 조회 최적화
+        1. 문제 상황
+            - MySQL : 많은 필터링으로 인하여 쿼리의 복잡도가 올라가고 다른 엔티티와의 연관관계가 복잡해짐으로써 CRUD의 성능에 영향을 미침.
+            - MongoDB : 해당 데이터베이스로 변경했음에도, 조회 속도 개선이 되지 않음.
+        2. 도입 이유
+            1. Indexing : 특정 필드를 하이라이팅하여, 더 빠른 조회 속도를 부여할 수 있게 함.
+            2. Page : 모든 데이터를 반환하는 것이 아닌, 사용자가 요구한 데이터만을 적절히 반환하여, 속도를 높이고자 함.
+            3. 필요한 필드만 SELECT : 모든 엔티티에 대한 조회를 하는 것이 아닌, 반환이 필요한 부분만 SELECT하여, 대용량의 데이터를 효율적으로 조회할 수 있게 함.
+        3. 구현 방식
+            1. Indexing : 
+                - 특정 엔티티 두 개만 선별해서 작성함. 밑의 ‘DB 성능 최적화’에 상세히 기록함.
+                1. Attendances
+                    - Index status
+                    - attendancesStatus : 모든 구성원들이 출결 상태에 대한 상태 업데이트가 많이 될 것이라 판단하여, index를 하지 않음
+                    - checkInTime, checkOutTime : 위와 같은 이유로 예상됨.
+                    - memberId : 멤버 아이디는 외래키로 개인 출결, 관리자 페이지의 조회가 많이 일어나면서, 해당 memberId는 생성/수정/삭제의 연산이 일어날 일이 드물다.
+                    - createdAt : createdAt 필드는 해당 출결 날짜에 해당하며, 스케줄러에 의한 Attendances ‘생성’은 매일 일어나고 ‘수정/삭제’는 거의 없지만, 멤버들이 출결 상태/관리자 근태 관리 페이지 조회가 자주 일어나는 것을 감안하면, INDEX 처리가 적절하다고 생각
+                2. Notifcations 
+                    - toMemberName, fromMemberName : 누가, 누구한테 전달 받았을 지에 대한 정보를 줘야함.
+                    - isRead
+                        - isRead는 isRead = false에 해당하는 알림 조회가 많음
+                        - isRead는 상태 변경이 많지만, 알림 1개당 단 한 번의 상태 변경만 이루어짐.
+                            - 초기 상태는 isRead = false → isRead = true 상태로의 변경만 하기 때문
+                        - Notifications 특성 상, 알림을 조회가 많이 이루어지기에 읽기 최적화가 더 중요함.
+                            - MongoDB 특성상 오버헤드가 일어날 수도 있음.
+            2. 페이징 조회
+                - 전체 데이터를 가지고 오는 것이 아닌 개발자의 요청에 따른 일부 데이터만 가지고 옴.
+                - 일부 데이터 요청에 LIMIT, OFFSET, ORDER BY등을 활용하여 조회함.
+                - 장점
+                    - **조회 성능 향상**: 전체 데이터 조회보다 빠름.
+                    - **메모리 사용량 감소**: 불필요한 데이터 로딩 방지.
+                    - **네트워크 부하 감소**: 클라이언트로 전송하는 데이터가 줄어듦.
+        4. 기대 효과
+            1. 대용량의 데이터를 조회하는 속도가 개선됨.
+            2. 서버에서도 DB에게 필요한 데이터의 필드만 받아서 사용하기에 부하가 줄어듦.
+        5. DB 성능 최적화 (성능 테스트 환경에 따른 결과값)
    </details>
