@@ -134,26 +134,26 @@
    - 도입 이유
       - 특정 API의 요청/응답을 보여주는 것이 아닌, 직접적으로 요청/응답이 가는 형태를 단 하나의 화면으로 보여줄 수 있게 됨.
       - 백엔드 개발자라도 프론트의 데이터 요청/응답 흐름을 알고 있어야 한다고 생각함.
-        - 프레임 워크 결정
-            - ReactJs
-                - 직접 다루어 본 적이 존재해, 비교적 낮은 러닝 커브
-                - 수많은 라이브러리들이 존재하여 유지 보수가 용이
-            - VueJs
-                - Vuex, Pinia를 활용한 간단한 상태 관리
-                - 이전 프로젝트에서 사용해본 경험 존재
-                - 상대적으로 높은 러닝 커브
-                - 라이브러리가 상대적으로 적어 유지 보수가 어려움
-            - 결론
-                - 아래와 같은 이유로 ReactJs를 통한 프론트를 구성하고자 함.
-                - 대량의 데이터 관리
-                    - 대량의 데이터 처리를 필터링, 테이블, 페이지을 통해 구성 → SPA(Single Page Application) 구조를 통하여 다량의 데이터를 빠르게 렌더링이 가능함.
-                - 보안
-                    - JWT 기반 인증 적용 → Spring Boot 백엔드와 연동하여 토큰 기반 인증을 함.
-                    - CSRF, XSS 방어 → React는 기본적으로 클라이언트 렌더링을 사용하여 서버 측 렌더링보다 CSRF 위험이 적음
-                - 확장성 & 유지보수
-                    - 컴포넌트 기반 개발로 재사용성이 높음 → 유지보수 시 특정 컴포넌트만 수정하여 빠른 대응 가능
-                    - AWS S3 + CloudFront 배포와 호환성 높음 → 정적 사이트로 빌드하여 빠르게 배포 가능
-        - 구현 방식
+      - 프레임 워크 결정
+         - ReactJs
+            - 직접 다루어 본 적이 존재해, 비교적 낮은 러닝 커브
+            - 수많은 라이브러리들이 존재하여 유지 보수가 용이
+         - VueJs
+            - Vuex, Pinia를 활용한 간단한 상태 관리
+            - 이전 프로젝트에서 사용해본 경험 존재
+            - 상대적으로 높은 러닝 커브
+            - 라이브러리가 상대적으로 적어 유지 보수가 어려움
+         - 결론
+            - 아래와 같은 이유로 ReactJs를 통한 프론트를 구성하고자 함.
+            - 대량의 데이터 관리
+                - 대량의 데이터 처리를 필터링, 테이블, 페이지을 통해 구성 → SPA(Single Page Application) 구조를 통하여 다량의 데이터를 빠르게 렌더링이 가능함.
+            - 보안
+                - JWT 기반 인증 적용 → Spring Boot 백엔드와 연동하여 토큰 기반 인증을 함.
+                - CSRF, XSS 방어 → React는 기본적으로 클라이언트 렌더링을 사용하여 서버 측 렌더링보다 CSRF 위험이 적음
+            - 확장성 & 유지보수
+                - 컴포넌트 기반 개발로 재사용성이 높음 → 유지보수 시 특정 컴포넌트만 수정하여 빠른 대응 가능
+                - AWS S3 + CloudFront 배포와 호환성 높음 → 정적 사이트로 빌드하여 빠르게 배포 가능
+         - 구현 방식
             - 대량의 데이터 관리
                 - 필터를 재사용 컴포넌트를 만들어 사용하고 각각의 특징이 두드러지는 테이블과 페이지는 따로 만들어 대량 데이터를 관리를 밑과 같은 코드로 관리합니다.
                     - FilterDropDown
@@ -189,83 +189,66 @@
             - 빠른 데이터 검색 & 렌더링 최적화로 사용자 경험이 향상됩니다.
             - 안전한 사용자 인증 & 데이터 보호할 수 있습니다.
    </details>
-            
-    - 보안을 강화한 인프라
-        1. JWT Token 보안 강화
-            1. 문제 상황
-                
-                기존의 Spring boot의 Security를 사용해, Session을 통한 제어를 하는 방식은 서버에 많은 부담을 주며, 직원이 많은 환경에서는 서버를 여러 대 둬야 하는데, 같은 세션을 공유하는 저장소를 확장 해야하는 유지 보수 비용이 불필요하게 발생하게 됩니다.
-                
-            2. 도입 이유 
-                1. 기업의 내부 정보의 안정성 증가 
-                2. Jwt Token
+
+    <details>
+        <summary>보안을 강화한 인프라</summary>
+        - JWT Token 보안 강화
+            - 문제 상황    
+                기존의 Spring boot의 Security를 사용해, Session을 통한 제어를 하는 방식은 서버에 많은 부담을 주며, 직원이 많은 환경에서는 서버를 여러 대 둬야 하는데, 같은 세션을 공유하는 저장소를 확장 해야하는 유지 보수 비용이 불필요하게 발생하게 됩니다.   
+            - 도입 이유 
+                - 기업의 내부 정보의 안정성 증가 
+                - Jwt Token
                     - 상대적으로 낮은 유지 보수 비용
                     - 높은 개발 친화성
                     - 확장성
-            3. 구현 방식
+            - 구현 방식
                 - JWT Token은 Access Token은 만료 기간은 1시간, RefreshToken은 만료 기간이 1일이며, RefreshToken은 Redis를 통한 저장을 하고 있습니다.
-                1. Jwt Token이 필요 없는 API 요청 : 로그인, 회원 가입, 이름 중복 체크에 관련된 요청은 요청 헤더에 Jwt Token을 넣지 않은 API 요청을 합니다.
-                2. 일반적인 API 요청 : 모든 요청은 요청 헤더에 Cookie를 담아서 요청을 보내야 합니다.
-                3. WebSocket 요청 : Cookie에 저장되어 있는 accessToken을 Authorization : Bearer your_jwt_token과 같은 형식으로 요청 헤더에 담아서 요청합니다.
-            4. 기대 효과
-                1. 기존의 세션 방식에서 취약한 XSS, CSRF 공격 방어를 할 수 있습니다.
-                2. Websocket 환경 사용에 있어서 Jwt Token 인증 방식을 재사용하여 인증을 할 수 있습니다.
-                
-        2. HTTPS 적용 및 ResponseCookie 활용
-            1. 문제 상황
-                
+                - Jwt Token이 필요 없는 API 요청 : 로그인, 회원 가입, 이름 중복 체크에 관련된 요청은 요청 헤더에 Jwt Token을 넣지 않은 API 요청을 합니다.
+                - 일반적인 API 요청 : 모든 요청은 요청 헤더에 Cookie를 담아서 요청을 보내야 합니다.
+                - WebSocket 요청 : Cookie에 저장되어 있는 accessToken을 Authorization : Bearer your_jwt_token과 같은 형식으로 요청 헤더에 담아서 요청합니다.
+            - 기대 효과
+                - 기존의 세션 방식에서 취약한 XSS, CSRF 공격 방어를 할 수 있습니다.
+                - Websocket 환경 사용에 있어서 Jwt Token 인증 방식을 재사용하여 인증을 할 수 있습니다.
+        - HTTPS 적용 및 ResponseCookie 활용
+            - 문제 상황   
                 브라우저에서 http 프로토콜로 서버의 접근을 허용하게 되면 네트워크에서 비밀번호, 토큰을 가로채는 중간자 공격에 취약하다는 문제점이 발생합니다.
-                
-            2. 도입 이유
-                1. HTTPS를 도입하여 클라이언트-서버간의 데이터를 암호화하여 보안을 강화하고자 합니다.
-                2. ALB를 활용하여, EC2 내부는 HTTP 프로토콜로 통신하여 접근하게 하여, 보안의 안정성을 증대 시키고자 합니다.
-                3. Jwt Token을 HttpOnly, Secure = true, SameSite = “Strict” 환경에만 작동하게 하여, 특정 공격의 취약한 부분을 제거하고자 합니다.
-            3. 구현 방식
-                1. AWS ACM을 활용한 TLS 버젼 1.2 인증서를 API 서버와 웹 사이트에 발급하여 데이터를 암호화할 수 있게 합니다.
-                2. CloudFront와 ALB를 통한 원본 서버를 연결하여 성능을 최적화할 수 있게 합니다.
-                3. Spring boot에서 ResponseCookie를 활용해서 특정 설정을 통하여 HTTPS 프로토콜 환경에서만 해당 쿠키를 전달 가능하게 변경합니다.
-                4. 사진 첨부
-                    - 정적 웹사이트, API 서버 TLS 발급
-                        
-                        ![image.png](attachment:5808b852-0467-4d3d-8e7e-2419eedd4c94:image.png)
-                        
+            - 도입 이유
+                - HTTPS를 도입하여 클라이언트-서버간의 데이터를 암호화하여 보안을 강화하고자 합니다.
+                - ALB를 활용하여, EC2 내부는 HTTP 프로토콜로 통신하여 접근하게 하여, 보안의 안정성을 증대 시키고자 합니다.
+                - Jwt Token을 HttpOnly, Secure = true, SameSite = “Strict” 환경에만 작동하게 하여, 특정 공격의 취약한 부분을 제거하고자 합니다.
+            - 구현 방식
+                - AWS ACM을 활용한 TLS 버젼 1.2 인증서를 API 서버와 웹 사이트에 발급하여 데이터를 암호화할 수 있게 합니다.
+                - CloudFront와 ALB를 통한 원본 서버를 연결하여 성능을 최적화할 수 있게 합니다.
+                - Spring boot에서 ResponseCookie를 활용해서 특정 설정을 통하여 HTTPS 프로토콜 환경에서만 해당 쿠키를 전달 가능하게 변경합니다.
+                - 사진 첨부
+                    - 정적 웹사이트, API 서버 TLS 발급       
+                            ![backoffice_tls](https://github.com/user-attachments/assets/30a03764-2d7f-4646-8c8e-037c4e4a6b76)
                     - CloudFront ALB 연결
-                        
-                        ![image.png](attachment:fa29cc84-9f56-456c-8c66-1bc19e6ca410:image.png)
-                        
-                        ![image.png](attachment:25c0c7aa-5966-4eae-88bd-f5d311c7e7b6:image.png)
-                        
-            4. 기대 효과
-                1. MITM(Man-in-the-Middle) 공격 방지 및 데이터 보안이 강화됩니다.
-                2. 클라이언트에서 JWT 토큰 접근 차단 (XSS, CSRF 공격 방어 가능)할 수 있습니다.
+                        ![cloudFront_alb_connect](https://github.com/user-attachments/assets/f8795583-81a0-474b-b1d5-dc4dc64f7bf4)
+                        ![cloudFront_alb_connect_v2](https://github.com/user-attachments/assets/3c37633e-de32-420b-9d06-d421492b40e7)
+            - 기대 효과
+                - MITM(Man-in-the-Middle) 공격 방지 및 데이터 보안이 강화됩니다.
+                - 클라이언트에서 JWT 토큰 접근 차단 (XSS, CSRF 공격 방어 가능)할 수 있습니다.
             - 해당 문제 상황 추가 정리
-                
-                [Https 설정](https://www.notion.so/Https-1ad793fd0cc8818d8476d66fd7caf37b?pvs=21)
-                
-                [Cookie](https://www.notion.so/Cookie-1ad793fd0cc8813eb46ce889b1c18950?pvs=21)
-                
-            
-        3. 인프라 보안
-            1. 문제 상황
-                
+                [backoffice_cookie_v1.pdf](https://github.com/user-attachments/files/19104903/backoffice_cookie_v1.pdf)
+        - 인프라 보안
+            - 문제 상황   
                 비정상적인 API 접근, 대용량 파일 업로드를 하는 경우에 그대로 application에 전달 되는 문제점이 발생합니다.
-                
-            2. 도입 이유
-                1. 불필요한 트래픽이 발생하여, 비용이 추가적으로 발생하게 됩니다.
-                2. 대용량 파일 업로드를 하게 되면 S3 스토리지에 대한 과한 비용이 발생 할 수 있음으로, 대용량 파일 업로드를 방지하고자 합니다.
-                3. WAF을 활용하여, 추가적인 보안을 확장할 수 있습니다. 
-            3. 구현 방식
-                1. AWS WAF의 기존의 제한 방식을 추가로 사용 또는 자기 자신이 만든 제한을 추가하여 EC2 원본 서버의 접근을 앞단에서 막게 합니다.
+            - 도입 이유
+                - 불필요한 트래픽이 발생하여, 비용이 추가적으로 발생하게 됩니다.
+                - 대용량 파일 업로드를 하게 되면 S3 스토리지에 대한 과한 비용이 발생 할 수 있음으로, 대용량 파일 업로드를 방지하고자 합니다.
+                - WAF을 활용하여, 추가적인 보안을 확장할 수 있습니다. 
+            - 구현 방식
+                - AWS WAF의 기존의 제한 방식을 추가로 사용 또는 자기 자신이 만든 제한을 추가하여 EC2 원본 서버의 접근을 앞단에서 막게 합니다.
                     - 10MB 이상의 파일 업로드 차단
                     - 특정 국가/지역의 접근을 제한
                     - SQL Injection 및 XSS 공격 탐지 및 차단
-                2. CloudFront와 S3의 보안 설정 강화
+                - CloudFront와 S3의 보안 설정 강화
                     - CloudFront에서만 S3 원본 접근 허용 (Origin Access Control)
                     - 파일 업로드 시, 특정 출처(Origin)만 허용
                     - CloudFront의 캐싱 무효화 정책 활성화
-                3. 사진 첨부
+                - 사진 첨부
                     - WAF 대용량 파일 업로드 차단 규칙
-                        
                         ```json
                         {
                           "Name": "LimitRequestBodySize",
@@ -301,37 +284,31 @@
                           }
                         }
                         ```
-                        
                     - CloudFront의 WAF 설정을 통한 특정 국가/지역의 접근 제한
-                        
-                        ![image.png](attachment:fa29cc84-9f56-456c-8c66-1bc19e6ca410:image.png)
-                        
-                    
-            4. 기대 효과
-                1. 서버 부하 방지 및 악성 트래픽 차단
-                2. 대용량 요청에 대하여 트래픽 제한으로 인프라 비용 절감
-            
-        4. 확장 가능성
-            1. 문제 상황
-                
+                        ![cloudFront_blocked_special_country](https://github.com/user-attachments/assets/5dd6ae56-55c4-4490-9a0a-ec6ec4851617)
+            - 기대 효과
+                - 서버 부하 방지 및 악성 트래픽 차단
+                - 대용량 요청에 대하여 트래픽 제한으로 인프라 비용 절감   
+        - 확장 가능성
+            - 문제 상황   
                 application 레벨이 아닌 앞단 레벨의 문제점을 전부 로깅으로 기록할 수 없다는 문제점이 발생합니다.
-                
-            2. 도입 이유
-                1. 로깅 검사를 application에서 로깅을 저장하는 것과 WAF에서도 로깅을 기록하여, 장애 감지 및 분석을 추가적으로 하여, 에러 방지에 힘쓰고자 합니다.
-                2. AWS 인프라를 사용하고 있음으로 WAF뿐만 아니라, CloudWatch의 추가 확장을 고려할 수 있습니다.
-            3. 차후 구현 방식
-                1. AWS CloudWatch Logs 및 Metrics 적용을 통한 CloudFront, EC2, ALB 상태 모니터링을 효율적으로 할 수 있습니다.
-                2. ELK Stack을 통한 API 요청 로그 시각화 및 분석을 할 수 있습니다.
-            4. 기대 효과
-                1. 실시간 장애 감지 및 빠른 대응 가능
-                2. 트래픽 분석을 통한 최적화 가능
-            
+            - 도입 이유
+                - 로깅 검사를 application에서 로깅을 저장하는 것과 WAF에서도 로깅을 기록하여, 장애 감지 및 분석을 추가적으로 하여, 에러 방지에 힘쓰고자 합니다.
+                - AWS 인프라를 사용하고 있음으로 WAF뿐만 아니라, CloudWatch의 추가 확장을 고려할 수 있습니다.
+            - 차후 구현 방식
+                - AWS CloudWatch Logs 및 Metrics 적용을 통한 CloudFront, EC2, ALB 상태 모니터링을 효율적으로 할 수 있습니다.
+                - ELK Stack을 통한 API 요청 로그 시각화 및 분석을 할 수 있습니다.
+            - 기대 효과
+                - 실시간 장애 감지 및 빠른 대응 가능
+                - 트래픽 분석을 통한 최적화 가능
             | 카테고리 | 문제 상황 | 도입 이유 | 구현 방식 | 기대 효과 |
             | --- | --- | --- | --- | --- |
             | **JWT 인증** | 세션 기반 인증은 서버 부담 증가 | 유지보수 비용 절감, 확장성 고려 | AccessToken + RefreshToken 구조, WebSocket에서도 사용 | XSS, CSRF 방어 및 인증 통합 |
             | **HTTPS + Secure Cookie** | HTTP 프로토콜 사용 시 보안 취약 | MITM 공격 방어, JWT 토큰 보호 | AWS ACM TLS 적용, HttpOnly Secure Cookie 설정 | 데이터 암호화 및 클라이언트 접근 차단 |
             | **인프라 보안 (WAF + CloudFront + S3)** | 비정상적인 API 접근 및 대용량 파일 업로드 문제 | 불필요한 트래픽 차단 및 비용 절감 | WAF 차단 규칙 적용, CloudFront + S3 OAC 활용 | 서버 부하 방지, 악성 트래픽 차단 |
             | **인프라 기반 확장 가능성 (CloudWatch + ELK)** | 로깅 부족으로 문제 분석 어려움 | 장애 감지 및 분석 강화 | AWS CloudWatch, WAF 로그 분석, ELK Stack 연계 | 실시간 모니터링 및 최적화 가능 |
+    </details>
+   
     - 반복되는 작업 공통화
         
         스케줄러
