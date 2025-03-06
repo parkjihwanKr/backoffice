@@ -413,3 +413,14 @@
             2. 서버에서도 DB에게 필요한 데이터의 필드만 받아서 사용하기에 부하가 줄어듦.
         5. DB 성능 최적화 (성능 테스트 환경에 따른 결과값)
    </details>
+   <details>
+       <summary> 기술적 결정 정리 </summary>
+        [backoffice_DB_성능_최적화_v2.pdf](https://github.com/user-attachments/files/19105494/backoffice_DB_._._v2.pdf)
+        [backoffice_v1.pdf](https://github.com/user-attachments/files/19105503/backoffice_v1.pdf)
+        [backoffice_Swagger_UI_v2.pdf](https://github.com/user-attachments/files/19105507/backoffice_Swagger_UI_v2.pdf)
+        [backoffice_Notification_v1.pdf](https://github.com/user-attachments/files/19105510/backoffice_Notification_v1.pdf)
+        [backoffice_Infrastructures_v1.pdf](https://github.com/user-attachments/files/19105511/backoffice_Infrastructures_v1.pdf)
+        [backoffice_cookie_v1.pdf](https://github.com/user-attachments/files/19105514/backoffice_cookie_v1.pdf)
+        [backoffice_cors_policy_v1.pdf](https://github.com/user-attachments/files/19105515/backoffice_cors_policy_v1.pdf)
+
+   </details>
