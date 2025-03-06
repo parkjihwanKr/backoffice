@@ -1,11 +1,13 @@
 package com.example.backoffice.domain.member.service;
 
 import com.example.backoffice.domain.member.converter.MembersConverter;
+import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
+import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.repository.MembersRepository;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.SchedulerCustomException;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +30,26 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MembersServiceImplV1 implements MembersServiceV1 {
 
+    private final PasswordEncoder passwordEncoder;
     private final MembersRepository membersRepository;
 
     @Override
     @Transactional
     public void signup(Members member){
         membersRepository.save(member);
+    }
+
+    @Override
+    @Transactional
+    public void checkAvailableMemberName(String requestedMemberName){
+        if (!requestedMemberName.matches("^[a-z0-9]{8,16}$")) {
+            throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_NAME);
+        }
+
+        if(isExistMemberName(requestedMemberName)){
+            throw new MembersCustomException(
+                    MembersExceptionCode.EXISTS_MEMBER);
+        }
     }
 
     @Override
@@ -54,10 +71,33 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Members findByEmailOrMemberNameOrAddressOrContact(
-            String email, String memberName, String address, String contact){
-        return membersRepository.findByEmailOrMemberNameOrAddressOrContact(
-                email, memberName, address, contact).orElse(null);
+    public void checkDuplicatedMember(MembersRequestDto.CreateOneDto requestDto){
+        Members duplicatedInfoMember
+                = membersRepository.findByEmailOrMemberNameOrAddressOrContact(
+                        requestDto.getEmail(), requestDto.getMemberName(),
+                requestDto.getAddress(), requestDto.getContact()).orElse(null);
+        if(duplicatedInfoMember != null){
+            MembersExceptionEnum exceptionType
+                    = findExceptionType(requestDto, duplicatedInfoMember);
+            switch (exceptionType) {
+                case EMAIL
+                        -> throw new MembersCustomException(
+                        MembersExceptionCode.DUPLICATED_EMAIL);
+                case ADDRESS
+                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_ADDRESS);
+                case MEMBER_NAME
+                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_MEMBER_NAME);
+                case CONTACT
+                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_CONTACT);
+                case NULL
+                        -> throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_EXCEPTION_TYPE);
+            }
+        }
+    }
+
+    @Override
+    public String encodePassword(String password){
+        return passwordEncoder.encode(password);
     }
 
     @Override
@@ -302,15 +342,6 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public Boolean isExistMemberName(String memberName){
-        if(membersRepository.existsByMemberName(memberName)){
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Members> findAllByDepartment(MemberDepartment department, String memberName){
         List<Members> memberList = membersRepository.findAllByDepartmentAndMemberName(
                 department, memberName);
@@ -351,5 +382,51 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     public Members findCeo() {
         return membersRepository.findByPosition(MemberPosition.CEO).orElseThrow(
                 ()-> new MembersCustomException(MembersExceptionCode.NOT_FOUND_MEMBER));
+    }
+
+    @Override
+    @Transactional
+    public void checkPassword(String password, String passwordConfirm){
+        if(!password.equals(passwordConfirm)){
+            throw new MembersCustomException(
+                    MembersExceptionCode.NOT_MATCHED_PASSWORD_AND_PASSWORD_CONFIRM);
+        }
+    }
+
+    private MembersExceptionEnum findExceptionType(
+            MembersRequestDto.CreateOneDto requestDto, Members duplicatedInfoMember){
+        if(requestDto.getContact().equals(duplicatedInfoMember.getContact())){
+            return MembersExceptionEnum.CONTACT;
+        }
+        if(requestDto.getEmail().equals(duplicatedInfoMember.getEmail())){
+            return MembersExceptionEnum.EMAIL;
+        }
+        if(requestDto.getAddress().equals(duplicatedInfoMember.getAddress())){
+            return MembersExceptionEnum.ADDRESS;
+        }
+        if(requestDto.getMemberName().equals(duplicatedInfoMember.getMemberName())){
+            return MembersExceptionEnum.MEMBER_NAME;
+        }
+        return MembersExceptionEnum.NULL;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean isExistMemberName(String memberName){
+        return membersRepository.existsByMemberName(memberName);
+    }
+
+    @Override
+    public void checkIntroductionMaxLength(String requestedIntroduction){
+        if(requestedIntroduction.length() > 500){
+            throw new MembersCustomException(MembersExceptionCode.MAX_LENGTH_500);
+        }
+    }
+
+    @Override
+    public void matchedMemberName(String memberName, String loginMemberName){
+        if(!memberName.equals(loginMemberName)){
+            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER_NAME);
+        }
     }
 }

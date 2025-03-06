@@ -52,7 +52,8 @@ public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
     @Transactional(readOnly = true)
     public List<FavoritesResponseDto.ReadOneDto> readAll(
             Members loginMember){
-        List<Favorites> favoritieList = favoritesRepository.findAllByMember(loginMember);
+        List<Favorites> favoritieList
+                = favoritesRepository.findAllByMemberId(loginMember.getId());
         return FavoritesConverter.toReadAllDto(favoritieList);
     }
 
