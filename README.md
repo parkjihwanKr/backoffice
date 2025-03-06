@@ -123,16 +123,11 @@
         - 감사
             
             ![감사관리v1000](https://github.com/user-attachments/assets/2f71fe94-b575-48d0-b055-9647e2afc0e0)
-
-    
-5. API 명세서
-
-   [backoffice_API_명세서_v1.pdf](https://github.com/user-attachments/files/19086861/backoffice_API_._v1.pdf)
  
-
-1. **Technical Decision**
-    - 프론트
-        1. 문제 상황
+5. **Technical Decision**
+   <details>
+       <summary>프론트</summary>
+       1. 문제 상황
             
             PostMan 또는 다른 방식을 통해 API 요청을 보여주는 개발 방식 보다는 해당 서비스가 직접적으로 이루어지는 과정을 직접 보여주고자 하는데, 적절하게 사용할 수 있는 프론트 기술을 알지 못하는 문제에 직면함.
             
@@ -193,6 +188,7 @@
         5. 기대 효과
             - 빠른 데이터 검색 & 렌더링 최적화로 사용자 경험이 향상됩니다.
             - 안전한 사용자 인증 & 데이터 보호할 수 있습니다.
+   </details>
             
     - 보안을 강화한 인프라
         1. JWT Token 보안 강화
