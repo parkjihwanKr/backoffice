@@ -308,33 +308,30 @@
             | **인프라 보안 (WAF + CloudFront + S3)** | 비정상적인 API 접근 및 대용량 파일 업로드 문제 | 불필요한 트래픽 차단 및 비용 절감 | WAF 차단 규칙 적용, CloudFront + S3 OAC 활용 | 서버 부하 방지, 악성 트래픽 차단 |
             | **인프라 기반 확장 가능성 (CloudWatch + ELK)** | 로깅 부족으로 문제 분석 어려움 | 장애 감지 및 분석 강화 | AWS CloudWatch, WAF 로그 분석, ELK Stack 연계 | 실시간 모니터링 및 최적화 가능 |
     </details>
-   
-    - 반복되는 작업 공통화
-        
-        스케줄러
-        
-        1. 문제 상황
-            
+
+   <details>
+       <summary>반복되는 작업 공통화</summary>
+        - 문제 상황
             현재 인사 담당자가  매일 출근할 때마다 개별적으로 근태 기록을 생성하고, 휴가가 끝난 멤버의 상태를 직접 변경해야 하는 번거로움이 있음. 또한, 연말이 되면 수작업으로 연간 데이터를 정리해야 하는 문제가 발생. 이를 자동화하여 인사 담당자의 업무 부담을 줄이고, 실수 없이 일관된 처리를 수행할 방법을 모색
-            
-        2. 도입 이유 
+        - 도입 이유 
             1. 관리자의 업무를 자동화하여, 일의 부담감을 덜고자 함. 
             2. 모든 직원은 실수로 발생할 수 있는 데이터를 일관된 업무 처리로 오류를 최소화함.
             3. 신규 멤버는 일관된 프로세스를 통해 적응 속도를 향상시키고 조직 전체의 운영 효율성을 높일 수 있음.
-        3. 구현 방식
+        - 구현 방식
             - DailyScheduler, MonthlyScheduler, YearlyScheduler를 나누어 실행하게 함.
             1. DailyScheduler : 당일에 처리해야 할 업무를 자동화
             2. MonthlyScheduler: 달 단위에 처리해야 할 업무를 자동화
             3. YearlyScheduler : 연 단위에 처리해야 할 업무를 자동화
-        4. 기대 효과
+        - 기대 효과
             1. 업무가 치중되어 있는 관리자의 업무가 자동화되어 전략적 업무에 집중할 수 있게 됨.
             2. 모든 멤버가 일괄적인 업무 처리에 따라 빠른 업무 적응 속도가 기대됨.
-    - DB 성능 최적화
-        1. 다양한 DB
+   </details>
+
+   <details>
+       <summary>DB 성능 최적화</summary>
+       1. 다양한 DB
             1. 문제 상황
-                
-                기존 인프라는 MySQL만 사용하고 있었으나, 특정 엔티티의 데이터가 수십만 개 이상이 쌓이면서 밑과 같은 문제가 발생함.
-                
+                - 기존 인프라는 MySQL만 사용하고 있었으나, 특정 엔티티의 데이터가 수십만 개 이상이 쌓이면서 밑과 같은 문제가 발생함.
                 1. MySQL에서 특정 엔티티 대상으로 복잡한 조회에 대해서 성능이 급격히 저하됨.
                 2. RefreshToken은 자주 변경되어지는 데이터임으로 MySQL과 맞지 않음.
                 3. 바뀌지 않는 데이터가 Server에 똑같은 SELECT 조회문을 날려 불필요한 API 요청을 줄 일 필요가 있다고 생각함.
@@ -361,9 +358,6 @@
                         - FAIL → 403 에러
                     - 위와 같은 검증을 하고, RefreshToken은 RefreshTokenRepository에 저장
                     - 이미지 첨부
-                        
-                        ![image.png](attachment:2bff97c5-01b8-49d1-aaa5-8d106a75d06c:image.png)
-                        
                 3. CacheData → Client & Redis
                     1. Client의 localStorage에 저장하는 방식
                         1. 네트워크 요청 없이 즉시 사용 가능
@@ -374,239 +368,8 @@
                     - 따라서, 덜 중요한 정보는 localStorage에 저장하고, 중요한 정보는 Redis에 저장하는 방식으로 혼합하여 사용
                     - 이미지 첨부 :
                         - localStorage :
-                            
-                            ![image.png](attachment:0e2ef1c8-b19b-4ada-8e21-a4c81c99c19e:image.png)
-                            
                         - 휴가 정정 기간(데이터베이스 2) :
-                            
-                            ![image.png](attachment:474f5fdb-7109-47bd-8826-32cde56cbcc3:image.png)
-                            
                         - 예정된 근태 기록(데이터베이스 3) :
-                            
-                            ![image.png](attachment:6ad11437-5e98-4c42-bd15-0bfeeb479432:image.png)
-                            
-                    - 코드 첨부 :
-                        - UpdateVacationPeriodRepository (휴가 정정 기간 수정 레포지토리)
-                            
-                            ```java
-                            package com.example.backoffice.global.redis;
-                            
-                            import com.fasterxml.jackson.core.JsonProcessingException;
-                            import com.fasterxml.jackson.databind.ObjectMapper;
-                            import org.springframework.beans.factory.annotation.Qualifier;
-                            import org.springframework.data.redis.core.RedisTemplate;
-                            import org.springframework.stereotype.Component;
-                            
-                            import java.util.concurrent.TimeUnit;
-                            
-                            @Component
-                            public class UpdateVacationPeriodRepository {
-                            
-                                private final ObjectMapper objectMapper;
-                            
-                                @Qualifier("redisTemplateForVacationPeriod")
-                                private final RedisTemplate<String, Object> redisTemplateForVacationPeriod;
-                            
-                                public UpdateVacationPeriodRepository (
-                                        ObjectMapper objectMapper,
-                                        @Qualifier("redisTemplateForVacationPeriod") RedisTemplate<String, Object> redisTemplateForVacationPeriod){
-                                    this.objectMapper = objectMapper;
-                                    this.redisTemplateForVacationPeriod = redisTemplateForVacationPeriod;
-                                }
-                            
-                                public <T> void saveMonthlyVacationPeriod(
-                                        String key, Integer minutes, T value) throws JsonProcessingException{
-                                    String valueString = null;
-                                    try {
-                                        valueString =
-                                                !(value instanceof String)
-                                                        ? objectMapper.writeValueAsString(value)
-                                                        : (String) value;
-                                    } catch (JsonProcessingException e) {
-                                        throw new RuntimeException();
-                                    }
-                            
-                                    redisTemplateForVacationPeriod.opsForValue().set(key, objectMapper.writeValueAsString(value));
-                                    redisTemplateForVacationPeriod.expire(key, minutes, TimeUnit.MINUTES);
-                                }
-                            
-                                public void deleteVacationPeriod(String key){
-                                    redisTemplateForVacationPeriod.delete(key);
-                                }
-                            
-                                public boolean existsByKey(String key) {
-                                    return redisTemplateForVacationPeriod.opsForValue().get(key) != null;
-                                }
-                            
-                                public <T> T getValueByKey(String key, Class<T> valueType) {
-                                    Object value = redisTemplateForVacationPeriod.opsForValue().get(key);
-                            
-                                    if (value == null) {
-                                        return null;
-                                    }
-                            
-                                    try {
-                                        if (value instanceof String) {
-                                            // JSON 문자열로 간주하여 역직렬화
-                                            return objectMapper.readValue((String) value, valueType);
-                                        } else if (valueType.isInstance(value)) {
-                                            return valueType.cast(value);
-                                        } else {
-                                            throw new IllegalArgumentException("The value retrieved from Redis is not compatible with the specified type.");
-                                        }
-                                    } catch (JsonProcessingException e) {
-                                        throw new RuntimeException("Failed to deserialize value from Redis for key: " + key, e);
-                                    }
-                                }
-                            }
-                            
-                            ```
-                            
-                        - UpcomingAttendancesRepository (예정된 외근 기록)
-                            
-                            ```java
-                            package com.example.backoffice.global.redis;
-                            
-                            import com.example.backoffice.global.common.DateRange;
-                            import com.example.backoffice.global.date.DateTimeUtils;
-                            import com.example.backoffice.global.exception.GlobalExceptionCode;
-                            import com.example.backoffice.global.exception.JsonCustomException;
-                            import com.fasterxml.jackson.core.JsonProcessingException;
-                            import com.fasterxml.jackson.databind.ObjectMapper;
-                            import org.springframework.beans.factory.annotation.Qualifier;
-                            import org.springframework.data.redis.core.RedisTemplate;
-                            import org.springframework.stereotype.Component;
-                            
-                            import java.util.*;
-                            import java.util.concurrent.TimeUnit;
-                            
-                            @Component
-                            public class UpcomingAttendanceRepository {
-                                // database 2 : cachedMemberAttendance
-                                private final ObjectMapper objectMapper;
-                            
-                                private final RedisTemplate<String, Object> redisTemplateForCached;
-                            
-                                // Long, DateRange
-                                public UpcomingAttendanceRepository(
-                                        ObjectMapper objectMapper,
-                                        @Qualifier("redisTemplateForCachedMemberAttendance") RedisTemplate<String, Object> redisTemplateForCached) {
-                                    this.objectMapper = objectMapper;
-                                    this.redisTemplateForCached = redisTemplateForCached;
-                                }
-                            
-                                public <T> void saveOne(Long memberId, DateRange value, String description) {
-                                    String key = RedisProvider.MEMBER_ID_PREFIX + memberId + ", "+description;
-                                    String valueString = serializeValue(value);
-                            
-                                    Long ttl = DateTimeUtils.calculateMinutesFromTodayToEndDate(value.getEndDate());
-                                    redisTemplateForCached.opsForValue().set(key, valueString, ttl, TimeUnit.MINUTES);
-                                }
-                            
-                                public String getRawValue(String key) {
-                                    return (String) redisTemplateForCached.opsForValue().get(key);
-                                }
-                            
-                                // 키에 해당하는 value 조회
-                                public <T> T getValue(Long memberId, Class<T> valueType) {
-                                    String key = RedisProvider.MEMBER_ID_PREFIX + memberId;
-                                    String value = (String) redisTemplateForCached.opsForValue().get(key);
-                            
-                                    if (Objects.isNull(value)) {
-                                        return null; // 키가 없을 경우 null 반환
-                                    }
-                                    try {
-                                        // JSON 문자열을 지정된 타입의 객체로 변환하여 반환
-                                        return objectMapper.readValue(value, valueType);
-                                    } catch (JsonProcessingException e) {
-                                        throw new JsonCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
-                                    }
-                                }
-                            
-                                public Map<String, String> getAllRawValues() {
-                                    Set<String> keys = redisTemplateForCached.keys(
-                                            RedisProvider.MEMBER_ID_PREFIX + "*");
-                                    Map<String, String> allValues = new HashMap<>();
-                            
-                                    if (keys != null) {
-                                        for (String key : keys) {
-                                            String value = getRawValue(key);
-                                            allValues.put(key, value);
-                                        }
-                                    }
-                            
-                                    return allValues;
-                                }
-                            
-                                // 토큰 삭제
-                                public void delete(String key) {
-                                    redisTemplateForCached.delete(key);
-                                }
-                            
-                                // Key에서 memberId 추출
-                                public Long extractMemberIdFromKey(String key) {
-                                    try {
-                                        String memberIdPart = key.split(",")[0].split(":")[1].trim();
-                                        return Long.valueOf(memberIdPart);
-                                    } catch (Exception e) {
-                                        return null;
-                                    }
-                                }
-                            
-                                // Key에서 description 추출
-                                public String extractDescriptionFromKey(String key) {
-                                    try {
-                                        return key.split(",")[1].trim();
-                                    } catch (Exception e) {
-                                        return null;
-                                    }
-                                }
-                            
-                                public Map<Long, String> getStartDatesByMemberIds(List<Long> memberIdList){
-                                    // 모든 예정 근태 데이터 가져오기
-                                    Map<String, String> upcomingAttendanceMap = getAllRawValues();
-                                    Map<Long, String> memberStartDateMap = new HashMap<>();
-                            
-                                    for (Map.Entry<String, String> entry : upcomingAttendanceMap.entrySet()) {
-                                        String key = entry.getKey();  // 예: "memberId:3, 상하이 외근"
-                                        String value = entry.getValue(); // 예: "{\"startDate\":\"2025-03-07 09:00:00\",\"endDate\":\"2025-03-14 18:00:00\"}"
-                            
-                                        // JSON을 객체로 변환
-                                        DateRange attendanceData = deserializeValue(value, DateRange.class);
-                            
-                                        // key에서 memberId 추출
-                                        Long memberId = extractMemberIdFromKey(key);
-                            
-                                        // memberId가 리스트에 포함된 경우만 처리
-                                        if (memberId != null && memberIdList.contains(memberId)) {
-                                            memberStartDateMap.put(memberId, attendanceData.getStartDate().toString());
-                                        }
-                                    }
-                            
-                                    return memberStartDateMap;
-                                }
-                            
-                                // JSON 직렬화
-                                private String serializeValue(DateRange value) {
-                                    try {
-                                        return objectMapper.writeValueAsString(value);
-                                    } catch (JsonProcessingException e) {
-                                        throw new JsonCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
-                                    }
-                                }
-                            
-                                // JSON 역직렬화
-                                public <T> T deserializeValue(String value, Class<T> valueType) {
-                                    try {
-                                        return objectMapper.readValue(value, valueType);
-                                    } catch (JsonProcessingException e) {
-                                        throw new JsonCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
-                                    }
-                                }
-                            }
-                            
-                            ```
-                            
             4. 기대 효과
                 1. 백 만개의 데이터가 존재할 때, MongoDB에서 조회 속도를 약 6~8배 성능을 향상시킬 수 있음. 
                 2. RefreshToken을 Redis를 통한 관리를 하여, 간단하게 TTL 설정하고 XSS, CSRF, MITM과 같은 공격을 방지할 수 있어 안전하게 구성할 수 있음.
@@ -624,9 +387,6 @@
                     - 특정 엔티티 두 개만 선별해서 작성함. 밑의 ‘DB 성능 최적화’에 상세히 기록함.
                     1. Attendances
                         - Index status
-                            
-                            ![image.png](attachment:eff8cfe7-933f-4ca8-ad2f-39cd9f11f03a:image.png)
-                            
                         - attendancesStatus : 모든 구성원들이 출결 상태에 대한 상태 업데이트가 많이 될 것이라 판단하여, index를 하지 않음
                         - checkInTime, checkOutTime : 위와 같은 이유로 예상됨.
                         - memberId : 멤버 아이디는 외래키로 개인 출결, 관리자 페이지의 조회가 많이 일어나면서, 해당 memberId는 생성/수정/삭제의 연산이 일어날 일이 드물다.
@@ -650,5 +410,4 @@
                 1. 대용량의 데이터를 조회하는 속도가 개선됨.
                 2. 서버에서도 DB에게 필요한 데이터의 필드만 받아서 사용하기에 부하가 줄어듦.
             5. DB 성능 최적화 (성능 테스트 환경에 따른 결과값)
-                
-                [DB 성능 최적화](https://www.notion.so/DB-1ad793fd0cc8819d925cc20207341eca?pvs=21)
+   </details>
