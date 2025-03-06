@@ -192,23 +192,24 @@
 
     <details>
         <summary>보안을 강화한 인프라</summary>
-        - JWT Token 보안 강화
-            - 문제 상황    
-                    기존의 Spring boot의 Security를 사용해, Session을 통한 제어를 하는 방식은 서버에 많은 부담을 주며, 직원이 많은 환경에서는 서버를 여러 대 둬야 하는데, 같은 세션을 공유하는 저장소를 확장 해야하는 유지 보수 비용이 불필요하게 발생하게 됩니다.   
-            - 도입 이유 
-                - 기업의 내부 정보의 안정성 증가 
-                - Jwt Token
-                    - 상대적으로 낮은 유지 보수 비용
-                    - 높은 개발 친화성
-                    - 확장성
-            - 구현 방식
-                - JWT Token은 Access Token은 만료 기간은 1시간, RefreshToken은 만료 기간이 1일이며, RefreshToken은 Redis를 통한 저장을 하고 있습니다.
-                - Jwt Token이 필요 없는 API 요청 : 로그인, 회원 가입, 이름 중복 체크에 관련된 요청은 요청 헤더에 Jwt Token을 넣지 않은 API 요청을 합니다.
-                - 일반적인 API 요청 : 모든 요청은 요청 헤더에 Cookie를 담아서 요청을 보내야 합니다.
-                - WebSocket 요청 : Cookie에 저장되어 있는 accessToken을 Authorization : Bearer your_jwt_token과 같은 형식으로 요청 헤더에 담아서 요청합니다.
-            - 기대 효과
-                - 기존의 세션 방식에서 취약한 XSS, CSRF 공격 방어를 할 수 있습니다.
-                - Websocket 환경 사용에 있어서 Jwt Token 인증 방식을 재사용하여 인증을 할 수 있습니다.
+        
+   - JWT Token 보안 강화
+      - 문제 상황
+           기존의 Spring boot의 Security를 사용해, Session을 통한 제어를 하는 방식은 서버에 많은 부담을 주며, 직원이 많은 환경에서는 서버를 여러 대 둬야 하는데, 같은 세션을 공유하는 저장소를 확장 해야하는 유지 보수 비용이 불필요하게 발생하게 됩니다.   
+      - 도입 이유 
+        - 기업의 내부 정보의 안정성 증가 
+        - Jwt Token
+            - 상대적으로 낮은 유지 보수 비용
+            - 높은 개발 친화성
+            - 확장성
+        - 구현 방식
+            - JWT Token은 Access Token은 만료 기간은 1시간, RefreshToken은 만료 기간이 1일이며, RefreshToken은 Redis를 통한 저장을 하고 있습니다.
+            - Jwt Token이 필요 없는 API 요청 : 로그인, 회원 가입, 이름 중복 체크에 관련된 요청은 요청 헤더에 Jwt Token을 넣지 않은 API 요청을 합니다.
+            - 일반적인 API 요청 : 모든 요청은 요청 헤더에 Cookie를 담아서 요청을 보내야 합니다.
+            - WebSocket 요청 : Cookie에 저장되어 있는 accessToken을 Authorization : Bearer your_jwt_token과 같은 형식으로 요청 헤더에 담아서 요청합니다.
+        - 기대 효과
+            - 기존의 세션 방식에서 취약한 XSS, CSRF 공격 방어를 할 수 있습니다.
+            - Websocket 환경 사용에 있어서 Jwt Token 인증 방식을 재사용하여 인증을 할 수 있습니다.
         - HTTPS 적용 및 ResponseCookie 활용
             - 문제 상황   
                 브라우저에서 http 프로토콜로 서버의 접근을 허용하게 되면 네트워크에서 비밀번호, 토큰을 가로채는 중간자 공격에 취약하다는 문제점이 발생합니다.
