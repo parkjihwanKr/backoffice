@@ -11,8 +11,6 @@ public interface CommonAspect {
 
     Members getLoginMemberInfo();
 
-    String getLoginMemberName();
-
     void getLogMessage(String message);
 
     void auditLogServiceSave(

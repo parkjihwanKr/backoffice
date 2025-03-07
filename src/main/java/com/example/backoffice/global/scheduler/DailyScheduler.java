@@ -50,18 +50,19 @@ public class DailyScheduler implements SchedulerTask{
     private void sendNotificationForUnCompletedEvaluationMember(){
         List<Evaluations> evaluationList
                 = evaluationsService.findAllByEndDatePlusSevenDays(LocalDate.now().plusDays(7));
-        if(!evaluationList.isEmpty()){
-            List<Members> unCompletedEvaluationMemberList
-                    = membersEvaluationsService.findAllByIsCompleted(false).stream()
-                    .map(MembersEvaluations::getMember).toList();
-            for(Members unCompletedEvaluationMember : unCompletedEvaluationMemberList){
-                String message = "설문 조사 마감 7일 전입니다. 신속히 마무리 해주시길 바랍니다.";
-                notificationsService.generateEntityAndSendMessage(
-                        NotificationsConverter.toNotificationData(
-                                unCompletedEvaluationMember, membersService.findHRManager(), message),
-                        NotificationType.EVALUATION
-                );
-            }
+        if (evaluationList.isEmpty()) {
+            return; // 불필요한 연산 방지
+        }
+        List<Members> unCompletedEvaluationMemberList
+                = membersEvaluationsService.findAllByIsCompleted(false).stream()
+                .map(MembersEvaluations::getMember).toList();
+        for(Members unCompletedEvaluationMember : unCompletedEvaluationMemberList){
+            String message = "설문 조사 마감 7일 전입니다. 신속히 마무리 해주시길 바랍니다.";
+            notificationsService.generateEntityAndSendMessage(
+                    NotificationsConverter.toNotificationData(
+                            unCompletedEvaluationMember, membersService.findHRManager(), message),
+                    NotificationType.EVALUATION
+            );
         }
     }
 
