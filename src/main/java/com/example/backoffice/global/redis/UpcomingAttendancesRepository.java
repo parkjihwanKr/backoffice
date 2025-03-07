@@ -17,18 +17,19 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class CachedMemberAttendanceRedisProvider {
+public class UpcomingAttendancesRepository {
     // database 2 : cachedMemberAttendance
     private final ObjectMapper objectMapper;
 
-    private final RedisTemplate<String, Object> redisTemplateForCached;
+    @Qualifier("redisTemplateForUpcomingAttendance")
+    private final RedisTemplate<String, Object> redisTemplateForUpcomingAttendance;
 
     // Long, DateRange
-    public CachedMemberAttendanceRedisProvider(
+    public UpcomingAttendancesRepository(
             ObjectMapper objectMapper,
-            @Qualifier("redisTemplateForCachedMemberAttendance") RedisTemplate<String, Object> redisTemplateForCached) {
+            @Qualifier("redisTemplateForUpcomingAttendance") RedisTemplate<String, Object> redisTemplateForUpcomingAttendance) {
         this.objectMapper = objectMapper;
-        this.redisTemplateForCached = redisTemplateForCached;
+        this.redisTemplateForUpcomingAttendance = redisTemplateForUpcomingAttendance;
     }
 
     public <T> void saveOne(Long memberId, DateRange value, String description) {
@@ -36,17 +37,17 @@ public class CachedMemberAttendanceRedisProvider {
         String valueString = serializeValue(value);
 
         Long ttl = DateTimeUtils.calculateMinutesFromTodayToEndDate(value.getEndDate());
-        redisTemplateForCached.opsForValue().set(key, valueString, ttl, TimeUnit.MINUTES);
+        redisTemplateForUpcomingAttendance.opsForValue().set(key, valueString, ttl, TimeUnit.MINUTES);
     }
 
     public String getRawValue(String key) {
-        return (String) redisTemplateForCached.opsForValue().get(key);
+        return (String) redisTemplateForUpcomingAttendance.opsForValue().get(key);
     }
 
     // 키에 해당하는 value 조회
     public <T> T getValue(Long memberId, Class<T> valueType) {
         String key = RedisProvider.MEMBER_ID_PREFIX + memberId;
-        String value = (String) redisTemplateForCached.opsForValue().get(key);
+        String value = (String) redisTemplateForUpcomingAttendance.opsForValue().get(key);
 
         if (Objects.isNull(value)) {
             return null; // 키가 없을 경우 null 반환
@@ -60,7 +61,7 @@ public class CachedMemberAttendanceRedisProvider {
     }
 
     public Map<String, String> getAllRawValues() {
-        Set<String> keys = redisTemplateForCached.keys(
+        Set<String> keys = redisTemplateForUpcomingAttendance.keys(
                 RedisProvider.MEMBER_ID_PREFIX + "*");
         Map<String, String> allValues = new HashMap<>();
 
@@ -76,7 +77,7 @@ public class CachedMemberAttendanceRedisProvider {
 
     // 토큰 삭제
     public void delete(String key) {
-        redisTemplateForCached.delete(key);
+        redisTemplateForUpcomingAttendance.delete(key);
     }
 
     // Key에서 memberId 추출

@@ -2,6 +2,7 @@ package com.example.backoffice.domain.member.service;
 
 import com.example.backoffice.domain.member.converter.MembersConverter;
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
+import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
@@ -14,6 +15,7 @@ import com.example.backoffice.global.exception.SchedulerCustomException;
 import com.example.backoffice.global.scheduler.ScheduledEventType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -192,7 +194,12 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
         return MembersConverter.toDepartment(department);
     }
 
+
     @Override
+    @Cacheable(
+            value = "membersByDeptAndPos",
+            cacheManager = "cacheManagerForCachedMember",
+            key = "#department + '-' + #position")
     public Page<Members> findAllByDepartmentAndPosition(
             MemberDepartment department, MemberPosition position,
             Pageable pageable){
