@@ -1,6 +1,7 @@
 package com.example.backoffice.domain.member.service;
 
 import com.example.backoffice.domain.member.dto.MembersRequestDto;
+import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
 import com.example.backoffice.domain.member.entity.Members;
@@ -339,4 +340,5 @@ public interface MembersServiceV1 {
      * @param memberName : 요청 받은 멤버 아이디
      */
     void matchedMemberName(String memberName, String loginMemberName);
+
 }

@@ -16,7 +16,9 @@ import com.example.backoffice.domain.vacation.exception.VacationsCustomException
 import com.example.backoffice.domain.vacation.exception.VacationsExceptionCode;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import com.example.backoffice.global.date.DateTimeUtils;
+import com.example.backoffice.global.redis.RedisProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,6 +95,13 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     }
 
     @Override
+    @Cacheable(
+            value = "vacationPeriodSpecialDay",
+            cacheManager = "cacheManagerForVacationPeriod",
+            key = "'vacationPeriod:' " +
+                    "+ T(" + RedisProvider.DATE_TIME_UTILS + ").getCurrentDateTime().getYear()" +
+                    " + ':' + T(" + RedisProvider.DATE_TIME_UTILS + ").getCurrentDateTime().getMonthValue()",
+            unless = "#result == null")
     @Transactional(readOnly = true)
     public VacationsResponseDto.UpdatePeriodDto readUpcomingUpdateVacationPeriod(
             Members loginMember) {
