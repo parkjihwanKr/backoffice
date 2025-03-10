@@ -4,6 +4,7 @@ import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
@@ -341,4 +342,9 @@ public interface MembersServiceV1 {
      */
     void matchedMemberName(String memberName, String loginMemberName);
 
+    /**
+     * 멤버 권한이 '어드민'이상의 등급인지
+     * @param role : 멤버 권한
+     */
+    void hasAdminAccess(MemberRole role);
 }

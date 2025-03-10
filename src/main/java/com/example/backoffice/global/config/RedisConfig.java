@@ -70,7 +70,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public JedisConnectionFactory redisConnectionFactoryForCachedMember() {
+    public JedisConnectionFactory redisConnectionFactoryForCachedData() {
         RedisStandaloneConfiguration config
                 = new RedisStandaloneConfiguration(host, port);
         config.setDatabase(4);
@@ -93,15 +93,15 @@ public class RedisConfig {
 
     @Bean
     @Primary
-    public RedisCacheManager cacheManagerForCachedMember(
-            @Qualifier("redisConnectionFactoryForCachedMember")
-            RedisConnectionFactory redisConnectionFactoryForCachedMember) {
+    public RedisCacheManager cacheManagerForCachedData(
+            @Qualifier("redisConnectionFactoryForCachedData")
+            RedisConnectionFactory redisConnectionFactoryForCachedData) {
 
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10)) // 캐싱 유지 시간 설정
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
-        return RedisCacheManager.builder(redisConnectionFactoryForCachedMember)
+        return RedisCacheManager.builder(redisConnectionFactoryForCachedData)
                 .cacheDefaults(cacheConfiguration)
                 .build();
     }
@@ -152,11 +152,11 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplateFormCachedMember(
-            @Qualifier("redisConnectionFactoryForCachedMember")
-            JedisConnectionFactory redisConnectionFactoryForCachedMember) {
+    public RedisTemplate<String, Object> redisTemplateFormCachedData(
+            @Qualifier("redisConnectionFactoryForCachedData")
+            JedisConnectionFactory redisConnectionFactoryForCachedData) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactoryForCachedMember);
+        template.setConnectionFactory(redisConnectionFactoryForCachedData);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;

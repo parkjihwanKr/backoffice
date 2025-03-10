@@ -5,6 +5,7 @@ import com.example.backoffice.domain.member.dto.MembersRequestDto;
 import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
@@ -198,7 +199,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     @Cacheable(
             value = "membersByDeptAndPos",
-            cacheManager = "cacheManagerForCachedMember",
+            cacheManager = "cacheManagerForCachedData",
             key = "#department + '-' + #position")
     public Page<Members> findAllByDepartmentAndPosition(
             MemberDepartment department, MemberPosition position,
@@ -434,6 +435,13 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     public void matchedMemberName(String memberName, String loginMemberName){
         if(!memberName.equals(loginMemberName)){
             throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER_NAME);
+        }
+    }
+
+    @Override
+    public void hasAdminAccess(MemberRole loginMemberRole){
+        if(loginMemberRole.equals(MemberRole.EMPLOYEE)){
+            throw new MembersCustomException(MembersExceptionCode.RESTRICTED_ACCESS_MEMBER);
         }
     }
 }
