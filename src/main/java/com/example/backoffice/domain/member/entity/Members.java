@@ -20,7 +20,13 @@ import java.util.List;
 @Entity
 @Getter
 @Builder
-@Table(name = "members")
+@Table(
+        name = "members",
+        indexes = {
+                @Index(name = "idx_member_department", columnList = "department"),
+                @Index(name = "idx_member_position", columnList = "position")
+        }
+)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Members extends CommonEntity {

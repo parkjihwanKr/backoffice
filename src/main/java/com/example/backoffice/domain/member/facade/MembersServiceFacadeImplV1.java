@@ -10,15 +10,15 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
-import com.example.backoffice.domain.member.exception.MembersExceptionEnum;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,39 +34,24 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     private final MembersServiceV1 membersService;
     private final NotificationsServiceV1 notificationsService;
     private final VacationsServiceV1 vacationsService;
-    private final PasswordEncoder passwordEncoder;
 
     // 타당성 검사 추가
     @Override
+    @CacheEvict(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()"
+    )
     @Transactional
     public MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto){
-        if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
-            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
-        }
-        Members duplicatedInfoMember
-                = membersService.findByEmailOrMemberNameOrAddressOrContact(
-                requestDto.getEmail(), requestDto.getMemberName(),
-                requestDto.getAddress(), requestDto.getContact());
-        if(duplicatedInfoMember != null){
-            MembersExceptionEnum exceptionType
-                    = findExceptionType(requestDto, duplicatedInfoMember);
-            switch (exceptionType) {
-                case EMAIL
-                        -> throw new MembersCustomException(
-                                MembersExceptionCode.DUPLICATED_EMAIL);
-                case ADDRESS
-                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_ADDRESS);
-                case MEMBER_NAME
-                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_MEMBER_NAME);
-                case CONTACT
-                        -> throw new MembersCustomException(MembersExceptionCode.DUPLICATED_CONTACT);
-                case NULL
-                        -> throw new MembersCustomException(MembersExceptionCode.NOT_FOUND_EXCEPTION_TYPE);
-            }
-        }
 
-        String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
+        membersService.checkPassword(requestDto.getPassword(), requestDto.getPassword());
+
+        membersService.checkDuplicatedMember(requestDto);
+
+        String bCrytPassword
+                = membersService.encodePassword(requestDto.getPassword());
         Members member = MembersConverter.toEntity(requestDto, bCrytPassword);
         membersService.signup(member);
         return MembersConverter.toCreateOneDto(member);
@@ -76,15 +61,10 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Transactional(readOnly = true)
     public MembersResponseDto.ReadAvailableMemberNameDto checkAvailableMemberName(
             String requestedMemberName){
-        if (!requestedMemberName.matches("^[a-z0-9]{8,16}$")) {
-            throw new MembersCustomException(MembersExceptionCode.INVALID_MEMBER_NAME);
-        }
+        membersService.checkAvailableMemberName(requestedMemberName);
 
-        if(membersService.isExistMemberName(requestedMemberName)){
-            throw new MembersCustomException(
-                    MembersExceptionCode.EXISTS_MEMBER);
-        }
-        return MembersConverter.toReadAvailableMemberNameDto(true, requestedMemberName);
+        return MembersConverter.toReadAvailableMemberNameDto(
+                true, requestedMemberName);
     }
 
     @Override
@@ -140,6 +120,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
 
     @Override
+    @CacheEvict(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()"
+    )
     @Transactional
     public MembersResponseDto.UpdateOneDto updateOne(
             Long memberId, Members loginMember,
@@ -149,17 +134,15 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         Members matchedMember = membersService.matchLoginMember(loginMember, memberId);
 
         // 1. 요청dto의 멤버 네임과 db에 존재하는 memberName이 다르면 안됨
-        if(!requestDto.getMemberName().equals(matchedMember.getMemberName())){
-            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_MEMBER_NAME);
-        }
+        membersService.matchedMemberName(
+                requestDto.getMemberName(), matchedMember.getMemberName());
+
         // 2. 요청dto의 password와 passwordConfirm이 다르면 안됨
-        if(!requestDto.getPassword().equals(requestDto.getPasswordConfirm())){
-            throw new MembersCustomException(MembersExceptionCode.NOT_MATCHED_PASSWORD);
-        }
+        membersService.checkPassword(
+                requestDto.getPassword(), requestDto.getPasswordConfirm());
+
         // 데이터 베이스 제약 조건까지 넘어가지 않도록 먼저 오류 설정
-        if(requestDto.getIntroduction().length() > 500){
-            throw new MembersCustomException(MembersExceptionCode.MAX_LENGTH_500);
-        }
+        membersService.checkIntroductionMaxLength(requestDto.getIntroduction());
 
         // 3. 요청dto의 contact가 나를 제외한 db에 존재하는 모든 멤버의 연락처와 같으면 안됨
         // 4. 요청dto의 email이 나를 제외한 db에 존재하는 모든 멤버의 이메일과 같으면 안됨
@@ -174,7 +157,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
             }
         }
 
-        String bCrytPassword = passwordEncoder.encode(requestDto.getPassword());
+        String bCrytPassword = membersService.encodePassword(requestDto.getPassword());
 
         matchedMember.updateMemberInfo(
                 requestDto.getName(), requestDto.getEmail(), requestDto.getAddress(),
@@ -183,6 +166,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
+    @CacheEvict(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()"
+    )
     @Transactional
     public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttributeByAdmin(
             Long memberId, Members loginMember,
@@ -217,7 +205,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
         String document
                 = filesService.createOneForMemberRole(multipartFile, updateMember);
 
-        MemberRole role = checkedRole(requestDto.getRole());
+        MemberRole role = toRole(requestDto.getRole());
         MemberDepartment department = checkedDepartment(requestDto.getDepartment());
         MemberPosition position = checkedPosition(requestDto.getPosition());
 
@@ -305,6 +293,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
+    @CacheEvict(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()"
+    )
     @Transactional
     public void deleteOneByAdmin(Long memberId, Members loginMember){
         membersService.findHRManagerOrCEO(loginMember);
@@ -356,30 +349,18 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
+    @Cacheable(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()")
     @Transactional(readOnly = true)
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
+        membersService.hasAdminAccess(loginMember.getRole());
         List<Members> memberList = membersService.findAll();
         return MembersConverter.toReadNameListDto(memberList);
     }
 
-    private MembersExceptionEnum findExceptionType(
-            MembersRequestDto.CreateOneDto requestDto, Members duplicatedInfoMember){
-        if(requestDto.getContact().equals(duplicatedInfoMember.getContact())){
-            return MembersExceptionEnum.CONTACT;
-        }
-        if(requestDto.getEmail().equals(duplicatedInfoMember.getEmail())){
-            return MembersExceptionEnum.EMAIL;
-        }
-        if(requestDto.getAddress().equals(duplicatedInfoMember.getAddress())){
-            return MembersExceptionEnum.ADDRESS;
-        }
-        if(requestDto.getMemberName().equals(duplicatedInfoMember.getMemberName())){
-            return MembersExceptionEnum.MEMBER_NAME;
-        }
-        return MembersExceptionEnum.NULL;
-    }
-
-    public MemberRole checkedRole(String role){
+    public MemberRole toRole(String role){
         return MembersConverter.toRole(role);
     }
 

@@ -1,7 +1,10 @@
 package com.example.backoffice.domain.member.service;
 
+import com.example.backoffice.domain.member.dto.MembersRequestDto;
+import com.example.backoffice.domain.member.dto.MembersResponseDto;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.MemberPosition;
+import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.exception.MembersCustomException;
 import com.example.backoffice.domain.member.exception.MembersExceptionCode;
@@ -19,6 +22,16 @@ public interface MembersServiceV1 {
      * @param member 회원 가입 정보
      */
     void signup(Members member);
+
+    /**
+     * 멤버 아이디를 사용할 수 있는지 체크
+     * @param requestedMemberName : requestDTO를 통해 받아온 멤버 아이디
+     * @throws MembersCustomException {@link MembersExceptionCode#EXISTS_MEMBER}
+     * 존재하는 멤버인 경우
+     * @throws MembersCustomException {@link MembersExceptionCode#INVALID_MEMBER_NAME}
+     * 특수한 정규식에 부합하지 않는 멤버 아이디를 요청한 경우
+     */
+    void checkAvailableMemberName(String requestedMemberName);
 
     /**
      * 멤버 아이디를 통한 멤버 조회
@@ -51,15 +64,10 @@ public interface MembersServiceV1 {
     Members matchLoginMember(Members loginMember, Long memberId);
 
     /**
-     * 이메일, 이름, 주소, 연락처 중 하나로 멤버를 조회
-     * @param email 멤버 이메일
-     * @param memberName 멤버 이름
-     * @param address 멤버 주소
-     * @param contact 멤버 연락처
-     * @return 조회된 멤버
+     * 중복되는 멤버인지 확인
+     * @param requestDto : 회원가입 진행을 위한 요청 DTO
      */
-    Members findByEmailOrMemberNameOrAddressOrContact(
-            String email, String memberName, String address, String contact);
+    void checkDuplicatedMember(MembersRequestDto.CreateOneDto requestDto);
 
     /**
      * 멤버 ID가 존재 확인
@@ -119,8 +127,6 @@ public interface MembersServiceV1 {
      * @return CEO
      * @throws MembersCustomException {@link MembersExceptionCode#RESTRICTED_ACCESS_MEMBER}
      * 접근 불가능한 멤버
-     * @throws MembersCustomException {@link MembersExceptionCode#MATCHED_MEMBER_INFO_MEMBER_NAME}
-     * 멤버 이름에 매칭하는 멤버 정보가 없음
      */
     Members findCeoByMemberName(String memberName);
 
@@ -306,4 +312,39 @@ public interface MembersServiceV1 {
      * @return CEO || null
      */
     Members findCeo();
+
+    /**
+     * password와 passwordConfirm이 일치하는지 확인
+     * @param password : 요청 받은 패스워드
+     * @param passwordConfirm : 요청 받은 패스워드 확인
+     */
+    void checkPassword(String password, String passwordConfirm);
+
+    /**
+     * 요청받은 패스워드를 BCrytPassword 인코딩
+     * @param password : 요청 받은 패스워드
+     * @return BCrytPassword
+     */
+    String encodePassword(String password);
+
+    /**
+     * 자기 소개 길이가 긴지 체크
+     * @param requestedIntroduction : 요청 받은 자기소개
+     * @throws MembersCustomException {@link MembersExceptionCode#MAX_LENGTH_500}
+     * 자기 소개의 길이가 길 때
+     */
+    void checkIntroductionMaxLength(String requestedIntroduction);
+
+    /**
+     * 요청 받은 멤버 아이디와 일치하는 멤버 아이디가 일치하는지 확인
+     * @param loginMemberName : 로그인 멤버의 멤버 아이디
+     * @param memberName : 요청 받은 멤버 아이디
+     */
+    void matchedMemberName(String memberName, String loginMemberName);
+
+    /**
+     * 멤버 권한이 '어드민'이상의 등급인지
+     * @param role : 멤버 권한
+     */
+    void hasAdminAccess(MemberRole role);
 }

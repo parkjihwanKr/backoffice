@@ -81,7 +81,10 @@ public enum MembersExceptionCode {
             "8자 이상 16자 이하의 소문자 알파벳을 포함한 아이디 이름만 가능합니다!"),
     MAX_LENGTH_500(
             HttpStatus.BAD_REQUEST, "MEMBER-025",
-            "자기소개는 500 길이 제한이 있습니다.")
+            "자기소개는 500 길이 제한이 있습니다."),
+    NOT_MATCHED_PASSWORD_AND_PASSWORD_CONFIRM(
+            HttpStatus.BAD_REQUEST, "MEMBER-026",
+            "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
