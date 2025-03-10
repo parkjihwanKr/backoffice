@@ -14,6 +14,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,11 @@ public class MainPageService {
     private final VacationsServiceV1 vacationsService;
     private final AttendancesServiceV1 attendancesService;
 
+    @Cacheable(
+            key = "#loginMember.getId()",
+            cacheManager = "cacheManagerForCachedData",
+            value = "mainPage"
+    )
     @Transactional(readOnly = true)
     public MainPageResponseDto read(Members loginMember){
         // 멤버는 100명으로 고정

@@ -14,8 +14,9 @@ import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.notification.service.NotificationsServiceV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
@@ -37,6 +37,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     // 타당성 검사 추가
     @Override
+    @CacheEvict(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()"
+    )
     @Transactional
     public MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto){
@@ -115,6 +120,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
 
     @Override
+    @CacheEvict(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()"
+    )
     @Transactional
     public MembersResponseDto.UpdateOneDto updateOne(
             Long memberId, Members loginMember,
@@ -156,6 +166,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
+    @CacheEvict(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()"
+    )
     @Transactional
     public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttributeByAdmin(
             Long memberId, Members loginMember,
@@ -278,6 +293,11 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
+    @CacheEvict(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()"
+    )
     @Transactional
     public void deleteOneByAdmin(Long memberId, Members loginMember){
         membersService.findHRManagerOrCEO(loginMember);
@@ -329,8 +349,13 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
+    @Cacheable(
+            value = "membersByRole",
+            cacheManager = "cacheManagerForCachedData",
+            key = "#loginMember.getRole()")
     @Transactional(readOnly = true)
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
+        membersService.hasAdminAccess(loginMember.getRole());
         List<Members> memberList = membersService.findAll();
         return MembersConverter.toReadNameListDto(memberList);
     }

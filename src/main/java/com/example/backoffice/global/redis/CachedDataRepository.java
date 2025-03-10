@@ -6,18 +6,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CachedMemberRepository {
+public class CachedDataRepository {
 
     private final ObjectMapper objectMapper;
 
-    @Qualifier("redisTemplateFormCachedMember")
-    private final RedisTemplate<String, Object> redisTemplateFormCachedMember;
+    @Qualifier("redisTemplateFormCachedData")
+    private final RedisTemplate<String, Object> redisTemplateFormCachedData;
 
-    public CachedMemberRepository(
+    public CachedDataRepository(
             ObjectMapper objectMapper,
-            @Qualifier("redisTemplateFormCachedMember") RedisTemplate<String, Object> redisTemplateFormCachedMember){
+            @Qualifier("redisTemplateFormCachedData") RedisTemplate<String, Object> redisTemplateFormCachedData){
         this.objectMapper = objectMapper;
-        this.redisTemplateFormCachedMember = redisTemplateFormCachedMember;
+        this.redisTemplateFormCachedData = redisTemplateFormCachedData;
     }
 
 
