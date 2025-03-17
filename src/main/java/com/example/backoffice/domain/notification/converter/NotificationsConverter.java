@@ -45,6 +45,15 @@ public class NotificationsConverter {
                 .build();
     }
 
+    public static NotificationData toNotificationData(
+            Members toMember, Members fromMember, String message) {
+        return NotificationData.builder()
+                .toMember(toMember)
+                .fromMember(fromMember)
+                .message(message)
+                .build();
+    }
+
     public static NotificationsResponseDto.ReadOneDto toReadOneDto(
             Notifications notification, MemberPosition position) {
         return NotificationsResponseDto.ReadOneDto.builder()

@@ -113,4 +113,7 @@ public interface NotificationsServiceV1 {
     NotificationData toNotificationData(
             Members toMember, Members fromMember, Boards board,
             Comments comment, Comments reply, Events event, String message);
+
+    NotificationData toNotificationData(
+            Members toMember, Members fromMember, String message);
 }

@@ -16,8 +16,9 @@ import com.example.backoffice.domain.vacation.exception.VacationsCustomException
 import com.example.backoffice.domain.vacation.exception.VacationsExceptionCode;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import com.example.backoffice.global.date.DateTimeUtils;
-import com.example.backoffice.global.redis.RedisProvider;
+import com.example.backoffice.global.redis.service.VacationPeriodCacheServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +35,16 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     private final MembersServiceV1 membersService;
     private final NotificationsServiceV1 notificationsService;
     private final VacationsServiceV1 vacationsService;
+    private final VacationPeriodCacheServiceV1 vacationPeriodCacheService;
     private final VacationPeriodProvider vacationPeriodProvider;
 
+    @CacheEvict(
+            value = "Upcoming",
+            key = "'VacationPeriod:' + " +
+                    "T(com.example.backoffice.global.date.DateTimeUtils).getCurrentDateTime().getYear() + ':'" +
+                    " + T(com.example.backoffice.global.date.DateTimeUtils).getCurrentDateTime().getMonthValue()",
+            cacheManager = "cacheManagerForVacationPeriod"
+    )
     @Override
     public VacationsResponseDto.UpdatePeriodDto updatePeriodByAdmin(
             Members loginMember, VacationsRequestDto.UpdatePeriodDto requestDto){
@@ -45,13 +54,14 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
         String key = vacationPeriodProvider.createKey(
                 (long)DateTimeUtils.getToday().getYear(),
                 (long)DateTimeUtils.getToday().getMonthValue());
-        if(vacationsService.existPeriod(key)){
-            vacationsService.deletePeriodByKey(key);
+        if(vacationPeriodCacheService.existPeriod(key)){
+            vacationPeriodCacheService.deletePeriodByKey(key);
         }
+
         LocalDateTime newStartDate
                 = DateTimeUtils.parse(requestDto.getStartDate());
         LocalDateTime newEndDate
-                = DateTimeUtils.parse(requestDto.getEndDate());
+                = DateTimeUtils.parse(requestDto.getEndDate()).minusSeconds(1);
 
         // 현재 월을 기준으로 검증
         LocalDateTime now = DateTimeUtils.getCurrentDateTime();
@@ -68,17 +78,14 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
             throw new VacationsCustomException(VacationsExceptionCode.END_DATE_BEFORE_START_DATE);
         }
 
-        vacationPeriodProvider.setVacationPeriod(newStartDate, newEndDate);
-
         List<Members> memberList = membersService.findAll();
 
         for(Members member : memberList){
             notificationsService.generateEntityAndSendMessage(
                     NotificationsConverter.toNotificationData(
                             member, loginMember, null, null, null, null,
-                            "변경된 휴가 신청 기간 안내입니다 : "
-                                    +vacationPeriodProvider.getVacationPeriod().getStartDate() + " ~ "
-                                    +vacationPeriodProvider.getVacationPeriod().getEndDate()),
+                            "변경된 휴가 신청 기간 안내입니다 : "+
+                                    newStartDate + " ~ "+ newEndDate),
                     NotificationType.UPDATE_VACATION_PERIOD);
         }
 
@@ -86,63 +93,44 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
                 = DateTimeUtils.calculateMinutesFromTodayToEndDate(
                         DateTimeUtils.getEndDayOfMonth(
                                 (long)now.getYear(), (long)now.getMonthValue()));
-        String values = vacationPeriodProvider.createValues(
-                vacationPeriodProvider.getVacationPeriod().getStartDate().getDayOfMonth(),
-                vacationPeriodProvider.getVacationPeriod().getEndDate().getDayOfMonth());
+        VacationsResponseDto.ReadPeriodDto values
+                = vacationPeriodProvider.createValues(newStartDate, newEndDate);
 
-        vacationsService.savePeriod(key, Math.toIntExact(ttlMinutes), values);
+        vacationPeriodCacheService.save(key, Math.toIntExact(ttlMinutes), values);
         return VacationsConverter.toUpdatePeriodDto(newStartDate, newEndDate);
     }
 
     @Override
     @Cacheable(
-            value = "vacationPeriodSpecialDay",
             cacheManager = "cacheManagerForVacationPeriod",
-            key = "'vacationPeriod:' " +
-                    "+ T(" + RedisProvider.DATE_TIME_UTILS + ").getCurrentDateTime().getYear()" +
-                    " + ':' + T(" + RedisProvider.DATE_TIME_UTILS + ").getCurrentDateTime().getMonthValue()",
-            unless = "#result == null")
+            value = "Upcoming", // Redis 캐시 네임
+            key = "'VacationPeriod:' + T(com.example.backoffice.global.date.DateTimeUtils).getCurrentDateTime().getYear()" +
+                    " + ':' + T(com.example.backoffice.global.date.DateTimeUtils).getFormattedMonth()"
+    )
     @Transactional(readOnly = true)
-    public VacationsResponseDto.UpdatePeriodDto readUpcomingUpdateVacationPeriod(
-            Members loginMember) {
+    public VacationsResponseDto.ReadPeriodDto readUpcomingUpdateVacationPeriod(Members loginMember) {
         membersService.findById(loginMember.getId());
 
-        if(!vacationPeriodProvider.getVacationPeriod().isEmpty()){
-            LocalDateTime startDate = vacationPeriodProvider.getVacationPeriod().getStartDate();
-            LocalDateTime endDate = vacationPeriodProvider.getVacationPeriod().getEndDate();
+        String key = vacationPeriodProvider.createKey(
+                (long)DateTimeUtils.getCurrentDateTime().getYear(),
+                (long)DateTimeUtils.getCurrentDateTime().getMonthValue());
 
-            return VacationsConverter.toUpdatePeriodDto(startDate, endDate);
-        }else {
-            String key = vacationPeriodProvider.createKey(
-                    (long)DateTimeUtils.getCurrentDateTime().getYear(),
-                    (long)DateTimeUtils.getCurrentDateTime().getMonthValue());
-            if(vacationsService.existPeriod(key)){
-                String value = vacationsService.getValueByKey(key);
-
-                LocalDateTime upcomingUpdateVacationPeriodStartDay =
-                        vacationPeriodProvider.calculateUpcomingStartDate(key, value);
-                LocalDateTime upcomingUpdateVacationPeriodEndDay =
-                        vacationPeriodProvider.calculateUpcomingEndDate(key, value);
-                vacationPeriodProvider.setVacationPeriod(
-                        upcomingUpdateVacationPeriodStartDay,
-                        upcomingUpdateVacationPeriodEndDay);
-                return VacationsConverter.toUpdatePeriodDto(
-                        upcomingUpdateVacationPeriodStartDay,
-                        upcomingUpdateVacationPeriodEndDay);
-            }
-            String message
-                    = VacationsExceptionCode
-                    .NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY
-                    .getMessage();
-            notificationsService.generateEntityAndSendMessage(
-                    notificationsService.toNotificationData(
-                            membersService.findItManager(), membersService.findByPosition(MemberPosition.CEO),
-                            null, null, null, null, message
-                    ), NotificationType.URGENT_SERVER_ERROR);
-
-            throw new VacationsCustomException(
-                    VacationsExceptionCode.NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY);
+        if (vacationPeriodCacheService.existPeriod(key)) {
+            return vacationPeriodCacheService.getValueByKey(key, VacationsResponseDto.ReadPeriodDto.class);
         }
+
+        String message
+                = VacationsExceptionCode
+                .NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY
+                .getMessage();
+        notificationsService.generateEntityAndSendMessage(
+                notificationsService.toNotificationData(
+                        membersService.findItManager(),
+                        membersService.findByPosition(MemberPosition.CEO), message
+                ), NotificationType.URGENT_SERVER_ERROR);
+
+        throw new VacationsCustomException(
+                VacationsExceptionCode.NOT_YET_SETTING_VACATION_PERIOD_IN_MEMORY);
     }
 
     @Override

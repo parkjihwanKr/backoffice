@@ -210,6 +210,7 @@ public class EventsConverter {
             Events event){
         return EventsResponseDto.ReadCompanySummaryOneDto.builder()
                 .department(event.getDepartment())
+                .eventType(event.getEventType())
                 .eventId(event.getId())
                 .title(event.getTitle())
                 .startDate(event.getStartDate())

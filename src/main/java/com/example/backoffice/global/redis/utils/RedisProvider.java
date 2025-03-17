@@ -1,4 +1,4 @@
-package com.example.backoffice.global.redis;
+package com.example.backoffice.global.redis.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,8 @@ public class RedisProvider {
     public static final String MEMBER_ID_PREFIX = "memberId:";
     public static final String BOARD_ID_PREFIX = "boardId:";
     public static final String REFRESH_TOKEN_PREFIX = "refreshToken : ";
-    public static final String DATE_TIME_UTILS = "com.example.backoffice.global.date.DateTimeUtils";
+    public static final String MAIN_PAGE_PREFIX = "mainPage:summary:memberId::";
+    public static final Integer MAIN_PAGE_TTL = 10000;
 
     private final ObjectMapper objectMapper;
 

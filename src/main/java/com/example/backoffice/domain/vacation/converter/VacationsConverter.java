@@ -57,6 +57,15 @@ public class VacationsConverter {
                 .build();
     }
 
+    public static VacationsResponseDto.ReadPeriodDto toReadPeriodDto(
+            LocalDateTime startDate, LocalDateTime endDate) {
+        return VacationsResponseDto.ReadPeriodDto.builder()
+               .startDate(startDate)
+               .endDate(endDate)
+               .build();
+    }
+
+
     public static VacationsResponseDto.CreateOneDto toCreateOneDto(
             Vacations vacation){
         return VacationsResponseDto.CreateOneDto.builder()

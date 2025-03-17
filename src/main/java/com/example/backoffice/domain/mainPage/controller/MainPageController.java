@@ -1,7 +1,7 @@
 package com.example.backoffice.domain.mainPage.controller;
 
 import com.example.backoffice.domain.mainPage.dto.MainPageResponseDto;
-import com.example.backoffice.domain.mainPage.service.MainPageService;
+import com.example.backoffice.domain.mainPage.proxy.MainPageProxyService;
 import com.example.backoffice.global.dto.CommonResponseDto;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Main Page API", description = "메인 페이지 API")
 public class MainPageController {
 
-    private final MainPageService mainPageService;
+    private final MainPageProxyService mainPageProxyService;
 
     @GetMapping("/main-page")
     @Operation(summary = "메인 페이지 조회",
@@ -42,9 +42,9 @@ public class MainPageController {
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<MainPageResponseDto> read(
+    public ResponseEntity<MainPageResponseDto.ReadOneDto> read(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         return ResponseEntity.status(HttpStatus.OK).body(
-                mainPageService.read(memberDetails.getMembers()));
+                mainPageProxyService.read(memberDetails.getMembers()));
     }
 }

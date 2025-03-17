@@ -1,7 +1,8 @@
-package com.example.backoffice.global.redis;
+package com.example.backoffice.global.redis.repository;
 
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JsonCustomException;
+import com.example.backoffice.global.redis.utils.RedisProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,6 +15,7 @@ import java.util.Set;
 public class ViewCountRepository {
 
     private final ObjectMapper objectMapper;
+
     @Qualifier("redisTemplateForViewCount")
     private final RedisTemplate<String, Object> redisTemplateForViewCount;
 

@@ -199,7 +199,7 @@ public class MembersServiceImplV1 implements MembersServiceV1 {
     @Override
     @Cacheable(
             value = "membersByDeptAndPos",
-            cacheManager = "cacheManagerForCachedData",
+            cacheManager = "cacheManagerForMainPage",
             key = "#department + '-' + #position")
     public Page<Members> findAllByDepartmentAndPosition(
             MemberDepartment department, MemberPosition position,

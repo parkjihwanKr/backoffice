@@ -4,7 +4,7 @@ import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.JwtAuthenticationFilter;
 import com.example.backoffice.global.jwt.JwtAuthorizationFilter;
 import com.example.backoffice.global.jwt.JwtProvider;
-import com.example.backoffice.global.redis.RefreshTokenRepository;
+import com.example.backoffice.global.redis.repository.RefreshTokenRepository;
 import com.example.backoffice.global.security.CustomLogoutHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

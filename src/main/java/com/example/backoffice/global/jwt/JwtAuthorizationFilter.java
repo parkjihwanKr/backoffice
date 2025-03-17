@@ -3,7 +3,7 @@ package com.example.backoffice.global.jwt;
 import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
-import com.example.backoffice.global.redis.RefreshTokenRepository;
+import com.example.backoffice.global.redis.repository.RefreshTokenRepository;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -7,7 +7,9 @@ import lombok.Getter;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
@@ -15,6 +17,11 @@ public class DateTimeUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER
             = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+    private static final DateTimeFormatter CUSTOM_TIME_FORMATTER
+            = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private static final String CUSTOM_TIME_FORMATTER_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     @Getter
     private static final LocalDateTime todayCheckInTime =
@@ -28,7 +35,7 @@ public class DateTimeUtils {
     private static LocalDateTime tomorrow;
 
     // 0초 접미사 상수
-    public static final String suffixZeroSeconds = ":00";
+    public static final String SUFFIX_ZERO_SECONDS = ":00";
 
     // 현재 시점(LocalDateTime) 반환
     public static LocalDateTime getCurrentDateTime() {
@@ -43,12 +50,25 @@ public class DateTimeUtils {
         return todayCheckOutTime.toLocalTime();
     }
 
+    public static DateTimeFormatter getCustomDateTimeFormatter(){
+        return new DateTimeFormatterBuilder()
+                .appendPattern(CUSTOM_TIME_FORMATTER_PATTERN)
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                .toFormatter();
+    }
+
     // 특정 문자열을 LocalDateTime으로 파싱
     public static LocalDateTime parse(String dateTimeStr) {
         try {
-            return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
+            if (dateTimeStr.contains("T")) {
+                return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER); // 'T' 포함된 데이터 처리
+            } else {
+                return LocalDateTime.parse(dateTimeStr, CUSTOM_TIME_FORMATTER); // 'T' 없는 데이터 처리
+            }
         } catch (DateTimeParseException e) {
-            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE);
+            throw new DateUtilException(GlobalExceptionCode.NOT_PARSE_DATE); // 예외 처리
         }
     }
 
@@ -148,6 +168,15 @@ public class DateTimeUtils {
                 year.intValue(), month.intValue(), day.intValue(), 0, 0, 0);
     }
 
+    public static LocalDateTime formattedOf(Long year, Long month, Long day){
+        validateYearAndMonth(year, month);
+        LocalDateTime dateTime
+                = LocalDateTime.of(
+                        year.intValue(), month.intValue(), day.intValue(),
+                0, 0, 0);
+        return DateTimeUtils.parse(dateTime.format(DATE_TIME_FORMATTER));
+    }
+
     public static LocalDateTime atEndOfDay(Long year, Long month, Long day){
         validateYearAndMonth(year, month);
         return LocalDateTime.of(
@@ -235,5 +264,35 @@ public class DateTimeUtils {
             return false;
         }
         return true;
+    }
+
+    public static Duration getAtEndOfDay(){
+        // 현재 시간과 비교하여 Duration 객체를 계산
+        LocalDateTime now = getCurrentDateTime();
+        LocalDateTime targetDateTime
+                = atEndOfDay(
+                    (long)now.getYear(),
+                    (long)now.getMonthValue(),
+                    (long)now.getDayOfMonth());
+
+        // 차이를 Duration으로 반환
+        return Duration.between(now, targetDateTime);
+    }
+
+    public static Duration getEndDayOfMonth(){
+        // 현재 시간과 비교하여 Duration 객체를 계산
+        LocalDateTime now = getCurrentDateTime();
+        LocalDateTime targetDateTime
+                = getEndDayOfMonth(
+                (long)now.getYear(),
+                (long)now.getMonthValue());
+
+        // 차이를 Duration으로 반환
+        return Duration.between(now, targetDateTime);
+    }
+
+    public static String getFormattedMonth() {
+        int monthValue = getCurrentDateTime().getMonthValue();
+        return String.format("%02d", monthValue);
     }
 }

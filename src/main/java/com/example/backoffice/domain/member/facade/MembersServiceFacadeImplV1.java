@@ -39,7 +39,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @CacheEvict(
             value = "membersByRole",
-            cacheManager = "cacheManagerForCachedData",
+            cacheManager = "cacheManagerForMainPage",
             key = "#loginMember.getRole()"
     )
     @Transactional
@@ -122,7 +122,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @CacheEvict(
             value = "membersByRole",
-            cacheManager = "cacheManagerForCachedData",
+            cacheManager = "cacheManagerForMainPage",
             key = "#loginMember.getRole()"
     )
     @Transactional
@@ -168,7 +168,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @CacheEvict(
             value = "membersByRole",
-            cacheManager = "cacheManagerForCachedData",
+            cacheManager = "cacheManagerForMainPage",
             key = "#loginMember.getRole()"
     )
     @Transactional
@@ -295,7 +295,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @CacheEvict(
             value = "membersByRole",
-            cacheManager = "cacheManagerForCachedData",
+            cacheManager = "cacheManagerForMainPage",
             key = "#loginMember.getRole()"
     )
     @Transactional
@@ -351,7 +351,7 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     @Override
     @Cacheable(
             value = "membersByRole",
-            cacheManager = "cacheManagerForCachedData",
+            cacheManager = "cacheManagerForMainPage",
             key = "#loginMember.getRole()")
     @Transactional(readOnly = true)
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {

@@ -5,11 +5,10 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.dto.TokenDto;
-import com.example.backoffice.global.redis.RefreshTokenRepository;
+import com.example.backoffice.global.redis.repository.RefreshTokenRepository;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.Collection;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

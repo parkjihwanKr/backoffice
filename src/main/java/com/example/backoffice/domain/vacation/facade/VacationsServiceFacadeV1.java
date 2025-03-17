@@ -74,7 +74,7 @@ public interface VacationsServiceFacadeV1 {
      * @return {@link VacationsResponseDto.UpdatePeriodDto}
      * 해당하는 년, 월의 휴가 정정 기간 시작일과 마지막일
      */
-    VacationsResponseDto.UpdatePeriodDto readUpcomingUpdateVacationPeriod(
+    VacationsResponseDto.ReadPeriodDto readUpcomingUpdateVacationPeriod(
             Members loginMember);
 
     /**

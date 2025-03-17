@@ -17,8 +17,9 @@ import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.date.DateTimeUtils;
-import com.example.backoffice.global.redis.UpcomingAttendancesRepository;
+import com.example.backoffice.global.redis.repository.UpcomingAttendancesRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -232,7 +233,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         membersService.findById(memberId);
         Attendances attendance
                 = attendancesRepository.findByIdAndMemberId(attendanceId, memberId)
-                .orElseThrow(() -> new AttendancesCustomException(AttendancesExceptionCode.NOT_FOUND_ATTENDANCES));
+                .orElseThrow(
+                        () -> new AttendancesCustomException(AttendancesExceptionCode.NOT_FOUND_ATTENDANCES));
 
         // 2. 근태 기록 변경 권한이 있는지
         Members hrManagerOrCeo = membersService.findHRManagerOrCEO(loginMember);
@@ -273,6 +275,11 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     }
 
     @Override
+    @CacheEvict(
+            key = "#requestDto.getMemberId()",
+            cacheManager = "cacheManagerForMainPage",
+            value = "mainPage:summary:memberId"
+    )
     @Transactional
     public AttendancesResponseDto.CreateOneDto createOneByAdmin(
             AttendancesRequestDto.CreateOneDto requestDto, Members loginMember) {
@@ -284,9 +291,9 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         // 3. DateRange 계산
         LocalDateTime startTime = DateTimeUtils.parse(
-                requestDto.getStartDate() + DateTimeUtils.suffixZeroSeconds);
+                requestDto.getStartDate() + DateTimeUtils.SUFFIX_ZERO_SECONDS);
         LocalDateTime endTime = DateTimeUtils.parse(
-                requestDto.getEndDate() + DateTimeUtils.suffixZeroSeconds);
+                requestDto.getEndDate() + DateTimeUtils.SUFFIX_ZERO_SECONDS);
         DateTimeUtils.validateStartAndEndDate(startTime, endTime);
 
         DateRange dateRange = new DateRange(startTime, endTime);
@@ -348,6 +355,12 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     }
 
     @Override
+    @CacheEvict(
+            key = "#root.target.getMemberIdsByAttendanceIds(#deleteAttendanceIdList)",
+            cacheManager = "cacheManagerForMainPage",
+            value = "mainPage:summary:memberId",
+            allEntries = true
+    )
     @Transactional
     public void deleteByAdmin(
             List<Long> deleteAttendanceIdList, Members loginMember){
@@ -838,5 +851,12 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                     throw new AttendancesCustomException(
                             AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
         }
+    }
+
+    private List<Long> getMemberIdsByAttendanceIds(List<Long> deleteAttendanceIdList) {
+        return attendancesRepository.findAllById(deleteAttendanceIdList).stream()
+                .map(attendance -> attendance.getMember().getId())
+                .distinct()
+                .toList();
     }
 }

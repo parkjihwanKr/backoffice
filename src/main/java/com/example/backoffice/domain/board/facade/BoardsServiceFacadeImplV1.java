@@ -19,6 +19,8 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 import com.example.backoffice.domain.reaction.service.ReactionsServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -154,7 +156,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         Boards board = boardsService.findById(boardId);
         isMatchedBoardOwner(loginMember.getId(),board.getMember().getId());
         boardsService.deleteById(boardId);
-        viewCountService.deleteByBoardId(boardId);
+        viewCountService.deleteByBoardId(boardId, loginMember.getId());
     }
 
     @Override

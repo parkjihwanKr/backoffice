@@ -249,6 +249,12 @@ public class NotificationsServiceImplV1 implements NotificationsServiceV1 {
                 toMember, fromMember, board, comment, reply, event, message);
     }
 
+    @Override
+    public NotificationData toNotificationData(
+            Members toMember, Members fromMember, String message){
+        return NotificationsConverter.toNotificationData(
+                toMember, fromMember, message);
+    }
 
     private Notifications toEntity(NotificationData notificationData, String message, NotificationType domainType){
         return NotificationsConverter.toEntity(

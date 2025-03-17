@@ -16,7 +16,10 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
+import com.example.backoffice.global.redis.service.CacheMainPageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,8 +38,14 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     private final FilesServiceV1 filesService;
     private final EventsServiceV1 eventsService;
     private final VacationsServiceV1 vacationsService;
+    private final CacheMainPageService cacheMainPageService;
 
     @Override
+    @CacheEvict(
+            key = "#loginMember.getId()",
+            cacheManager = "cacheManagerForMainPage",
+            value = "mainPage:summary:memberId"
+    )
     @Transactional
     public EventsResponseDto.CreateOneDepartmentTypeDto createOneDepartmentType(
             String department, Members loginMember,
@@ -125,7 +134,10 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                 requestDto.getTitle(), requestDto.getDescription(),
                 event.getDepartment(), eventDateRangeDto.getDateRange().getStartDate(),
                 eventDateRangeDto.getDateRange().getEndDate(), EventType.DEPARTMENT);
-
+        List<Long> departmentMemberIdList
+                = membersService.findAllByDepartment(event.getDepartment()).stream()
+                .map(Members::getId).toList();
+        cacheMainPageService.evict(departmentMemberIdList);
         return EventsConverter.toUpdateOneForDepartmentEventDto(event);
     }
 
@@ -143,6 +155,11 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                 && !loginMember.getPosition().equals(MemberPosition.CEO)) {
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
         }
+
+        List<Long> departmentMemberIdList
+                = membersService.findAllByDepartment(event.getDepartment()).stream()
+                .map(Members::getId).toList();
+        cacheMainPageService.evict(departmentMemberIdList);
 
         // 이벤트 삭제
         eventsService.deleteById(eventId);

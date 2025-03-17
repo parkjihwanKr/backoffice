@@ -24,5 +24,5 @@ public interface ViewCountServiceV1 {
      * 게시글 삭제로 인하여 관련된 게시글 캐싱 삭제
      * @param boardId 삭제하려는 게시글 아이디
      */
-    void deleteByBoardId(Long boardId);
+    void deleteByBoardId(Long boardId, Long memberId);
 }

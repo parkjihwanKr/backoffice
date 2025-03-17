@@ -91,9 +91,19 @@ public interface BoardsServiceV1 {
      */
     List<Boards> findThreeByCreatedAtDesc(BoardType boardType);
 
+    /**
+     * 메인 페이지의 전체 게시글 상단의 3개 조회
+     * @param loginMember : 로그인 멤버
+     * @return 메인 페이지의 전체 게시글 상단의 3개 반환
+     */
     List<BoardsResponseDto.ReadSummaryOneDto> getGeneralBoardDtoList(
             Members loginMember);
 
+    /**
+     * 메인 페이지의 부서 게시글 상단의 3개 조회
+     * @param loginMember : 로그인 멤버
+     * @return 메인 페이지의 부서 게시글 상단의 3개 반환
+     */
     List<BoardsResponseDto.ReadSummaryOneDto> getDepartmentBoardDtoList(
             Members loginMember);
 }
