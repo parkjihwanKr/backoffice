@@ -2,7 +2,7 @@ package com.example.backoffice.global.redis.service;
 
 import com.example.backoffice.domain.vacation.entity.VacationPeriodProvider;
 
-public interface VacationPeriodCacheServiceV1 {
+public interface VacationPeriodServiceV1 {
     /**
      * 해당하는 휴가 정정 기간이 존재하는지
      * @param key : redis key

@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class UpdateVacationPeriodRepository {
+public class VacationPeriodRepository {
 
     private final ObjectMapper objectMapper;
 
     @Qualifier("redisTemplateForCacheData")
     private final RedisTemplate<String, Object> redisTemplateForCacheData;
 
-    public UpdateVacationPeriodRepository (
+    public VacationPeriodRepository(
             ObjectMapper objectMapper,
             @Qualifier("redisTemplateForCacheData") RedisTemplate<String, Object> redisTemplateForCacheData){
         this.objectMapper = objectMapper;
@@ -26,7 +26,7 @@ public class UpdateVacationPeriodRepository {
 
     public <T> void save(String key, Integer minutes, T value) {
         try {
-            redisTemplateForCacheData.opsForValue().set(key, value); // JSON 변환 제거
+            redisTemplateForCacheData.opsForValue().set(key, value);
             redisTemplateForCacheData.expire(key, minutes, TimeUnit.MINUTES);
         } catch (Exception e) {
             throw new JsonCustomException(GlobalExceptionCode.NOT_SERIALIZED_JSON);

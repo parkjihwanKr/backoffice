@@ -1,16 +1,15 @@
 package com.example.backoffice.global.redis.service;
 
-import com.example.backoffice.global.redis.repository.UpdateVacationPeriodRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.backoffice.global.redis.repository.VacationPeriodRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class VacationPeriodCacheServiceImplV1 implements VacationPeriodCacheServiceV1{
+public class VacationPeriodServiceImplV1 implements VacationPeriodServiceV1 {
 
-    private final UpdateVacationPeriodRepository vacationPeriodRepository;
+    private final VacationPeriodRepository vacationPeriodRepository;
 
     public boolean existsByKey(String key){
         return vacationPeriodRepository.existsByKey(key);

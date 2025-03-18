@@ -4,10 +4,7 @@ import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.VacationPeriod;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodProvider;
 import com.example.backoffice.global.date.DateTimeUtils;
-import com.example.backoffice.global.exception.GlobalExceptionCode;
-import com.example.backoffice.global.exception.JsonCustomException;
-import com.example.backoffice.global.redis.service.VacationPeriodCacheServiceImplV1;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.backoffice.global.redis.service.VacationPeriodServiceImplV1;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +24,7 @@ public class VacationPeriodInitializer {
     private boolean isSecure;
 
     private final VacationPeriodProvider vacationPeriodProvider;
-    private final VacationPeriodCacheServiceImplV1 vacationPeriodCacheService;
+    private final VacationPeriodServiceImplV1 vacationPeriodCacheService;
 
     // 최초의 한 번만 시행
     // 서버 시작 시 한 번만 실행되는 메서드

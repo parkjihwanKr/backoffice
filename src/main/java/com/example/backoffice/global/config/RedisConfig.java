@@ -28,6 +28,7 @@ public class RedisConfig {
     /**
      * database 0 : refresh token repository
      * database 1 : caching data repository
+     * database 2 : view count repository
      */
 
     @Value("${spring.data.redis.port}")
@@ -64,8 +65,7 @@ public class RedisConfig {
     @Primary
     public RedisCacheManager cacheManagerForMainPage(
             @Qualifier("redisConnectionFactoryForCacheData")
-            RedisConnectionFactory redisConnectionFactoryForCachedData,
-            ObjectMapper objectMapper) {
+            RedisConnectionFactory redisConnectionFactoryForCachedData) {
 
         Jackson2JsonRedisSerializer<MainPageResponseDto.ReadOneDto> serializer =
                 new Jackson2JsonRedisSerializer<>(MainPageResponseDto.ReadOneDto.class);
@@ -110,7 +110,8 @@ public class RedisConfig {
             @Qualifier("redisConnectionFactoryForViewCount")
             RedisConnectionFactory redisConnectionFactoryForViewCount) {
 
-        RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+        RedisCacheConfiguration cacheConfiguration
+                = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
         return RedisCacheManager.builder(redisConnectionFactoryForViewCount)
@@ -153,8 +154,7 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, VacationsResponseDto.ReadPeriodDto> redisTemplateForVacation(
             @Qualifier("redisConnectionFactoryForCacheData")
-            RedisConnectionFactory redisConnectionFactoryForCachedData,
-            ObjectMapper objectMapper) {
+            RedisConnectionFactory redisConnectionFactoryForCachedData) {
 
         RedisTemplate<String, VacationsResponseDto.ReadPeriodDto> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactoryForCachedData);

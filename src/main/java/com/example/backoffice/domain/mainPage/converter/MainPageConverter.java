@@ -39,12 +39,12 @@ public class MainPageConverter {
 
     public static MainPageResponseDto.SummaryExceptBoardDto toSummaryExceptBoardDto(
             List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList,
-            List<EventsResponseDto.ReadCompanySummaryOneDto> companyEventList,
+            List<EventsResponseDto.ReadCompanySummaryOneDto> companyEventDtoList,
             List<VacationsResponseDto.ReadSummaryOneDto> personalVacationList,
             List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceList){
         return MainPageResponseDto.SummaryExceptBoardDto.builder()
                 .personalFavoritesDtoList(personalFavoritesDtoList)
-                .companyEventDtoList(companyEventList)
+                .companyEventDtoList(companyEventDtoList)
                 .personalVacationDtoList(personalVacationList)
                 .personalAttendanceDtoList(personalAttendanceList)
                 .build();

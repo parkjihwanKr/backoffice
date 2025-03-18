@@ -16,7 +16,7 @@ import com.example.backoffice.domain.vacation.exception.VacationsCustomException
 import com.example.backoffice.domain.vacation.exception.VacationsExceptionCode;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import com.example.backoffice.global.date.DateTimeUtils;
-import com.example.backoffice.global.redis.service.VacationPeriodCacheServiceV1;
+import com.example.backoffice.global.redis.service.VacationPeriodServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,7 +35,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     private final MembersServiceV1 membersService;
     private final NotificationsServiceV1 notificationsService;
     private final VacationsServiceV1 vacationsService;
-    private final VacationPeriodCacheServiceV1 vacationPeriodCacheService;
+    private final VacationPeriodServiceV1 vacationPeriodCacheService;
     private final VacationPeriodProvider vacationPeriodProvider;
 
     @CacheEvict(

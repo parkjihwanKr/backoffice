@@ -168,6 +168,12 @@ public class DateTimeUtils {
                 year.intValue(), month.intValue(), day.intValue(), 0, 0, 0);
     }
 
+    public static LocalDateTime of(int year, int month, int day, int hour, int minute, int second){
+        validateYearAndMonth((long)year, (long)month);
+        return LocalDateTime.of(
+                year, month, day, hour, minute, second);
+    }
+
     public static LocalDateTime formattedOf(Long year, Long month, Long day){
         validateYearAndMonth(year, month);
         LocalDateTime dateTime

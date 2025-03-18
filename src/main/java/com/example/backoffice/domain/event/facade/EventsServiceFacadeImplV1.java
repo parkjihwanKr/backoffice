@@ -16,6 +16,7 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
+import com.example.backoffice.global.date.DateTimeUtils;
 import com.example.backoffice.global.redis.service.CacheMainPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -174,16 +175,16 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
         // 해당하는 기간의 시작일과 종료일 계산
         LocalDateTime startDate
-                = LocalDateTime.of(
-                        year.intValue(), month.intValue(), 1, 0, 0);
+                = DateTimeUtils.of(year, month, 1L);
         YearMonth yearMonth
                 = YearMonth.of(year.intValue(), month.intValue());
         LocalDateTime endDate
-                = LocalDateTime.of(
-                        year.intValue(), month.intValue(),
-                yearMonth.lengthOfMonth(), 23, 59, 59);
+                = DateTimeUtils.of(
+                        year.intValue(), month.intValue(), yearMonth.lengthOfMonth(),
+                23, 59, 59);
 
-        List<EventsResponseDto.ReadOnePersonalScheduleDto> responseDtoList = new ArrayList<>();
+        List<EventsResponseDto.ReadOnePersonalScheduleDto> responseDtoList
+                = new ArrayList<>();
 
         // 해당 부서의 모든 일정 조회
         List<Events> departmentEventList
