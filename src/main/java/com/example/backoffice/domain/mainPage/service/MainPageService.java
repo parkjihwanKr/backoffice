@@ -60,13 +60,13 @@ public class MainPageService {
         return responseDto;
     }
 
-    public MainPageResponseDto.SummaryBoardDto readBoard(Members loginMember){
+    public MainPageResponseDto.SummarizedBoardDto readSummarizedBoard(Members loginMember){
         // 2. 전체 게시판 ResponseDto
-        List<BoardsResponseDto.ReadSummaryOneDto> generalBoardDtoList
+        List<BoardsResponseDto.ReadSummarizedOneDto> generalBoardDtoList
                 = boardsService.getGeneralBoardDtoList(loginMember);
 
         // 3. 부서 게시판 ResponseDto
-        List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardDtoList
+        List<BoardsResponseDto.ReadSummarizedOneDto> departmentBoardDtoList
                 = boardsService.getDepartmentBoardDtoList(loginMember);
 
         return MainPageConverter.toSummaryBoardDto(

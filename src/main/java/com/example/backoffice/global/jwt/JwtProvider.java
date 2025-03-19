@@ -193,7 +193,7 @@ public class JwtProvider {
         // ExpiredJwtException
         String memberName = getUsernameFromToken(refreshTokenValue);
 
-        String redisKey = REFRESH_TOKEN_HEADER+" : "+memberName;
+        String redisKey = REFRESH_TOKEN_HEADER+":"+memberName;
         String redisValue = tokenRedisProvider.getRefreshTokenValue(redisKey);
 
         if (refreshToken == null || redisValue == null){

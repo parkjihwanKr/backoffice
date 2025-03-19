@@ -8,7 +8,6 @@ import com.example.backoffice.global.redis.repository.RefreshTokenRepository;
 import com.example.backoffice.global.security.CustomLogoutHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,9 +28,6 @@ import java.util.Arrays;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-
-    @Value("${server.port}")
-    private String deploymentPort;
 
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository tokenRedisProvider;
@@ -74,8 +70,6 @@ public class WebSecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(request -> {
                             CorsConfiguration configuration = new CorsConfiguration();
-
-                            // 테스트를 위한 임시로 접근 url을 모두 허용
                             configuration.setAllowedOriginPatterns(
                                     Arrays.asList(
                                             "http://localhost:3000", "http://localhost:8080",

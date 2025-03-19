@@ -18,8 +18,8 @@ public class MainPageProxyService {
     public MainPageResponseDto.ReadOneDto read(Members loginMember) {
         MainPageResponseDto.SummaryExceptBoardDto summaryExceptBoardDtoList =
                 mainPageService.readSummaryExceptBoard(loginMember);
-        MainPageResponseDto.SummaryBoardDto summaryBoardDtoList
-                = mainPageService.readBoard(loginMember);
+        MainPageResponseDto.SummarizedBoardDto summaryBoardDtoList
+                = mainPageService.readSummarizedBoard(loginMember);
 
         return MainPageConverter.toMainPageResponseDto(
                 summaryExceptBoardDtoList.getPersonalFavoritesDtoList(),

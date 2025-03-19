@@ -105,6 +105,9 @@ public class RedisConfig {
                 .build();
     }
 
+    // 추가적으로 Object의 저장 가능성이 존재하기에
+    // @Cacheable과 같은 Spring boot 환경에서는
+    // GenericJackson2JsonRedisSerializer 방식을 유지
     @Bean
     public RedisCacheManager cacheManagerForViewCount(
             @Qualifier("redisConnectionFactoryForViewCount")
@@ -112,7 +115,8 @@ public class RedisConfig {
 
         RedisCacheConfiguration cacheConfiguration
                 = RedisCacheConfiguration.defaultCacheConfig()
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
+                        new GenericJackson2JsonRedisSerializer()));
 
         return RedisCacheManager.builder(redisConnectionFactoryForViewCount)
                 .cacheDefaults(cacheConfiguration)
@@ -168,13 +172,13 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplateForViewCount(
+    public RedisTemplate<String, String> redisTemplateForViewCount(
             @Qualifier("redisConnectionFactoryForViewCount")
             JedisConnectionFactory redisConnectionFactoryForViewCount) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactoryForViewCount);
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
         return template;
     }
 }

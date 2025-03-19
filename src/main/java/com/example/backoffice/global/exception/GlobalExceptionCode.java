@@ -27,8 +27,7 @@ public enum GlobalExceptionCode {
     NOT_EXIST_JWT_STATUS(HttpStatus.BAD_REQUEST, "JWT-006", "존재하지 않는 JWT STATUS입니다."),
     TOKEN_VALUE_IS_NULL(HttpStatus.BAD_REQUEST, "JWT-007", "토큰 값이 null입니다."),
     NOT_FOUND_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "JWT-008",
-            "Refresh Token이 Redis에 존재하지 않습니다." +
-                    "다시 로그인해주세요."),
+            "Refresh Token이 존재하지 않습니다. 다시 로그인해주세요."),
 
     // Authentcation
     NOT_MATCHED_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "AUTH-001", "해당 인증 정보가 일치하지 않습니다."),

@@ -96,7 +96,7 @@ public interface BoardsServiceV1 {
      * @param loginMember : 로그인 멤버
      * @return 메인 페이지의 전체 게시글 상단의 3개 반환
      */
-    List<BoardsResponseDto.ReadSummaryOneDto> getGeneralBoardDtoList(
+    List<BoardsResponseDto.ReadSummarizedOneDto> getGeneralBoardDtoList(
             Members loginMember);
 
     /**
@@ -104,6 +104,6 @@ public interface BoardsServiceV1 {
      * @param loginMember : 로그인 멤버
      * @return 메인 페이지의 부서 게시글 상단의 3개 반환
      */
-    List<BoardsResponseDto.ReadSummaryOneDto> getDepartmentBoardDtoList(
+    List<BoardsResponseDto.ReadSummarizedOneDto> getDepartmentBoardDtoList(
             Members loginMember);
 }

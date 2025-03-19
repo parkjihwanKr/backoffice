@@ -1,4 +1,4 @@
-package com.example.backoffice.domain.board.service;
+package com.example.backoffice.global.redis.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.entity.Members;

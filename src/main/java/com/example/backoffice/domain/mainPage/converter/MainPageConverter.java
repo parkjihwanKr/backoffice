@@ -13,8 +13,8 @@ public class MainPageConverter {
 
     public static MainPageResponseDto.ReadOneDto toMainPageResponseDto(
             List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList,
-            List<BoardsResponseDto.ReadSummaryOneDto> generalBoardList,
-            List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardList,
+            List<BoardsResponseDto.ReadSummarizedOneDto> generalBoardList,
+            List<BoardsResponseDto.ReadSummarizedOneDto> departmentBoardList,
             List<EventsResponseDto.ReadCompanySummaryOneDto> companyEventList,
             List<VacationsResponseDto.ReadSummaryOneDto> personalVacationList,
             List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceList){
@@ -28,10 +28,10 @@ public class MainPageConverter {
                 .build();
     }
 
-    public static MainPageResponseDto.SummaryBoardDto toSummaryBoardDto(
-            List<BoardsResponseDto.ReadSummaryOneDto> generalBoardList,
-            List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardList){
-        return MainPageResponseDto.SummaryBoardDto.builder()
+    public static MainPageResponseDto.SummarizedBoardDto toSummaryBoardDto(
+            List<BoardsResponseDto.ReadSummarizedOneDto> generalBoardList,
+            List<BoardsResponseDto.ReadSummarizedOneDto> departmentBoardList){
+        return MainPageResponseDto.SummarizedBoardDto.builder()
                 .generalBoardDtoList(generalBoardList)
                 .departmentBoardDtoList(departmentBoardList)
                 .build();

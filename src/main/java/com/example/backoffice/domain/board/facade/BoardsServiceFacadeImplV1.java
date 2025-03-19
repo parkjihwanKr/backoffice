@@ -9,7 +9,6 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.service.BoardsServiceV1;
-import com.example.backoffice.domain.board.service.ViewCountServiceV1;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.service.FilesServiceV1;
 import com.example.backoffice.domain.member.converter.MembersConverter;
@@ -18,9 +17,8 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 import com.example.backoffice.domain.reaction.service.ReactionsServiceV1;
+import com.example.backoffice.global.redis.service.ViewCountServiceV1;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -38,9 +36,9 @@ import java.util.stream.Collectors;
 public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     private final BoardsServiceV1 boardsService;
+    private final ViewCountServiceV1 viewCountService;
     private final ReactionsServiceV1 reactionsService;
     private final FilesServiceV1 filesService;
-    private final ViewCountServiceV1 viewCountService;
 
     @Override
     @Transactional(readOnly = true)

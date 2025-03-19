@@ -103,7 +103,7 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     @Override
     @Cacheable(
             cacheManager = "cacheManagerForVacationPeriod",
-            value = "Upcoming", // Redis 캐시 네임
+            value = "Upcoming",
             key = "'VacationPeriod:' + T(com.example.backoffice.global.date.DateTimeUtils).getCurrentDateTime().getYear()" +
                     " + ':' + T(com.example.backoffice.global.date.DateTimeUtils).getFormattedMonth()"
     )

@@ -213,9 +213,9 @@ public class BoardsConverter {
                 .build();
     }
 
-    public static BoardsResponseDto.ReadSummaryOneDto toSummaryOneDto(
+    public static BoardsResponseDto.ReadSummarizedOneDto toSummarizedOneDto(
             Boards board, Long viewCount){
-        return BoardsResponseDto.ReadSummaryOneDto.builder()
+        return BoardsResponseDto.ReadSummarizedOneDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
                 .author(board.getMember().getMemberName())
@@ -238,7 +238,7 @@ public class BoardsConverter {
         }
         throw new BoardsCustomException(BoardsExceptionCode.NOT_EQUALS_LIST_SIZE);
     }*/
-    public static List<BoardsResponseDto.ReadSummaryOneDto> toReadSummaryListDto(
+    public static List<BoardsResponseDto.ReadSummarizedOneDto> toReadSummarizedListDto(
         List<Boards> boardList, List<Long> viewCountList) {
     if (boardList.size() != viewCountList.size()) {
         throw new BoardsCustomException(BoardsExceptionCode.NOT_EQUALS_LIST_SIZE);
@@ -246,7 +246,7 @@ public class BoardsConverter {
 
     // Stream API를 사용하여 더 간결하게 작성
     return IntStream.range(0, boardList.size())
-            .mapToObj(i -> BoardsConverter.toSummaryOneDto(boardList.get(i), viewCountList.get(i)))
+            .mapToObj(i -> BoardsConverter.toSummarizedOneDto(boardList.get(i), viewCountList.get(i)))
             .collect(Collectors.toList());
     }
 

@@ -77,14 +77,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 }
             } catch (JwtCustomException e) {
                 log.error("JWT Validation Error: {}", e.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+
+                String jsonResponse = String.format("{\"errorCode\": \"%s\", \"message\": \"%s\"}",
+                        e.getErrorCode(), e.getMessage());
+
+                response.getWriter().write(jsonResponse);
                 return;
             }
         }else{
             try {
                 String accessTokenValue
                         = cookieUtil.getJwtTokenFromCookie(request, true);
-                // String accessTokenValue = jwtProvider.getJwtFromHeader(request);
                 JwtStatus jwtStatus = validateToken(accessTokenValue);
 
                 switch (jwtStatus) {
@@ -94,7 +100,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 }
             } catch (JwtCustomException e) {
                 log.error("JWT Validation Error: {}", e.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+
+                String jsonResponse = String.format("{\"errorCode\": \"%s\", \"message\": \"%s\"}",
+                        e.getErrorCode(), e.getMessage());
+
+                response.getWriter().write(jsonResponse);
                 return;
             }
         }
@@ -153,7 +166,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // Refresh Token에서 인증 정보 추출
         Authentication authentication = jwtProvider.getAuthentication(refreshTokenValue);
         String username = authentication.getName();
-        String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
+        String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+":"+username;
         // Redis에 해당 Refresh Token이 존재하는지 검증
         if (refreshTokenRepository.existsByKey(redisKey)) {
             MemberRole role

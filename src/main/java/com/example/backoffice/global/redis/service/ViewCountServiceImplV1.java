@@ -1,17 +1,20 @@
-package com.example.backoffice.domain.board.service;
+package com.example.backoffice.global.redis.service;
 
 import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.member.entity.Members;
-import com.example.backoffice.global.redis.utils.RedisProvider;
 import com.example.backoffice.global.redis.repository.ViewCountRepository;
+import com.example.backoffice.global.redis.utils.RedisProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
-public class ViewCountServiceImplV1 implements ViewCountServiceV1{
+public class ViewCountServiceImplV1 implements ViewCountServiceV1 {
 
     private final ViewCountRepository viewCountRepository;
 
@@ -22,10 +25,8 @@ public class ViewCountServiceImplV1 implements ViewCountServiceV1{
                 = RedisProvider.BOARD_ID_PREFIX+ board.getId()
                 + ":" + RedisProvider.MEMBER_ID_PREFIX+loginMember.getId();
 
-        Long currentCount = viewCountRepository.getViewCount(key);
-        if (currentCount == null) {
-            currentCount = 0L;
-        }
+        String currentCountToString = viewCountRepository.getViewCount(key);
+        long currentCount = parseLong(currentCountToString);
 
         if (board.getMember().getId().equals(loginMember.getId())) {
             if (currentCount < 1) {
@@ -41,12 +42,23 @@ public class ViewCountServiceImplV1 implements ViewCountServiceV1{
     @Override
     @Transactional
     public Long getTotalViewCountByBoardId(Long boardId){
-        return viewCountRepository.getTotalViewCountByBoardId(boardId);
+        Set<String> stringSetByBoardId
+                = viewCountRepository.getStringSetByBoardId(boardId);
+        List<String> viewCounts
+                = viewCountRepository.getViewCountsByKeys(stringSetByBoardId);
+
+        return viewCounts.stream()
+                .map(Long::parseLong)
+                .reduce(0L, Long::sum);
     }
 
     @CacheEvict(value = "viewCount", key = "'boardId:' + #boardId + ':memberId:' + #loginMemberId")
     @Transactional
     public void deleteByBoardId(Long boardId, Long loginMemberId) {
         viewCountRepository.deleteByBoardId(boardId);
+    }
+
+    private Long parseLong(String currentCountToString){
+        return currentCountToString != null ? Long.parseLong(currentCountToString) : 0L;
     }
 }

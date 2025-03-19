@@ -52,13 +52,16 @@ public class GlobalExceptionHandler {
 
     // JWT TOKEN 관련 커스텀 예외 처리
     @ExceptionHandler(JwtCustomException.class)
-    public ResponseEntity<CommonResponseDto<String>> handleJwtException(JwtCustomException ex) {
+    public ResponseEntity<CommonResponseDto<String>> handleJwtException(
+            JwtCustomException ex) {
         CommonResponseDto<String> errorResponse = new CommonResponseDto<>(
                 ex.getErrorCode(),  // 에러 코드
                 ex.getMessage(),    // 에러 메시지
                 ex.getHttpStatus().value()  // 상태 코드 설정
         );
-        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+        return ResponseEntity
+                .status(ex.getHttpStatus())
+                .body(errorResponse);
     }
 
     // 근태 관련 커스텀 예외 처리

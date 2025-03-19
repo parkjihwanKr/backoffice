@@ -35,9 +35,9 @@ public class MainPageResponseDto {
     @AllArgsConstructor
     @Schema(name = "SummaryBoardDto",
             description = "메인 페이지 게시글 응답 DTO")
-    public static class SummaryBoardDto {
-        private List<BoardsResponseDto.ReadSummaryOneDto> generalBoardDtoList;
-        private List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardDtoList;
+    public static class SummarizedBoardDto {
+        private List<BoardsResponseDto.ReadSummarizedOneDto> generalBoardDtoList;
+        private List<BoardsResponseDto.ReadSummarizedOneDto> departmentBoardDtoList;
     }
 
     @Getter
@@ -48,8 +48,8 @@ public class MainPageResponseDto {
             description = "메인 페이지 응답 DTO")
     public static class ReadOneDto {
         private List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList;
-        private List<BoardsResponseDto.ReadSummaryOneDto> generalBoardDtoList;
-        private List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardDtoList;
+        private List<BoardsResponseDto.ReadSummarizedOneDto> generalBoardDtoList;
+        private List<BoardsResponseDto.ReadSummarizedOneDto> departmentBoardDtoList;
         private List<EventsResponseDto.ReadCompanySummaryOneDto> companyEventDtoList;
         private List<VacationsResponseDto.ReadSummaryOneDto> personalVacationDtoList;
         private List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceDtoList;

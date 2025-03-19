@@ -86,7 +86,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 accessCookie.getName(), accessCookie.getValue(), accessCookie.getMaxAge(), accessCookie.getSameSite());
         ResponseCookie refreshCookie = null;
         // Refresh Token Cookie settings
-        String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+" : "+username;
+        String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+":"+username;
 
         boolean existRefreshToken
                 = tokenRedisProvider.existsByKey(redisKey);
