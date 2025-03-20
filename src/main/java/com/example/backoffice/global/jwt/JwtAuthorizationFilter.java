@@ -4,6 +4,7 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.redis.repository.RefreshTokenRepository;
+import com.example.backoffice.global.redis.utils.RedisProvider;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -125,7 +126,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private void successValidatedToken(String accessToken) {
         Authentication authentication = jwtProvider.getAuthentication(accessToken);
         String authName = authentication.getName();
-        String refreshTokenKey = JwtProvider.REFRESH_TOKEN_HEADER + " : " + authName;
+        String refreshTokenKey = RedisProvider.REFRESH_TOKEN_PREFIX + authName;
         // RefreshToken : name
         if (!refreshTokenRepository.existsByKey(refreshTokenKey)) {
             throw new JwtCustomException(GlobalExceptionCode.NOT_FOUND_REFRESH_TOKEN);
@@ -139,7 +140,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         Authentication authentication
                 = jwtProvider.getAuthentication(accessTokenValue);
         String refreshTokenKey
-                = JwtProvider.REFRESH_TOKEN_HEADER + " : " + authentication.getName();
+                = RedisProvider.REFRESH_TOKEN_PREFIX + authentication.getName();
         String refreshTokenValue
                 = refreshTokenRepository.getRefreshTokenValue(refreshTokenKey);
         JwtStatus jwtStatus = validateToken(refreshTokenValue);

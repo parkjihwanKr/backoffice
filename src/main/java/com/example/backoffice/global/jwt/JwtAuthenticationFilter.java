@@ -6,6 +6,7 @@ import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.dto.TokenDto;
 import com.example.backoffice.global.redis.repository.RefreshTokenRepository;
+import com.example.backoffice.global.redis.utils.RedisProvider;
 import com.example.backoffice.global.security.MemberDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -23,13 +24,14 @@ import java.io.IOException;
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtProvider jwtProvider;
-    private final RefreshTokenRepository tokenRedisProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final CookieUtil cookieUtil;
+
     public JwtAuthenticationFilter(
-            JwtProvider jwtProvider, RefreshTokenRepository tokenRedisProvider,
+            JwtProvider jwtProvider, RefreshTokenRepository refreshTokenRepository,
             CookieUtil cookieUtil) {
         this.jwtProvider = jwtProvider;
-        this.tokenRedisProvider = tokenRedisProvider;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.cookieUtil = cookieUtil;
         setFilterProcessesUrl("/api/v1/login");
     }
@@ -89,7 +91,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+":"+username;
 
         boolean existRefreshToken
-                = tokenRedisProvider.existsByKey(redisKey);
+                = refreshTokenRepository.existsByKey(redisKey);
         if(!existRefreshToken){
             refreshCookie
                     = cookieUtil.createCookie(
@@ -99,14 +101,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             log.info("Created Refresh Token Cookie: Name = {}, Value = {}, Max-Age = {}, SameSite = {}",
                     refreshCookie.getName(), refreshCookie.getValue(), refreshCookie.getMaxAge(), refreshCookie.getSameSite());
 
-            tokenRedisProvider.saveToken(
-                    refreshCookie.getName()+ " : " + username,
+            refreshTokenRepository.saveToken(
+                    RedisProvider.REFRESH_TOKEN_PREFIX + username,
                     Math.toIntExact(
                             jwtProvider.getRefreshTokenExpiration()),
                     tokenDto.getRefreshToken());
         }else {
             String redisValue
-                    = tokenRedisProvider.getRefreshTokenValue(redisKey);
+                    = refreshTokenRepository.getRefreshTokenValue(redisKey);
             if (redisValue != null) {  // 가져온 값이 null이 아닐 때만 쿠키 생성
                 refreshCookie = cookieUtil.createCookie(
                         JwtProvider.REFRESH_TOKEN_HEADER, redisValue,
