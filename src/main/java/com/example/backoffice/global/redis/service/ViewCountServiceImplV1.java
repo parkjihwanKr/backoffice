@@ -42,14 +42,17 @@ public class ViewCountServiceImplV1 implements ViewCountServiceV1 {
     @Override
     @Transactional
     public Long getTotalViewCountByBoardId(Long boardId){
-        Set<String> stringSetByBoardId
-                = viewCountRepository.getStringSetByBoardId(boardId);
-        List<String> viewCounts
-                = viewCountRepository.getViewCountsByKeys(stringSetByBoardId);
+        Long viewCount = calculateViewCount(boardId);
+        if(viewCount >= 51){
+            return 51L;
+        }
+        return viewCount;
+    }
 
-        return viewCounts.stream()
-                .map(Long::parseLong)
-                .reduce(0L, Long::sum);
+    @Override
+    @Transactional
+    public Long clickTotalViewCountByBoardId(Long boardId){
+        return calculateViewCount(boardId);
     }
 
     @CacheEvict(value = "viewCount", key = "'boardId:' + #boardId + ':memberId:' + #loginMemberId")
@@ -58,6 +61,15 @@ public class ViewCountServiceImplV1 implements ViewCountServiceV1 {
         viewCountRepository.deleteByBoardId(boardId);
     }
 
+    private Long calculateViewCount(Long boardId){
+        Set<String> stringSetByBoardId
+                = viewCountRepository.getStringSetByBoardId(boardId);
+        List<String> viewCounts
+                = viewCountRepository.getViewCountsByKeys(stringSetByBoardId);
+        return viewCounts.stream()
+                .map(Long::parseLong)
+                .reduce(0L, Long::sum);
+    }
     private Long parseLong(String currentCountToString){
         return currentCountToString != null ? Long.parseLong(currentCountToString) : 0L;
     }

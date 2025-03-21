@@ -37,11 +37,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     // 타당성 검사 추가
     @Override
-    @CacheEvict(
-            value = "membersByRole",
-            cacheManager = "cacheManagerForMainPage",
-            key = "#loginMember.getRole()"
-    )
     @Transactional
     public MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto){
@@ -120,11 +115,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
 
     @Override
-    @CacheEvict(
-            value = "membersByRole",
-            cacheManager = "cacheManagerForMainPage",
-            key = "#loginMember.getRole()"
-    )
     @Transactional
     public MembersResponseDto.UpdateOneDto updateOne(
             Long memberId, Members loginMember,
@@ -166,11 +156,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @CacheEvict(
-            value = "membersByRole",
-            cacheManager = "cacheManagerForMainPage",
-            key = "#loginMember.getRole()"
-    )
     @Transactional
     public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttributeByAdmin(
             Long memberId, Members loginMember,
@@ -293,11 +278,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @CacheEvict(
-            value = "membersByRole",
-            cacheManager = "cacheManagerForMainPage",
-            key = "#loginMember.getRole()"
-    )
     @Transactional
     public void deleteOneByAdmin(Long memberId, Members loginMember){
         membersService.findHRManagerOrCEO(loginMember);
@@ -349,10 +329,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Cacheable(
-            value = "membersByRole",
-            cacheManager = "cacheManagerForMainPage",
-            key = "#loginMember.getRole()")
     @Transactional(readOnly = true)
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
         membersService.hasAdminAccess(loginMember.getRole());

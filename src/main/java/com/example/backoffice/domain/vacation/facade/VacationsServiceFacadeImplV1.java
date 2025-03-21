@@ -38,6 +38,44 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     private final VacationPeriodServiceV1 vacationPeriodCacheService;
     private final VacationPeriodProvider vacationPeriodProvider;
 
+/*    @PostConstruct
+    @Transactional
+    public void test() {
+        List<Members> memberList = membersService.findAll();
+
+        for (int i = 0; i < 2000; i++) {
+            LocalDate startDate = getRandomDate();
+            LocalDate endDate = startDate.plusDays(ThreadLocalRandom.current().nextInt(1, 6)); // 1~5일 랜덤
+
+            VacationType vacationType = switch (i % 3) {
+                case 0 -> VacationType.SICK_LEAVE;
+                case 1 -> VacationType.ANNUAL_LEAVE;
+                default -> VacationType.URGENT_LEAVE;
+            };
+
+            boolean urgent = (vacationType != VacationType.ANNUAL_LEAVE); // ANNUAL_LEAVE면 false, 아니면 true
+            Members assignedMember = memberList.get(i % memberList.size()); // 순환 배정
+
+            vacationsService.save(
+                    VacationsConverter.toEntity(
+                            "title" + i,
+                            "reason" + i,
+                            VacationsConverter.toVacationDateRangeDto(startDate.atStartOfDay(), endDate.atStartOfDay()),
+                            vacationType,
+                            urgent,
+                            assignedMember
+                    )
+            );
+        }
+    }
+
+    private LocalDate getRandomDate() {
+        LocalDate start = LocalDate.of(2024, 3, 1);
+        LocalDate end = LocalDate.of(2025, 2, 28);
+        long randomDays = ThreadLocalRandom.current().nextLong(ChronoUnit.DAYS.between(start, end));
+        return start.plusDays(randomDays);
+    }*/
+
     @CacheEvict(
             value = "Upcoming",
             key = "'VacationPeriod:' + " +

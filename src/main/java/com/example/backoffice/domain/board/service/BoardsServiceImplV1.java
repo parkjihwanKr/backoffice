@@ -86,6 +86,14 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Boards> findTop3ByBoardTypeAndDepartmentOrderByCreatedAtDesc(
+            BoardType boardType, MemberDepartment department) {
+        return boardsRepository.findTop3ByBoardTypeAndDepartmentOrderByCreatedAtDesc(
+                boardType, department);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<BoardsResponseDto.ReadSummarizedOneDto> getGeneralBoardDtoList(Members loginMember) {
         List<Boards> generalBoardList
                 = findThreeByCreatedAtDesc(BoardType.GENERAL);
@@ -104,7 +112,8 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
     public List<BoardsResponseDto.ReadSummarizedOneDto> getDepartmentBoardDtoList(
             Members loginMember) {
         List<Boards> departmentBoardList
-                = findThreeByCreatedAtDesc(BoardType.DEPARTMENT);
+                = findTop3ByBoardTypeAndDepartmentOrderByCreatedAtDesc(
+                        BoardType.DEPARTMENT, loginMember.getDepartment());
         List<Long> departmentBoardViewCountList = new ArrayList<>();
         for(Boards board : departmentBoardList){
             departmentBoardViewCountList.add(

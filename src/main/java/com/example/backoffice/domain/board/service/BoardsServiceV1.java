@@ -92,6 +92,15 @@ public interface BoardsServiceV1 {
     List<Boards> findThreeByCreatedAtDesc(BoardType boardType);
 
     /**
+     * 게시글 타입과 로그인 사용자 부서에 따른 게시글 3개 조회
+     * @param boardType : 부서 타입의 게시글
+     * @param department : 로그인 사용자의 부서
+     * @return 게시글 타입과 로그인 사용자 부서에 따른 게시글 3개
+     */
+    List<Boards> findTop3ByBoardTypeAndDepartmentOrderByCreatedAtDesc(
+            BoardType boardType, MemberDepartment department);
+
+    /**
      * 메인 페이지의 전체 게시글 상단의 3개 조회
      * @param loginMember : 로그인 멤버
      * @return 메인 페이지의 전체 게시글 상단의 3개 반환

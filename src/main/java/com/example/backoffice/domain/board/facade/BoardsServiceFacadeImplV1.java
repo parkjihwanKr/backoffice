@@ -372,4 +372,11 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
         return BoardsConverter.toUpdateOneDto(board, afterFileUrlList);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long readOneTotalViewCount(Long boardId, Members loginMember) {
+        boardsService.findById(boardId);
+        return viewCountService.clickTotalViewCountByBoardId(boardId);
+    }
 }

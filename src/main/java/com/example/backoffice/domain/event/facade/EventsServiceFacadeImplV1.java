@@ -18,6 +18,7 @@ import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import com.example.backoffice.global.date.DateTimeUtils;
 import com.example.backoffice.global.redis.service.CacheMainPageService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -28,8 +29,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @RequiredArgsConstructor
@@ -40,6 +43,46 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     private final EventsServiceV1 eventsService;
     private final VacationsServiceV1 vacationsService;
     private final CacheMainPageService cacheMainPageService;
+
+/*    @PostConstruct
+    @Transactional
+    public void test() {
+        for (int i = 0; i < 500; i++) {
+            Members[] members = {
+                    membersService.findById(1L), // ceo
+                    membersService.findById(2L), // hrManager
+                    membersService.findById(3L), // itManager
+                    membersService.findById(4L), // auditManager
+                    membersService.findById(5L)  // salesManager
+            };
+
+            Members selectedMember = members[i % 5]; // 5배수 로테이션
+            EventType eventType = (i % 2 == 0) ? EventType.COMPANY : EventType.DEPARTMENT;
+
+            LocalDateTime startDate = getRandomDate();
+            LocalDateTime endDate = startDate.plusDays(ThreadLocalRandom.current().nextInt(1, 10));
+
+            eventsService.save(
+                    EventsConverter.toEntity(
+                            "title" + i,
+                            "description" + i,
+                            EventsConverter.toEventDateRangeDto(startDate, endDate),
+                            selectedMember,
+                            selectedMember.getDepartment(),
+                            eventType
+                    )
+            );
+        }
+    }
+
+    private LocalDateTime getRandomDate() {
+        LocalDateTime start = LocalDateTime.of(2024, 3, 1, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 3, 1, 0, 0);
+        long randomDays
+                = ThreadLocalRandom.current().nextLong(
+                        ChronoUnit.DAYS.between(start, end));
+        return start.plusDays(randomDays);
+    }*/
 
     @Override
     @CacheEvict(

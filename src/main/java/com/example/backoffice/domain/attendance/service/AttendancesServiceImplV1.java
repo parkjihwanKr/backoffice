@@ -852,11 +852,4 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
                             AttendancesExceptionCode.NOT_FOUND_ATTENDANCE_STATUS);
         }
     }
-
-    private List<Long> getMemberIdsByAttendanceIds(List<Long> deleteAttendanceIdList) {
-        return attendancesRepository.findAllById(deleteAttendanceIdList).stream()
-                .map(attendance -> attendance.getMember().getId())
-                .distinct()
-                .toList();
-    }
 }
