@@ -19,7 +19,6 @@ import com.example.backoffice.global.date.DateTimeUtils;
 import com.example.backoffice.global.redis.service.VacationPeriodServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -139,12 +138,6 @@ public class VacationsServiceFacadeImplV1 implements VacationsServiceFacadeV1{
     }
 
     @Override
-    @Cacheable(
-            cacheManager = "cacheManagerForVacationPeriod",
-            value = "Upcoming",
-            key = "'VacationPeriod:' + T(com.example.backoffice.global.date.DateTimeUtils).getCurrentDateTime().getYear()" +
-                    " + ':' + T(com.example.backoffice.global.date.DateTimeUtils).getFormattedMonth()"
-    )
     @Transactional(readOnly = true)
     public VacationsResponseDto.ReadPeriodDto readUpcomingUpdateVacationPeriod(Members loginMember) {
         membersService.findById(loginMember.getId());
