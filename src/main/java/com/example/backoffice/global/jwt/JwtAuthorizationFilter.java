@@ -164,37 +164,31 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private void makeNewAccessToken(String refreshTokenValue, HttpServletResponse response, JwtStatus jwtStatus) throws UnsupportedEncodingException {
-        // Refresh Token에서 인증 정보 추출
         Authentication authentication = jwtProvider.getAuthentication(refreshTokenValue);
         String username = authentication.getName();
         String redisKey = JwtProvider.REFRESH_TOKEN_HEADER+":"+username;
-        // Redis에 해당 Refresh Token이 존재하는지 검증
+
         if (refreshTokenRepository.existsByKey(redisKey)) {
-            MemberRole role
-                    = ((MemberDetailsImpl) authentication.getPrincipal()).getMembers().getRole();
+            MemberRole role = ((MemberDetailsImpl) authentication.getPrincipal()).getMembers().getRole();
 
-            // 새 Access Token 생성
             String newAccessToken = jwtProvider.createToken(username, role).getAccessToken();
-            String accessToken
-                    = URLEncoder.encode(newAccessToken, "utf-8")
-                    .replaceAll("\\+", "%20");
+            String accessToken = URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");
 
-            ResponseCookie accessCookie
-                    = cookieUtil.createCookie(
-                            JwtProvider.ACCESS_TOKEN_HEADER, accessToken,
+            ResponseCookie accessCookie = cookieUtil.createCookie(
+                    JwtProvider.ACCESS_TOKEN_HEADER, accessToken,
                     jwtProvider.getAccessTokenExpiration());
             response.addHeader("Set-Cookie", accessCookie.toString());
 
             String refreshCookie = refreshTokenRepository.getRefreshTokenValue(redisKey);
             response.addHeader("Set-Cookie", refreshCookie);
 
+            refreshTokenRepository.deleteToken(redisKey);
+
             log.info("accessCookie : "+accessCookie + " / refreshCookie : "+refreshCookie);
-            // 원래 사용자 데이터도 함께 반환
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            String jsonResponse
-                    = String.format(
-                            "{\"accessToken\":\"%s\", \"username\":\"%s\"}",
+            String jsonResponse = String.format(
+                    "{\"accessToken\":\"%s\", \"username\":\"%s\"}",
                     newAccessToken, username);
             try{
                 response.getWriter().write(jsonResponse);
@@ -210,7 +204,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // Refresh Token에서 인증 정보 추출
         Authentication authentication = jwtProvider.getAuthentication(refreshTokenValue);
         String username = authentication.getName();
-        String redisKey = JwtProvider.REFRESH_TOKEN_HEADER + " : " + username;
+        String redisKey = JwtProvider.REFRESH_TOKEN_HEADER + ":" + username;
         // Redis에 해당 Refresh Token이 존재하는지 검증
         if (refreshTokenRepository.existsByKey(redisKey)) {
             MemberRole role
@@ -232,8 +226,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                             JwtProvider.REFRESH_TOKEN_HEADER, refreshTokenValue,
                     jwtProvider.getRefreshTokenExpiration());
             response.addHeader("Set-Cookie", refreshCookie.toString());
-
-            refreshTokenRepository.deleteToken(redisKey);
             refreshTokenRepository.saveToken(
                     redisKey, Math.toIntExact(
                             jwtProvider.getRefreshTokenExpiration()),

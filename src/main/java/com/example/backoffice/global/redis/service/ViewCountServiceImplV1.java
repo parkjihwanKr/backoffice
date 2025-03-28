@@ -70,6 +70,7 @@ public class ViewCountServiceImplV1 implements ViewCountServiceV1 {
                 .map(Long::parseLong)
                 .reduce(0L, Long::sum);
     }
+
     private Long parseLong(String currentCountToString){
         return currentCountToString != null ? Long.parseLong(currentCountToString) : 0L;
     }

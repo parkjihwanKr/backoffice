@@ -17,7 +17,7 @@ import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
 import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.date.DateTimeUtils;
-import com.example.backoffice.global.redis.repository.UpcomingAttendancesRepository;
+import com.example.backoffice.global.redis.service.UpcomingAttendancesServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -38,8 +38,8 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
     private final MembersServiceV1 membersService;
     private final NotificationsServiceV1 notificationsService;
     private final VacationsServiceV1 vacationsService;
+    private final UpcomingAttendancesServiceV1 upcomingAttendancesService;
     private final AttendancesRepository attendancesRepository;
-    private final UpcomingAttendancesRepository upcomingAttendancesRepository;
 
     @Override
     @Transactional
@@ -50,7 +50,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
         for (Members member : memberList) {
             // Redis에서 해당 멤버의 DateRange 데이터 가져오기
             DateRange cachedDateRange
-                    = upcomingAttendancesRepository.getValue(
+                    = upcomingAttendancesService.getValue(
                             member.getId(), DateRange.class);
 
             if (cachedDateRange != null && DateTimeUtils.isInDateRange(cachedDateRange)) {
@@ -320,12 +320,12 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             handleTodayAttendance(
                     foundMember, attendanceStatus, requestDto.getDescription());
             // 내일의 근태 기록 이후의 근태 기록 처리
-            upcomingAttendancesRepository.saveOne(
+            upcomingAttendancesService.save(
                     foundMember.getId(), new DateRange(startTime.plusDays(1L), endTime),
                     requestDto.getDescription());
         } else if ((DateTimeUtils.isAfterToday(startTime) && DateTimeUtils.isAfterToday(endTime))) {
             // 시작일이 내일이 아닌 경우
-            upcomingAttendancesRepository.saveOne(foundMember.getId(), dateRange,
+            upcomingAttendancesService.save(foundMember.getId(), dateRange,
                     requestDto.getDescription());
         }
 
@@ -444,7 +444,7 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
 
         // 2. Redis에서 모든 데이터 가져오기
         Map<String, String> redisData
-                = upcomingAttendancesRepository.getAllRawValues();
+                = upcomingAttendancesService.getAllRawValues();
         List<AttendancesResponseDto.ReadScheduledRecordDto> recordList = new ArrayList<>();
 
         int index = 0;
@@ -452,13 +452,14 @@ public class AttendancesServiceImplV1 implements AttendancesServiceV1{
             String key = entry.getKey();
             String rawValue = entry.getValue();
             // 2-1. Key에서 memberId와 description 추출
-            Long memberId = upcomingAttendancesRepository.extractMemberIdFromKey(key);
-            String description = upcomingAttendancesRepository.extractDescriptionFromKey(key);
+            Long memberId = upcomingAttendancesService.extractMemberIdFromKey(key);
+            String description = upcomingAttendancesService.extractDescriptionFromKey(key);
 
             if (memberId == null || description == null) continue;
 
             // 2-2. Value에서 DateRange 파싱
-            DateRange dateRange = upcomingAttendancesRepository.deserializeValue(rawValue, DateRange.class);
+            DateRange dateRange
+                    = upcomingAttendancesService.deserializeValue(rawValue, DateRange.class);
 
             Members member;
             if (department == null) {

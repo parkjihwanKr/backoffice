@@ -2,7 +2,9 @@ package com.example.backoffice.global.redis.repository;
 
 import com.example.backoffice.global.redis.utils.RedisProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -37,16 +39,15 @@ public class ViewCountRepository {
     // 해당 게시글의 조회수 총 합 가지고 오기
     public Set<String> getStringSetByBoardId(Long boardId) {
         String keyPattern = getBoardKeyPattern(boardId);
-        Set<String> keys = redisTemplateForViewCount.keys(keyPattern);
-
-        return keys == null ? Collections.emptySet() : keys;
+        return scanKeys(keyPattern, 1000);
     }
 
     public List<String> getViewCountsByKeys(Set<String> keys) {
-        return keys.stream()
-                .map(redisTemplateForViewCount.opsForValue()::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        if (keys.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> results = redisTemplateForViewCount.opsForValue().multiGet(keys);
+        return results != null ? results.stream().filter(Objects::nonNull).collect(Collectors.toList()) : Collections.emptyList();
     }
 
     public void deleteByBoardId(Long boardId) {
@@ -63,5 +64,24 @@ public class ViewCountRepository {
 
     private String getBoardKeyPattern(Long domainId){
         return RedisProvider.BOARD_ID_PREFIX+domainId+":*";
+    }
+
+    private Set<String> scanKeys(String pattern, int count) {
+        Set<String> keys = new HashSet<>();
+        ScanOptions options = ScanOptions.scanOptions()
+                .match(pattern)
+                .count(count) // 한 번에 조회할 개수 설정
+                .build();
+
+        try (Cursor<byte[]> cursor = redisTemplateForViewCount
+                .getConnectionFactory()
+                .getConnection()
+                .scan(options)) {
+
+            while (cursor.hasNext()) {
+                keys.add(new String(cursor.next())); // 키 저장
+            }
+        }
+        return keys;
     }
 }
