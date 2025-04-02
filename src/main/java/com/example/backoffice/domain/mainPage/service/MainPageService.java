@@ -13,8 +13,8 @@ import com.example.backoffice.domain.mainPage.dto.MainPageResponseDto;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
+import com.example.backoffice.global.redis.service.CacheMainPageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,33 +29,14 @@ public class MainPageService {
     private final EventsServiceV1 eventsService;
     private final VacationsServiceV1 vacationsService;
     private final AttendancesServiceV1 attendancesService;
+    private final CacheMainPageService cacheMainPageService;
 
-    @Cacheable(
-            key = "#loginMember.getId()",
-            cacheManager = "cacheManagerForCachedData",
-            value = "mainPage"
-    )
     @Transactional(readOnly = true)
-    public MainPageResponseDto read(Members loginMember){
-        // 멤버는 100명으로 고정
-        // 즐겨 찾기 1명당 10개의 즐겨찾기 보유 가능
-        // 전체 게시글 10-50개 정도 있다고 가정
-        // 부서 게시글 멤버당 3개~10개 정도 쓴다고 가정
-        // 부서당 일정표 1달에 1~5개 일정이 존재, 부서 7개 존재
-        // 개인 일정표(휴가) 1달에 1개~2개 있다고 가정
-        // 개인 근태표 멤버당 1년에 365개의 근태 기록 존재
-
+    public MainPageResponseDto.SummaryExceptBoardDto readSummaryExceptBoard(
+            Members loginMember){
         // 1. 개인 즐겨찾기
         List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList
                 = favoritesService.readSummary(loginMember);
-
-        // 2. 전체 게시판 ResponseDto
-        List<BoardsResponseDto.ReadSummaryOneDto> generalBoardDtoList
-                = boardsService.getGeneralBoardDtoList(loginMember);
-
-        // 3. 부서 게시판 ResponseDto
-        List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardDtoList
-                = boardsService.getDepartmentBoardDtoList(loginMember);
 
         // 4. 부서 일정표
         List<EventsResponseDto.ReadCompanySummaryOneDto> companyEventDtoList
@@ -69,9 +50,26 @@ public class MainPageService {
         List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceDtoList
                 = attendancesService.getPersonalAttendanceDtoList(loginMember);
 
-        return MainPageConverter.toMainPageResponseDto(
-                personalFavoritesDtoList, generalBoardDtoList,
-                departmentBoardDtoList, companyEventDtoList,
-                personalVacationDtoList, personalAttendanceDtoList);
+        MainPageResponseDto.SummaryExceptBoardDto
+                responseDto = MainPageConverter.toSummaryExceptBoardDto(
+                    personalFavoritesDtoList, companyEventDtoList,
+                    personalVacationDtoList, personalAttendanceDtoList);
+        // 7. 직접 캐시 레포지토리에 저장
+        cacheMainPageService.save(loginMember.getId(), responseDto);
+
+        return responseDto;
+    }
+
+    public MainPageResponseDto.SummarizedBoardDto readSummarizedBoard(Members loginMember){
+        // 2. 전체 게시판 ResponseDto
+        List<BoardsResponseDto.ReadSummarizedOneDto> generalBoardDtoList
+                = boardsService.getGeneralBoardDtoList(loginMember);
+
+        // 3. 부서 게시판 ResponseDto
+        List<BoardsResponseDto.ReadSummarizedOneDto> departmentBoardDtoList
+                = boardsService.getDepartmentBoardDtoList(loginMember);
+
+        return MainPageConverter.toSummaryBoardDto(
+                generalBoardDtoList, departmentBoardDtoList);
     }
 }

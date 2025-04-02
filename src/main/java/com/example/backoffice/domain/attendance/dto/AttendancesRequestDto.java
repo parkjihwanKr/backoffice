@@ -40,6 +40,7 @@ public class AttendancesRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateOneDto {
+        private Long memberId;
         private String memberName;
         private String attendanceStatus;
         private String startDate;

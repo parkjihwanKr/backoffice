@@ -9,7 +9,6 @@ import com.example.backoffice.domain.board.entity.Boards;
 import com.example.backoffice.domain.board.exception.BoardsCustomException;
 import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.service.BoardsServiceV1;
-import com.example.backoffice.domain.board.service.ViewCountServiceV1;
 import com.example.backoffice.domain.comment.entity.Comments;
 import com.example.backoffice.domain.file.service.FilesServiceV1;
 import com.example.backoffice.domain.member.converter.MembersConverter;
@@ -18,6 +17,7 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.reaction.dto.ReactionsResponseDto;
 import com.example.backoffice.domain.reaction.service.ReactionsServiceV1;
+import com.example.backoffice.global.redis.service.ViewCountServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +37,9 @@ import java.util.stream.Collectors;
 public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
 
     private final BoardsServiceV1 boardsService;
+    private final ViewCountServiceV1 viewCountService;
     private final ReactionsServiceV1 reactionsService;
     private final FilesServiceV1 filesService;
-    private final ViewCountServiceV1 viewCountService;
 
     @Override
     @Transactional(readOnly = true)
@@ -63,7 +64,6 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         Page<Boards> otherBoardPage
                 = boardsService.findByIsImportantFalseAndBoardTypeOrderByCreatedAtDesc(
                         pageable, BoardType.GENERAL);
-
         // 5. 중요한 게시글과 일반 게시글을 합칩니다.
         List<Boards> combinedBoards = new ArrayList<>(topImportantBoards);
         combinedBoards.addAll(remainingImportantBoards);  // 남은 중요한 게시글 추가
@@ -154,7 +154,7 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         Boards board = boardsService.findById(boardId);
         isMatchedBoardOwner(loginMember.getId(),board.getMember().getId());
         boardsService.deleteById(boardId);
-        viewCountService.deleteByBoardId(boardId);
+        viewCountService.deleteByBoardId(boardId, loginMember.getId());
     }
 
     @Override
@@ -371,5 +371,12 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         }
 
         return BoardsConverter.toUpdateOneDto(board, afterFileUrlList);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long readOneTotalViewCount(Long boardId, Members loginMember) {
+        boardsService.findById(boardId);
+        return viewCountService.clickTotalViewCountByBoardId(boardId);
     }
 }

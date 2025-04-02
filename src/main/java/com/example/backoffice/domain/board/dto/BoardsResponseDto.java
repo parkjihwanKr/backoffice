@@ -75,7 +75,7 @@ public class BoardsResponseDto {
     @NoArgsConstructor
     @Schema(name = "BoardsResponseDto.ReadSummaryOneDto",
             description = "요약된 게시글 한 개 조회 응답 DTO")
-    public static class ReadSummaryOneDto {
+    public static class ReadSummarizedOneDto {
         private Long boardId;
         private String title;
         private String author;

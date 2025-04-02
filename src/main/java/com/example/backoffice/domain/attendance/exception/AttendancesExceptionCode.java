@@ -56,6 +56,10 @@ public enum AttendancesExceptionCode {
     NOT_EXIST_ATTENDANCE_PAGE(
             HttpStatus.BAD_REQUEST, "ATTENDANCES-015",
             "해당하는 페이지에 근태 기록이 존재하지 않습니다."),
+
+    NOT_FOUND_ATTENDANCE_DESCRIPTION(
+            HttpStatus.BAD_REQUEST, "ATTENDANCES-016",
+            "외근 예정 기록은 설명이 필요합니다."),
     ;
 
     private final HttpStatus httpStatus;

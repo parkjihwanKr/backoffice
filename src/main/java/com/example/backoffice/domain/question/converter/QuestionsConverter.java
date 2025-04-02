@@ -65,7 +65,7 @@ public class QuestionsConverter {
                 .questionNumber(question.getNumber())
                 .questionText(question.getQuestionText())
                 .questionsType(question.getQuestionsType())
-                .multipleChoiceAnswerList(question.getMultipleChoiceAnswerList())
+                .multipleChoiceAnswerList(null)
                 .build();
     }
 
@@ -78,7 +78,7 @@ public class QuestionsConverter {
                 .updatedNumber(updatedNumber)
                 .questionText(questionText)
                 .questionsType(questionsType)
-                .multipleChoiceAnswerList(multipleChoiceAnswerList)
+                .multipleChoiceAnswerList(null)
                 .build();
     }
 

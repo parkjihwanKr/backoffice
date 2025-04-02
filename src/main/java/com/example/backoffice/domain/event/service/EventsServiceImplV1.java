@@ -64,7 +64,7 @@ public class EventsServiceImplV1 implements EventsServiceV1 {
             MemberDepartment department){
         List<Events> departmentEventList
                 = findAllByEventTypeAndDepartmentAndStartDateOrEndDateBetween(
-                        null, department,
+                        EventType.DEPARTMENT, department,
                 DateTimeUtils.getToday(), DateTimeUtils.getToday().plusDays(6));
 
         return EventsConverter.toReadCompanySummaryListDto(departmentEventList);

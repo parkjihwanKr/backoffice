@@ -57,16 +57,16 @@ public class VacationsController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "월별 휴가 신청 기간 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = VacationsResponseDto.UpdatePeriodDto.class))),
+                            schema = @Schema(implementation = VacationsResponseDto.ReadPeriodDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class))),
             @ApiResponse(responseCode = "403", description = "권한 없음",
                     content = @Content(mediaType = "application/json")),
     })
-    public ResponseEntity<VacationsResponseDto.UpdatePeriodDto> readUpcomingUpdateVacationPeriod(
+    public ResponseEntity<VacationsResponseDto.ReadPeriodDto> readUpcomingUpdateVacationPeriod(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        VacationsResponseDto.UpdatePeriodDto responseDto
+        VacationsResponseDto.ReadPeriodDto responseDto
                 = vacationsServiceFacade.readUpcomingUpdateVacationPeriod(
                         memberDetails.getMembers());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);

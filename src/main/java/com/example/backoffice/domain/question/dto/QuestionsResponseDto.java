@@ -1,6 +1,6 @@
 package com.example.backoffice.domain.question.dto;
 
-import com.example.backoffice.domain.answer.entity.Answers;
+import com.example.backoffice.domain.answer.dto.AnswerResponseDto;
 import com.example.backoffice.domain.question.entity.QuestionsType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -52,7 +52,7 @@ public class QuestionsResponseDto {
         private Long questionNumber;
         private String questionText;
         private QuestionsType questionsType;
-        private List<Answers> multipleChoiceAnswerList;
+        private List<AnswerResponseDto.ReadOneDto> multipleChoiceAnswerList;
     }
 
     @Getter
@@ -67,7 +67,7 @@ public class QuestionsResponseDto {
         private Long updatedNumber;
         private String questionText;
         private QuestionsType questionsType;
-        private List<Answers> multipleChoiceAnswerList;
+        private List<AnswerResponseDto.ReadOneDto> multipleChoiceAnswerList;
     }
 
     @Getter

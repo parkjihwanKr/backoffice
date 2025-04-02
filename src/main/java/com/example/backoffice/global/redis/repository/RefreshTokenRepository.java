@@ -1,4 +1,4 @@
-package com.example.backoffice.global.redis;
+package com.example.backoffice.global.redis.repository;
 
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;

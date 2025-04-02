@@ -9,6 +9,7 @@ import com.example.backoffice.domain.board.exception.BoardsExceptionCode;
 import com.example.backoffice.domain.board.repository.BoardsRepository;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.member.entity.Members;
+import com.example.backoffice.global.redis.service.ViewCountServiceV1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,7 +86,15 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BoardsResponseDto.ReadSummaryOneDto> getGeneralBoardDtoList(Members loginMember) {
+    public List<Boards> findTop3ByBoardTypeAndDepartmentOrderByCreatedAtDesc(
+            BoardType boardType, MemberDepartment department) {
+        return boardsRepository.findTop3ByBoardTypeAndDepartmentOrderByCreatedAtDesc(
+                boardType, department);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BoardsResponseDto.ReadSummarizedOneDto> getGeneralBoardDtoList(Members loginMember) {
         List<Boards> generalBoardList
                 = findThreeByCreatedAtDesc(BoardType.GENERAL);
         List<Long> generalBoardViewCountList = new ArrayList<>();
@@ -94,23 +103,24 @@ public class BoardsServiceImplV1 implements BoardsServiceV1 {
                     viewCountService.getTotalViewCountByBoardId(board.getId()));
         }
 
-        return BoardsConverter.toReadSummaryListDto(
+        return BoardsConverter.toReadSummarizedListDto(
                 generalBoardList, generalBoardViewCountList);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BoardsResponseDto.ReadSummaryOneDto> getDepartmentBoardDtoList(
+    public List<BoardsResponseDto.ReadSummarizedOneDto> getDepartmentBoardDtoList(
             Members loginMember) {
         List<Boards> departmentBoardList
-                = findThreeByCreatedAtDesc(BoardType.DEPARTMENT);
+                = findTop3ByBoardTypeAndDepartmentOrderByCreatedAtDesc(
+                        BoardType.DEPARTMENT, loginMember.getDepartment());
         List<Long> departmentBoardViewCountList = new ArrayList<>();
         for(Boards board : departmentBoardList){
             departmentBoardViewCountList.add(
                     viewCountService.getTotalViewCountByBoardId(board.getId()));
         }
 
-        return BoardsConverter.toReadSummaryListDto(
+        return BoardsConverter.toReadSummarizedListDto(
                 departmentBoardList, departmentBoardViewCountList);
     }
 }

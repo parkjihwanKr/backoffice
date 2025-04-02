@@ -4,10 +4,7 @@ import com.example.backoffice.domain.attendance.service.AttendancesServiceV1;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.vacation.entity.VacationPeriodProvider;
 import com.example.backoffice.global.date.DateTimeUtils;
-import com.example.backoffice.global.exception.GlobalExceptionCode;
-import com.example.backoffice.global.exception.JsonCustomException;
-import com.example.backoffice.global.redis.UpdateVacationPeriodRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.backoffice.global.redis.service.VacationPeriodServiceImplV1;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,7 +19,7 @@ public class MonthlyScheduler implements SchedulerTask{
     private final MembersServiceV1 membersService;
     private final AttendancesServiceV1 attendancesService;
     private final VacationPeriodProvider vacationPeriodProvider;
-    private final UpdateVacationPeriodRepository vacationPeriodRepository;
+    private final VacationPeriodServiceImplV1 vacationPeriodCacheService;
 
     @Override
     public void execute(){
@@ -56,16 +53,11 @@ public class MonthlyScheduler implements SchedulerTask{
         Long ttlMinutes
                 = DateTimeUtils.calculateMinutesFromTodayToEndDate(endOfDay);
         // 휴가 신청 기간을 VacationPeriod에 저장
-        vacationPeriodProvider.setVacationPeriod(secondMondayOfMonth, thirdFridayofMonth);
-        try {
-            vacationPeriodRepository.saveMonthlyVacationPeriod(
-                    vacationPeriodProvider.createKey(currentYear, currentMonth),
-                    Math.toIntExact(ttlMinutes),
-                    vacationPeriodProvider.createValues(
-                            secondMondayOfMonth.getDayOfMonth(), thirdFridayofMonth.getDayOfMonth()));
-        }catch (JsonProcessingException e) {
-            throw new JsonCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
-        }
+        vacationPeriodCacheService.save(
+                vacationPeriodProvider.createKey(currentYear, currentMonth),
+                Math.toIntExact(ttlMinutes),
+                vacationPeriodProvider.createValues(
+                        secondMondayOfMonth, thirdFridayofMonth));
     }
 
     private void deleteBeforeTwoYearAttendanceList(){

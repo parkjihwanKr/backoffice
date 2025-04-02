@@ -16,7 +16,12 @@ import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 import com.example.backoffice.domain.vacation.service.VacationsServiceV1;
+import com.example.backoffice.global.date.DateTimeUtils;
+import com.example.backoffice.global.redis.service.CacheMainPageService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,8 +29,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @RequiredArgsConstructor
@@ -35,8 +42,14 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
     private final FilesServiceV1 filesService;
     private final EventsServiceV1 eventsService;
     private final VacationsServiceV1 vacationsService;
+    private final CacheMainPageService cacheMainPageService;
 
     @Override
+    @CacheEvict(
+            key = "#loginMember.getId()",
+            cacheManager = "cacheManagerForMainPage",
+            value = "mainPage:summary:memberId"
+    )
     @Transactional
     public EventsResponseDto.CreateOneDepartmentTypeDto createOneDepartmentType(
             String department, Members loginMember,
@@ -125,7 +138,10 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
                 requestDto.getTitle(), requestDto.getDescription(),
                 event.getDepartment(), eventDateRangeDto.getDateRange().getStartDate(),
                 eventDateRangeDto.getDateRange().getEndDate(), EventType.DEPARTMENT);
-
+        List<Long> departmentMemberIdList
+                = membersService.findAllByDepartment(event.getDepartment()).stream()
+                .map(Members::getId).toList();
+        cacheMainPageService.evict(departmentMemberIdList);
         return EventsConverter.toUpdateOneForDepartmentEventDto(event);
     }
 
@@ -144,6 +160,11 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
             throw new EventsCustomException(EventsExceptionCode.NO_PERMISSION_TO_DELETE_EVENT);
         }
 
+        List<Long> departmentMemberIdList
+                = membersService.findAllByDepartment(event.getDepartment()).stream()
+                .map(Members::getId).toList();
+        cacheMainPageService.evict(departmentMemberIdList);
+
         // 이벤트 삭제
         eventsService.deleteById(eventId);
     }
@@ -157,16 +178,16 @@ public class EventsServiceFacadeImplV1 implements EventsServiceFacadeV1{
 
         // 해당하는 기간의 시작일과 종료일 계산
         LocalDateTime startDate
-                = LocalDateTime.of(
-                        year.intValue(), month.intValue(), 1, 0, 0);
+                = DateTimeUtils.of(year, month, 1L);
         YearMonth yearMonth
                 = YearMonth.of(year.intValue(), month.intValue());
         LocalDateTime endDate
-                = LocalDateTime.of(
-                        year.intValue(), month.intValue(),
-                yearMonth.lengthOfMonth(), 23, 59, 59);
+                = DateTimeUtils.of(
+                        year.intValue(), month.intValue(), yearMonth.lengthOfMonth(),
+                23, 59, 59);
 
-        List<EventsResponseDto.ReadOnePersonalScheduleDto> responseDtoList = new ArrayList<>();
+        List<EventsResponseDto.ReadOnePersonalScheduleDto> responseDtoList
+                = new ArrayList<>();
 
         // 해당 부서의 모든 일정 조회
         List<Events> departmentEventList

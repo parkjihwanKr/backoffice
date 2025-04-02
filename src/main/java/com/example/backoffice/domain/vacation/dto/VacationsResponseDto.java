@@ -2,6 +2,8 @@ package com.example.backoffice.domain.vacation.dto;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
 import com.example.backoffice.domain.vacation.entity.VacationType;
+import com.example.backoffice.global.redis.deserializer.VacationPeriodDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +19,20 @@ public class VacationsResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Schema(name = "VacationsResponseDto.UpdatePeriodDto",
-            description = "휴가 신청 기간 응답 DTO")
+            description = "휴가 신청 기간 수정 응답 DTO")
     public static class UpdatePeriodDto {
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @JsonDeserialize(using = VacationPeriodDeserializer.class)
+    @Schema(name = "VacationsResponseDto.ReadPeriodDto",
+            description = "휴가 신청 기간 조회 응답 DTO")
+    public static class ReadPeriodDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
     }

@@ -304,4 +304,14 @@ public class BoardsController {
                 .body(new CommonResponse<>(
                         200, "부서 게시글 잠금 상태 변경 성공", null));
     }
+
+    @GetMapping("/boards/{boardId}/view-count")
+    public ResponseEntity<Long> readTotalViewCount(
+            @PathVariable long boardId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        Long viewCount
+                = boardsServiceFacade.readOneTotalViewCount(
+                        boardId, memberDetails.getMembers());
+        return ResponseEntity.status(HttpStatus.OK).body(viewCount);
+    }
 }

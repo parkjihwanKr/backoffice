@@ -131,4 +131,11 @@ public interface BoardsServiceFacadeV1 {
      * @param loginMember 요청을 수행한 로그인 사용자
      */
     void updateOneForMarkAsLocked(Long boardId, Members loginMember);
+
+    /**
+     * 게시글 총 조회 수 조회
+     * @param boardId 조회할 게시글 아이디
+     * @param loginMember 요청을 수행한 로그인 사용자
+     */
+    Long readOneTotalViewCount(Long boardId, Members loginMember);
 }

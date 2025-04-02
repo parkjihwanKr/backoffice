@@ -4,7 +4,8 @@ import com.example.backoffice.domain.member.entity.MemberRole;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JwtCustomException;
 import com.example.backoffice.global.jwt.dto.TokenDto;
-import com.example.backoffice.global.redis.RefreshTokenRepository;
+import com.example.backoffice.global.redis.repository.RefreshTokenRepository;
+import com.example.backoffice.global.redis.utils.RedisProvider;
 import com.example.backoffice.global.security.MemberDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -193,7 +194,7 @@ public class JwtProvider {
         // ExpiredJwtException
         String memberName = getUsernameFromToken(refreshTokenValue);
 
-        String redisKey = REFRESH_TOKEN_HEADER+" : "+memberName;
+        String redisKey = RedisProvider.REFRESH_TOKEN_PREFIX +memberName;
         String redisValue = tokenRedisProvider.getRefreshTokenValue(redisKey);
 
         if (refreshToken == null || redisValue == null){

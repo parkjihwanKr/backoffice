@@ -4,7 +4,7 @@ import com.example.backoffice.global.exception.AuthenticationCustomException;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.jwt.CookieUtil;
 import com.example.backoffice.global.jwt.JwtProvider;
-import com.example.backoffice.global.redis.RefreshTokenRepository;
+import com.example.backoffice.global.redis.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

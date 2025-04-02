@@ -1,9 +1,10 @@
-package com.example.backoffice.global.redis;
+package com.example.backoffice.global.redis.repository;
 
 import com.example.backoffice.global.common.DateRange;
 import com.example.backoffice.global.date.DateTimeUtils;
 import com.example.backoffice.global.exception.GlobalExceptionCode;
 import com.example.backoffice.global.exception.JsonCustomException;
+import com.example.backoffice.global.redis.utils.RedisProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,36 +19,35 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class UpcomingAttendancesRepository {
-    // database 2 : cachedMemberAttendance
     private final ObjectMapper objectMapper;
 
-    @Qualifier("redisTemplateForUpcomingAttendance")
-    private final RedisTemplate<String, Object> redisTemplateForUpcomingAttendance;
+    @Qualifier("redisTemplateForCacheData")
+    private final RedisTemplate<String, Object> redisTemplateForCacheData;
 
     // Long, DateRange
     public UpcomingAttendancesRepository(
             ObjectMapper objectMapper,
-            @Qualifier("redisTemplateForUpcomingAttendance") RedisTemplate<String, Object> redisTemplateForUpcomingAttendance) {
+            @Qualifier("redisTemplateForCacheData") RedisTemplate<String, Object> redisTemplateForCacheData) {
         this.objectMapper = objectMapper;
-        this.redisTemplateForUpcomingAttendance = redisTemplateForUpcomingAttendance;
+        this.redisTemplateForCacheData = redisTemplateForCacheData;
     }
 
     public <T> void saveOne(Long memberId, DateRange value, String description) {
-        String key = RedisProvider.MEMBER_ID_PREFIX + memberId + ", "+description;
+        String key = RedisProvider.MEMBER_ID_PREFIX + memberId + "::"+description;
         String valueString = serializeValue(value);
 
         Long ttl = DateTimeUtils.calculateMinutesFromTodayToEndDate(value.getEndDate());
-        redisTemplateForUpcomingAttendance.opsForValue().set(key, valueString, ttl, TimeUnit.MINUTES);
+        redisTemplateForCacheData.opsForValue().set(key, valueString, ttl, TimeUnit.MINUTES);
     }
 
     public String getRawValue(String key) {
-        return (String) redisTemplateForUpcomingAttendance.opsForValue().get(key);
+        return (String) redisTemplateForCacheData.opsForValue().get(key);
     }
 
     // 키에 해당하는 value 조회
     public <T> T getValue(Long memberId, Class<T> valueType) {
-        String key = RedisProvider.MEMBER_ID_PREFIX + memberId;
-        String value = (String) redisTemplateForUpcomingAttendance.opsForValue().get(key);
+        String key = RedisProvider.MEMBER_ID_PREFIX + memberId + "::";
+        String value = (String) redisTemplateForCacheData.opsForValue().get(key);
 
         if (Objects.isNull(value)) {
             return null; // 키가 없을 경우 null 반환
@@ -61,8 +61,8 @@ public class UpcomingAttendancesRepository {
     }
 
     public Map<String, String> getAllRawValues() {
-        Set<String> keys = redisTemplateForUpcomingAttendance.keys(
-                RedisProvider.MEMBER_ID_PREFIX + "*");
+        Set<String> keys = redisTemplateForCacheData.keys(
+                RedisProvider.MEMBER_ID_PREFIX+"*::*");
         Map<String, String> allValues = new HashMap<>();
 
         if (keys != null) {
@@ -77,13 +77,13 @@ public class UpcomingAttendancesRepository {
 
     // 토큰 삭제
     public void delete(String key) {
-        redisTemplateForUpcomingAttendance.delete(key);
+        redisTemplateForCacheData.delete(key);
     }
 
     // Key에서 memberId 추출
     public Long extractMemberIdFromKey(String key) {
         try {
-            String memberIdPart = key.split(",")[0].split(":")[1].trim();
+            String memberIdPart = key.split("::")[0].split(":")[1].trim();
             return Long.valueOf(memberIdPart);
         } catch (Exception e) {
             return null;
@@ -93,9 +93,9 @@ public class UpcomingAttendancesRepository {
     // Key에서 description 추출
     public String extractDescriptionFromKey(String key) {
         try {
-            return key.split(",")[1].trim();
+            return key.split("::")[1].trim();
         } catch (Exception e) {
-            return null;
+            throw new JsonCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
         }
     }
 

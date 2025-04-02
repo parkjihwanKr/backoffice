@@ -10,6 +10,7 @@ import com.example.backoffice.domain.favorite.repository.FavoritesRepository;
 import com.example.backoffice.domain.member.entity.Members;
 import com.example.backoffice.domain.member.service.MembersServiceV1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,17 +24,22 @@ public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
     private final FavoritesRepository favoritesRepository;
 
     @Override
+    @CacheEvict(
+            key = "#loginMember.getId()",
+            cacheManager = "cacheManagerForMainPage",
+            value = "mainPage:summary:memberId"
+    )
     @Transactional
     public FavoritesResponseDto.CreateOneDto createOne(
-            Members loginMembers, FavoritesRequestDto.CreateOneDto requestDto){
+            Members loginMember, FavoritesRequestDto.CreateOneDto requestDto){
 
-        if(favoritesRepository.findByMemberId(loginMembers.getId()).size() >= 11){
+        if(favoritesRepository.findByMemberId(loginMember.getId()).size() >= 11){
             throw new FavoritesCustomException(FavoritesExceptionCode.NOT_EXCEED);
         }
 
         Favorites favorites
                 = FavoritesConverter.toEntity(
-                        loginMembers, requestDto.getUrl(), requestDto.getDescription());
+                        loginMember, requestDto.getUrl(), requestDto.getDescription());
         favoritesRepository.save(favorites);
         return FavoritesConverter.toCreateOneDto(favorites);
     }
@@ -58,6 +64,11 @@ public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
     }
 
     @Override
+    @CacheEvict(
+            key = "#loginMember.getId()",
+            cacheManager = "cacheManagerForMainPage",
+            value = "mainPage:summary:memberId"
+    )
     @Transactional
     public FavoritesResponseDto.UpdateOneDto updateOne(
             Long favoritesId, FavoritesRequestDto.UpdateOneDto requestDto,
@@ -79,6 +90,11 @@ public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
     }
 
     @Override
+    @CacheEvict(
+            key = "#loginMember.getId()",
+            cacheManager = "cacheManagerForMainPage",
+            value = "mainPage:summary:memberId"
+    )
     @Transactional
     public void deleteOne(Long favoritesId, Members loginMember){
         Favorites favorites = findById(favoritesId);

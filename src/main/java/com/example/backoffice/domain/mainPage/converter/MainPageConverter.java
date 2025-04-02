@@ -11,18 +11,40 @@ import java.util.List;
 
 public class MainPageConverter {
 
-    public static MainPageResponseDto toMainPageResponseDto(
+    public static MainPageResponseDto.ReadOneDto toMainPageResponseDto(
             List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList,
-            List<BoardsResponseDto.ReadSummaryOneDto> generalBoardList,
-            List<BoardsResponseDto.ReadSummaryOneDto> departmentBoardList,
+            List<BoardsResponseDto.ReadSummarizedOneDto> generalBoardList,
+            List<BoardsResponseDto.ReadSummarizedOneDto> departmentBoardList,
             List<EventsResponseDto.ReadCompanySummaryOneDto> companyEventList,
             List<VacationsResponseDto.ReadSummaryOneDto> personalVacationList,
             List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceList){
-        return MainPageResponseDto.builder()
+        return MainPageResponseDto.ReadOneDto.builder()
                 .personalFavoritesDtoList(personalFavoritesDtoList)
                 .generalBoardDtoList(generalBoardList)
                 .departmentBoardDtoList(departmentBoardList)
-                .comapnyEventDtoList(companyEventList)
+                .companyEventDtoList(companyEventList)
+                .personalVacationDtoList(personalVacationList)
+                .personalAttendanceDtoList(personalAttendanceList)
+                .build();
+    }
+
+    public static MainPageResponseDto.SummarizedBoardDto toSummaryBoardDto(
+            List<BoardsResponseDto.ReadSummarizedOneDto> generalBoardList,
+            List<BoardsResponseDto.ReadSummarizedOneDto> departmentBoardList){
+        return MainPageResponseDto.SummarizedBoardDto.builder()
+                .generalBoardDtoList(generalBoardList)
+                .departmentBoardDtoList(departmentBoardList)
+                .build();
+    }
+
+    public static MainPageResponseDto.SummaryExceptBoardDto toSummaryExceptBoardDto(
+            List<FavoritesResponseDto.ReadSummaryOneDto> personalFavoritesDtoList,
+            List<EventsResponseDto.ReadCompanySummaryOneDto> companyEventDtoList,
+            List<VacationsResponseDto.ReadSummaryOneDto> personalVacationList,
+            List<AttendancesResponseDto.ReadSummaryOneDto> personalAttendanceList){
+        return MainPageResponseDto.SummaryExceptBoardDto.builder()
+                .personalFavoritesDtoList(personalFavoritesDtoList)
+                .companyEventDtoList(companyEventDtoList)
                 .personalVacationDtoList(personalVacationList)
                 .personalAttendanceDtoList(personalAttendanceList)
                 .build();

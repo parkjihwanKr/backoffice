@@ -1,9 +1,5 @@
 package com.example.backoffice.domain.member.entity;
 
-import com.example.backoffice.domain.attendance.entity.Attendances;
-import com.example.backoffice.domain.event.entity.Events;
-import com.example.backoffice.domain.favorite.entity.Favorites;
-import com.example.backoffice.domain.memberEvaluation.entity.MembersEvaluations;
 import com.example.backoffice.global.common.CommonEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -14,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -98,22 +92,6 @@ public class Members extends CommonEntity {
 
     // 휴가 상태
     private Boolean onVacation;
-
-    // relations
-    /*@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reactions> reactionList;*/
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Events> eventList;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Favorites> favoritieList;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MembersEvaluations> membersEvaluations;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attendances> attendanceList;
 
     // entity method
     public void updateMemberInfo(
