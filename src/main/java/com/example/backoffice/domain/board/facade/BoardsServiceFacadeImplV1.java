@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,7 +64,6 @@ public class BoardsServiceFacadeImplV1 implements BoardsServiceFacadeV1{
         Page<Boards> otherBoardPage
                 = boardsService.findByIsImportantFalseAndBoardTypeOrderByCreatedAtDesc(
                         pageable, BoardType.GENERAL);
-
         // 5. 중요한 게시글과 일반 게시글을 합칩니다.
         List<Boards> combinedBoards = new ArrayList<>(topImportantBoards);
         combinedBoards.addAll(remainingImportantBoards);  // 남은 중요한 게시글 추가

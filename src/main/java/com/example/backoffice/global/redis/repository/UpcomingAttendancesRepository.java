@@ -33,7 +33,7 @@ public class UpcomingAttendancesRepository {
     }
 
     public <T> void saveOne(Long memberId, DateRange value, String description) {
-        String key = RedisProvider.MEMBER_ID_PREFIX + memberId + ", "+description;
+        String key = RedisProvider.MEMBER_ID_PREFIX + memberId + "::"+description;
         String valueString = serializeValue(value);
 
         Long ttl = DateTimeUtils.calculateMinutesFromTodayToEndDate(value.getEndDate());
@@ -46,7 +46,7 @@ public class UpcomingAttendancesRepository {
 
     // 키에 해당하는 value 조회
     public <T> T getValue(Long memberId, Class<T> valueType) {
-        String key = RedisProvider.MEMBER_ID_PREFIX + memberId;
+        String key = RedisProvider.MEMBER_ID_PREFIX + memberId + "::";
         String value = (String) redisTemplateForCacheData.opsForValue().get(key);
 
         if (Objects.isNull(value)) {
@@ -62,7 +62,7 @@ public class UpcomingAttendancesRepository {
 
     public Map<String, String> getAllRawValues() {
         Set<String> keys = redisTemplateForCacheData.keys(
-                RedisProvider.MEMBER_ID_PREFIX + "*");
+                RedisProvider.MEMBER_ID_PREFIX+"*::*");
         Map<String, String> allValues = new HashMap<>();
 
         if (keys != null) {
@@ -83,7 +83,7 @@ public class UpcomingAttendancesRepository {
     // Key에서 memberId 추출
     public Long extractMemberIdFromKey(String key) {
         try {
-            String memberIdPart = key.split(",")[0].split(":")[1].trim();
+            String memberIdPart = key.split("::")[0].split(":")[1].trim();
             return Long.valueOf(memberIdPart);
         } catch (Exception e) {
             return null;
@@ -93,9 +93,9 @@ public class UpcomingAttendancesRepository {
     // Key에서 description 추출
     public String extractDescriptionFromKey(String key) {
         try {
-            return key.split(",")[1].trim();
+            return key.split("::")[1].trim();
         } catch (Exception e) {
-            return null;
+            throw new JsonCustomException(GlobalExceptionCode.NOT_DESERIALIZED_JSON);
         }
     }
 
