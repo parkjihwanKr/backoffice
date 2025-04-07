@@ -2,6 +2,7 @@ package com.example.backoffice.domain.vacation.repository;
 
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.Vacations;
 
 import java.time.LocalDateTime;
@@ -90,6 +91,6 @@ public interface VacationsQuery {
      * @param endDate : 마지막 일
      * @return : 생성일자를 내림차순하여 시작일과 마지막일을 필터링한 멤버의 휴가 리스트
      */
-    List<Vacations> findVacationsBetweenOrderByCreatedAtDesc(
+    List<VacationsResponseDto.ReadSummaryOneDto> findFilteredVacations(
             Long memberId, LocalDateTime startDate, LocalDateTime endDate);
 }

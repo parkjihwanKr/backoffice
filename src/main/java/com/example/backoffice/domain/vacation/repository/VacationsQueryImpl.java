@@ -1,8 +1,10 @@
 package com.example.backoffice.domain.vacation.repository;
 
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.example.backoffice.domain.vacation.dto.VacationsResponseDto;
 import com.example.backoffice.domain.vacation.entity.QVacations;
 import com.example.backoffice.domain.vacation.entity.Vacations;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -142,10 +144,22 @@ public class VacationsQueryImpl extends QuerydslRepositorySupport implements Vac
     }
 
     @Override
-    public List<Vacations> findVacationsBetweenOrderByCreatedAtDesc(
+    public List<VacationsResponseDto.ReadSummaryOneDto> findFilteredVacations(
             Long memberId, LocalDateTime startDate, LocalDateTime endDate) {
         return jpaQueryFactory
-                .selectFrom(qVacations)
+                .select(Projections.constructor(
+                        VacationsResponseDto.ReadSummaryOneDto.class,
+                        qVacations.id,
+                        // 조인 연산을 발생 시킴 -> optimizer로 인하여 index 조회를 하기에
+                        // 연산 비용이 크지 않아 그대로 냅둠.
+                        qVacations.onVacationMember.memberName,
+                        qVacations.vacationType,
+                        qVacations.isAccepted,
+                        qVacations.startDate,
+                        qVacations.endDate,
+                        qVacations.urgentReason)
+                )
+                .from(qVacations)
                 .where(
                         qVacations.onVacationMember.id.eq(memberId),
                         vacationDateOverlap(startDate, endDate))

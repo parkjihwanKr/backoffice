@@ -100,10 +100,7 @@ public class VacationsServiceImplV1 implements VacationsServiceV1 {
     @Transactional(readOnly = true)
     public List<VacationsResponseDto.ReadSummaryOneDto> getPersonalVacationDtoList(
             Long memberId) {
-        List<Vacations> vacationList
-                = vacationsRepository.findVacationsBetweenOrderByCreatedAtDesc(
-                        memberId, DateTimeUtils.getToday(), DateTimeUtils.getToday().plusDays(6));
-
-        return VacationsConverter.toReadSummaryDtoList(vacationList);
+        return vacationsRepository.findFilteredVacations(
+                memberId, DateTimeUtils.getToday(), DateTimeUtils.getToday().plusDays(6));
     }
 }

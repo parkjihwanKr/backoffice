@@ -26,8 +26,9 @@ public class VacationPeriodRepository {
 
     public <T> void save(String key, Integer minutes, T value) {
         try {
-            redisTemplateForCacheData.opsForValue().set(key, value);
-            redisTemplateForCacheData.expire(key, minutes, TimeUnit.MINUTES);
+            redisTemplateForCacheData
+                    .opsForValue()
+                    .set(key, value, minutes, TimeUnit.MINUTES);
         } catch (Exception e) {
             throw new JsonCustomException(GlobalExceptionCode.NOT_SERIALIZED_JSON);
         }

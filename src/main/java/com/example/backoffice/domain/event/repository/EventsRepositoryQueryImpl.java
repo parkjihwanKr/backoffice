@@ -1,9 +1,11 @@
 package com.example.backoffice.domain.event.repository;
 
+import com.example.backoffice.domain.event.dto.EventsResponseDto;
 import com.example.backoffice.domain.event.entity.EventType;
 import com.example.backoffice.domain.event.entity.Events;
 import com.example.backoffice.domain.event.entity.QEvents;
 import com.example.backoffice.domain.member.entity.MemberDepartment;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -40,6 +42,28 @@ public class EventsRepositoryQueryImpl extends QuerydslRepositorySupport impleme
             LocalDateTime start, LocalDateTime end) {
         return jpaQueryFactory
                 .selectFrom(qEvents)
+                .where(
+                        eventTypeEq(eventType), // EventType 필터링
+                        departmentEq(department), // 부서 필터링
+                        qEvents.startDate.loe(end),  // 시작일이 endDate보다 작거나 같음
+                        qEvents.endDate.goe(start)   // 종료일이 startDate보다 크거나 같음확인
+                ).fetch();
+    }
+
+    @Override
+    public List<EventsResponseDto.ReadCompanySummaryOneDto> findFilteredForMainPage(
+            EventType eventType, MemberDepartment department,
+            LocalDateTime start, LocalDateTime end) {
+        return jpaQueryFactory
+                .select(Projections.constructor(
+                        EventsResponseDto.ReadCompanySummaryOneDto.class,
+                        qEvents.id,
+                        qEvents.title,
+                        qEvents.eventType,
+                        qEvents.startDate,
+                        qEvents.endDate,
+                        qEvents.department))
+                .from(qEvents)
                 .where(
                         eventTypeEq(eventType), // EventType 필터링
                         departmentEq(department), // 부서 필터링
