@@ -28,7 +28,6 @@ public class FavoritesController {
 
     private final FavoritesServiceV1 favoritesService;
 
-    // 즐겨찾기 생성
     @PostMapping("/favorites")
     @Operation(summary = "즐겨 찾기 하나 생성",
             description = "로그인한 사용자가 해당 URL에 대한 즐겨찾기를 생성할 수 있다.")
@@ -50,7 +49,6 @@ public class FavoritesController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 즐겨찾기 1개 조회
     @GetMapping("/favorites/{favoriteId}")
     @Operation(summary = "즐겨 찾기 하나 조회",
             description = "로그인한 사용자가 자신의 즐겨찾기 하나를 조회할 수 있다.")
@@ -72,7 +70,6 @@ public class FavoritesController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 즐겨찾기 모두 조회
     @GetMapping("/favorites")
     @Operation(summary = "즐겨 찾기 리스트 조회",
             description = "로그인한 사용자가 자신의 즐겨찾기 리스트를 조회할 수 있다.")
@@ -117,7 +114,6 @@ public class FavoritesController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 즐겨찾기 삭제
     @DeleteMapping("/favorites/{favoritesId}")
     @Operation(summary = "즐겨 찾기 하나 삭제",
             description = "로그인한 사용자가 자신의 즐겨찾기 하나를 삭제할 수 있다.")
