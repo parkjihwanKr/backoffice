@@ -38,5 +38,3 @@ networks:
 volumes:
   redis_data:
   mongodb_data:
-
-#docker-compose.yml 누락되어서 서버에 올라간 에러 해결
