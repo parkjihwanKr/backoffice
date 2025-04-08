@@ -35,7 +35,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     // 타당성 검사 추가
     @Override
-    @Transactional
     public MembersResponseDto.CreateOneDto createOneForSignup(
             MembersRequestDto.CreateOneDto requestDto){
 
@@ -51,7 +50,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public MembersResponseDto.ReadAvailableMemberNameDto checkAvailableMemberName(
             String requestedMemberName){
         membersService.checkAvailableMemberName(requestedMemberName);
@@ -61,7 +59,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public MembersResponseDto.ReadOneDetailsDto readOne(
             Long memberId, Members loginMember){
         // 1. 멤버가 자기 자신인 경우
@@ -75,7 +72,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Transactional
     public Page<MembersResponseDto.ReadOneSummaryDto> readByAdmin(
             String department, String position,
             Members loginMember, Pageable pageable) {
@@ -113,7 +109,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
 
     @Override
-    @Transactional
     public MembersResponseDto.UpdateOneDto updateOne(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneDto requestDto){
@@ -154,7 +149,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Transactional
     public MembersResponseDto.UpdateOneForAttributeDto updateOneForAttributeByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForAttributeDto requestDto,
@@ -205,7 +199,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Transactional
     public MembersResponseDto.UpdateOneForSalaryDto updateOneForSalaryByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForSalaryDto requestDto){
@@ -245,7 +238,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     // 프로필 이미지 업로드
     @Override
-    @Transactional
     public MembersResponseDto.UpdateOneForProfileImageDto updateOneForProfileImage(
             Long memberId, Members loginMember, MultipartFile image){
         Members updatedMember
@@ -260,7 +252,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
 
     // 프로필 이미지 삭제
     @Override
-    @Transactional
     public MembersResponseDto.DeleteOneForProfileImageDto deleteOneForProfileImage(
             Long memberId, Members loginMember){
         Members existMember = membersService.matchLoginMember(loginMember, memberId);
@@ -276,14 +267,12 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Transactional
     public void deleteOneByAdmin(Long memberId, Members loginMember){
         membersService.findHRManagerOrCEO(loginMember);
         membersService.deleteById(memberId);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public MembersResponseDto.ReadOneForVacationListDto readOneForVacationList(
             Long memberId, Members loginMember){
         membersService.matchLoginMember(loginMember, memberId);
@@ -296,7 +285,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Transactional
     public MembersResponseDto.UpdateOneForVacationDto updateMemberVacationByAdmin(
             Long memberId, Members loginMember,
             MembersRequestDto.UpdateOneForVacationDto requestDto){
@@ -327,7 +315,6 @@ public class MembersServiceFacadeImplV1 implements MembersServiceFacadeV1 {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<MembersResponseDto.ReadNameDto> readNameList(Members loginMember) {
         membersService.hasAdminAccess(loginMember.getRole());
         List<Members> memberList = membersService.findAll();
