@@ -1,3 +1,4 @@
+# java slim 버전
 FROM openjdk:17-jdk-slim
 VOLUME /tmp
 ARG JAR_FILE=build/libs/*.jar

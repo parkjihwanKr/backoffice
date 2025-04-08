@@ -39,4 +39,6 @@ out/
 
 ### docker enviorment variable settings
 .env
+
+## application.yml
 application.yml
