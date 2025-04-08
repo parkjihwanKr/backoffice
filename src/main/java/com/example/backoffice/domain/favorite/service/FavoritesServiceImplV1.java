@@ -117,10 +117,10 @@ public class FavoritesServiceImplV1 implements FavoritesServiceV1 {
     @Transactional
     public List<FavoritesResponseDto.ReadSummaryOneDto> readSummary(
             Members loginMember) {
-        membersService.findById(loginMember.getId());
+        Long loginMemberId = loginMember.getId();
+        membersService.findById(loginMemberId);
         List<Favorites> favoritesList
-                = favoritesRepository.findByMemberId(loginMember.getId());
-
+                = favoritesRepository.findByMemberId(loginMemberId);
         return FavoritesConverter.toReadSummaryListDto(favoritesList);
     }
 }
